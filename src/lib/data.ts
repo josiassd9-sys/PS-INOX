@@ -39,6 +39,74 @@ export type Category = {
   unit: 'm' | 'm²' | 'un';
 };
 
+const INCH_TO_MM = 25.4;
+
+const chapasGroup1: {thickness: number, desc: string}[] = [
+    { thickness: 0.4, desc: '0.40mm' },
+    { thickness: 0.5, desc: '0.50mm' },
+    { thickness: 0.6, desc: '0.60mm' },
+    { thickness: 0.8, desc: '0.80mm' },
+    { thickness: 1.0, desc: '1.00mm' },
+    { thickness: 1.2, desc: '1.20mm' },
+];
+
+const chapasGroup2: {thickness: number, desc: string}[] = [
+    { thickness: 1.5, desc: '1.50mm' },
+    { thickness: 2.0, desc: '2.00mm' },
+    { thickness: 2.5, desc: '2.50mm' },
+    { thickness: 3.0, desc: '3.00mm' },
+    { thickness: 3.5, desc: '3.50mm' },
+    { thickness: 4.0, desc: '4.00mm' },
+    { thickness: 3/16 * INCH_TO_MM, desc: '3/16" (4.76mm)' },
+    { thickness: 5.0, desc: '5.00mm' },
+    { thickness: 6.0, desc: '6.00mm' },
+    { thickness: 1/4 * INCH_TO_MM, desc: '1/4" (6.35mm)' },
+    { thickness: 5/16 * INCH_TO_MM, desc: '5/16" (7.94mm)' },
+    { thickness: 3/8 * INCH_TO_MM, desc: '3/8" (9.52mm)' },
+    { thickness: 10.0, desc: '10.00mm' },
+    { thickness: 12.0, desc: '12.00mm' },
+    { thickness: 1/2 * INCH_TO_MM, desc: '1/2" (12.70mm)' },
+    { thickness: 5/8 * INCH_TO_MM, desc: '5/8" (15.88mm)' },
+    { thickness: 3/4 * INCH_TO_MM, desc: '3/4" (19.05mm)' },
+    { thickness: 7/8 * INCH_TO_MM, desc: '7/8" (22.22mm)' },
+    { thickness: 1 * INCH_TO_MM, desc: '1" (25.40mm)' },
+];
+
+const dimensionsGroup1 = [
+    { w: 1.25, h: 2.0, desc: '1250x2000mm' },
+    { w: 1.25, h: 3.0, desc: '1250x3000mm' },
+];
+
+const dimensionsGroup2 = [
+    { w: 1.25, h: 2.0, desc: '1250x2000mm' },
+    { w: 1.25, h: 3.0, desc: '1250x3000mm' },
+    { w: 1.54, h: 2.0, desc: '1540x2000mm' },
+    { w: 1.54, h: 3.0, desc: '1540x3000mm' },
+];
+
+const generateChapas = (): SteelItem[] => {
+    const items: SteelItem[] = [];
+    chapasGroup1.forEach(chapa => {
+        dimensionsGroup1.forEach(dim => {
+            items.push({
+                id: `chapa-${chapa.thickness}-${dim.w}x${dim.h}`,
+                description: `Chapa Inox ${chapa.desc} (${dim.desc})`,
+                weight: chapa.thickness * SHEET_WEIGHT_CONSTANT * dim.w * dim.h,
+            });
+        });
+    });
+    chapasGroup2.forEach(chapa => {
+        dimensionsGroup2.forEach(dim => {
+            items.push({
+                id: `chapa-${chapa.thickness}-${dim.w}x${dim.h}`,
+                description: `Chapa Inox ${chapa.desc} (${dim.desc})`,
+                weight: chapa.thickness * SHEET_WEIGHT_CONSTANT * dim.w * dim.h,
+            });
+        });
+    });
+    return items;
+};
+
 export const CATEGORIES: Category[] = [
   {
     id: 'tubos-od',
@@ -104,16 +172,7 @@ export const CATEGORIES: Category[] = [
     name: 'Chapas',
     icon: 'Square',
     unit: 'un',
-    items: [
-        { id: 'c-0.5-1000x2000', description: 'Chapa Inox 0.50mm (1000x2000mm)', weight: 0.5 * SHEET_WEIGHT_CONSTANT * (1.0 * 2.0) },
-        { id: 'c-0.5-1250x2500', description: 'Chapa Inox 0.50mm (1250x2500mm)', weight: 0.5 * SHEET_WEIGHT_CONSTANT * (1.25 * 2.5) },
-        { id: 'c-1.0-1000x2000', description: 'Chapa Inox 1.00mm (1000x2000mm)', weight: 1.0 * SHEET_WEIGHT_CONSTANT * (1.0 * 2.0) },
-        { id: 'c-1.0-1250x2500', description: 'Chapa Inox 1.00mm (1250x2500mm)', weight: 1.0 * SHEET_WEIGHT_CONSTANT * (1.25 * 2.5) },
-        { id: 'c-1.5-1000x2000', description: 'Chapa Inox 1.50mm (1000x2000mm)', weight: 1.5 * SHEET_WEIGHT_CONSTANT * (1.0 * 2.0) },
-        { id: 'c-1.5-1250x2500', description: 'Chapa Inox 1.50mm (1250x2500mm)', weight: 1.5 * SHEET_WEIGHT_CONSTANT * (1.25 * 2.5) },
-        { id: 'c-2.0-1000x2000', description: 'Chapa Inox 2.00mm (1000x2000mm)', weight: 2.0 * SHEET_WEIGHT_CONSTANT * (1.0 * 2.0) },
-        { id: 'c-2.0-1250x2500', description: 'Chapa Inox 2.00mm (1250x2500mm)', weight: 2.0 * SHEET_WEIGHT_CONSTANT * (1.25 * 2.5) },
-    ],
+    items: generateChapas(),
   },
   {
     id: 'barras-redondas',

@@ -1,29 +1,33 @@
+
 // Calculation constants for stainless steel
 const STAINLESS_STEEL_DENSITY_KG_M3 = 8000;
+const INCH_TO_MM = 25.4;
+
 // For tubes: Weight(kg/m) = (OD_mm - WT_mm) * WT_mm * (PI * DENSITY / 1000000)
-// The previous constant 0.02466 was based on a different density and formula. 
-// Correct formula for tubes is (OD - WT) * WT * PI * density / 1000. Let's use a simplified constant.
-// Using density 8000 kg/m^3: (OD-WT)*WT * 3.14159 * 8000 / 1000000 = (OD-WT)*WT*0.025132
-// Let's stick to the derived constant for consistency in calculations.
 const TUBE_WEIGHT_CONSTANT = Math.PI * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
 
 // For sheets: Weight(kg/m²) = Thickness_mm * (DENSITY / 1000)
 const SHEET_WEIGHT_CONSTANT = STAINLESS_STEEL_DENSITY_KG_M3 / 1000;
+
 // For round bars: Weight(kg/m) = D_mm^2 * (PI/4) * (DENSITY / 1000000)
 const ROUND_BAR_WEIGHT_CONSTANT =
   (Math.PI / 4) * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
+
 // For angle bars: Weight(kg/m) = ( (Leg_A_mm * 2) - Thickness_mm ) * Thickness_mm * (DENSITY / 1000000)
 const calculateAngleBarWeight = (leg_mm: number, thickness_mm: number) => {
     return ((leg_mm * 2) - thickness_mm) * thickness_mm * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
 }
+
 // For flat bars: Weight(kg/m) = Width_mm * Thickness_mm * (DENSITY / 1000000)
 const calculateFlatBarWeight = (width_mm: number, thickness_mm: number) => {
     return width_mm * thickness_mm * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
 }
+
 // For square tubes: Weight(kg/m) = (Side_mm * 4 - (Thickness_mm * 4)) * Thickness_mm * (DENSITY / 1000000)
 const calculateSquareTubeWeight = (side_mm: number, thickness_mm: number) => {
     return ((side_mm * 4) - (thickness_mm * 4)) * thickness_mm * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
 }
+
 // For rectangular tubes: Weight(kg/m) = ( (Side_A_mm + Side_B_mm) * 2 - (Thickness_mm * 4) ) * Thickness_mm * (DENSITY / 1000000)
 const calculateRectangularTubeWeight = (side_a_mm: number, side_b_mm: number, thickness_mm: number) => {
     return ( (side_a_mm + side_b_mm) * 2 - (thickness_mm * 4) ) * thickness_mm * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
@@ -43,8 +47,6 @@ export type Category = {
   icon: string;
   unit: 'm' | 'm²' | 'un';
 };
-
-const INCH_TO_MM = 25.4;
 
 const chapasGroup1: {thickness: number, desc: string}[] = [
     { thickness: 0.4, desc: '0.40mm' },
@@ -91,12 +93,13 @@ const dimensionsGroup2 = [
 
 const generateChapas = (): SteelItem[] => {
     const items: SteelItem[] = [];
+    const density = STAINLESS_STEEL_DENSITY_KG_M3 / 1000;
     chapasGroup1.forEach(chapa => {
         dimensionsGroup1.forEach(dim => {
             items.push({
                 id: `chapa-${chapa.thickness}-${dim.w}x${dim.h}`,
                 description: `Chapa Inox ${chapa.desc} (${dim.desc})`,
-                weight: chapa.thickness * SHEET_WEIGHT_CONSTANT * dim.w * dim.h,
+                weight: chapa.thickness * density * dim.w * dim.h,
             });
         });
     });
@@ -105,7 +108,7 @@ const generateChapas = (): SteelItem[] => {
             items.push({
                 id: `chapa-${chapa.thickness}-${dim.w}x${dim.h}`,
                 description: `Chapa Inox ${chapa.desc} (${dim.desc})`,
-                weight: chapa.thickness * SHEET_WEIGHT_CONSTANT * dim.w * dim.h,
+                weight: chapa.thickness * density * dim.w * dim.h,
             });
         });
     });
@@ -429,3 +432,5 @@ export const CATEGORIES: Category[] = [
     ]
   },
 ];
+
+    

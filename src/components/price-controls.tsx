@@ -47,6 +47,17 @@ export function PriceControls({
   const [aiSuggestion, setAiSuggestion] = React.useState<{ suggestedMarkup: number; reasoning: string } | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [cutOffPercentage, setCutOffPercentage] = React.useState(30);
+  const [cutOffSellingPrice, setCutOffSellingPrice] = React.useState(0);
+
+  React.useEffect(() => {
+    const calculatedCutOffPrice = sellingPrice * (1 + cutOffPercentage / 100);
+    setCutOffSellingPrice(calculatedCutOffPrice);
+  }, [sellingPrice, cutOffPercentage]);
+
+  const handleCutOffPercentageChange = (value: number | null) => {
+    setCutOffPercentage(value ?? 0);
+  };
 
   const handleGenerateSuggestion = async () => {
     setIsLoading(true);
@@ -99,7 +110,7 @@ export function PriceControls({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
           <div className="space-y-2">
             <Label htmlFor="cost-price">Custo (R$/kg)</Label>
             <Input
@@ -130,53 +141,74 @@ export function PriceControls({
               placeholder="Ex: 35.70"
             />
           </div>
-
-          <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <AlertDialogTrigger asChild>
-              <Button variant="outline" onClick={handleGenerateSuggestion}>
-                <Sparkles className="mr-2" />
-                Sugerir Margem (IA)
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Sugestão de Markup (IA)</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {isLoading && "Analisando dados de mercado para sugerir o markup ideal..."}
-                  {!isLoading && !aiSuggestion && "Não foi possível obter uma sugestão. Tente novamente."}
-                  {aiSuggestion && "Com base nos dados, aqui está uma sugestão de markup:"}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              {isLoading && (
-                <div className="flex justify-center items-center h-24">
-                  <Loader2 className="animate-spin h-8 w-8 text-primary" />
-                </div>
-              )}
-              {aiSuggestion && !isLoading && (
-                <div className="space-y-4">
-                  <p className="text-4xl font-bold text-center text-primary">
-                    {aiSuggestion.suggestedMarkup.toFixed(2)}%
-                  </p>
-                  <Card className="bg-muted/50">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm">Justificativa</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground">
-                        {aiSuggestion.reasoning}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-              )}
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={handleApplySuggestion} disabled={!aiSuggestion || isLoading}>
-                  Aplicar Sugestão
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <div className="space-y-2">
+            <Label htmlFor="cut-off-percentage">Corte (%)</Label>
+            <Input
+              id="cut-off-percentage"
+              type="number"
+              value={cutOffPercentage > 0 ? cutOffPercentage : ""}
+              onChange={(e) => handleCutOffPercentageChange(e.target.valueAsNumber)}
+              placeholder="Ex: 30"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="cut-off-selling-price">Venda com Corte (R$/kg)</Label>
+            <Input
+              id="cut-off-selling-price"
+              type="text"
+              readOnly
+              value={formatCurrency(cutOffSellingPrice)}
+              className="font-semibold text-primary bg-muted/30"
+            />
+          </div>
+        </div>
+        <div className="mt-4 flex justify-end">
+            <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" onClick={handleGenerateSuggestion} className="w-full md:w-auto">
+                  <Sparkles className="mr-2" />
+                  Sugerir Margem (IA)
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Sugestão de Markup (IA)</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {isLoading && "Analisando dados de mercado para sugerir o markup ideal..."}
+                    {!isLoading && !aiSuggestion && "Não foi possível obter uma sugestão. Tente novamente."}
+                    {aiSuggestion && "Com base nos dados, aqui está uma sugestão de markup:"}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                {isLoading && (
+                  <div className="flex justify-center items-center h-24">
+                    <Loader2 className="animate-spin h-8 w-8 text-primary" />
+                  </div>
+                )}
+                {aiSuggestion && !isLoading && (
+                  <div className="space-y-4">
+                    <p className="text-4xl font-bold text-center text-primary">
+                      {aiSuggestion.suggestedMarkup.toFixed(2)}%
+                    </p>
+                    <Card className="bg-muted/50">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-sm">Justificativa</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground">
+                          {aiSuggestion.reasoning}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleApplySuggestion} disabled={!aiSuggestion || isLoading}>
+                    Aplicar Sugestão
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
         </div>
       </CardContent>
     </Card>

@@ -192,6 +192,42 @@ export const CATEGORIES: Category[] = [
       { id: 'ts-4-sch5', description: 'Tubo Schedule 4" SCH 5 (114.30mm x 2.11mm)', weight: (114.30 - 2.11) * 2.11 * TUBE_WEIGHT_CONSTANT },
       { id: 'ts-4-sch10', description: 'Tubo Schedule 4" SCH 10 (114.30mm x 3.05mm)', weight: (114.30 - 3.05) * 3.05 * TUBE_WEIGHT_CONSTANT },
       { id: 'ts-4-sch40', description: 'Tubo Schedule 4" SCH 40 (114.30mm x 6.02mm)', weight: (114.30 - 6.02) * 6.02 * TUBE_WEIGHT_CONSTANT },
+       // NPS 5"
+       { id: 'ts-5-sch5', description: 'Tubo Schedule 5" SCH 5 (141.30mm x 2.77mm)', weight: (141.30 - 2.77) * 2.77 * TUBE_WEIGHT_CONSTANT },
+       { id: 'ts-5-sch10', description: 'Tubo Schedule 5" SCH 10 (141.30mm x 3.40mm)', weight: (141.30 - 3.40) * 3.40 * TUBE_WEIGHT_CONSTANT },
+       { id: 'ts-5-sch40', description: 'Tubo Schedule 5" SCH 40 (141.30mm x 6.55mm)', weight: (141.30 - 6.55) * 6.55 * TUBE_WEIGHT_CONSTANT },
+       // NPS 6"
+       { id: 'ts-6-sch5', description: 'Tubo Schedule 6" SCH 5 (168.28mm x 2.77mm)', weight: (168.28 - 2.77) * 2.77 * TUBE_WEIGHT_CONSTANT },
+       { id: 'ts-6-sch10', description: 'Tubo Schedule 6" SCH 10 (168.28mm x 3.40mm)', weight: (168.28 - 3.40) * 3.40 * TUBE_WEIGHT_CONSTANT },
+       { id: 'ts-6-sch40', description: 'Tubo Schedule 6" SCH 40 (168.28mm x 7.11mm)', weight: (168.28 - 7.11) * 7.11 * TUBE_WEIGHT_CONSTANT },
+       // NPS 8"
+       { id: 'ts-8-sch5', description: 'Tubo Schedule 8" SCH 5 (219.08mm x 2.77mm)', weight: (219.08 - 2.77) * 2.77 * TUBE_WEIGHT_CONSTANT },
+       { id: 'ts-8-sch10', description: 'Tubo Schedule 8" SCH 10 (219.08mm x 3.76mm)', weight: (219.08 - 3.76) * 3.76 * TUBE_WEIGHT_CONSTANT },
+       { id: 'ts-8-sch40', description: 'Tubo Schedule 8" SCH 40 (219.08mm x 8.18mm)', weight: (219.08 - 8.18) * 8.18 * TUBE_WEIGHT_CONSTANT },
+       // NPS 10"
+       { id: 'ts-10-sch5', description: 'Tubo Schedule 10" SCH 5 (273.05mm x 3.40mm)', weight: (273.05 - 3.40) * 3.40 * TUBE_WEIGHT_CONSTANT },
+       { id: 'ts-10-sch10', description: 'Tubo Schedule 10" SCH 10 (273.05mm x 4.19mm)', weight: (273.05 - 4.19) * 4.19 * TUBE_WEIGHT_CONSTANT },
+       { id: 'ts-10-sch40', description: 'Tubo Schedule 10" SCH 40 (273.05mm x 9.27mm)', weight: (273.05 - 9.27) * 9.27 * TUBE_WEIGHT_CONSTANT },
+       // NPS 12"
+       { id: 'ts-12-sch5', description: 'Tubo Schedule 12" SCH 5 (323.85mm x 3.96mm)', weight: (323.85 - 3.96) * 3.96 * TUBE_WEIGHT_CONSTANT },
+       { id: 'ts-12-sch10', description: 'Tubo Schedule 12" SCH 10 (323.85mm x 4.57mm)', weight: (323.85 - 4.57) * 4.57 * TUBE_WEIGHT_CONSTANT },
+       { id: 'ts-12-sch40', description: 'Tubo Schedule 12" SCH 40 (323.85mm x 9.53mm)', weight: (323.85 - 9.53) * 9.53 * TUBE_WEIGHT_CONSTANT },
+       // NPS 14"
+       { id: 'ts-14-sch5', description: 'Tubo Schedule 14" SCH 5 (355.60mm x 3.96mm)', weight: (355.60 - 3.96) * 3.96 * TUBE_WEIGHT_CONSTANT },
+       { id: 'ts-14-sch10', description: 'Tubo Schedule 14" SCH 10 (355.60mm x 6.35mm)', weight: (355.60 - 6.35) * 6.35 * TUBE_WEIGHT_CONSTANT },
+       { id: 'ts-14-sch40', description: 'Tubo Schedule 14" SCH 40 (355.60mm x 11.13mm)', weight: (355.60 - 11.13) * 11.13 * TUBE_WEIGHT_CONSTANT },
+       // NPS 16"
+       { id: 'ts-16-sch5', description: 'Tubo Schedule 16" SCH 5 (406.40mm x 4.19mm)', weight: (406.40 - 4.19) * 4.19 * TUBE_WEIGHT_CONSTANT },
+       { id: 'ts-16-sch10', description: 'Tubo Schedule 16" SCH 10 (406.40mm x 6.35mm)', weight: (406.40 - 6.35) * 6.35 * TUBE_WEIGHT_CONSTANT },
+       { id: 'ts-16-sch40', description: 'Tubo Schedule 16" SCH 40 (406.40mm x 12.70mm)', weight: (406.40 - 12.70) * 12.70 * TUBE_WEIGHT_CONSTANT },
+       // NPS 18"
+       { id: 'ts-18-sch5', description: 'Tubo Schedule 18" SCH 5 (457.20mm x 4.19mm)', weight: (457.20 - 4.19) * 4.19 * TUBE_WEIGHT_CONSTANT },
+       { id: 'ts-18-sch10', description: 'Tubo Schedule 18" SCH 10 (457.20mm x 6.35mm)', weight: (457.20 - 6.35) * 6.35 * TUBE_WEIGHT_CONSTANT },
+       { id: 'ts-18-sch40', description: 'Tubo Schedule 18" SCH 40 (457.20mm x 14.27mm)', weight: (457.20 - 14.27) * 14.27 * TUBE_WEIGHT_CONSTANT },
+       // NPS 20"
+       { id: 'ts-20-sch5', description: 'Tubo Schedule 20" SCH 5 (508.00mm x 4.78mm)', weight: (508.00 - 4.78) * 4.78 * TUBE_WEIGHT_CONSTANT },
+       { id: 'ts-20-sch10', description: 'Tubo Schedule 20" SCH 10 (508.00mm x 6.35mm)', weight: (508.00 - 6.35) * 6.35 * TUBE_WEIGHT_CONSTANT },
+       { id: 'ts-20-sch40', description: 'Tubo Schedule 20" SCH 40 (508.00mm x 15.09mm)', weight: (508.00 - 15.09) * 15.09 * TUBE_WEIGHT_CONSTANT },
     ],
   },
 ];

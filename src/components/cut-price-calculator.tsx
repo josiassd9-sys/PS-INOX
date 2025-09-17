@@ -81,7 +81,7 @@ export function CutPriceCalculator({
   };
 
   return (
-    <Card className="sticky top-6">
+    <Card>
       <CardHeader>
         <div className="flex justify-between items-start">
             <div>

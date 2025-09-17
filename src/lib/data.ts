@@ -36,7 +36,7 @@ export type Category = {
   name: string;
   items: SteelItem[];
   icon: string;
-  unit: 'm' | 'm²';
+  unit: 'm' | 'm²' | 'un';
 };
 
 export const CATEGORIES: Category[] = [
@@ -103,28 +103,16 @@ export const CATEGORIES: Category[] = [
     id: 'chapas',
     name: 'Chapas',
     icon: 'Square',
-    unit: 'm²',
+    unit: 'un',
     items: [
-      {
-        id: 'c1',
-        description: 'Chapa Inox x 0.50mm',
-        weight: 0.5 * SHEET_WEIGHT_CONSTANT,
-      },
-      {
-        id: 'c2',
-        description: 'Chapa Inox x 1.00mm',
-        weight: 1.0 * SHEET_WEIGHT_CONSTANT,
-      },
-      {
-        id: 'c3',
-        description: 'Chapa Inox x 1.50mm',
-        weight: 1.5 * SHEET_WEIGHT_CONSTANT,
-      },
-      {
-        id: 'c4',
-        description: 'Chapa Inox x 2.00mm',
-        weight: 2.0 * SHEET_WEIGHT_CONSTANT,
-      },
+        { id: 'c-0.5-1000x2000', description: 'Chapa Inox 0.50mm (1000x2000mm)', weight: 0.5 * SHEET_WEIGHT_CONSTANT * (1.0 * 2.0) },
+        { id: 'c-0.5-1250x2500', description: 'Chapa Inox 0.50mm (1250x2500mm)', weight: 0.5 * SHEET_WEIGHT_CONSTANT * (1.25 * 2.5) },
+        { id: 'c-1.0-1000x2000', description: 'Chapa Inox 1.00mm (1000x2000mm)', weight: 1.0 * SHEET_WEIGHT_CONSTANT * (1.0 * 2.0) },
+        { id: 'c-1.0-1250x2500', description: 'Chapa Inox 1.00mm (1250x2500mm)', weight: 1.0 * SHEET_WEIGHT_CONSTANT * (1.25 * 2.5) },
+        { id: 'c-1.5-1000x2000', description: 'Chapa Inox 1.50mm (1000x2000mm)', weight: 1.5 * SHEET_WEIGHT_CONSTANT * (1.0 * 2.0) },
+        { id: 'c-1.5-1250x2500', description: 'Chapa Inox 1.50mm (1250x2500mm)', weight: 1.5 * SHEET_WEIGHT_CONSTANT * (1.25 * 2.5) },
+        { id: 'c-2.0-1000x2000', description: 'Chapa Inox 2.00mm (1000x2000mm)', weight: 2.0 * SHEET_WEIGHT_CONSTANT * (1.0 * 2.0) },
+        { id: 'c-2.0-1250x2500', description: 'Chapa Inox 2.00mm (1250x2500mm)', weight: 2.0 * SHEET_WEIGHT_CONSTANT * (1.25 * 2.5) },
     ],
   },
   {

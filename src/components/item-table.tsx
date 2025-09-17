@@ -94,7 +94,7 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
     }).format(value);
   };
 
-  const unitLabel = category.unit === "m" ? "m" : "m²";
+  const unitLabel = category.unit === "m" ? "m" : category.unit === 'm²' ? "m²" : "un";
   const weightUnitLabel = `kg/${unitLabel}`;
   const priceUnitLabel = `R$/${unitLabel}`;
 
@@ -183,7 +183,7 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
               {filteredItems.map((item) => (
                 <Collapsible asChild key={item.id} open={selectedItem?.id === item.id}>
                     <>
-                    <CollapsibleTrigger asChild>
+                    <CollapsibleTrigger asChild disabled={category.unit !== 'm'}>
                         <TableRow 
                             onClick={() => handleRowClick(item)}
                             className={cn(
@@ -200,19 +200,21 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
                             </TableCell>
                         </TableRow>
                     </CollapsibleTrigger>
-                    <CollapsibleContent asChild>
-                        <tr>
-                            <td colSpan={3}>
-                                <div className="p-4">
-                                <CutPriceCalculator
-                                    selectedItem={item}
-                                    sellingPrice={sellingPrice}
-                                    onClose={() => setSelectedItem(null)}
-                                />
-                                </div>
-                            </td>
-                        </tr>
-                    </CollapsibleContent>
+                    {category.unit === 'm' && (
+                        <CollapsibleContent asChild>
+                            <tr>
+                                <td colSpan={3}>
+                                    <div className="p-4">
+                                    <CutPriceCalculator
+                                        selectedItem={item}
+                                        sellingPrice={sellingPrice}
+                                        onClose={() => setSelectedItem(null)}
+                                    />
+                                    </div>
+                                </td>
+                            </tr>
+                        </CollapsibleContent>
+                    )}
                     </>
                 </Collapsible>
               ))}

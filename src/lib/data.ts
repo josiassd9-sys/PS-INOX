@@ -312,7 +312,7 @@ export const CATEGORIES: Category[] = [
   },
   {
     id: 'metalon',
-    name: 'Metalon',
+    name: 'Metalon Quadrado',
     icon: 'Square',
     unit: 'm',
     items: [
@@ -336,6 +336,7 @@ export const CATEGORIES: Category[] = [
         { id: 'm-60x60-2.0', description: 'Metalon 60x60 x 2.00mm', weight: calculateSquareTubeWeight(60, 2.0) },
         { id: 'm-80x80-1.5', description: 'Metalon 80x80 x 1.50mm', weight: calculateSquareTubeWeight(80, 1.5) },
         { id: 'm-80x80-2.0', description: 'Metalon 80x80 x 2.00mm', weight: calculateSquareTubeWeight(80, 2.0) },
+        { id: 'm-100x100-1.5', description: 'Metalon 100x100 x 1.50mm', weight: calculateSquareTubeWeight(100, 1.5) },
         { id: 'm-100x100-2.0', description: 'Metalon 100x100 x 2.00mm', weight: calculateSquareTubeWeight(100, 2.0) },
         { id: 'm-100x100-3.0', description: 'Metalon 100x100 x 3.00mm', weight: calculateSquareTubeWeight(100, 3.0) },
     ]

@@ -17,7 +17,11 @@ const calculateFlatBarWeight = (width_mm: number, thickness_mm: number) => {
 }
 // For square tubes: Weight(kg/m) = (Side_mm * 4 - (Thickness_mm * 4)) * Thickness_mm * (DENSITY / 1000000)
 const calculateSquareTubeWeight = (side_mm: number, thickness_mm: number) => {
-    return (side_mm * 4 - (thickness_mm * 4)) * thickness_mm * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
+    return ((side_mm * 4) - (thickness_mm * 4)) * thickness_mm * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
+}
+// For rectangular tubes: Weight(kg/m) = ( (Side_A_mm + Side_B_mm) * 2 - (Thickness_mm * 4) ) * Thickness_mm * (DENSITY / 1000000)
+const calculateRectangularTubeWeight = (side_a_mm: number, side_b_mm: number, thickness_mm: number) => {
+    return ( (side_a_mm + side_b_mm) * 2 - (thickness_mm * 4) ) * thickness_mm * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
 }
 
 
@@ -311,7 +315,7 @@ export const CATEGORIES: Category[] = [
     ]
   },
   {
-    id: 'metalon',
+    id: 'metalon-quadrado',
     name: 'Metalon Quadrado',
     icon: 'Square',
     unit: 'm',
@@ -339,6 +343,34 @@ export const CATEGORIES: Category[] = [
         { id: 'm-100x100-1.5', description: 'Metalon 100x100 x 1.50mm', weight: calculateSquareTubeWeight(100, 1.5) },
         { id: 'm-100x100-2.0', description: 'Metalon 100x100 x 2.00mm', weight: calculateSquareTubeWeight(100, 2.0) },
         { id: 'm-100x100-3.0', description: 'Metalon 100x100 x 3.00mm', weight: calculateSquareTubeWeight(100, 3.0) },
+    ]
+  },
+  {
+    id: 'metalon-retangular',
+    name: 'Metalon Retangular',
+    icon: 'RectangleHorizontal',
+    unit: 'm',
+    items: [
+        { id: 'mr-40x20-1.0', description: 'Metalon 40x20 x 1.00mm', weight: calculateRectangularTubeWeight(40, 20, 1.0) },
+        { id: 'mr-40x20-1.2', description: 'Metalon 40x20 x 1.20mm', weight: calculateRectangularTubeWeight(40, 20, 1.2) },
+        { id: 'mr-40x20-1.5', description: 'Metalon 40x20 x 1.50mm', weight: calculateRectangularTubeWeight(40, 20, 1.5) },
+        { id: 'mr-50x20-1.2', description: 'Metalon 50x20 x 1.20mm', weight: calculateRectangularTubeWeight(50, 20, 1.2) },
+        { id: 'mr-50x20-1.5', description: 'Metalon 50x20 x 1.50mm', weight: calculateRectangularTubeWeight(50, 20, 1.5) },
+        { id: 'mr-50x30-1.2', description: 'Metalon 50x30 x 1.20mm', weight: calculateRectangularTubeWeight(50, 30, 1.2) },
+        { id: 'mr-50x30-1.5', description: 'Metalon 50x30 x 1.50mm', weight: calculateRectangularTubeWeight(50, 30, 1.5) },
+        { id: 'mr-60x40-1.2', description: 'Metalon 60x40 x 1.20mm', weight: calculateRectangularTubeWeight(60, 40, 1.2) },
+        { id: 'mr-60x40-1.5', description: 'Metalon 60x40 x 1.50mm', weight: calculateRectangularTubeWeight(60, 40, 1.5) },
+        { id: 'mr-80x40-1.2', description: 'Metalon 80x40 x 1.20mm', weight: calculateRectangularTubeWeight(80, 40, 1.2) },
+        { id: 'mr-80x40-1.5', description: 'Metalon 80x40 x 1.50mm', weight: calculateRectangularTubeWeight(80, 40, 1.5) },
+        { id: 'mr-100x40-1.2', description: 'Metalon 100x40 x 1.20mm', weight: calculateRectangularTubeWeight(100, 40, 1.2) },
+        { id: 'mr-100x40-1.5', description: 'Metalon 100x40 x 1.50mm', weight: calculateRectangularTubeWeight(100, 40, 1.5) },
+        { id: 'mr-100x50-1.5', description: 'Metalon 100x50 x 1.50mm', weight: calculateRectangularTubeWeight(100, 50, 1.5) },
+        { id: 'mr-100x50-2.0', description: 'Metalon 100x50 x 2.00mm', weight: calculateRectangularTubeWeight(100, 50, 2.0) },
+        { id: 'mr-100x50-3.0', description: 'Metalon 100x50 x 3.00mm', weight: calculateRectangularTubeWeight(100, 50, 3.0) },
+        { id: 'mr-120x60-2.0', description: 'Metalon 120x60 x 2.00mm', weight: calculateRectangularTubeWeight(120, 60, 2.0) },
+        { id: 'mr-120x60-3.0', description: 'Metalon 120x60 x 3.00mm', weight: calculateRectangularTubeWeight(120, 60, 3.0) },
+        { id: 'mr-150x50-2.0', description: 'Metalon 150x50 x 2.00mm', weight: calculateRectangularTubeWeight(150, 50, 2.0) },
+        { id: 'mr-150x50-3.0', description: 'Metalon 150x50 x 3.00mm', weight: calculateRectangularTubeWeight(150, 50, 3.0) },
     ]
   },
 ];

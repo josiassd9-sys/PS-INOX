@@ -15,6 +15,10 @@ const calculateAngleBarWeight = (leg_mm: number, thickness_mm: number) => {
 const calculateFlatBarWeight = (width_mm: number, thickness_mm: number) => {
     return width_mm * thickness_mm * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
 }
+// For square tubes: Weight(kg/m) = (Side_mm * 4 - (Thickness_mm * 4)) * Thickness_mm * (DENSITY / 1000000)
+const calculateSquareTubeWeight = (side_mm: number, thickness_mm: number) => {
+    return (side_mm * 4 - (thickness_mm * 4)) * thickness_mm * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
+}
 
 
 export type SteelItem = {
@@ -304,6 +308,36 @@ export const CATEGORIES: Category[] = [
         { id: 'bc-4-1/4', description: 'Barra Chata 4" x 1/4" (101.60mm x 6.35mm)', weight: calculateFlatBarWeight(101.60, 6.35) },
         { id: 'bc-4-3/8', description: 'Barra Chata 4" x 3/8" (101.60mm x 9.52mm)', weight: calculateFlatBarWeight(101.60, 9.52) },
         { id: 'bc-4-1/2', description: 'Barra Chata 4" x 1/2" (101.60mm x 12.70mm)', weight: calculateFlatBarWeight(101.60, 12.70) },
+    ]
+  },
+  {
+    id: 'metalon',
+    name: 'Metalon',
+    icon: 'Square',
+    unit: 'm',
+    items: [
+        { id: 'm-15x15-1.0', description: 'Metalon 15x15 x 1.00mm', weight: calculateSquareTubeWeight(15, 1.0) },
+        { id: 'm-15x15-1.2', description: 'Metalon 15x15 x 1.20mm', weight: calculateSquareTubeWeight(15, 1.2) },
+        { id: 'm-15x15-1.5', description: 'Metalon 15x15 x 1.50mm', weight: calculateSquareTubeWeight(15, 1.5) },
+        { id: 'm-20x20-1.0', description: 'Metalon 20x20 x 1.00mm', weight: calculateSquareTubeWeight(20, 1.0) },
+        { id: 'm-20x20-1.2', description: 'Metalon 20x20 x 1.20mm', weight: calculateSquareTubeWeight(20, 1.2) },
+        { id: 'm-20x20-1.5', description: 'Metalon 20x20 x 1.50mm', weight: calculateSquareTubeWeight(20, 1.5) },
+        { id: 'm-25x25-1.0', description: 'Metalon 25x25 x 1.00mm', weight: calculateSquareTubeWeight(25, 1.0) },
+        { id: 'm-25x25-1.2', description: 'Metalon 25x25 x 1.20mm', weight: calculateSquareTubeWeight(25, 1.2) },
+        { id: 'm-25x25-1.5', description: 'Metalon 25x25 x 1.50mm', weight: calculateSquareTubeWeight(25, 1.5) },
+        { id: 'm-30x30-1.2', description: 'Metalon 30x30 x 1.20mm', weight: calculateSquareTubeWeight(30, 1.2) },
+        { id: 'm-30x30-1.5', description: 'Metalon 30x30 x 1.50mm', weight: calculateSquareTubeWeight(30, 1.5) },
+        { id: 'm-40x40-1.2', description: 'Metalon 40x40 x 1.20mm', weight: calculateSquareTubeWeight(40, 1.2) },
+        { id: 'm-40x40-1.5', description: 'Metalon 40x40 x 1.50mm', weight: calculateSquareTubeWeight(40, 1.5) },
+        { id: 'm-50x50-1.2', description: 'Metalon 50x50 x 1.20mm', weight: calculateSquareTubeWeight(50, 1.2) },
+        { id: 'm-50x50-1.5', description: 'Metalon 50x50 x 1.50mm', weight: calculateSquareTubeWeight(50, 1.5) },
+        { id: 'm-50x50-2.0', description: 'Metalon 50x50 x 2.00mm', weight: calculateSquareTubeWeight(50, 2.0) },
+        { id: 'm-60x60-1.5', description: 'Metalon 60x60 x 1.50mm', weight: calculateSquareTubeWeight(60, 1.5) },
+        { id: 'm-60x60-2.0', description: 'Metalon 60x60 x 2.00mm', weight: calculateSquareTubeWeight(60, 2.0) },
+        { id: 'm-80x80-1.5', description: 'Metalon 80x80 x 1.50mm', weight: calculateSquareTubeWeight(80, 1.5) },
+        { id: 'm-80x80-2.0', description: 'Metalon 80x80 x 2.00mm', weight: calculateSquareTubeWeight(80, 2.0) },
+        { id: 'm-100x100-2.0', description: 'Metalon 100x100 x 2.00mm', weight: calculateSquareTubeWeight(100, 2.0) },
+        { id: 'm-100x100-3.0', description: 'Metalon 100x100 x 3.00mm', weight: calculateSquareTubeWeight(100, 3.0) },
     ]
   },
 ];

@@ -351,6 +351,9 @@ export const CATEGORIES: Category[] = [
     icon: 'RectangleHorizontal',
     unit: 'm',
     items: [
+        { id: 'mr-40x10-1.0', description: 'Metalon 40x10 x 1.00mm', weight: calculateRectangularTubeWeight(40, 10, 1.0) },
+        { id: 'mr-40x10-1.2', description: 'Metalon 40x10 x 1.20mm', weight: calculateRectangularTubeWeight(40, 10, 1.2) },
+        { id: 'mr-40x10-1.5', description: 'Metalon 40x10 x 1.50mm', weight: calculateRectangularTubeWeight(40, 10, 1.5) },
         { id: 'mr-40x20-1.0', description: 'Metalon 40x20 x 1.00mm', weight: calculateRectangularTubeWeight(40, 20, 1.0) },
         { id: 'mr-40x20-1.2', description: 'Metalon 40x20 x 1.20mm', weight: calculateRectangularTubeWeight(40, 20, 1.2) },
         { id: 'mr-40x20-1.5', description: 'Metalon 40x20 x 1.50mm', weight: calculateRectangularTubeWeight(40, 20, 1.5) },

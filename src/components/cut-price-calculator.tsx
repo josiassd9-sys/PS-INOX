@@ -35,7 +35,7 @@ export function CutPriceCalculator({
       const pricePerMeter = selectedItem.weight * sellingPrice;
       const piecePrice = pricePerMeter * (Number(cutLength) / 1000);
       const finalPriceWithCut = piecePrice * (1 + cutPercentage / 100);
-      setFinalPrice(finalPriceWithCut);
+      setFinalPrice(Math.ceil(finalPriceWithCut));
     } else {
       setFinalPrice(0);
     }

@@ -35,10 +35,9 @@ import {
 interface ItemTableProps {
   category: Category;
   sellingPrice: number;
-  cutPercentage: number;
 }
 
-export function ItemTable({ category, sellingPrice, cutPercentage }: ItemTableProps) {
+export function ItemTable({ category, sellingPrice }: ItemTableProps) {
   const [items, setItems] = React.useState<SteelItem[]>(category.items);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
@@ -208,7 +207,6 @@ export function ItemTable({ category, sellingPrice, cutPercentage }: ItemTablePr
                                 <CutPriceCalculator
                                     selectedItem={item}
                                     sellingPrice={sellingPrice}
-                                    initialCutPercentage={cutPercentage}
                                     onClose={() => setSelectedItem(null)}
                                 />
                                 </div>

@@ -30,22 +30,18 @@ interface PriceControlsProps {
   costPrice: number;
   markup: number;
   sellingPrice: number;
-  cutPercentage: number;
   onCostChange: (value: number | null) => void;
   onMarkupChange: (value: number | null) => void;
   onSellingPriceChange: (value: number | null) => void;
-  onCutPercentageChange: (value: number | null) => void;
 }
 
 export function PriceControls({
   costPrice,
   markup,
   sellingPrice,
-  cutPercentage,
   onCostChange,
   onMarkupChange,
   onSellingPriceChange,
-  onCutPercentageChange,
 }: PriceControlsProps) {
   const { toast } = useToast();
   const [aiSuggestion, setAiSuggestion] = React.useState<{ suggestedMarkup: number; reasoning: string } | null>(null);
@@ -96,7 +92,7 @@ export function PriceControls({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
           <div className="space-y-2">
             <Label htmlFor="cost-price">Custo (R$/kg)</Label>
             <Input
@@ -125,16 +121,6 @@ export function PriceControls({
               value={sellingPrice > 0 ? sellingPrice.toFixed(2) : ""}
               onChange={(e) => onSellingPriceChange(e.target.valueAsNumber)}
               placeholder="Ex: 35.70"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="cut-off-percentage">Acréscimo Corte (%)</Label>
-            <Input
-              id="cut-off-percentage"
-              type="number"
-              value={cutPercentage > 0 ? cutPercentage : ""}
-              onChange={(e) => onCutPercentageChange(e.target.valueAsNumber)}
-              placeholder="Ex: 30"
             />
           </div>
         </div>

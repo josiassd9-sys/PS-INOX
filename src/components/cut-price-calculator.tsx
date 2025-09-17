@@ -17,19 +17,17 @@ import { X } from "lucide-react";
 interface CutPriceCalculatorProps {
   selectedItem: SteelItem;
   sellingPrice: number;
-  initialCutPercentage: number;
   onClose: () => void;
 }
 
 export function CutPriceCalculator({
   selectedItem,
   sellingPrice,
-  initialCutPercentage,
   onClose,
 }: CutPriceCalculatorProps) {
   const [cutLength, setCutLength] = React.useState<number | "">("");
   const [finalPrice, setFinalPrice] = React.useState(0);
-  const [currentCutPercentage, setCurrentCutPercentage] = React.useState(initialCutPercentage);
+  const [currentCutPercentage, setCurrentCutPercentage] = React.useState(0);
 
   // Function to calculate dynamic percentage
   const calculateDynamicPercentage = (lengthInMm: number) => {
@@ -62,10 +60,10 @@ export function CutPriceCalculator({
       const finalPriceWithCut = piecePrice * (1 + dynamicPercentage / 100);
       setFinalPrice(Math.ceil(finalPriceWithCut));
     } else {
-      setCurrentCutPercentage(initialCutPercentage);
+      setCurrentCutPercentage(0);
       setFinalPrice(0);
     }
-  }, [cutLength, sellingPrice, selectedItem, initialCutPercentage]);
+  }, [cutLength, sellingPrice, selectedItem]);
 
 
   React.useEffect(() => {

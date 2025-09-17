@@ -33,22 +33,23 @@ export function CutPriceCalculator({
 
   // Function to calculate dynamic percentage
   const calculateDynamicPercentage = (lengthInMm: number) => {
-    if (lengthInMm <= 0) return 100;
-    if (lengthInMm >= 3000) return 10;
-
-    // Linear interpolation: y = y1 + (x - x1) * (y2 - y1) / (x2 - x1)
-    // We are interpolating between (10mm, 100%) and (3000mm, 10%)
     const minLength = 10;
+    const midLength = 1000;
     const maxLength = 3000;
-    const minPercentage = 100;
-    const maxPercentage = 10;
-    
-    // Clamp the length to the defined range for calculation
-    const clampedLength = Math.max(minLength, Math.min(lengthInMm, maxLength));
+    const highPercentage = 100;
+    const midPercentage = 30;
+    const lowPercentage = 10;
 
-    const percentage = minPercentage + (clampedLength - minLength) * (maxPercentage - minPercentage) / (maxLength - minLength);
-    
-    return percentage;
+    if (lengthInMm <= minLength) return highPercentage;
+    if (lengthInMm >= maxLength) return lowPercentage;
+
+    if (lengthInMm <= midLength) {
+      // Interpolate between 10mm (100%) and 1000mm (30%)
+      return highPercentage + (lengthInMm - minLength) * (midPercentage - highPercentage) / (midLength - minLength);
+    } else {
+      // Interpolate between 1000mm (30%) and 3000mm (10%)
+      return midPercentage + (lengthInMm - midLength) * (lowPercentage - midPercentage) / (maxLength - midLength);
+    }
   };
 
   React.useEffect(() => {

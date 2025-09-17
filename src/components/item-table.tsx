@@ -166,10 +166,10 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="border rounded-lg">
+        <div className="border rounded-lg overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="bg-primary/5 hover:bg-primary/10">
                 <TableHead>Descrição</TableHead>
                 <TableHead className="text-right">
                   Peso ({weightUnitLabel})
@@ -187,15 +187,17 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
                         <TableRow 
                             onClick={() => handleRowClick(item)}
                             className={cn(
+                                'even:bg-primary/5 odd:bg-transparent',
                                 category.unit === 'm' && 'cursor-pointer',
-                                selectedItem?.id === item.id && 'bg-primary/10 hover:bg-primary/20'
+                                selectedItem?.id === item.id && 'bg-primary/20 hover:bg-primary/20',
+                                category.unit !== 'm' && 'hover:bg-primary/10',
                             )}
                             >
                             <TableCell>{item.description}</TableCell>
                             <TableCell className="text-right">
                                 {formatNumber(item.weight, 3)}
                             </TableCell>
-                            <TableCell className="text-right font-medium">
+                            <TableCell className="text-right font-medium text-primary">
                                 {formatCurrency(item.weight * sellingPrice)}
                             </TableCell>
                         </TableRow>
@@ -204,7 +206,7 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
                         <CollapsibleContent asChild>
                             <tr>
                                 <td colSpan={3}>
-                                    <div className="p-4">
+                                    <div className="p-4 bg-primary/5">
                                     <CutPriceCalculator
                                         selectedItem={item}
                                         sellingPrice={sellingPrice}

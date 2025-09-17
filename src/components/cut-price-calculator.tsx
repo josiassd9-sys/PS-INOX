@@ -79,7 +79,7 @@ export function CutPriceCalculator({
   };
 
   return (
-    <Card>
+    <Card className="border-primary/20">
       <CardHeader>
         <div className="flex justify-between items-start">
             <div>
@@ -117,8 +117,8 @@ export function CutPriceCalculator({
             </div>
           </div>
           <div className="space-y-2">
-            <Label>Preço Final da Peça</Label>
-            <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm font-semibold text-primary h-10 flex items-center">
+            <Label className="text-primary font-semibold">Preço Final da Peça</Label>
+            <div className="w-full rounded-md border border-primary/50 bg-primary/10 px-3 py-2 text-base md:text-sm font-bold text-primary h-10 flex items-center">
               {formatCurrency(finalPrice)}
             </div>
           </div>

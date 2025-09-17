@@ -85,18 +85,22 @@ export function Dashboard() {
             </h2>
             <div className="w-7"/>
           </header>
-          <PriceControls
-            costPrice={costPrice}
-            markup={markup}
-            sellingPrice={sellingPrice}
-            onCostChange={handleCostChange}
-            onMarkupChange={handleMarkupChange}
-            onSellingPriceChange={handleSellingPriceChange}
-          />
-          <ItemTable 
-            category={selectedCategory} 
-            sellingPrice={sellingPrice} 
-          />
+          <div className="sticky top-0 z-10 bg-background/95 py-4 backdrop-blur-sm -mx-4 px-4 -mt-4 pt-4 md:-mx-6 md:px-6">
+            <PriceControls
+              costPrice={costPrice}
+              markup={markup}
+              sellingPrice={sellingPrice}
+              onCostChange={handleCostChange}
+              onMarkupChange={handleMarkupChange}
+              onSellingPriceChange={handleSellingPriceChange}
+            />
+          </div>
+          <div className="-mt-4">
+            <ItemTable 
+              category={selectedCategory} 
+              sellingPrice={sellingPrice} 
+            />
+          </div>
         </div>
       </SidebarInset>
     </SidebarProvider>

@@ -83,7 +83,7 @@ export function PriceControls({
   };
 
   return (
-    <Card>
+    <Card className="border-primary/20">
       <CardHeader>
         <CardTitle>Parâmetros de Preço Universal</CardTitle>
         <CardDescription>
@@ -114,13 +114,14 @@ export function PriceControls({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="selling-price">Venda (R$/kg)</Label>
+            <Label htmlFor="selling-price" className="text-primary font-semibold">Venda (R$/kg)</Label>
             <Input
               id="selling-price"
               type="number"
               value={sellingPrice > 0 ? sellingPrice.toFixed(2) : ""}
               onChange={(e) => onSellingPriceChange(e.target.valueAsNumber)}
               placeholder="Ex: 35.70"
+              className="border-primary/50 text-primary font-bold text-base"
             />
           </div>
         </div>

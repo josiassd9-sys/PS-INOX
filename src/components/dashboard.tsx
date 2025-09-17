@@ -19,8 +19,8 @@ import { ItemTable } from "./item-table";
 import { Icon } from "./icons";
 
 export function Dashboard() {
-  const [costPrice, setCostPrice] = React.useState(25);
-  const [markup, setMarkup] = React.useState(40);
+  const [costPrice, setCostPrice] = React.useState(30);
+  const [markup, setMarkup] = React.useState(50);
   const [sellingPrice, setSellingPrice] = React.useState(
     costPrice * (1 + markup / 100)
   );

@@ -150,4 +150,48 @@ export const CATEGORIES: Category[] = [
       },
     ],
   },
+  {
+    id: 'tubos-schedule',
+    name: 'Tubos Schedule',
+    icon: 'Layers',
+    unit: 'm',
+    items: [
+      // NPS 1/2"
+      { id: 'ts-1/2-sch5', description: 'Tubo Schedule 1/2" SCH 5 (21.34mm x 1.65mm)', weight: (21.34 - 1.65) * 1.65 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-1/2-sch10', description: 'Tubo Schedule 1/2" SCH 10 (21.34mm x 2.11mm)', weight: (21.34 - 2.11) * 2.11 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-1/2-sch40', description: 'Tubo Schedule 1/2" SCH 40 (21.34mm x 2.77mm)', weight: (21.34 - 2.77) * 2.77 * TUBE_WEIGHT_CONSTANT },
+      // NPS 3/4"
+      { id: 'ts-3/4-sch5', description: 'Tubo Schedule 3/4" SCH 5 (26.67mm x 1.65mm)', weight: (26.67 - 1.65) * 1.65 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-3/4-sch10', description: 'Tubo Schedule 3/4" SCH 10 (26.67mm x 2.11mm)', weight: (26.67 - 2.11) * 2.11 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-3/4-sch40', description: 'Tubo Schedule 3/4" SCH 40 (26.67mm x 2.87mm)', weight: (26.67 - 2.87) * 2.87 * TUBE_WEIGHT_CONSTANT },
+      // NPS 1"
+      { id: 'ts-1-sch5', description: 'Tubo Schedule 1" SCH 5 (33.40mm x 1.65mm)', weight: (33.40 - 1.65) * 1.65 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-1-sch10', description: 'Tubo Schedule 1" SCH 10 (33.40mm x 2.77mm)', weight: (33.40 - 2.77) * 2.77 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-1-sch40', description: 'Tubo Schedule 1" SCH 40 (33.40mm x 3.38mm)', weight: (33.40 - 3.38) * 3.38 * TUBE_WEIGHT_CONSTANT },
+      // NPS 1 1/4"
+      { id: 'ts-1_1/4-sch5', description: 'Tubo Schedule 1 1/4" SCH 5 (42.16mm x 1.65mm)', weight: (42.16 - 1.65) * 1.65 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-1_1/4-sch10', description: 'Tubo Schedule 1 1/4" SCH 10 (42.16mm x 2.77mm)', weight: (42.16 - 2.77) * 2.77 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-1_1/4-sch40', description: 'Tubo Schedule 1 1/4" SCH 40 (42.16mm x 3.56mm)', weight: (42.16 - 3.56) * 3.56 * TUBE_WEIGHT_CONSTANT },
+      // NPS 1 1/2"
+      { id: 'ts-1_1/2-sch5', description: 'Tubo Schedule 1 1/2" SCH 5 (48.26mm x 1.65mm)', weight: (48.26 - 1.65) * 1.65 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-1_1/2-sch10', description: 'Tubo Schedule 1 1/2" SCH 10 (48.26mm x 2.77mm)', weight: (48.26 - 2.77) * 2.77 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-1_1/2-sch40', description: 'Tubo Schedule 1 1/2" SCH 40 (48.26mm x 3.68mm)', weight: (48.26 - 3.68) * 3.68 * TUBE_WEIGHT_CONSTANT },
+      // NPS 2"
+      { id: 'ts-2-sch5', description: 'Tubo Schedule 2" SCH 5 (60.33mm x 1.65mm)', weight: (60.33 - 1.65) * 1.65 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-2-sch10', description: 'Tubo Schedule 2" SCH 10 (60.33mm x 2.77mm)', weight: (60.33 - 2.77) * 2.77 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-2-sch40', description: 'Tubo Schedule 2" SCH 40 (60.33mm x 3.91mm)', weight: (60.33 - 3.91) * 3.91 * TUBE_WEIGHT_CONSTANT },
+      // NPS 2 1/2"
+      { id: 'ts-2_1/2-sch5', description: 'Tubo Schedule 2 1/2" SCH 5 (73.03mm x 2.11mm)', weight: (73.03 - 2.11) * 2.11 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-2_1/2-sch10', description: 'Tubo Schedule 2 1/2" SCH 10 (73.03mm x 3.05mm)', weight: (73.03 - 3.05) * 3.05 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-2_1/2-sch40', description: 'Tubo Schedule 2 1/2" SCH 40 (73.03mm x 5.16mm)', weight: (73.03 - 5.16) * 5.16 * TUBE_WEIGHT_CONSTANT },
+      // NPS 3"
+      { id: 'ts-3-sch5', description: 'Tubo Schedule 3" SCH 5 (88.90mm x 2.11mm)', weight: (88.90 - 2.11) * 2.11 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-3-sch10', description: 'Tubo Schedule 3" SCH 10 (88.90mm x 3.05mm)', weight: (88.90 - 3.05) * 3.05 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-3-sch40', description: 'Tubo Schedule 3" SCH 40 (88.90mm x 5.49mm)', weight: (88.90 - 5.49) * 5.49 * TUBE_WEIGHT_CONSTANT },
+      // NPS 4"
+      { id: 'ts-4-sch5', description: 'Tubo Schedule 4" SCH 5 (114.30mm x 2.11mm)', weight: (114.30 - 2.11) * 2.11 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-4-sch10', description: 'Tubo Schedule 4" SCH 10 (114.30mm x 3.05mm)', weight: (114.30 - 3.05) * 3.05 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-4-sch40', description: 'Tubo Schedule 4" SCH 40 (114.30mm x 6.02mm)', weight: (114.30 - 6.02) * 6.02 * TUBE_WEIGHT_CONSTANT },
+    ],
+  },
 ];

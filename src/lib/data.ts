@@ -297,6 +297,7 @@ export const CATEGORIES: Category[] = [
         { id: 'bc-2-1', description: 'Barra Chata 2" x 1" (50.80mm x 25.40mm)', weight: calculateFlatBarWeight(50.80, 25.40) },
         { id: 'bc-2_1/2-1/4', description: 'Barra Chata 2.1/2" x 1/4" (63.50mm x 6.35mm)', weight: calculateFlatBarWeight(63.50, 6.35) },
         { id: 'bc-2_1/2-3/8', description: 'Barra Chata 2.1/2" x 3/8" (63.50mm x 9.52mm)', weight: calculateFlatBarWeight(63.50, 9.52) },
+        { id: 'bc-2_1/2-1/2', description: 'Barra Chata 2.1/2" x 1/2" (63.50mm x 12.70mm)', weight: calculateFlatBarWeight(63.50, 12.70) },
         { id: 'bc-3-1/4', description: 'Barra Chata 3" x 1/4" (76.20mm x 6.35mm)', weight: calculateFlatBarWeight(76.20, 6.35) },
         { id: 'bc-3-3/8', description: 'Barra Chata 3" x 3/8" (76.20mm x 9.52mm)', weight: calculateFlatBarWeight(76.20, 9.52) },
         { id: 'bc-3-1/2', description: 'Barra Chata 3" x 1/2" (76.20mm x 12.70mm)', weight: calculateFlatBarWeight(76.20, 12.70) },

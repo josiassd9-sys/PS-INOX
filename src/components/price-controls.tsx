@@ -92,7 +92,7 @@ export function PriceControls({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+        <div className="grid grid-cols-3 gap-2 md:gap-4 items-end">
           <div className="space-y-2">
             <Label htmlFor="cost-price">Custo (R$/kg)</Label>
             <Input
@@ -104,7 +104,7 @@ export function PriceControls({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="markup">Margem de Lucro (%)</Label>
+            <Label htmlFor="markup">Margem (%)</Label>
             <Input
               id="markup"
               type="number"

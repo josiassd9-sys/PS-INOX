@@ -7,6 +7,11 @@ const SHEET_WEIGHT_CONSTANT = STAINLESS_STEEL_DENSITY_KG_M3 / 1000;
 // For round bars: Weight(kg/m) = D_mm^2 * 0.00623
 const ROUND_BAR_WEIGHT_CONSTANT =
   (Math.PI / 4) * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
+// For angle bars: Weight(kg/m) = ( (Leg_A_mm * 2) - Thickness_mm ) * Thickness_mm * (DENSITY / 1000000)
+const calculateAngleBarWeight = (leg_mm: number, thickness_mm: number) => {
+    return ((leg_mm * 2) - thickness_mm) * thickness_mm * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
+}
+
 
 export type SteelItem = {
   id: string;
@@ -65,33 +70,21 @@ export const CATEGORIES: Category[] = [
         { id: 't-2-2.00', description: 'Tubo OD 2" (50.80mm) x 2.00mm', weight: (50.80 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
         { id: 't-2-2.50', description: 'Tubo OD 2" (50.80mm) x 2.50mm', weight: (50.80 - 2.50) * 2.50 * TUBE_WEIGHT_CONSTANT },
         { id: 't-2-3.00', description: 'Tubo OD 2" (50.80mm) x 3.00mm', weight: (50.80 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
-        { id: 't-2_1/2-1.00', description: 'Tubo OD 2.1/2" (63.50mm) x 1.00mm', weight: (63.50 - 1.00) * 1.00 * TUBE_WEIGHT_CONSTANT },
         { id: 't-2_1/2-1.20', description: 'Tubo OD 2.1/2" (63.50mm) x 1.20mm', weight: (63.50 - 1.20) * 1.20 * TUBE_WEIGHT_CONSTANT },
         { id: 't-2_1/2-1.50', description: 'Tubo OD 2.1/2" (63.50mm) x 1.50mm', weight: (63.50 - 1.50) * 1.50 * TUBE_WEIGHT_CONSTANT },
         { id: 't-2_1/2-2.00', description: 'Tubo OD 2.1/2" (63.50mm) x 2.00mm', weight: (63.50 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
-        { id: 't-2_1/2-2.50', description: 'Tubo OD 2.1/2" (63.50mm) x 2.50mm', weight: (63.50 - 2.50) * 2.50 * TUBE_WEIGHT_CONSTANT },
         { id: 't-2_1/2-3.00', description: 'Tubo OD 2.1/2" (63.50mm) x 3.00mm', weight: (63.50 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
-        { id: 't-3-1.00', description: 'Tubo OD 3" (76.20mm) x 1.00mm', weight: (76.20 - 1.00) * 1.00 * TUBE_WEIGHT_CONSTANT },
         { id: 't-3-1.20', description: 'Tubo OD 3" (76.20mm) x 1.20mm', weight: (76.20 - 1.20) * 1.20 * TUBE_WEIGHT_CONSTANT },
         { id: 't-3-1.50', description: 'Tubo OD 3" (76.20mm) x 1.50mm', weight: (76.20 - 1.50) * 1.50 * TUBE_WEIGHT_CONSTANT },
         { id: 't-3-2.00', description: 'Tubo OD 3" (76.20mm) x 2.00mm', weight: (76.20 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
-        { id: 't-3-2.50', description: 'Tubo OD 3" (76.20mm) x 2.50mm', weight: (76.20 - 2.50) * 2.50 * TUBE_WEIGHT_CONSTANT },
         { id: 't-3-3.00', description: 'Tubo OD 3" (76.20mm) x 3.00mm', weight: (76.20 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
         { id: 't-4-1.50', description: 'Tubo OD 4" (101.60mm) x 1.50mm', weight: (101.60 - 1.50) * 1.50 * TUBE_WEIGHT_CONSTANT },
         { id: 't-4-2.00', description: 'Tubo OD 4" (101.60mm) x 2.00mm', weight: (101.60 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
-        { id: 't-4-2.50', description: 'Tubo OD 4" (101.60mm) x 2.50mm', weight: (101.60 - 2.50) * 2.50 * TUBE_WEIGHT_CONSTANT },
         { id: 't-4-3.00', description: 'Tubo OD 4" (101.60mm) x 3.00mm', weight: (101.60 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
         { id: 't-5-2.00', description: 'Tubo OD 5" (127.00mm) x 2.00mm', weight: (127.00 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
-        { id: 't-5-2.50', description: 'Tubo OD 5" (127.00mm) x 2.50mm', weight: (127.00 - 2.50) * 2.50 * TUBE_WEIGHT_CONSTANT },
         { id: 't-5-3.00', description: 'Tubo OD 5" (127.00mm) x 3.00mm', weight: (127.00 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
         { id: 't-6-2.00', description: 'Tubo OD 6" (152.40mm) x 2.00mm', weight: (152.40 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
-        { id: 't-6-2.50', description: 'Tubo OD 6" (152.40mm) x 2.50mm', weight: (152.40 - 2.50) * 2.50 * TUBE_WEIGHT_CONSTANT },
         { id: 't-6-3.00', description: 'Tubo OD 6" (152.40mm) x 3.00mm', weight: (152.40 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
-        { id: 't-8-2.00', description: 'Tubo OD 8" (203.20mm) x 2.00mm', weight: (203.20 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
-        { id: 't-8-2.50', description: 'Tubo OD 8" (203.20mm) x 2.50mm', weight: (203.20 - 2.50) * 2.50 * TUBE_WEIGHT_CONSTANT },
-        { id: 't-8-3.00', description: 'Tubo OD 8" (203.20mm) x 3.00mm', weight: (203.20 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
-        { id: 't-10-2.50', description: 'Tubo OD 10" (254.00mm) x 2.50mm', weight: (254.00 - 2.50) * 2.50 * TUBE_WEIGHT_CONSTANT },
-        { id: 't-10-3.00', description: 'Tubo OD 10" (254.00mm) x 3.00mm', weight: (254.00 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
     ],
   },
   {
@@ -246,5 +239,31 @@ export const CATEGORIES: Category[] = [
        { id: 'ts-20-sch10', description: 'Tubo Schedule 20" SCH 10 (508.00mm x 6.35mm)', weight: (508.00 - 6.35) * 6.35 * TUBE_WEIGHT_CONSTANT },
        { id: 'ts-20-sch40', description: 'Tubo Schedule 20" SCH 40 (508.00mm x 15.09mm)', weight: (508.00 - 15.09) * 15.09 * TUBE_WEIGHT_CONSTANT },
     ],
+  },
+  {
+    id: 'cantoneiras',
+    name: 'Cantoneiras',
+    icon: 'FlipHorizontal',
+    unit: 'm',
+    items: [
+        { id: 'can-3/4-1/8', description: 'Cantoneira 3/4" x 1/8" (19.05mm x 3.17mm)', weight: calculateAngleBarWeight(19.05, 3.17) },
+        { id: 'can-3/4-3/16', description: 'Cantoneira 3/4" x 3/16" (19.05mm x 4.76mm)', weight: calculateAngleBarWeight(19.05, 4.76) },
+        { id: 'can-1-1/8', description: 'Cantoneira 1" x 1/8" (25.40mm x 3.17mm)', weight: calculateAngleBarWeight(25.40, 3.17) },
+        { id: 'can-1-3/16', description: 'Cantoneira 1" x 3/16" (25.40mm x 4.76mm)', weight: calculateAngleBarWeight(25.40, 4.76) },
+        { id: 'can-1-1/4', description: 'Cantoneira 1" x 1/4" (25.40mm x 6.35mm)', weight: calculateAngleBarWeight(25.40, 6.35) },
+        { id: 'can-1_1/4-1/8', description: 'Cantoneira 1.1/4" x 1/8" (31.75mm x 3.17mm)', weight: calculateAngleBarWeight(31.75, 3.17) },
+        { id: 'can-1_1/4-3/16', description: 'Cantoneira 1.1/4" x 3/16" (31.75mm x 4.76mm)', weight: calculateAngleBarWeight(31.75, 4.76) },
+        { id: 'can-1_1/4-1/4', description: 'Cantoneira 1.1/4" x 1/4" (31.75mm x 6.35mm)', weight: calculateAngleBarWeight(31.75, 6.35) },
+        { id: 'can-1_1/2-1/8', description: 'Cantoneira 1.1/2" x 1/8" (38.10mm x 3.17mm)', weight: calculateAngleBarWeight(38.10, 3.17) },
+        { id: 'can-1_1/2-3/16', description: 'Cantoneira 1.1/2" x 3/16" (38.10mm x 4.76mm)', weight: calculateAngleBarWeight(38.10, 4.76) },
+        { id: 'can-1_1/2-1/4', description: 'Cantoneira 1.1/2" x 1/4" (38.10mm x 6.35mm)', weight: calculateAngleBarWeight(38.10, 6.35) },
+        { id: 'can-2-1/8', description: 'Cantoneira 2" x 1/8" (50.80mm x 3.17mm)', weight: calculateAngleBarWeight(50.80, 3.17) },
+        { id: 'can-2-3/16', description: 'Cantoneira 2" x 3/16" (50.80mm x 4.76mm)', weight: calculateAngleBarWeight(50.80, 4.76) },
+        { id: 'can-2-1/4', description: 'Cantoneira 2" x 1/4" (50.80mm x 6.35mm)', weight: calculateAngleBarWeight(50.80, 6.35) },
+        { id: 'can-2_1/2-3/16', description: 'Cantoneira 2.1/2" x 3/16" (63.50mm x 4.76mm)', weight: calculateAngleBarWeight(63.50, 4.76) },
+        { id: 'can-2_1/2-1/4', description: 'Cantoneira 2.1/2" x 1/4" (63.50mm x 6.35mm)', weight: calculateAngleBarWeight(63.50, 6.35) },
+        { id: 'can-3-3/16', description: 'Cantoneira 3" x 3/16" (76.20mm x 4.76mm)', weight: calculateAngleBarWeight(76.20, 4.76) },
+        { id: 'can-3-1/4', description: 'Cantoneira 3" x 1/4" (76.20mm x 6.35mm)', weight: calculateAngleBarWeight(76.20, 6.35) },
+    ]
   },
 ];

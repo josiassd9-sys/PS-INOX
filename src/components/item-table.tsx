@@ -205,7 +205,7 @@ export function ItemTable({ category, sellingPrice, cutPercentage }: ItemTablePr
           <CutPriceCalculator
             selectedItem={selectedItem}
             sellingPrice={sellingPrice}
-            cutPercentage={cutPercentage}
+            initialCutPercentage={cutPercentage}
             onClose={() => setSelectedItem(null)}
           />
         )}

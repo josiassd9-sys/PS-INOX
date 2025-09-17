@@ -17,29 +17,55 @@ import { X } from "lucide-react";
 interface CutPriceCalculatorProps {
   selectedItem: SteelItem;
   sellingPrice: number;
-  cutPercentage: number;
+  initialCutPercentage: number;
   onClose: () => void;
 }
 
 export function CutPriceCalculator({
   selectedItem,
   sellingPrice,
-  cutPercentage,
+  initialCutPercentage,
   onClose,
 }: CutPriceCalculatorProps) {
   const [cutLength, setCutLength] = React.useState<number | "">("");
   const [finalPrice, setFinalPrice] = React.useState(0);
+  const [currentCutPercentage, setCurrentCutPercentage] = React.useState(initialCutPercentage);
+
+  // Function to calculate dynamic percentage
+  const calculateDynamicPercentage = (lengthInMm: number) => {
+    if (lengthInMm <= 0) return 100;
+    if (lengthInMm >= 3000) return 10;
+
+    // Linear interpolation: y = y1 + (x - x1) * (y2 - y1) / (x2 - x1)
+    // We are interpolating between (10mm, 100%) and (3000mm, 10%)
+    const minLength = 10;
+    const maxLength = 3000;
+    const minPercentage = 100;
+    const maxPercentage = 10;
+    
+    // Clamp the length to the defined range for calculation
+    const clampedLength = Math.max(minLength, Math.min(lengthInMm, maxLength));
+
+    const percentage = minPercentage + (clampedLength - minLength) * (maxPercentage - minPercentage) / (maxLength - minLength);
+    
+    return percentage;
+  };
 
   React.useEffect(() => {
-    if (cutLength !== "") {
+    if (cutLength !== "" && cutLength > 0) {
+      const dynamicPercentage = calculateDynamicPercentage(Number(cutLength));
+      setCurrentCutPercentage(dynamicPercentage);
+      
       const pricePerMeter = selectedItem.weight * sellingPrice;
       const piecePrice = pricePerMeter * (Number(cutLength) / 1000);
-      const finalPriceWithCut = piecePrice * (1 + cutPercentage / 100);
+      const finalPriceWithCut = piecePrice * (1 + dynamicPercentage / 100);
       setFinalPrice(Math.ceil(finalPriceWithCut));
     } else {
+      setCurrentCutPercentage(initialCutPercentage);
       setFinalPrice(0);
     }
-  }, [cutLength, sellingPrice, cutPercentage, selectedItem]);
+  }, [cutLength, sellingPrice, selectedItem, initialCutPercentage]);
+
 
   React.useEffect(() => {
     // Reset cut length when item changes
@@ -84,6 +110,12 @@ export function CutPriceCalculator({
               }
               placeholder="Ex: 500"
             />
+          </div>
+          <div className="space-y-2">
+            <Label>Acréscimo de Corte (%)</Label>
+            <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm font-semibold h-10 flex items-center">
+              {currentCutPercentage.toFixed(2)}%
+            </div>
           </div>
           <div className="space-y-2">
             <Label>Preço Final da Peça</Label>

@@ -1,10 +1,15 @@
 // Calculation constants for stainless steel
-const STAINLESS_STEEL_DENSITY_KG_M3 = 7930;
-// For tubes: Weight(kg/m) = (OD_mm - WT_mm) * WT_mm * 0.02466
-const TUBE_WEIGHT_CONSTANT = 0.02466;
-// For sheets: Weight(kg/m²) = Thickness_mm * 7.93
+const STAINLESS_STEEL_DENSITY_KG_M3 = 8000;
+// For tubes: Weight(kg/m) = (OD_mm - WT_mm) * WT_mm * (PI * DENSITY / 1000000)
+// The previous constant 0.02466 was based on a different density and formula. 
+// Correct formula for tubes is (OD - WT) * WT * PI * density / 1000. Let's use a simplified constant.
+// Using density 8000 kg/m^3: (OD-WT)*WT * 3.14159 * 8000 / 1000000 = (OD-WT)*WT*0.025132
+// Let's stick to the derived constant for consistency in calculations.
+const TUBE_WEIGHT_CONSTANT = Math.PI * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
+
+// For sheets: Weight(kg/m²) = Thickness_mm * (DENSITY / 1000)
 const SHEET_WEIGHT_CONSTANT = STAINLESS_STEEL_DENSITY_KG_M3 / 1000;
-// For round bars: Weight(kg/m) = D_mm^2 * 0.00623
+// For round bars: Weight(kg/m) = D_mm^2 * (PI/4) * (DENSITY / 1000000)
 const ROUND_BAR_WEIGHT_CONSTANT =
   (Math.PI / 4) * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
 // For angle bars: Weight(kg/m) = ( (Leg_A_mm * 2) - Thickness_mm ) * Thickness_mm * (DENSITY / 1000000)

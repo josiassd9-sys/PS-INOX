@@ -30,34 +30,27 @@ interface PriceControlsProps {
   costPrice: number;
   markup: number;
   sellingPrice: number;
+  cutPercentage: number;
   onCostChange: (value: number | null) => void;
   onMarkupChange: (value: number | null) => void;
   onSellingPriceChange: (value: number | null) => void;
+  onCutPercentageChange: (value: number | null) => void;
 }
 
 export function PriceControls({
   costPrice,
   markup,
   sellingPrice,
+  cutPercentage,
   onCostChange,
   onMarkupChange,
   onSellingPriceChange,
+  onCutPercentageChange,
 }: PriceControlsProps) {
   const { toast } = useToast();
   const [aiSuggestion, setAiSuggestion] = React.useState<{ suggestedMarkup: number; reasoning: string } | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const [cutOffPercentage, setCutOffPercentage] = React.useState(30);
-  const [cutOffSellingPrice, setCutOffSellingPrice] = React.useState(0);
-
-  React.useEffect(() => {
-    const calculatedCutOffPrice = sellingPrice * (1 + cutOffPercentage / 100);
-    setCutOffSellingPrice(calculatedCutOffPrice);
-  }, [sellingPrice, cutOffPercentage]);
-
-  const handleCutOffPercentageChange = (value: number | null) => {
-    setCutOffPercentage(value ?? 0);
-  };
 
   const handleGenerateSuggestion = async () => {
     setIsLoading(true);
@@ -93,13 +86,6 @@ export function PriceControls({
     setIsDialogOpen(false);
   };
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -110,7 +96,7 @@ export function PriceControls({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
           <div className="space-y-2">
             <Label htmlFor="cost-price">Custo (R$/kg)</Label>
             <Input
@@ -142,23 +128,13 @@ export function PriceControls({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="cut-off-percentage">Corte (%)</Label>
+            <Label htmlFor="cut-off-percentage">Acréscimo Corte (%)</Label>
             <Input
               id="cut-off-percentage"
               type="number"
-              value={cutOffPercentage > 0 ? cutOffPercentage : ""}
-              onChange={(e) => handleCutOffPercentageChange(e.target.valueAsNumber)}
+              value={cutPercentage > 0 ? cutPercentage : ""}
+              onChange={(e) => onCutPercentageChange(e.target.valueAsNumber)}
               placeholder="Ex: 30"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="cut-off-selling-price">Venda com Corte (R$/kg)</Label>
-            <Input
-              id="cut-off-selling-price"
-              type="text"
-              readOnly
-              value={formatCurrency(cutOffSellingPrice)}
-              className="font-semibold text-primary bg-muted/30"
             />
           </div>
         </div>

@@ -17,7 +17,6 @@ import { Warehouse } from "lucide-react";
 import { PriceControls } from "./price-controls";
 import { ItemTable } from "./item-table";
 import { Icon } from "./icons";
-import { cn } from "@/lib/utils";
 
 export function Dashboard() {
   const [costPrice, setCostPrice] = React.useState(25);
@@ -25,6 +24,7 @@ export function Dashboard() {
   const [sellingPrice, setSellingPrice] = React.useState(
     costPrice * (1 + markup / 100)
   );
+  const [cutPercentage, setCutPercentage] = React.useState(30);
   const [selectedCategoryId, setSelectedCategoryId] = React.useState(
     CATEGORIES[0]?.id || ""
   );
@@ -47,6 +47,10 @@ export function Dashboard() {
     if (costPrice > 0) {
       setMarkup(((selling / costPrice) - 1) * 100);
     }
+  };
+
+  const handleCutPercentageChange = (value: number | null) => {
+    setCutPercentage(value ?? 0);
   };
 
   const selectedCategory =
@@ -90,11 +94,17 @@ export function Dashboard() {
             costPrice={costPrice}
             markup={markup}
             sellingPrice={sellingPrice}
+            cutPercentage={cutPercentage}
             onCostChange={handleCostChange}
             onMarkupChange={handleMarkupChange}
             onSellingPriceChange={handleSellingPriceChange}
+            onCutPercentageChange={handleCutPercentageChange}
           />
-          <ItemTable category={selectedCategory} sellingPrice={sellingPrice} />
+          <ItemTable 
+            category={selectedCategory} 
+            sellingPrice={sellingPrice} 
+            cutPercentage={cutPercentage}
+          />
         </div>
       </SidebarInset>
     </SidebarProvider>

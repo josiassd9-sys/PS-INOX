@@ -1,13 +1,17 @@
 "use client";
 
-import { LucideProps, icons } from 'lucide-react';
+import { LucideProps, icons, RectangleHorizontal } from 'lucide-react';
+
+const customIcons = {
+    RectangleHorizontal
+}
 
 interface IconProps extends LucideProps {
-  name: keyof typeof icons;
+  name: keyof typeof icons | keyof typeof customIcons;
 }
 
 export const Icon = ({ name, ...props }: IconProps) => {
-  const LucideIcon = icons[name];
+  const LucideIcon = icons[name as keyof typeof icons] || customIcons[name as keyof typeof customIcons];
   if (!LucideIcon) {
     // Fallback or error logging
     return null;

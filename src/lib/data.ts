@@ -11,6 +11,10 @@ const ROUND_BAR_WEIGHT_CONSTANT =
 const calculateAngleBarWeight = (leg_mm: number, thickness_mm: number) => {
     return ((leg_mm * 2) - thickness_mm) * thickness_mm * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
 }
+// For flat bars: Weight(kg/m) = Width_mm * Thickness_mm * (DENSITY / 1000000)
+const calculateFlatBarWeight = (width_mm: number, thickness_mm: number) => {
+    return width_mm * thickness_mm * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
+}
 
 
 export type SteelItem = {
@@ -264,6 +268,40 @@ export const CATEGORIES: Category[] = [
         { id: 'can-2_1/2-1/4', description: 'Cantoneira 2.1/2" x 1/4" (63.50mm x 6.35mm)', weight: calculateAngleBarWeight(63.50, 6.35) },
         { id: 'can-3-3/16', description: 'Cantoneira 3" x 3/16" (76.20mm x 4.76mm)', weight: calculateAngleBarWeight(76.20, 4.76) },
         { id: 'can-3-1/4', description: 'Cantoneira 3" x 1/4" (76.20mm x 6.35mm)', weight: calculateAngleBarWeight(76.20, 6.35) },
+    ]
+  },
+  {
+    id: 'barras-chatas',
+    name: 'Barras Chatas',
+    icon: 'RectangleHorizontal',
+    unit: 'm',
+    items: [
+        { id: 'bc-3/4-1/8', description: 'Barra Chata 3/4" x 1/8" (19.05mm x 3.17mm)', weight: calculateFlatBarWeight(19.05, 3.17) },
+        { id: 'bc-3/4-3/16', description: 'Barra Chata 3/4" x 3/16" (19.05mm x 4.76mm)', weight: calculateFlatBarWeight(19.05, 4.76) },
+        { id: 'bc-3/4-1/4', description: 'Barra Chata 3/4" x 1/4" (19.05mm x 6.35mm)', weight: calculateFlatBarWeight(19.05, 6.35) },
+        { id: 'bc-1-1/8', description: 'Barra Chata 1" x 1/8" (25.40mm x 3.17mm)', weight: calculateFlatBarWeight(25.40, 3.17) },
+        { id: 'bc-1-3/16', description: 'Barra Chata 1" x 3/16" (25.40mm x 4.76mm)', weight: calculateFlatBarWeight(25.40, 4.76) },
+        { id: 'bc-1-1/4', description: 'Barra Chata 1" x 1/4" (25.40mm x 6.35mm)', weight: calculateFlatBarWeight(25.40, 6.35) },
+        { id: 'bc-1_1/4-1/8', description: 'Barra Chata 1.1/4" x 1/8" (31.75mm x 3.17mm)', weight: calculateFlatBarWeight(31.75, 3.17) },
+        { id: 'bc-1_1/4-3/16', description: 'Barra Chata 1.1/4" x 3/16" (31.75mm x 4.76mm)', weight: calculateFlatBarWeight(31.75, 4.76) },
+        { id: 'bc-1_1/4-1/4', description: 'Barra Chata 1.1/4" x 1/4" (31.75mm x 6.35mm)', weight: calculateFlatBarWeight(31.75, 6.35) },
+        { id: 'bc-1_1/2-1/8', description: 'Barra Chata 1.1/2" x 1/8" (38.10mm x 3.17mm)', weight: calculateFlatBarWeight(38.10, 3.17) },
+        { id: 'bc-1_1/2-3/16', description: 'Barra Chata 1.1/2" x 3/16" (38.10mm x 4.76mm)', weight: calculateFlatBarWeight(38.10, 4.76) },
+        { id: 'bc-1_1/2-1/4', description: 'Barra Chata 1.1/2" x 1/4" (38.10mm x 6.35mm)', weight: calculateFlatBarWeight(38.10, 6.35) },
+        { id: 'bc-2-1/8', description: 'Barra Chata 2" x 1/8" (50.80mm x 3.17mm)', weight: calculateFlatBarWeight(50.80, 3.17) },
+        { id: 'bc-2-3/16', description: 'Barra Chata 2" x 3/16" (50.80mm x 4.76mm)', weight: calculateFlatBarWeight(50.80, 4.76) },
+        { id: 'bc-2-1/4', description: 'Barra Chata 2" x 1/4" (50.80mm x 6.35mm)', weight: calculateFlatBarWeight(50.80, 6.35) },
+        { id: 'bc-2-3/8', description: 'Barra Chata 2" x 3/8" (50.80mm x 9.52mm)', weight: calculateFlatBarWeight(50.80, 9.52) },
+        { id: 'bc-2-1/2', description: 'Barra Chata 2" x 1/2" (50.80mm x 12.70mm)', weight: calculateFlatBarWeight(50.80, 12.70) },
+        { id: 'bc-2-1', description: 'Barra Chata 2" x 1" (50.80mm x 25.40mm)', weight: calculateFlatBarWeight(50.80, 25.40) },
+        { id: 'bc-2_1/2-1/4', description: 'Barra Chata 2.1/2" x 1/4" (63.50mm x 6.35mm)', weight: calculateFlatBarWeight(63.50, 6.35) },
+        { id: 'bc-2_1/2-3/8', description: 'Barra Chata 2.1/2" x 3/8" (63.50mm x 9.52mm)', weight: calculateFlatBarWeight(63.50, 9.52) },
+        { id: 'bc-3-1/4', description: 'Barra Chata 3" x 1/4" (76.20mm x 6.35mm)', weight: calculateFlatBarWeight(76.20, 6.35) },
+        { id: 'bc-3-3/8', description: 'Barra Chata 3" x 3/8" (76.20mm x 9.52mm)', weight: calculateFlatBarWeight(76.20, 9.52) },
+        { id: 'bc-3-1/2', description: 'Barra Chata 3" x 1/2" (76.20mm x 12.70mm)', weight: calculateFlatBarWeight(76.20, 12.70) },
+        { id: 'bc-4-1/4', description: 'Barra Chata 4" x 1/4" (101.60mm x 6.35mm)', weight: calculateFlatBarWeight(101.60, 6.35) },
+        { id: 'bc-4-3/8', description: 'Barra Chata 4" x 3/8" (101.60mm x 9.52mm)', weight: calculateFlatBarWeight(101.60, 9.52) },
+        { id: 'bc-4-1/2', description: 'Barra Chata 4" x 1/2" (101.60mm x 12.70mm)', weight: calculateFlatBarWeight(101.60, 12.70) },
     ]
   },
 ];

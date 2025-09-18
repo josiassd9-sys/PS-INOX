@@ -40,7 +40,6 @@ interface ItemTableProps {
 
 export function ItemTable({ category, sellingPrice }: ItemTableProps) {
   const [items, setItems] = React.useState<SteelItem[]>(category.items);
-  const [searchTerm, setSearchTerm] = React.useState("");
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [selectedItem, setSelectedItem] = React.useState<SteelItem | null>(null);
 
@@ -49,7 +48,6 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
 
   React.useEffect(() => {
     setItems(category.items);
-    setSearchTerm("");
     setSelectedItem(null); 
   }, [category]);
 
@@ -77,9 +75,7 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
     }
   };
 
-  const filteredItems = items.filter((item) =>
-    item.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredItems = items;
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -104,16 +100,6 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
       <CardHeader className="flex-row items-center justify-between">
         <CardTitle>{category.name}</CardTitle>
         <div className="flex items-center gap-2">
-          <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Buscar item..."
-              className="pl-8 sm:w-[200px] md:w-[300px]"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm" className="h-8 gap-1">

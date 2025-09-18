@@ -13,10 +13,12 @@ import {
   SidebarInset,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Warehouse } from "lucide-react";
+import { Search, Warehouse } from "lucide-react";
 import { PriceControls } from "./price-controls";
 import { ItemTable } from "./item-table";
 import { Icon } from "./icons";
+import { Input } from "./ui/input";
+import { GlobalSearchResults } from "./global-search-results";
 
 export function Dashboard() {
   const [costPrice, setCostPrice] = React.useState(30);
@@ -27,6 +29,7 @@ export function Dashboard() {
   const [selectedCategoryId, setSelectedCategoryId] = React.useState(
     CATEGORIES[0]?.id || ""
   );
+  const [searchTerm, setSearchTerm] = React.useState("");
 
   const handleCostChange = (newCost: number | null) => {
     const cost = newCost ?? 0;
@@ -48,8 +51,24 @@ export function Dashboard() {
     }
   };
 
+  const handleSelectCategory = (categoryId: string) => {
+    setSelectedCategoryId(categoryId);
+    setSearchTerm(""); // Clear search when a category is selected
+  }
+
   const selectedCategory =
     CATEGORIES.find((c) => c.id === selectedCategoryId) || CATEGORIES[0];
+  
+  const filteredCategories = React.useMemo(() => {
+    if (!searchTerm) return [];
+    
+    return CATEGORIES.map(category => {
+      const filteredItems = category.items.filter(item => 
+        item.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      return { ...category, items: filteredItems };
+    }).filter(category => category.items.length > 0);
+  }, [searchTerm]);
 
   return (
     <SidebarProvider>
@@ -65,8 +84,8 @@ export function Dashboard() {
             {CATEGORIES.map((category) => (
               <SidebarMenuItem key={category.id}>
                 <SidebarMenuButton
-                  onClick={() => setSelectedCategoryId(category.id)}
-                  isActive={selectedCategoryId === category.id}
+                  onClick={() => handleSelectCategory(category.id)}
+                  isActive={selectedCategoryId === category.id && !searchTerm}
                 >
                   <Icon name={category.icon as any} />
                   <span>{category.name}</span>
@@ -78,12 +97,18 @@ export function Dashboard() {
       </Sidebar>
       <SidebarInset>
         <div className="p-4 md:p-6 flex flex-col gap-6">
-          <header className="flex items-center justify-between md:justify-end">
+          <header className="flex items-center justify-between">
             <SidebarTrigger className="md:hidden"/>
-            <h2 className="text-xl font-semibold md:hidden">
-                {selectedCategory?.name}
-            </h2>
-            <div className="w-7"/>
+            <div className="relative flex-1 max-w-sm">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                type="search"
+                placeholder="Buscar em todas as categorias..."
+                className="w-full rounded-lg bg-background pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
           </header>
           <div className="sticky top-0 z-10 bg-background/95 py-4 backdrop-blur-sm -mx-4 px-4 -mt-4 pt-4 md:-mx-6 md:px-6">
             <PriceControls
@@ -96,10 +121,18 @@ export function Dashboard() {
             />
           </div>
           <div className="-mt-4">
-            <ItemTable 
-              category={selectedCategory} 
-              sellingPrice={sellingPrice} 
-            />
+            {searchTerm ? (
+              <GlobalSearchResults 
+                categories={filteredCategories}
+                sellingPrice={sellingPrice}
+                searchTerm={searchTerm}
+              />
+            ) : (
+              <ItemTable 
+                category={selectedCategory} 
+                sellingPrice={sellingPrice} 
+              />
+            )}
           </div>
         </div>
       </SidebarInset>

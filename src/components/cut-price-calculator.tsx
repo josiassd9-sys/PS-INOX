@@ -67,9 +67,11 @@ export function CutPriceCalculator({
 
 
   React.useEffect(() => {
-    // Reset cut length when item changes
+    // Reset cut length when item changes or when selling price changes
     setCutLength("");
-  }, [selectedItem]);
+    setFinalPrice(0);
+    setCurrentCutPercentage(0);
+  }, [selectedItem, sellingPrice]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {

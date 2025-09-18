@@ -135,12 +135,13 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
     if (sizeInMm === null || sizeInMm > 25.4) {
       return 0; // No markup for items > 1 inch or if size can't be parsed
     }
-    const minSize = 3.17; // 1/8 inch
+    const minSize = 3.175; // 1/8 inch
     const maxSize = 25.4; // 1 inch
     const minMarkup = 30; // 30%
     const maxMarkup = 10; // 10%
     
     if (sizeInMm <= minSize) return minMarkup;
+    if (sizeInMm >= maxSize) return maxMarkup;
 
     // Linear interpolation
     const markup = minMarkup - ((sizeInMm - minSize) * (minMarkup - maxMarkup)) / (maxSize - minSize);

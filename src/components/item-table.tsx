@@ -198,7 +198,12 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
                                 {formatNumber(item.weight, 3)}
                             </TableCell>
                             <TableCell className="text-right font-medium text-primary">
-                                {formatCurrency(item.weight * sellingPrice)}
+                                <div>{formatCurrency(item.weight * sellingPrice)}</div>
+                                {category.unit === 'm' && (
+                                    <div className="text-xs text-muted-foreground font-normal">
+                                        {formatCurrency(item.weight * sellingPrice * 6)} / barra
+                                    </div>
+                                )}
                             </TableCell>
                         </TableRow>
                     </CollapsibleTrigger>

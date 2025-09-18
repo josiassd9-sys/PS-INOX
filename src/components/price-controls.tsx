@@ -34,8 +34,7 @@ export function PriceControls({
       <CardHeader className="pb-2">
         <CardTitle>Parâmetros de Preço Universal</CardTitle>
         <CardDescription>
-          Altere os valores de custo, margem ou venda. Os preços de todos os
-          itens serão atualizados em tempo real.
+          Atualize em tempo real os valores de custo, margem ou venda
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-2">

@@ -182,7 +182,7 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
             </TableHeader>
             <TableBody>
               {filteredItems.map((item) => {
-                 const itemPrice = item.weight * sellingPrice;
+                 const itemPrice = category.unit === 'm' ? Math.ceil(item.weight * sellingPrice) : item.weight * sellingPrice;
 
                 return (
                 <Collapsible asChild key={item.id} open={selectedItem?.id === item.id}>

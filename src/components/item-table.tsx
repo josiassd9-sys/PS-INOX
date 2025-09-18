@@ -95,59 +95,6 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
     }).format(value);
   };
   
-  const parseSizeFromDescription = (description: string): number | null => {
-    const regex = /(\d+[,.]?\d*)"|(\d+[,.]?\d*)\s?mm/i;
-    const match = description.match(regex);
-  
-    if (match) {
-      const inchValue = match[1];
-      const mmValue = match[2];
-  
-      if (inchValue) {
-        // Handle fractions like 1/2" or 1.1/2"
-        if (inchValue.includes('/')) {
-            const parts = inchValue.split(/[. ]/);
-            let totalInches = 0;
-            if (parts.length > 1) {
-                totalInches = parseFloat(parts[0]);
-                const fractionParts = parts[1].split('/');
-                if (fractionParts.length === 2) {
-                    totalInches += parseInt(fractionParts[0]) / parseInt(fractionParts[1]);
-                }
-            } else {
-                const fractionParts = inchValue.split('/');
-                if (fractionParts.length === 2) {
-                    totalInches = parseInt(fractionParts[0]) / parseInt(fractionParts[1]);
-                }
-            }
-            return totalInches * 25.4;
-        }
-        return parseFloat(inchValue.replace(',', '.')) * 25.4;
-      }
-      if (mmValue) {
-        return parseFloat(mmValue.replace(',', '.'));
-      }
-    }
-    return null;
-  };
-
-  const calculateFractionalMarkup = (sizeInMm: number | null): number => {
-    if (sizeInMm === null || sizeInMm > 25.4) {
-      return 0; // No markup for items > 1 inch or if size can't be parsed
-    }
-    const minSize = 3.175; // 1/8 inch
-    const maxSize = 25.4; // 1 inch
-    const minMarkup = 30; // 30%
-    const maxMarkup = 10; // 10%
-    
-    if (sizeInMm <= minSize) return minMarkup;
-    if (sizeInMm >= maxSize) return maxMarkup;
-
-    // Linear interpolation
-    const markup = minMarkup - ((sizeInMm - minSize) * (minMarkup - maxMarkup)) / (maxSize - minSize);
-    return markup;
-  };
-
   const unitLabel = category.unit === "m" ? "m" : category.unit === 'm²' ? "m²" : "un";
   const weightUnitLabel = `kg/${unitLabel}`;
   const priceUnitLabel = `R$/${unitLabel}`;
@@ -235,10 +182,7 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
             </TableHeader>
             <TableBody>
               {filteredItems.map((item) => {
-                 const sizeInMm = category.unit === 'm' ? parseSizeFromDescription(item.description) : null;
-                 const fractionalMarkup = calculateFractionalMarkup(sizeInMm);
-                 const finalSellingPrice = sellingPrice * (1 + fractionalMarkup / 100);
-                 const itemPrice = item.weight * finalSellingPrice;
+                 const itemPrice = item.weight * sellingPrice;
 
                 return (
                 <Collapsible asChild key={item.id} open={selectedItem?.id === item.id}>
@@ -259,11 +203,6 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
                             </TableCell>
                             <TableCell className="text-right font-medium text-primary">
                                 <div className="flex items-center justify-end gap-2">
-                                  {fractionalMarkup > 0 && (
-                                    <Badge variant="secondary" className="h-5 text-xs">
-                                        +{fractionalMarkup.toFixed(0)}%
-                                    </Badge>
-                                  )}
                                   <span>{formatCurrency(itemPrice)}</span>
                                 </div>
                                 {category.unit === 'm' && (
@@ -281,7 +220,7 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
                                     <div className="p-4 bg-primary/5">
                                     <CutPriceCalculator
                                         selectedItem={item}
-                                        sellingPrice={finalSellingPrice}
+                                        sellingPrice={sellingPrice}
                                         onClose={() => setSelectedItem(null)}
                                     />
                                     </div>

@@ -68,7 +68,7 @@ export function PriceControls({
               value={sellingPrice > 0 ? sellingPrice.toFixed(2) : ""}
               onChange={(e) => onSellingPriceChange(e.target.valueAsNumber)}
               placeholder="Ex: 35.70"
-              className="border-primary/50 text-primary font-bold text-base"
+              className="border-primary/50 text-primary font-bold text-sm"
             />
           </div>
         </div>

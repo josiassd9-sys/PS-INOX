@@ -99,13 +99,12 @@ const dimensionsGroup2 = [
 
 const generateChapas = (): SteelItem[] => {
     const items: SteelItem[] = [];
-    const density = STAINLESS_STEEL_DENSITY_KG_M3 / 1000; // kg/mm³ * 1000 to get kg/m³
     chapasGroup1.forEach(chapa => {
         dimensionsGroup1.forEach(dim => {
             items.push({
                 id: `chapa-${chapa.thickness}-${dim.w}x${dim.h}`,
                 description: `Chapa Inox ${chapa.desc} (${dim.desc})`,
-                weight: chapa.thickness * dim.w * dim.h * density,
+                weight: chapa.thickness * dim.w * dim.h * SHEET_WEIGHT_CONSTANT,
             });
         });
     });
@@ -114,7 +113,7 @@ const generateChapas = (): SteelItem[] => {
             items.push({
                 id: `chapa-${chapa.thickness}-${dim.w}x${dim.h}`,
                 description: `Chapa Inox ${chapa.desc} (${dim.desc})`,
-                weight: chapa.thickness * dim.w * dim.h * density,
+                weight: chapa.thickness * dim.w * dim.h * SHEET_WEIGHT_CONSTANT,
             });
         });
     });
@@ -179,6 +178,12 @@ export const CATEGORIES: Category[] = [
         { id: 't-5-3.00', description: 'Tubo OD 5" (127.00mm) x 3.00mm', weight: (127.00 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
         { id: 't-6-2.00', description: 'Tubo OD 6" (152.40mm) x 2.00mm', weight: (152.40 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
         { id: 't-6-3.00', description: 'Tubo OD 6" (152.40mm) x 3.00mm', weight: (152.40 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
+        { id: 't-8-2.00', description: 'Tubo OD 8" (203.20mm) x 2.00mm', weight: (203.20 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+        { id: 't-8-3.00', description: 'Tubo OD 8" (203.20mm) x 3.00mm', weight: (203.20 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
+        { id: 't-10-2.00', description: 'Tubo OD 10" (254.00mm) x 2.00mm', weight: (254.00 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+        { id: 't-10-3.00', description: 'Tubo OD 10" (254.00mm) x 3.00mm', weight: (254.00 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
+        { id: 't-12-2.00', description: 'Tubo OD 12" (304.80mm) x 2.00mm', weight: (304.80 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+        { id: 't-12-3.00', description: 'Tubo OD 12" (304.80mm) x 3.00mm', weight: (304.80 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
     ],
   },
   {

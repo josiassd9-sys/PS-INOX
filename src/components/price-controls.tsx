@@ -31,7 +31,7 @@ export function PriceControls({
 
   return (
     <Card className="border-primary/20">
-      <CardHeader>
+      <CardHeader className="pb-4">
         <CardTitle>Parâmetros de Preço Universal</CardTitle>
         <CardDescription>
           Altere os valores de custo, margem ou venda. Os preços de todos os

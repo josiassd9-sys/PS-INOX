@@ -33,9 +33,6 @@ export function PriceControls({
     <Card className="border-primary/20">
       <CardHeader className="pb-2">
         <CardTitle>Parâmetros de Preço</CardTitle>
-        <CardDescription>
-          Atualize em tempo real os valores de custo, margem ou venda
-        </CardDescription>
       </CardHeader>
       <CardContent className="pt-2">
         <div className="grid grid-cols-3 gap-2 md:gap-4">

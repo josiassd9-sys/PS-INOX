@@ -31,15 +31,15 @@ export function PriceControls({
 
   return (
     <Card className="border-primary/20">
-      <CardHeader className="pb-4">
+      <CardHeader className="pb-2">
         <CardTitle>Parâmetros de Preço Universal</CardTitle>
         <CardDescription>
           Altere os valores de custo, margem ou venda. Os preços de todos os
           itens serão atualizados em tempo real.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-3 gap-2 md:gap-4 items-end">
+      <CardContent className="pt-2">
+        <div className="grid grid-cols-3 gap-2 md:gap-4">
           <div className="space-y-2">
             <Label htmlFor="cost-price">Custo (R$/kg)</Label>
             <Input

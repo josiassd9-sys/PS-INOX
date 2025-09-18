@@ -100,7 +100,7 @@ export function Dashboard() {
           <header className="flex items-center justify-between">
             <SidebarTrigger className="md:hidden"/>
           </header>
-          <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm -mx-4 px-4 -mt-10 pt-4 md:-mx-6 md:px-6 md:-mt-12 space-y-4 pb-4">
+          <div className="space-y-4">
             <PriceControls
               costPrice={costPrice}
               markup={markup}
@@ -120,7 +120,7 @@ export function Dashboard() {
                 />
             </div>
           </div>
-          <div className="-mt-4">
+          <div>
             {searchTerm ? (
               <GlobalSearchResults 
                 categories={filteredCategories}

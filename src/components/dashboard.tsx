@@ -99,7 +99,17 @@ export function Dashboard() {
         <div className="p-4 md:p-6 flex flex-col gap-6">
           <header className="flex items-center justify-between">
             <SidebarTrigger className="md:hidden"/>
-            <div className="relative flex-1 max-w-sm">
+          </header>
+          <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm -mx-4 px-4 -mt-10 pt-4 md:-mx-6 md:px-6 md:-mt-12 space-y-4 pb-4">
+            <PriceControls
+              costPrice={costPrice}
+              markup={markup}
+              sellingPrice={sellingPrice}
+              onCostChange={handleCostChange}
+              onMarkupChange={handleMarkupChange}
+              onSellingPriceChange={handleSellingPriceChange}
+            />
+             <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                 type="search"
@@ -109,16 +119,6 @@ export function Dashboard() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
-          </header>
-          <div className="sticky top-0 z-10 bg-background/95 py-4 backdrop-blur-sm -mx-4 px-4 -mt-4 pt-4 md:-mx-6 md:px-6">
-            <PriceControls
-              costPrice={costPrice}
-              markup={markup}
-              sellingPrice={sellingPrice}
-              onCostChange={handleCostChange}
-              onMarkupChange={handleMarkupChange}
-              onSellingPriceChange={handleSellingPriceChange}
-            />
           </div>
           <div className="-mt-4">
             {searchTerm ? (

@@ -32,7 +32,7 @@ export function PriceControls({
   return (
     <Card className="border-primary/20">
       <CardHeader className="pb-2">
-        <CardTitle>Parâmetros de Preço Universal</CardTitle>
+        <CardTitle>Parâmetros de Preço</CardTitle>
         <CardDescription>
           Atualize em tempo real os valores de custo, margem ou venda
         </CardDescription>

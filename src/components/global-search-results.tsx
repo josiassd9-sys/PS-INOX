@@ -62,11 +62,11 @@ export function GlobalSearchResults({ categories, sellingPrice, searchTerm }: Gl
                     <AccordionContent>
                         <div className="overflow-auto max-h-[calc(100vh-22rem)]">
                             <Table>
-                                <TableHeader className="sticky top-0 z-10">
+                                <TableHeader>
                                 <TableRow className="bg-primary/5 hover:bg-primary/10">
-                                    <TableHead className="bg-background">Descrição</TableHead>
-                                    <TableHead className="text-right bg-background">Peso (kg/{category.unit === 'm' ? 'm' : category.unit})</TableHead>
-                                    <TableHead className="text-right font-semibold text-primary bg-background">Preço (R$/{category.unit === 'm' ? 'm' : category.unit})</TableHead>
+                                    <TableHead>Descrição</TableHead>
+                                    <TableHead className="text-right">Peso (kg/{category.unit === 'm' ? 'm' : category.unit})</TableHead>
+                                    <TableHead className="text-right font-semibold text-primary">Preço (R$/{category.unit === 'm' ? 'm' : category.unit})</TableHead>
                                 </TableRow>
                                 </TableHeader>
                                 <TableBody>

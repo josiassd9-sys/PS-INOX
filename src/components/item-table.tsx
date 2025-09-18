@@ -155,13 +155,13 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
       <CardContent>
         <div className="border rounded-lg overflow-auto max-h-[calc(100vh-22rem)]">
           <Table>
-            <TableHeader className="sticky top-0 z-10">
+            <TableHeader>
               <TableRow className="bg-primary/5 hover:bg-primary/10">
-                <TableHead className="bg-background">Descrição</TableHead>
-                <TableHead className="text-right bg-background">
+                <TableHead>Descrição</TableHead>
+                <TableHead className="text-right">
                   Peso ({weightUnitLabel})
                 </TableHead>
-                <TableHead className="text-right font-semibold text-primary bg-background">
+                <TableHead className="text-right font-semibold text-primary">
                   Preço ({priceUnitLabel})
                 </TableHead>
               </TableRow>

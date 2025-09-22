@@ -44,7 +44,7 @@ export function ScrapCalculator() {
     }).format(value);
   };
   
-  const calculateAndUpdate = React.useCallback((updatedFields: Field[]) => {
+  const calculateAndUpdate = (updatedFields: Field[]) => {
     const newFields = updatedFields.map(f => ({ ...f, isCalculated: false }));
     
     const getField = (name: Field["name"]) => newFields.find(f => f.name === name);
@@ -123,18 +123,24 @@ export function ScrapCalculator() {
         setFinalPrice(0);
     }
     setFields(newFields);
-  }, [shape, scrapPrice]);
+  };
 
 
   React.useEffect(() => {
-    calculateAndUpdate(fields);
-  }, [scrapPrice, shape, fields, calculateAndUpdate]);
+    const finalWeightField = fields.find(f => f.name === 'weight');
+    const finalWeight = finalWeightField?.value;
+    if (finalWeight) {
+        setFinalPrice(Number(finalWeight) * scrapPrice);
+    } else {
+        setFinalPrice(0);
+    }
+  }, [scrapPrice, fields]);
 
   const handleInputChange = (name: string, value: string) => {
-    const newFields = fields.map((field) =>
-      field.name === name ? { ...field, value: value, isCalculated: false } : field
+    const updatedFields = fields.map((field) =>
+      field.name === name ? { ...field, value: value === "" ? "" : Number(value), isCalculated: false } : field
     );
-    calculateAndUpdate(newFields);
+    calculateAndUpdate(updatedFields);
   };
 
   const getVisibleFields = () => {
@@ -148,7 +154,8 @@ export function ScrapCalculator() {
   const handleShapeChange = (value: Shape | "") => {
     if (value) {
       setShape(value);
-      setFields(initialFields.map(f => ({...f, value: ""})));
+      const resetFields = initialFields.map(f => ({...f, value: ""}));
+      setFields(resetFields);
       setFinalPrice(0);
     }
   };

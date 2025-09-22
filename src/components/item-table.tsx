@@ -27,11 +27,6 @@ import {
 import { Label } from "./ui/label";
 import { cn } from "@/lib/utils";
 import { CutPriceCalculator } from "./cut-price-calculator";
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-  } from "@/components/ui/collapsible"
 
 interface ItemTableProps {
   category: Category;
@@ -41,14 +36,14 @@ interface ItemTableProps {
 export function ItemTable({ category, sellingPrice }: ItemTableProps) {
   const [items, setItems] = React.useState<SteelItem[]>(category.items);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const [selectedItem, setSelectedItem] = React.useState<SteelItem | null>(null);
+  const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
 
   const [newDescription, setNewDescription] = React.useState("");
   const [newWeight, setNewWeight] = React.useState<number | "">("");
 
   React.useEffect(() => {
     setItems(category.items);
-    setSelectedItem(null); 
+    setSelectedItemId(null); 
   }, [category]);
 
   const handleAddItem = () => {
@@ -65,12 +60,12 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
     }
   };
   
-  const handleRowClick = (item: SteelItem) => {
+  const handleRowClick = (itemId: string) => {
     if (category.unit === 'm') {
-      if (selectedItem?.id === item.id) {
-        setSelectedItem(null); // Deselect if clicking the same item
+      if (selectedItemId === itemId) {
+        setSelectedItemId(null); // Deselect if clicking the same item
       } else {
-        setSelectedItem(item);
+        setSelectedItemId(itemId);
       }
     }
   };
@@ -169,17 +164,15 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
             <TableBody>
               {filteredItems.map((item) => {
                  const itemPrice = category.unit === 'm' ? Math.ceil(item.weight * sellingPrice) : item.weight * sellingPrice;
-
+                 const isSelected = selectedItemId === item.id;
                 return (
-                <Collapsible asChild key={item.id} open={selectedItem?.id === item.id}>
-                    <>
-                    <CollapsibleTrigger asChild disabled={category.unit !== 'm'}>
+                    <React.Fragment key={item.id}>
                         <TableRow 
-                            onClick={() => handleRowClick(item)}
+                            onClick={() => handleRowClick(item.id)}
                             className={cn(
                                 'even:bg-primary/5 odd:bg-transparent',
                                 category.unit === 'm' && 'cursor-pointer',
-                                selectedItem?.id === item.id && 'bg-primary/20 hover:bg-primary/20',
+                                isSelected && 'bg-primary/20 hover:bg-primary/20',
                                 category.unit !== 'm' && 'hover:bg-primary/10',
                             )}
                             >
@@ -198,24 +191,20 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
                                 )}
                             </TableCell>
                         </TableRow>
-                    </CollapsibleTrigger>
-                    {category.unit === 'm' && (
-                        <CollapsibleContent asChild>
-                            <tr>
-                                <td colSpan={3}>
+                        {isSelected && category.unit === 'm' && (
+                             <TableRow>
+                                <TableCell colSpan={3} className="p-0">
                                     <div className="p-4 bg-primary/5">
                                     <CutPriceCalculator
                                         selectedItem={item}
                                         sellingPrice={sellingPrice}
-                                        onClose={() => setSelectedItem(null)}
+                                        onClose={() => setSelectedItemId(null)}
                                     />
                                     </div>
-                                </td>
-                            </tr>
-                        </CollapsibleContent>
-                    )}
-                    </>
-                </Collapsible>
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </React.Fragment>
               )})}
             </TableBody>
           </Table>

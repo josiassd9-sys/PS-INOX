@@ -19,15 +19,14 @@ interface GlobalSearchResultsProps {
 }
 
 export function GlobalSearchResults({ categories, sellingPrice, searchTerm }: GlobalSearchResultsProps) {
-    const [selectedItem, setSelectedItem] = React.useState<SteelItem & { categoryUnit: string } | null>(null);
+    const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
 
-    const handleRowClick = (item: SteelItem, category: Category) => {
+    const handleRowClick = (itemId: string, category: Category) => {
         if (category.unit === 'm') {
-          const itemWithUnit = { ...item, categoryUnit: category.unit };
-          if (selectedItem?.id === item.id) {
-            setSelectedItem(null); // Deselect if clicking the same item
+          if (selectedItemId === itemId) {
+            setSelectedItemId(null); // Deselect if clicking the same item
           } else {
-            setSelectedItem(itemWithUnit);
+            setSelectedItemId(itemId);
           }
         }
     };
@@ -72,11 +71,11 @@ export function GlobalSearchResults({ categories, sellingPrice, searchTerm }: Gl
                                 <TableBody>
                                     {category.items.map(item => {
                                         const itemPrice = category.unit === 'm' ? Math.ceil(item.weight * sellingPrice) : item.weight * sellingPrice;
-                                        const isSelected = selectedItem?.id === item.id;
+                                        const isSelected = selectedItemId === item.id;
                                         return (
                                             <React.Fragment key={item.id}>
                                                 <TableRow
-                                                    onClick={() => handleRowClick(item, category)}
+                                                    onClick={() => handleRowClick(item.id, category)}
                                                     className={cn(
                                                         'even:bg-primary/5 odd:bg-transparent',
                                                         category.unit === 'm' && 'cursor-pointer',
@@ -96,17 +95,17 @@ export function GlobalSearchResults({ categories, sellingPrice, searchTerm }: Gl
                                                     </TableCell>
                                                 </TableRow>
                                                 {isSelected && category.unit === 'm' && (
-                                                    <tr>
-                                                        <td colSpan={3}>
+                                                    <TableRow>
+                                                        <TableCell colSpan={3} className="p-0">
                                                             <div className="p-4 bg-primary/5">
                                                                 <CutPriceCalculator
                                                                     selectedItem={item}
                                                                     sellingPrice={sellingPrice}
-                                                                    onClose={() => setSelectedItem(null)}
+                                                                    onClose={() => setSelectedItemId(null)}
                                                                 />
                                                             </div>
-                                                        </td>
-                                                    </tr>
+                                                        </TableCell>
+                                                    </TableRow>
                                                 )}
                                             </React.Fragment>
                                         )

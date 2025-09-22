@@ -47,8 +47,8 @@ export function ScrapCalculator() {
 
   React.useEffect(() => {
     const weightField = fields.find((f) => f.name === "weight");
-    if (weightField && weightField.value && scrapPrice) {
-      setFinalPrice(Math.ceil(Number(weightField.value)) * scrapPrice);
+    if (weightField && weightField.value && scrapPrice > 0) {
+      setFinalPrice(Number(weightField.value) * scrapPrice);
     } else {
       setFinalPrice(0);
     }
@@ -61,13 +61,13 @@ export function ScrapCalculator() {
       return acc;
     }, {} as Record<keyof Omit<Field, "isCalculated" | "label" | "unit">, number | null>);
 
+    const visibleFields = getVisibleFields();
     const filledFields = fields.filter(
-      (f) => f.value !== "" && (shape === "rectangle" ? ["width", "length", "thickness", "weight"].includes(f.name) : ["diameter", "thickness", "weight"].includes(f.name))
+      (f) => visibleFields.includes(f.name) && f.value !== ""
     );
 
-    if (filledFields.length < 3 && shape === 'rectangle') return;
-    if (filledFields.length < 2 && shape === 'disc') return;
-
+    if (filledFields.length < (shape === 'rectangle' ? 3 : 2)) return;
+    
     let newFields = [...fields];
     let calculated = false;
 
@@ -129,14 +129,21 @@ export function ScrapCalculator() {
     }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fields, lastEdited, shape]);
+  }, [fields, shape]);
 
+  const getVisibleFields = () => {
+    const commonFields = ["thickness", "weight"];
+    if (shape === "rectangle") {
+      return ["width", "length", ...commonFields];
+    }
+    return ["diameter", ...commonFields];
+  };
 
   const handleInputChange = (name: string, value: string) => {
     setLastEdited(name);
     setFields(
       fields.map((field) =>
-        field.name === name ? { ...field, value: value, isCalculated: false } : {...field, isCalculated: false}
+        field.name === name ? { ...field, value: value === "" ? "" : Number(value), isCalculated: false } : {...field, isCalculated: field.isCalculated}
       )
     );
   };
@@ -149,21 +156,28 @@ export function ScrapCalculator() {
     }
   };
 
-  const getVisibleFields = () => {
-    const commonFields = ["thickness", "weight"];
-    if (shape === "rectangle") {
-      return ["width", "length", ...commonFields];
-    }
-    return ["diameter", ...commonFields];
-  };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Calculadora de Retalhos e Discos</CardTitle>
-        <CardDescription>
-          Escolha o formato e preencha os campos para calcular a dimensão ou o peso faltante.
-        </CardDescription>
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+            <div className="flex-1">
+                <CardTitle>Calculadora de Retalhos e Discos</CardTitle>
+                <CardDescription className="mt-2">
+                    Escolha o formato e preencha os campos para calcular a dimensão ou o peso faltante.
+                </CardDescription>
+            </div>
+            <div className="space-y-2 md:w-48">
+                <Label htmlFor="scrap-price">Preço do Retalho (R$/kg)</Label>
+                <Input
+                id="scrap-price"
+                type="number"
+                value={scrapPrice > 0 ? scrapPrice : ""}
+                onChange={(e) => setScrapPrice(e.target.valueAsNumber || 0)}
+                placeholder="Ex: 23.00"
+                />
+            </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex justify-center">
@@ -193,21 +207,11 @@ export function ScrapCalculator() {
                 />
               </div>
             ))}
-             <div className="space-y-2">
-                <Label htmlFor="scrap-price">Preço do Retalho (R$/kg)</Label>
-                <Input
-                id="scrap-price"
-                type="number"
-                value={scrapPrice}
-                onChange={(e) => setScrapPrice(e.target.valueAsNumber)}
-                placeholder="Ex: 23.00"
-                />
-            </div>
-            <div className="space-y-2">
-                <Label className="text-primary font-semibold">Preço Final da Peça</Label>
-                <div className="w-full rounded-md border border-primary/50 bg-primary/10 px-3 py-2 text-base md:text-sm font-bold text-primary h-10 flex items-center">
-                {formatCurrency(finalPrice)}
-                </div>
+        </div>
+        <div className="space-y-2 pt-4">
+            <Label className="text-primary font-semibold text-lg">Preço Final da Peça</Label>
+            <div className="w-full rounded-md border border-primary/50 bg-primary/10 px-4 py-3 text-xl font-bold text-primary flex items-center">
+            {formatCurrency(finalPrice)}
             </div>
         </div>
       </CardContent>

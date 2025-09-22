@@ -39,78 +39,65 @@ export function ScrapCalculator() {
 
     if (shape === 'rectangle') {
         const fields = { width, length, thickness, weight };
-        const filledFields = Object.values(fields).filter(v => v !== "" && v > 0).length;
+        const filledFields = Object.entries(fields).filter(([_, v]) => v !== "" && Number(v) > 0).map(([k]) => k);
 
-        if (filledFields !== 3) return;
+        if (filledFields.length !== 3 || lastEdited === null) return;
+        
+        const fieldToCalculate = Object.keys(fields).find(k => !filledFields.includes(k));
+
+        if (!fieldToCalculate || fieldToCalculate === lastEdited) return;
 
         // Calculate weight
-        if (weight === "" || lastEdited !== 'weight') {
-            if (w_mm > 0 && l_mm > 0 && t_mm > 0) {
-                const calculatedWeight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * density;
-                setWeight(Math.ceil(calculatedWeight));
-                return;
-            }
+        if (fieldToCalculate === 'weight' && w_mm > 0 && l_mm > 0 && t_mm > 0) {
+            const calculatedWeight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * density;
+            setWeight(Math.ceil(calculatedWeight));
         }
         // Calculate thickness
-        if (thickness === "" || lastEdited !== 'thickness') {
-            if (w_mm > 0 && l_mm > 0 && kg > 0) {
-                const calculatedThickness = (kg * 1000 * 1000 * 1000) / (w_mm * l_mm * density);
-                setThickness(Math.ceil(calculatedThickness));
-                return;
-            }
+        else if (fieldToCalculate === 'thickness' && w_mm > 0 && l_mm > 0 && kg > 0) {
+            const calculatedThickness = (kg * 1000 * 1000 * 1000) / (w_mm * l_mm * density);
+            setThickness(Math.ceil(calculatedThickness));
         }
         // Calculate length
-        if (length === "" || lastEdited !== 'length') {
-            if (w_mm > 0 && t_mm > 0 && kg > 0) {
-                const calculatedLength = (kg * 1000 * 1000 * 1000) / (w_mm * t_mm * density);
-                setLength(Math.ceil(calculatedLength));
-                return;
-            }
+        else if (fieldToCalculate === 'length' && w_mm > 0 && t_mm > 0 && kg > 0) {
+            const calculatedLength = (kg * 1000 * 1000 * 1000) / (w_mm * t_mm * density);
+            setLength(Math.ceil(calculatedLength));
         }
         // Calculate width
-        if (width === "" || lastEdited !== 'width') {
-            if (l_mm > 0 && t_mm > 0 && kg > 0) {
-                const calculatedWidth = (kg * 1000 * 1000 * 1000) / (l_mm * t_mm * density);
-                setWidth(Math.ceil(calculatedWidth));
-                return;
-            }
+        else if (fieldToCalculate === 'width' && l_mm > 0 && t_mm > 0 && kg > 0) {
+            const calculatedWidth = (kg * 1000 * 1000 * 1000) / (l_mm * t_mm * density);
+            setWidth(Math.ceil(calculatedWidth));
         }
     } else { // disc
         const fields = { diameter, thickness, weight };
-        const filledFields = Object.values(fields).filter(v => v !== "" && v > 0).length;
+        const filledFields = Object.entries(fields).filter(([_, v]) => v !== "" && Number(v) > 0).map(([k]) => k);
 
-        if (filledFields !== 2) return;
+        if (filledFields.length !== 2 || lastEdited === null) return;
+
+        const fieldToCalculate = Object.keys(fields).find(k => !filledFields.includes(k));
+
+        if (!fieldToCalculate || fieldToCalculate === lastEdited) return;
 
         // Calculate weight
-        if (weight === "" || lastEdited !== 'weight') {
-            if (d_mm > 0 && t_mm > 0) {
-                const radius_m = d_mm / 2 / 1000;
-                const volume_m3 = Math.PI * Math.pow(radius_m, 2) * (t_mm / 1000);
-                const calculatedWeight = volume_m3 * density;
-                setWeight(Math.ceil(calculatedWeight));
-                return;
-            }
+        if (fieldToCalculate === 'weight' && d_mm > 0 && t_mm > 0) {
+            const radius_m = d_mm / 2 / 1000;
+            const volume_m3 = Math.PI * Math.pow(radius_m, 2) * (t_mm / 1000);
+            const calculatedWeight = volume_m3 * density;
+            setWeight(Math.ceil(calculatedWeight));
         }
         // Calculate thickness
-        if (thickness === "" || lastEdited !== 'thickness') {
-            if (d_mm > 0 && kg > 0) {
-                const radius_m = d_mm / 2 / 1000;
-                const area_m2 = Math.PI * Math.pow(radius_m, 2);
-                const calculatedThickness = (kg / (area_m2 * density)) * 1000;
-                setThickness(Math.ceil(calculatedThickness));
-                return;
-            }
+        else if (fieldToCalculate === 'thickness' && d_mm > 0 && kg > 0) {
+            const radius_m = d_mm / 2 / 1000;
+            const area_m2 = Math.PI * Math.pow(radius_m, 2);
+            const calculatedThickness = (kg / (area_m2 * density)) * 1000;
+            setThickness(Math.ceil(calculatedThickness));
         }
         // Calculate diameter
-        if (diameter === "" || lastEdited !== 'diameter') {
-            if (t_mm > 0 && kg > 0) {
-                const volume_m3 = kg / density;
-                const area_m2 = volume_m3 / (t_mm / 1000);
-                const radius_m = Math.sqrt(area_m2 / Math.PI);
-                const calculatedDiameter = radius_m * 2 * 1000;
-                setDiameter(Math.ceil(calculatedDiameter));
-                return;
-            }
+        else if (fieldToCalculate === 'diameter' && t_mm > 0 && kg > 0) {
+            const volume_m3 = kg / density;
+            const area_m2 = volume_m3 / (t_mm / 1000);
+            const radius_m = Math.sqrt(area_m2 / Math.PI);
+            const calculatedDiameter = radius_m * 2 * 1000;
+            setDiameter(Math.ceil(calculatedDiameter));
         }
     }
 
@@ -129,31 +116,6 @@ export function ScrapCalculator() {
         const value = e.target.value;
         setter(value === "" ? "" : Number(value));
         setLastEdited(fieldName);
-
-        // This is the key: we clear the field that should be calculated next
-        if (shape === 'rectangle') {
-            const fields = { width, length, thickness, weight };
-            const fieldSetters = { setWidth, setLength, setThickness, setWeight };
-            const fieldNames = ['width', 'length', 'thickness', 'weight'];
-            
-            const filledCount = fieldNames.filter(name => {
-                if (name === fieldName) return value !== '';
-                // @ts-ignore
-                return fields[name] !== '';
-            }).length;
-
-            if (filledCount === 3) {
-                const emptyField = fieldNames.find(name => {
-                    if (name === fieldName) return value === '';
-                    // @ts-ignore
-                    return fields[name] === '';
-                });
-                if (emptyField && emptyField !== fieldName) {
-                    // @ts-ignore
-                    fieldSetters[setterNameMap[emptyField]]('');
-                }
-            }
-        }
     }
   }
 
@@ -174,7 +136,7 @@ export function ScrapCalculator() {
           <div className="flex-1">
             <CardTitle>Calculadora de Retalhos e Discos</CardTitle>
             <CardDescription className="mt-2">
-              Preencha os campos para calcular a dimensão ou o peso faltante.
+              Preencha 3 dos 4 campos (ou 2 de 3 para disco) para calcular o valor faltante.
             </CardDescription>
           </div>
           <div className="space-y-2">

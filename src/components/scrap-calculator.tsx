@@ -15,142 +15,119 @@ import { STAINLESS_STEEL_DENSITY_KG_M3 } from "@/lib/data";
 
 type Shape = "rectangle" | "disc";
 
-interface Field {
-  name: "width" | "length" | "diameter" | "thickness" | "weight";
-  label: string;
-  unit: string;
-  value: number | "";
-  isCalculated?: boolean;
+interface Fields {
+  width: number | "";
+  length: number | "";
+  diameter: number | "";
+  thickness: number | "";
+  weight: number | "";
 }
-
-const initialFields: Field[] = [
-  { name: "width", label: "Largura", unit: "mm", value: "" },
-  { name: "length", label: "Comprimento", unit: "mm", value: "" },
-  { name: "diameter", label: "Diâmetro", unit: "mm", value: "" },
-  { name: "thickness", label: "Espessura", unit: "mm", value: "" },
-  { name: "weight", label: "Peso", unit: "kg", value: "" },
-];
 
 export function ScrapCalculator() {
   const [shape, setShape] = React.useState<Shape>("rectangle");
-  const [fields, setFields] = React.useState<Field[]>(initialFields);
+  const [fields, setFields] = React.useState<Fields>({
+    width: "",
+    length: "",
+    diameter: "",
+    thickness: "",
+    weight: "",
+  });
   const [scrapPrice, setScrapPrice] = React.useState(23);
   const [finalPrice, setFinalPrice] = React.useState(0);
+  const [calculating, setCalculating] = React.useState<keyof Fields | null>(null);
 
-  const calculateAndUpdate = (updatedFields: Field[], currentInputName?: string) => {
-    const newFields = updatedFields.map(f => ({ ...f, isCalculated: f.name !== currentInputName && f.isCalculated }));
+  const handleInputChange = (name: keyof Fields, value: string) => {
+    setCalculating(null); // Stop highlighting any field as calculated when user types
+    setFields(prev => ({
+        ...prev,
+        [name]: value === "" ? "" : Number(value)
+    }));
+  };
 
-    const getField = (name: Field["name"]) => newFields.find(f => f.name === name);
-    const getValue = (name: Field["name"]): number | null => {
-        const field = getField(name);
-        const value = field?.value;
-        return value !== "" && value != null && !isNaN(Number(value)) && Number(value) > 0 ? Number(value) : null;
-    }
+  React.useEffect(() => {
+    const vals = {
+        width: fields.width !== "" ? Number(fields.width) : null,
+        length: fields.length !== "" ? Number(fields.length) : null,
+        diameter: fields.diameter !== "" ? Number(fields.diameter) : null,
+        thickness: fields.thickness !== "" ? Number(fields.thickness) : null,
+        weight: fields.weight !== "" ? Number(fields.weight) : null,
+    };
 
-    let weightValue: number | "" | null = getValue('weight');
+    let calculatedField: keyof Fields | null = null;
+    let newFields = { ...fields };
 
     if (shape === "rectangle") {
-        let width = getValue('width');
-        let length = getValue('length');
-        let thickness = getValue('thickness');
-        let weight = getValue('weight');
+        const { width, length, thickness, weight } = vals;
+        const providedFields = [width, length, thickness, weight].filter(v => v !== null).length;
 
-        const providedFields = [width, length, thickness, weight];
-        const nullCount = providedFields.filter(v => v === null).length;
-
-        if (nullCount === 1) {
-            if (weight === null) {
-                const newWeight = (width! * length! * thickness! * STAINLESS_STEEL_DENSITY_KG_M3) / 1_000_000_000;
-                const weightField = getField('weight')!;
-                weightField.value = Math.ceil(newWeight);
-                weightField.isCalculated = true;
-            } else if (thickness === null) {
-                const newThickness = (weight * 1_000_000_000) / (width! * length! * STAINLESS_STEEL_DENSITY_KG_M3);
-                const thicknessField = getField('thickness')!;
-                thicknessField.value = newThickness;
-                thicknessField.isCalculated = true;
-            } else if (length === null) {
-                const newLength = (weight * 1_000_000_000) / (width! * thickness! * STAINLESS_STEEL_DENSITY_KG_M3);
-                const lengthField = getField('length')!;
-                lengthField.value = newLength;
-                lengthField.isCalculated = true;
-            } else if (width === null) {
-                const newWidth = (weight * 1_000_000_000) / (length! * thickness! * STAINLESS_STEEL_DENSITY_KG_M3);
-                const widthField = getField('width')!;
-                widthField.value = newWidth;
-                widthField.isCalculated = true;
+        if (providedFields === 3) {
+            if (weight === null && width && length && thickness) {
+                const newWeight = (width * length * thickness * STAINLESS_STEEL_DENSITY_KG_M3) / 1_000_000_000;
+                newFields.weight = Math.ceil(newWeight);
+                calculatedField = 'weight';
+            } else if (thickness === null && width && length && weight) {
+                const newThickness = (weight * 1_000_000_000) / (width * length * STAINLESS_STEEL_DENSITY_KG_M3);
+                newFields.thickness = Math.ceil(newThickness);
+                calculatedField = 'thickness';
+            } else if (length === null && width && thickness && weight) {
+                const newLength = (weight * 1_000_000_000) / (width * thickness * STAINLESS_STEEL_DENSITY_KG_M3);
+                newFields.length = Math.ceil(newLength);
+                calculatedField = 'length';
+            } else if (width === null && length && thickness && weight) {
+                const newWidth = (weight * 1_000_000_000) / (length * thickness * STAINLESS_STEEL_DENSITY_KG_M3);
+                newFields.width = Math.ceil(newWidth);
+                calculatedField = 'width';
             }
-        } else {
-             // Clear previously calculated values if not enough fields are filled
-             newFields.forEach(f => { if (f.isCalculated) f.value = ""; f.isCalculated = false; });
         }
-    } else if (shape === "disc") {
-        let diameter = getValue('diameter');
-        let thickness = getValue('thickness');
-        let weight = getValue('weight');
-        
-        const providedFields = [diameter, thickness, weight];
-        const nullCount = providedFields.filter(v => v === null).length;
+    } else { // Disc
+        const { diameter, thickness, weight } = vals;
+        const providedFields = [diameter, thickness, weight].filter(v => v !== null).length;
 
-        if (nullCount === 1) {
-            if (weight === null) {
-                const radius = diameter! / 2;
-                const newWeight = (Math.PI * radius * radius * thickness! * STAINLESS_STEEL_DENSITY_KG_M3) / 1_000_000_000;
-                const weightField = getField('weight')!;
-                weightField.value = Math.ceil(newWeight);
-                weightField.isCalculated = true;
-            } else if (thickness === null) {
-                const radius = diameter! / 2;
+        if (providedFields === 2) {
+            if (weight === null && diameter && thickness) {
+                const radius = diameter / 2;
+                const newWeight = (Math.PI * radius * radius * thickness * STAINLESS_STEEL_DENSITY_KG_M3) / 1_000_000_000;
+                newFields.weight = Math.ceil(newWeight);
+                calculatedField = 'weight';
+            } else if (thickness === null && diameter && weight) {
+                const radius = diameter / 2;
                 const newThickness = (weight * 1_000_000_000) / (Math.PI * radius * radius * STAINLESS_STEEL_DENSITY_KG_M3);
-                const thicknessField = getField('thickness')!;
-                thicknessField.value = newThickness;
-                thicknessField.isCalculated = true;
-            } else if (diameter === null) {
-                const newDiameter = Math.sqrt((weight * 1_000_000_000) / (thickness! * Math.PI * STAINLESS_STEEL_DENSITY_KG_M3)) * 2;
-                const diameterField = getField('diameter')!;
-                diameterField.value = newDiameter;
-                diameterField.isCalculated = true;
+                newFields.thickness = Math.ceil(newThickness);
+                calculatedField = 'thickness';
+            } else if (diameter === null && thickness && weight) {
+                const newDiameter = Math.sqrt((weight * 1_000_000_000) / (thickness * Math.PI * STAINLESS_STEEL_DENSITY_KG_M3)) * 2;
+                newFields.diameter = Math.ceil(newDiameter);
+                calculatedField = 'diameter';
             }
-        } else {
-            // Clear previously calculated values
-            newFields.forEach(f => { if (f.isCalculated) f.value = ""; f.isCalculated = false; });
         }
     }
+
+    if (calculatedField) {
+        setFields(newFields);
+        setCalculating(calculatedField);
+    }
     
-    weightValue = getValue('weight');
-    if (weightValue && scrapPrice > 0) {
-        setFinalPrice(Number(weightValue) * scrapPrice);
+    const finalWeight = newFields.weight !== "" ? Number(newFields.weight) : 0;
+    if (finalWeight > 0 && scrapPrice > 0) {
+        setFinalPrice(finalWeight * scrapPrice);
     } else {
         setFinalPrice(0);
     }
-    setFields(newFields);
-  };
 
-  const handleInputChange = (name: Field['name'], value: string) => {
-    const updatedFields = fields.map((field) =>
-      field.name === name ? { ...field, value: value, isCalculated: false } : field
-    );
-    calculateAndUpdate(updatedFields, name);
-  };
+  }, [fields, shape, scrapPrice]);
+
   
   const handleScrapPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPrice = e.target.valueAsNumber;
     setScrapPrice(isNaN(newPrice) ? 0 : newPrice);
-    const weightField = fields.find(f => f.name === 'weight');
-    const weight = weightField?.value;
-    if (weight && newPrice > 0) {
-        setFinalPrice(Number(weight) * newPrice);
-    } else {
-        setFinalPrice(0);
-    }
   }
 
   const handleShapeChange = (value: Shape | "") => {
     if (value) {
       setShape(value);
-      const resetFields = initialFields.map(f => ({...f, value: "", isCalculated: false}));
-      setFields(resetFields);
+      setFields({ width: "", length: "", diameter: "", thickness: "", weight: "" });
       setFinalPrice(0);
+      setCalculating(null);
     }
   };
 
@@ -160,14 +137,37 @@ export function ScrapCalculator() {
       currency: "BRL",
     }).format(value);
   };
+  
+  const renderInput = (name: keyof Fields, label: string, unit: string) => {
+    const isCalculated = calculating === name;
+    return (
+        <div key={name} className="space-y-2">
+            <Label htmlFor={name}>{label} ({unit})</Label>
+            <Input
+              id={name}
+              type="number"
+              value={fields[name]}
+              onChange={(e) => handleInputChange(name, e.target.value)}
+              placeholder={`Insira ${label.toLowerCase()}`}
+              className={isCalculated ? "bg-primary/10 border-primary/50 font-bold" : ""}
+              readOnly={isCalculated}
+            />
+        </div>
+    );
+  }
 
-  const getVisibleFields = () => {
-    const commonFields = ["thickness", "weight"];
-    if (shape === "rectangle") {
-      return ["width", "length", ...commonFields];
-    }
-    return ["diameter", ...commonFields];
+  const visibleFields: (keyof Fields)[] = shape === 'rectangle' 
+    ? ["width", "length", "thickness", "weight"] 
+    : ["diameter", "thickness", "weight"];
+  
+  const fieldLabels: Record<keyof Fields, { label: string, unit: string }> = {
+    width: { label: "Largura", unit: "mm" },
+    length: { label: "Comprimento", unit: "mm" },
+    diameter: { label: "Diâmetro", unit: "mm" },
+    thickness: { label: "Espessura", unit: "mm" },
+    weight: { label: "Peso", unit: "kg" }
   };
+
 
   return (
     <Card>
@@ -204,22 +204,7 @@ export function ScrapCalculator() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {fields
-            .filter((f) => getVisibleFields().includes(f.name))
-            .map((field) => (
-              <div key={field.name} className="space-y-2">
-                <Label htmlFor={field.name}>{field.label} ({field.unit})</Label>
-                <Input
-                  id={field.name}
-                  type="number"
-                  value={field.value}
-                  onChange={(e) => handleInputChange(field.name, e.target.value)}
-                  placeholder={`Insira ${field.label.toLowerCase()}`}
-                  className={field.isCalculated ? "bg-primary/10 border-primary/50 font-bold" : ""}
-                  readOnly={field.isCalculated}
-                />
-              </div>
-            ))}
+          {visibleFields.map(fieldName => renderInput(fieldName, fieldLabels[fieldName].label, fieldLabels[fieldName].unit))}
         </div>
         <div className="space-y-2 pt-4">
             <Label className="text-primary font-semibold text-lg">Preço Final da Peça</Label>
@@ -231,5 +216,3 @@ export function ScrapCalculator() {
     </Card>
   );
 }
-
-    

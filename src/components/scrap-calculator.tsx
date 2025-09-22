@@ -34,7 +34,6 @@ const initialFields: Field[] = [
 export function ScrapCalculator() {
   const [shape, setShape] = React.useState<Shape>("rectangle");
   const [fields, setFields] = React.useState<Field[]>(initialFields);
-  const [lastEdited, setLastEdited] = React.useState<string | null>(null);
   const [scrapPrice, setScrapPrice] = React.useState(23);
   const [finalPrice, setFinalPrice] = React.useState(0);
 
@@ -44,92 +43,91 @@ export function ScrapCalculator() {
       currency: "BRL",
     }).format(value);
   };
+  
+  const calculateAndUpdate = (currentFields: Field[], changedFieldName: string) => {
+    const newFields = currentFields.map(f => ({ ...f, isCalculated: f.name !== changedFieldName && f.isCalculated }));
 
-  React.useEffect(() => {
-    const weightField = fields.find((f) => f.name === "weight");
-    if (weightField && weightField.value && scrapPrice > 0) {
-      setFinalPrice(Number(weightField.value) * scrapPrice);
-    } else {
-      setFinalPrice(0);
-    }
-  }, [fields, scrapPrice]);
-
-  React.useEffect(() => {
-    const fieldValues = fields.reduce((acc, field) => {
+    const fieldValues = newFields.reduce((acc, field) => {
       acc[field.name] =
         field.value !== "" ? parseFloat(field.value as string) : null;
       return acc;
     }, {} as Record<keyof Omit<Field, "isCalculated" | "label" | "unit">, number | null>);
 
-    const visibleFields = getVisibleFields();
-    const filledFields = fields.filter(
-      (f) => visibleFields.includes(f.name) && f.value !== ""
-    );
-
-    if (filledFields.length < (shape === 'rectangle' ? 3 : 2)) return;
-    
-    let newFields = [...fields];
     let calculated = false;
 
-    // Rectangle Calculations
     if (shape === "rectangle") {
       const { width, length, thickness, weight } = fieldValues;
-      // Calculate weight
-      if (width && length && thickness && lastEdited !== "weight") {
-        const newWeight = (width * length * thickness * STAINLESS_STEEL_DENSITY_KG_M3) / 1000000;
-        newFields = newFields.map(f => f.name === 'weight' ? {...f, value: Math.ceil(newWeight), isCalculated: true} : f);
-        calculated = true;
+      const filledCount = [width, length, thickness, weight].filter(v => v !== null).length;
+      
+      if (filledCount === 3) {
+          if (weight === null) {
+              const newWeight = (width! * length! * thickness! * STAINLESS_STEEL_DENSITY_KG_M3) / 1000000;
+              const weightField = newFields.find(f => f.name === 'weight')!;
+              weightField.value = Math.ceil(newWeight);
+              weightField.isCalculated = true;
+          } else if (thickness === null) {
+              const newThickness = (weight * 1000000) / (width! * length! * STAINLESS_STEEL_DENSITY_KG_M3);
+              const thicknessField = newFields.find(f => f.name === 'thickness')!;
+              thicknessField.value = newThickness;
+              thicknessField.isCalculated = true;
+          } else if (length === null) {
+              const newLength = (weight * 1000000) / (width! * thickness! * STAINLESS_STEEL_DENSITY_KG_M3);
+              const lengthField = newFields.find(f => f.name === 'length')!;
+              lengthField.value = newLength;
+              lengthField.isCalculated = true;
+          } else if (width === null) {
+              const newWidth = (weight * 1000000) / (length! * thickness! * STAINLESS_STEEL_DENSITY_KG_M3);
+              const widthField = newFields.find(f => f.name === 'width')!;
+              widthField.value = newWidth;
+              widthField.isCalculated = true;
+          }
+          calculated = true;
       }
-      // Calculate thickness
-      else if (width && length && weight && lastEdited !== "thickness") {
-        const newThickness = (weight * 1000000) / (width * length * STAINLESS_STEEL_DENSITY_KG_M3);
-        newFields = newFields.map(f => f.name === 'thickness' ? {...f, value: newThickness, isCalculated: true} : f);
-        calculated = true;
-      }
-      // Calculate length
-      else if (width && thickness && weight && lastEdited !== "length") {
-        const newLength = (weight * 1000000) / (width * thickness * STAINLESS_STEEL_DENSITY_KG_M3);
-        newFields = newFields.map(f => f.name === 'length' ? {...f, value: newLength, isCalculated: true} : f);
-        calculated = true;
-      }
-      // Calculate width
-      else if (length && thickness && weight && lastEdited !== "width") {
-        const newWidth = (weight * 1000000) / (length * thickness * STAINLESS_STEEL_DENSITY_KG_M3);
-        newFields = newFields.map(f => f.name === 'width' ? {...f, value: newWidth, isCalculated: true} : f);
-        calculated = true;
-      }
-    }
-    // Disc Calculations
-    else if (shape === "disc") {
+    } else if (shape === "disc") {
         const { diameter, thickness, weight } = fieldValues;
-        // Calculate weight
-        if(diameter && thickness && lastEdited !== "weight"){
-            const radius = diameter / 2;
-            const newWeight = (Math.PI * radius * radius * thickness * STAINLESS_STEEL_DENSITY_KG_M3) / 1000000;
-            newFields = newFields.map(f => f.name === 'weight' ? {...f, value: Math.ceil(newWeight), isCalculated: true} : f);
-            calculated = true;
-        }
-        // Calculate thickness
-        else if(diameter && weight && lastEdited !== "thickness"){
-            const radius = diameter / 2;
-            const newThickness = (weight * 1000000) / (Math.PI * radius * radius * STAINLESS_STEEL_DENSITY_KG_M3);
-            newFields = newFields.map(f => f.name === 'thickness' ? {...f, value: newThickness, isCalculated: true} : f);
-            calculated = true;
-        }
-        // Calculate diameter
-        else if(thickness && weight && lastEdited !== "diameter"){
-            const newDiameter = Math.sqrt((weight * 1000000) / (thickness * Math.PI * STAINLESS_STEEL_DENSITY_KG_M3)) * 2;
-            newFields = newFields.map(f => f.name === 'diameter' ? {...f, value: newDiameter, isCalculated: true} : f);
+        const filledCount = [diameter, thickness, weight].filter(v => v !== null).length;
+
+        if (filledCount === 2) {
+            if (weight === null) {
+                const radius = diameter! / 2;
+                const newWeight = (Math.PI * radius * radius * thickness! * STAINLESS_STEEL_DENSITY_KG_M3) / 1000000;
+                const weightField = newFields.find(f => f.name === 'weight')!;
+                weightField.value = Math.ceil(newWeight);
+                weightField.isCalculated = true;
+            } else if (thickness === null) {
+                const radius = diameter! / 2;
+                const newThickness = (weight * 1000000) / (Math.PI * radius * radius * STAINLESS_STEEL_DENSITY_KG_M3);
+                const thicknessField = newFields.find(f => f.name === 'thickness')!;
+                thicknessField.value = newThickness;
+                thicknessField.isCalculated = true;
+            } else if (diameter === null) {
+                const newDiameter = Math.sqrt((weight * 1000000) / (thickness! * Math.PI * STAINLESS_STEEL_DENSITY_KG_M3)) * 2;
+                const diameterField = newFields.find(f => f.name === 'diameter')!;
+                diameterField.value = newDiameter;
+                diameterField.isCalculated = true;
+            }
             calculated = true;
         }
     }
     
     if (calculated) {
       setFields(newFields);
+      const finalWeight = newFields.find(f => f.name === 'weight')?.value;
+      if (finalWeight) {
+        setFinalPrice(Number(finalWeight) * scrapPrice);
+      } else {
+        setFinalPrice(0);
+      }
+    } else {
+        const finalWeight = newFields.find(f => f.name === 'weight')?.value;
+        if (finalWeight) {
+            setFinalPrice(Number(finalWeight) * scrapPrice);
+        } else {
+            setFinalPrice(0);
+        }
     }
+  }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fields, shape]);
 
   const getVisibleFields = () => {
     const commonFields = ["thickness", "weight"];
@@ -140,19 +138,23 @@ export function ScrapCalculator() {
   };
 
   const handleInputChange = (name: string, value: string) => {
-    setLastEdited(name);
-    setFields(
-      fields.map((field) =>
-        field.name === name ? { ...field, value: value === "" ? "" : Number(value), isCalculated: false } : {...field, isCalculated: field.isCalculated}
-      )
+    const newFields = fields.map((field) =>
+      field.name === name ? { ...field, value: value === "" ? "" : Number(value), isCalculated: false } : {...field, isCalculated: field.isCalculated && field.name !== name}
     );
+    setFields(newFields);
+    calculateAndUpdate(newFields, name);
   };
+
+  React.useEffect(() => {
+    const weightValue = fields.find(f => f.name === 'weight')?.value;
+    setFinalPrice(Number(weightValue || 0) * scrapPrice);
+  }, [scrapPrice, fields]);
   
   const handleShapeChange = (value: Shape | "") => {
     if (value) {
       setShape(value);
       setFields(initialFields.map(f => ({...f, value: ""})));
-      setLastEdited(null);
+      setFinalPrice(0);
     }
   };
 

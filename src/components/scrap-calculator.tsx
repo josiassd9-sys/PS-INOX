@@ -18,6 +18,7 @@ type Shape = "rectangle" | "disc";
 export function ScrapCalculator() {
   const [shape, setShape] = React.useState<Shape>("rectangle");
   const [scrapPrice, setScrapPrice] = React.useState<number | "">(23);
+  const [lastEdited, setLastEdited] = React.useState<string | null>(null);
 
   // States for rectangle
   const [width, setWidth] = React.useState<number | "">("");
@@ -27,125 +28,135 @@ export function ScrapCalculator() {
 
   // State for disc
   const [diameter, setDiameter] = React.useState<number | "">("");
-  
-  const [lastEdited, setLastEdited] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    const fields =
-      shape === "rectangle"
-        ? { width, length, thickness, weight }
-        : { diameter, thickness, weight };
-    
-    const filledFields = Object.values(fields).filter(v => v !== "" && v !== 0).length;
-    const expectedFilled = shape === 'rectangle' ? 3 : 2;
-
-    if (filledFields < expectedFilled) {
-        if (lastEdited) {
-             const resetField = (field: string) => {
-                if (field === 'width') setWidth('');
-                if (field === 'length') setLength('');
-                if (field === 'thickness') setThickness('');
-                if (field === 'weight') setWeight('');
-                if (field === 'diameter') setDiameter('');
-            }
-            // If we have less than the required fields, find the one that wasn't last edited and clear it.
-            const fieldToClear = Object.keys(fields).find(k => k !== lastEdited && Object.values(fields).filter(v => v === '').length < Object.keys(fields).length -1);
-            if (fieldToClear) {
-               // resetField(fieldToClear);
-            }
-        }
-       return;
-    };
-    if (filledFields > expectedFilled) return;
-
-    // --- Calculation Logic ---
     const w_mm = Number(width);
     const l_mm = Number(length);
     const t_mm = Number(thickness);
     const kg = Number(weight);
     const d_mm = Number(diameter);
-    const density = STAINLESS_STEEL_DENSITY_KG_M3; // kg/m³
+    const density = STAINLESS_STEEL_DENSITY_KG_M3;
 
     if (shape === 'rectangle') {
-        if (weight === "" && width && length && thickness && lastEdited !== 'weight') {
-            const calculatedWeight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * density;
-            setWeight(Math.ceil(calculatedWeight));
-        } else if (thickness === "" && width && length && weight && lastEdited !== 'thickness') {
-            const calculatedThickness = (kg * 1000) / ((w_mm / 1000) * (l_mm / 1000) * density);
-            setThickness(Math.ceil(calculatedThickness));
-        } else if (length === "" && width && thickness && weight && lastEdited !== 'length') {
-            const calculatedLength = (kg * 1000) / ((w_mm / 1000) * (t_mm / 1000) * density);
-            setLength(Math.ceil(calculatedLength));
-        } else if (width === "" && length && thickness && weight && lastEdited !== 'width') {
-             const calculatedWidth = (kg * 1000) / ((l_mm / 1000) * (t_mm / 1000) * density);
-            setWidth(Math.ceil(calculatedWidth));
+        const fields = { width, length, thickness, weight };
+        const filledFields = Object.values(fields).filter(v => v !== "" && v > 0).length;
+
+        if (filledFields !== 3) return;
+
+        // Calculate weight
+        if (weight === "" || lastEdited !== 'weight') {
+            if (w_mm > 0 && l_mm > 0 && t_mm > 0) {
+                const calculatedWeight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * density;
+                setWeight(Math.ceil(calculatedWeight));
+                return;
+            }
+        }
+        // Calculate thickness
+        if (thickness === "" || lastEdited !== 'thickness') {
+            if (w_mm > 0 && l_mm > 0 && kg > 0) {
+                const calculatedThickness = (kg * 1000 * 1000 * 1000) / (w_mm * l_mm * density);
+                setThickness(Math.ceil(calculatedThickness));
+                return;
+            }
+        }
+        // Calculate length
+        if (length === "" || lastEdited !== 'length') {
+            if (w_mm > 0 && t_mm > 0 && kg > 0) {
+                const calculatedLength = (kg * 1000 * 1000 * 1000) / (w_mm * t_mm * density);
+                setLength(Math.ceil(calculatedLength));
+                return;
+            }
+        }
+        // Calculate width
+        if (width === "" || lastEdited !== 'width') {
+            if (l_mm > 0 && t_mm > 0 && kg > 0) {
+                const calculatedWidth = (kg * 1000 * 1000 * 1000) / (l_mm * t_mm * density);
+                setWidth(Math.ceil(calculatedWidth));
+                return;
+            }
         }
     } else { // disc
-        if (weight === "" && diameter && thickness && lastEdited !== 'weight') {
-            const radius_m = d_mm / 2 / 1000;
-            const volume_m3 = Math.PI * Math.pow(radius_m, 2) * (t_mm / 1000);
-            const calculatedWeight = volume_m3 * density;
-            setWeight(Math.ceil(calculatedWeight));
-        } else if (thickness === "" && diameter && weight && lastEdited !== 'thickness') {
-            const radius_m = d_mm / 2 / 1000;
-            const area_m2 = Math.PI * Math.pow(radius_m, 2);
-            const calculatedThickness = (kg / (area_m2 * density)) * 1000;
-            setThickness(Math.ceil(calculatedThickness));
-        } else if (diameter === "" && thickness && weight && lastEdited !== 'diameter') {
-            const volume_m3 = kg / density;
-            const area_m2 = volume_m3 / (t_mm / 1000);
-            const radius_m = Math.sqrt(area_m2 / Math.PI);
-            const calculatedDiameter = radius_m * 2 * 1000;
-            setDiameter(Math.ceil(calculatedDiameter));
+        const fields = { diameter, thickness, weight };
+        const filledFields = Object.values(fields).filter(v => v !== "" && v > 0).length;
+
+        if (filledFields !== 2) return;
+
+        // Calculate weight
+        if (weight === "" || lastEdited !== 'weight') {
+            if (d_mm > 0 && t_mm > 0) {
+                const radius_m = d_mm / 2 / 1000;
+                const volume_m3 = Math.PI * Math.pow(radius_m, 2) * (t_mm / 1000);
+                const calculatedWeight = volume_m3 * density;
+                setWeight(Math.ceil(calculatedWeight));
+                return;
+            }
+        }
+        // Calculate thickness
+        if (thickness === "" || lastEdited !== 'thickness') {
+            if (d_mm > 0 && kg > 0) {
+                const radius_m = d_mm / 2 / 1000;
+                const area_m2 = Math.PI * Math.pow(radius_m, 2);
+                const calculatedThickness = (kg / (area_m2 * density)) * 1000;
+                setThickness(Math.ceil(calculatedThickness));
+                return;
+            }
+        }
+        // Calculate diameter
+        if (diameter === "" || lastEdited !== 'diameter') {
+            if (t_mm > 0 && kg > 0) {
+                const volume_m3 = kg / density;
+                const area_m2 = volume_m3 / (t_mm / 1000);
+                const radius_m = Math.sqrt(area_m2 / Math.PI);
+                const calculatedDiameter = radius_m * 2 * 1000;
+                setDiameter(Math.ceil(calculatedDiameter));
+                return;
+            }
         }
     }
 
   }, [width, length, thickness, weight, diameter, shape, lastEdited]);
 
-
   const handleShapeChange = (value: Shape | "") => {
     if (value) {
       setShape(value);
-      setWidth('');
-      setLength('');
-      setThickness('');
-      setWeight('');
-      setDiameter('');
+      setWidth(''); setLength(''); setThickness(''); setWeight(''); setDiameter('');
       setLastEdited(null);
     }
   };
 
-  const createInputHandler = (setter: React.Dispatch<React.SetStateAction<number | "">>, fieldName: string) => {
+  const handleInputChange = (setter: React.Dispatch<React.SetStateAction<number | "">>, fieldName: string) => {
     return (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setter(value === "" ? "" : Number(value));
         setLastEdited(fieldName);
-        
-        // Reset the calculated field to allow new calculation
-        const allFields = shape === 'rectangle' ? ['width', 'length', 'thickness', 'weight'] : ['diameter', 'thickness', 'weight'];
-        const currentValues = shape === 'rectangle' ? {width, length, thickness, weight} : {diameter, thickness, weight};
-        
-        const filledCount = allFields.filter(f => {
-            if (f === 'width') return width !== '';
-            if (f === 'length') return length !== '';
-            if (f === 'thickness') return thickness !== '';
-            if (f === 'weight') return weight !== '';
-            if (f === 'diameter') return diameter !== '';
-            return false;
-        }).length;
 
-        if(filledCount >= (shape === 'rectangle' ? 3 : 2)) {
-             const fieldToReset = allFields.find(f => f !== fieldName);
-             if (fieldToReset) {
-                 if (fieldToReset === 'width') setWidth('');
-                 if (fieldToReset === 'length') setLength('');
-                 if (fieldToReset === 'thickness') setThickness('');
-                 if (fieldToReset === 'weight') setWeight('');
-                 if (fieldToReset === 'diameter') setDiameter('');
-             }
+        // This is the key: we clear the field that should be calculated next
+        if (shape === 'rectangle') {
+            const fields = { width, length, thickness, weight };
+            const fieldSetters = { setWidth, setLength, setThickness, setWeight };
+            const fieldNames = ['width', 'length', 'thickness', 'weight'];
+            
+            const filledCount = fieldNames.filter(name => {
+                if (name === fieldName) return value !== '';
+                // @ts-ignore
+                return fields[name] !== '';
+            }).length;
+
+            if (filledCount === 3) {
+                const emptyField = fieldNames.find(name => {
+                    if (name === fieldName) return value === '';
+                    // @ts-ignore
+                    return fields[name] === '';
+                });
+                if (emptyField && emptyField !== fieldName) {
+                    // @ts-ignore
+                    fieldSetters[setterNameMap[emptyField]]('');
+                }
+            }
         }
-       
-        setter(e.target.value === "" ? "" : e.target.valueAsNumber);
     }
   }
+
 
   const finalPrice = (Number(weight) || 0) * (Number(scrapPrice) || 0);
 
@@ -200,26 +211,26 @@ export function ScrapCalculator() {
             <>
               <div className="space-y-2">
                 <Label htmlFor="width">Largura (mm)</Label>
-                <Input id="width" type="number" placeholder="Insira a largura" value={width} onChange={createInputHandler(setWidth, 'width')} />
+                <Input id="width" type="number" placeholder="Insira a largura" value={width} onChange={handleInputChange(setWidth, 'width')} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="length">Comprimento (mm)</Label>
-                <Input id="length" type="number" placeholder="Insira o comprimento" value={length} onChange={createInputHandler(setLength, 'length')} />
+                <Input id="length" type="number" placeholder="Insira o comprimento" value={length} onChange={handleInputChange(setLength, 'length')} />
               </div>
             </>
           ) : (
             <div className="space-y-2">
               <Label htmlFor="diameter">Diâmetro (mm)</Label>
-              <Input id="diameter" type="number" placeholder="Insira o diâmetro" value={diameter} onChange={createInputHandler(setDiameter, 'diameter')} />
+              <Input id="diameter" type="number" placeholder="Insira o diâmetro" value={diameter} onChange={handleInputChange(setDiameter, 'diameter')} />
             </div>
           )}
           <div className="space-y-2">
             <Label htmlFor="thickness">Espessura (mm)</Label>
-            <Input id="thickness" type="number" placeholder="Insira a espessura" value={thickness} onChange={createInputHandler(setThickness, 'thickness')} />
+            <Input id="thickness" type="number" placeholder="Insira a espessura" value={thickness} onChange={handleInputChange(setThickness, 'thickness')} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="weight">Peso (kg)</Label>
-            <Input id="weight" type="number" placeholder="Insira o peso" value={weight} onChange={createInputHandler(setWeight, 'weight')} />
+            <Input id="weight" type="number" placeholder="Insira o peso" value={weight} onChange={handleInputChange(setWeight, 'weight')} />
           </div>
         </div>
 

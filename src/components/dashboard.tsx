@@ -19,6 +19,7 @@ import { ItemTable } from "./item-table";
 import { Icon } from "./icons";
 import { Input } from "./ui/input";
 import { GlobalSearchResults } from "./global-search-results";
+import { ScrapCalculator } from "./scrap-calculator";
 
 export function Dashboard() {
   const [costPrice, setCostPrice] = React.useState(30);
@@ -62,13 +63,15 @@ export function Dashboard() {
   const filteredCategories = React.useMemo(() => {
     if (!searchTerm) return [];
     
-    return CATEGORIES.map(category => {
+    return CATEGORIES.filter(cat => cat.id !== 'retalhos').map(category => {
       const filteredItems = category.items.filter(item => 
         item.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
       return { ...category, items: filteredItems };
     }).filter(category => category.items.length > 0);
   }, [searchTerm]);
+  
+  const isScrapCategory = selectedCategoryId === 'retalhos';
 
   return (
     <SidebarProvider>
@@ -127,6 +130,8 @@ export function Dashboard() {
                 sellingPrice={sellingPrice}
                 searchTerm={searchTerm}
               />
+            ) : isScrapCategory ? (
+                <ScrapCalculator />
             ) : (
               <ItemTable 
                 category={selectedCategory} 

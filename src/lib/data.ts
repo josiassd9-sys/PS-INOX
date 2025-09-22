@@ -1,5 +1,5 @@
-// Calculation constants for stainless steel
-const STAINLESS_STEEL_DENSITY_KG_M3 = 8000;
+
+export const STAINLESS_STEEL_DENSITY_KG_M3 = 8000;
 const INCH_TO_MM = 25.4;
 
 // For tubes: Weight(kg/m) = (OD_mm - WT_mm) * WT_mm * (PI * DENSITY / 1000000)
@@ -9,7 +9,7 @@ const TUBE_WEIGHT_CONSTANT = Math.PI * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000)
 const SHEET_WEIGHT_CONSTANT = STAINLESS_STEEL_DENSITY_KG_M3 / 1000;
 
 // For round bars: Weight(kg/m) = D_mm^2 * (PI/4) * (DENSITY / 1000000)
-const ROUND_BAR_WEIGHT_CONSTANT =
+export const ROUND_BAR_WEIGHT_CONSTANT =
   (Math.PI / 4) * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
 
 // For square bars: Weight(kg/m) = Side_mm^2 * (DENSITY / 1000000)
@@ -51,7 +51,7 @@ export type Category = {
   name: string;
   items: SteelItem[];
   icon: string;
-  unit: 'm' | 'm²' | 'un';
+  unit: 'm' | 'm²' | 'un' | 'calc';
 };
 
 const chapasGroup1: {thickness: number, desc: string}[] = [
@@ -121,6 +121,13 @@ const generateChapas = (): SteelItem[] => {
 };
 
 export const CATEGORIES: Category[] = [
+  {
+    id: 'retalhos',
+    name: 'Retalhos',
+    icon: 'Scissors',
+    unit: 'calc',
+    items: [],
+  },
   {
     id: 'tubos-od',
     name: 'Tubos OD',

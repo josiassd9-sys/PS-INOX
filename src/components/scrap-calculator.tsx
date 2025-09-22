@@ -14,111 +14,129 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { STAINLESS_STEEL_DENSITY_KG_M3 } from "@/lib/data";
 
 type Shape = "rectangle" | "disc";
+type FieldName = "width" | "length" | "thickness" | "weight" | "diameter";
+
+const DENSITY = STAINLESS_STEEL_DENSITY_KG_M3;
 
 export function ScrapCalculator() {
   const [shape, setShape] = React.useState<Shape>("rectangle");
   const [scrapPrice, setScrapPrice] = React.useState<number | "">(23);
   
-  // States for rectangle
-  const [width, setWidth] = React.useState<number | "">("");
-  const [length, setLength] = React.useState<number | "">("");
-  const [thickness, setThickness] = React.useState<number | "">("");
-  const [weight, setWeight] = React.useState<number | "">("");
+  const [fields, setFields] = React.useState({
+    width: "",
+    length: "",
+    thickness: "",
+    weight: "",
+    diameter: "",
+  });
+  
+  const [lastEdited, setLastEdited] = React.useState<FieldName | null>(null);
 
-  // State for disc
-  const [diameter, setDiameter] = React.useState<number | "">("");
+  const calculateMissingField = (updatedFields: Record<string, string>, lastEditedField: FieldName | null) => {
+    const newFields = { ...updatedFields };
 
-  const fieldSetters = {
-    width: setWidth,
-    length: setLength,
-    thickness: setThickness,
-    weight: setWeight,
-    diameter: setDiameter,
-  };
-
-  React.useEffect(() => {
-    const density = STAINLESS_STEEL_DENSITY_KG_M3;
+    const getNum = (val: string) => (val !== "" ? Number(val) : 0);
     
     if (shape === 'rectangle') {
-        const fields = { width, length, thickness, weight };
-        const filledFields = Object.entries(fields).filter(([_, v]) => v !== "" && Number(v) > 0);
+      const { width, length, thickness, weight } = newFields;
+      const inputs = { width, length, thickness, weight };
+      const filledCount = Object.values(inputs).filter(v => v !== "").length;
+
+      if (filledCount === 3) {
+        const w = getNum(width);
+        const l = getNum(length);
+        const t = getNum(thickness);
+        const kg = getNum(weight);
         
-        if (filledFields.length !== 3) return;
-
-        const emptyFieldName = Object.keys(fields).find(key => fields[key as keyof typeof fields] === "" || Number(fields[key as keyof typeof fields]) === 0);
-        if (!emptyFieldName) return;
-
-        const w_mm = Number(width);
-        const l_mm = Number(length);
-        const t_mm = Number(thickness);
-        const kg = Number(weight);
-        const setter = fieldSetters[emptyFieldName as keyof typeof fieldSetters];
-
-
-        if (emptyFieldName === 'weight' && w_mm > 0 && l_mm > 0 && t_mm > 0) {
-            const calculatedWeight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * density;
-            setter(Math.ceil(calculatedWeight));
-        } else if (emptyFieldName === 'thickness' && w_mm > 0 && l_mm > 0 && kg > 0) {
-            const calculatedThickness = (kg * 1000 * 1000 * 1000) / (w_mm * l_mm * density);
-            setter(Math.ceil(calculatedThickness));
-        } else if (emptyFieldName === 'length' && w_mm > 0 && t_mm > 0 && kg > 0) {
-            const calculatedLength = (kg * 1000 * 1000 * 1000) / (w_mm * t_mm * density);
-            setter(Math.ceil(calculatedLength));
-        } else if (emptyFieldName === 'width' && l_mm > 0 && t_mm > 0 && kg > 0) {
-            const calculatedWidth = (kg * 1000 * 1000 * 1000) / (l_mm * t_mm * density);
-            setter(Math.ceil(calculatedWidth));
+        if (weight === "" || lastEditedField !== 'weight') {
+          if (w > 0 && l > 0 && t > 0) newFields.weight = String(Math.ceil((w / 1000) * (l / 1000) * (t / 1000) * DENSITY));
         }
-
+        if (thickness === "" || lastEditedField !== 'thickness') {
+           if (w > 0 && l > 0 && kg > 0) newFields.thickness = String(Math.ceil((kg * 1000000000) / (w * l * DENSITY)));
+        }
+        if (length === "" || lastEditedField !== 'length') {
+           if (w > 0 && t > 0 && kg > 0) newFields.length = String(Math.ceil((kg * 1000000000) / (w * t * DENSITY)));
+        }
+        if (width === "" || lastEditedField !== 'width') {
+           if (l > 0 && t > 0 && kg > 0) newFields.width = String(Math.ceil((kg * 1000000000) / (l * t * DENSITY)));
+        }
+      }
     } else { // disc
-        const fields = { diameter, thickness, weight };
-        const filledFields = Object.entries(fields).filter(([_, v]) => v !== "" && Number(v) > 0);
+      const { diameter, thickness, weight } = newFields;
+      const inputs = { diameter, thickness, weight };
+      const filledCount = Object.values(inputs).filter(v => v !== "").length;
 
-        if (filledFields.length !== 2) return;
+      if (filledCount === 2) {
+        const d = getNum(diameter);
+        const t = getNum(thickness);
+        const kg = getNum(weight);
 
-        const emptyFieldName = Object.keys(fields).find(key => fields[key as keyof typeof fields] === "" || Number(fields[key as keyof typeof fields]) === 0);
-        if (!emptyFieldName) return;
-
-        const d_mm = Number(diameter);
-        const t_mm = Number(thickness);
-        const kg = Number(weight);
-        const setter = fieldSetters[emptyFieldName as keyof typeof fieldSetters];
-
-
-        if (emptyFieldName === 'weight' && d_mm > 0 && t_mm > 0) {
-            const radius_m = d_mm / 2 / 1000;
-            const volume_m3 = Math.PI * Math.pow(radius_m, 2) * (t_mm / 1000);
-            const calculatedWeight = volume_m3 * density;
-            setter(Math.ceil(calculatedWeight));
-        } else if (emptyFieldName === 'thickness' && d_mm > 0 && kg > 0) {
-            const radius_m = d_mm / 2 / 1000;
-            const area_m2 = Math.PI * Math.pow(radius_m, 2);
-            const calculatedThickness = (kg / (area_m2 * density)) * 1000;
-            setter(Math.ceil(calculatedThickness));
-        } else if (emptyFieldName === 'diameter' && t_mm > 0 && kg > 0) {
-            const volume_m3 = kg / density;
-            const area_m2 = volume_m3 / (t_mm / 1000);
-            const radius_m = Math.sqrt(area_m2 / Math.PI);
-            const calculatedDiameter = radius_m * 2 * 1000;
-            setter(Math.ceil(calculatedDiameter));
+        if (weight === "" || lastEditedField !== 'weight') {
+          if (d > 0 && t > 0) {
+            const r_m = d / 2000;
+            const vol_m3 = Math.PI * r_m * r_m * (t / 1000);
+            newFields.weight = String(Math.ceil(vol_m3 * DENSITY));
+          }
         }
+        if (thickness === "" || lastEditedField !== 'thickness') {
+          if (d > 0 && kg > 0) {
+            const r_m = d / 2000;
+            const area_m2 = Math.PI * r_m * r_m;
+            newFields.thickness = String(Math.ceil((kg / (area_m2 * DENSITY)) * 1000));
+          }
+        }
+        if (diameter === "" || lastEditedField !== 'diameter') {
+          if (t > 0 && kg > 0) {
+            const vol_m3 = kg / DENSITY;
+            const area_m2 = vol_m3 / (t / 1000);
+            const r_m = Math.sqrt(area_m2 / Math.PI);
+            newFields.diameter = String(Math.ceil(r_m * 2 * 1000));
+          }
+        }
+      }
     }
-  }, [width, length, thickness, weight, diameter, shape]);
+    return newFields;
+  };
+
+  const handleInputChange = (fieldName: FieldName) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setLastEdited(fieldName);
+    
+    setFields(prevFields => {
+      const updatedFields = {
+        ...prevFields,
+        [fieldName]: value,
+      };
+      
+      const filledCount = Object.values(updatedFields).filter(v => v !== "" && v !== "0").length;
+      const requiredCount = shape === 'rectangle' ? 3 : 2;
+
+      // If user clears a field, clear the calculated field too
+      if (value === "") {
+        const filledValues = Object.entries(updatedFields)
+          .filter(([k,v]) => v !== "");
+        if(filledValues.length < requiredCount) {
+            for(const key in updatedFields) {
+               if(key !== fieldName && prevFields[key as FieldName] !== updatedFields[key as FieldName]) {
+                 updatedFields[key as FieldName] = "";
+               }
+            }
+        }
+      }
+      
+      return calculateMissingField(updatedFields, fieldName);
+    });
+  };
 
   const handleShapeChange = (value: Shape | "") => {
     if (value) {
       setShape(value);
-      setWidth(''); setLength(''); setThickness(''); setWeight(''); setDiameter('');
+      setFields({ width: "", length: "", thickness: "", weight: "", diameter: "" });
+      setLastEdited(null);
     }
   };
-
-  const handleInputChange = (setter: React.Dispatch<React.SetStateAction<number | "">>) => {
-    return (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setter(value === "" ? "" : Number(value));
-    }
-  }
-
-  const finalPrice = (Number(weight) || 0) * (Number(scrapPrice) || 0);
+  
+  const finalPrice = (Number(fields.weight) || 0) * (Number(scrapPrice) || 0);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -171,26 +189,26 @@ export function ScrapCalculator() {
             <>
               <div className="space-y-2">
                 <Label htmlFor="width">Largura (mm)</Label>
-                <Input id="width" type="number" placeholder="Insira a largura" value={width} onChange={handleInputChange(setWidth)} />
+                <Input id="width" type="number" placeholder="Insira a largura" value={fields.width} onChange={handleInputChange('width')} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="length">Comprimento (mm)</Label>
-                <Input id="length" type="number" placeholder="Insira o comprimento" value={length} onChange={handleInputChange(setLength)} />
+                <Input id="length" type="number" placeholder="Insira o comprimento" value={fields.length} onChange={handleInputChange('length')} />
               </div>
             </>
           ) : (
             <div className="space-y-2">
               <Label htmlFor="diameter">Diâmetro (mm)</Label>
-              <Input id="diameter" type="number" placeholder="Insira o diâmetro" value={diameter} onChange={handleInputChange(setDiameter)} />
+              <Input id="diameter" type="number" placeholder="Insira o diâmetro" value={fields.diameter} onChange={handleInputChange('diameter')} />
             </div>
           )}
           <div className="space-y-2">
             <Label htmlFor="thickness">Espessura (mm)</Label>
-            <Input id="thickness" type="number" placeholder="Insira a espessura" value={thickness} onChange={handleInputChange(setThickness)} />
+            <Input id="thickness" type="number" placeholder="Insira a espessura" value={fields.thickness} onChange={handleInputChange('thickness')} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="weight">Peso (kg)</Label>
-            <Input id="weight" type="number" placeholder="Insira o peso" value={weight} onChange={handleInputChange(setWeight)} />
+            <Input id="weight" type="number" placeholder="Insira o peso" value={fields.weight} onChange={handleInputChange('weight')} />
           </div>
         </div>
 

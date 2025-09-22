@@ -37,16 +37,9 @@ export function ScrapCalculator() {
   const [scrapPrice, setScrapPrice] = React.useState(23);
   const [finalPrice, setFinalPrice] = React.useState(0);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-  };
-  
-  const calculateAndUpdate = (updatedFields: Field[]) => {
-    const newFields = updatedFields.map(f => ({ ...f, isCalculated: false }));
-    
+  const calculateAndUpdate = (updatedFields: Field[], currentInputName?: string) => {
+    const newFields = updatedFields.map(f => ({ ...f, isCalculated: f.name !== currentInputName && f.isCalculated }));
+
     const getField = (name: Field["name"]) => newFields.find(f => f.name === name);
     const getValue = (name: Field["name"]): number | null => {
         const field = getField(name);
@@ -54,15 +47,16 @@ export function ScrapCalculator() {
         return value !== "" && value != null && !isNaN(Number(value)) && Number(value) > 0 ? Number(value) : null;
     }
 
+    let weightValue: number | "" | null = getValue('weight');
+
     if (shape === "rectangle") {
-        let { width, length, thickness, weight } = {
-            width: getValue('width'),
-            length: getValue('length'),
-            thickness: getValue('thickness'),
-            weight: getValue('weight')
-        };
-        const providedFields = {width, length, thickness, weight};
-        const nullCount = Object.values(providedFields).filter(v => v === null).length;
+        let width = getValue('width');
+        let length = getValue('length');
+        let thickness = getValue('thickness');
+        let weight = getValue('weight');
+
+        const providedFields = [width, length, thickness, weight];
+        const nullCount = providedFields.filter(v => v === null).length;
 
         if (nullCount === 1) {
             if (weight === null) {
@@ -86,16 +80,17 @@ export function ScrapCalculator() {
                 widthField.value = newWidth;
                 widthField.isCalculated = true;
             }
+        } else {
+             // Clear previously calculated values if not enough fields are filled
+             newFields.forEach(f => { if (f.isCalculated) f.value = ""; f.isCalculated = false; });
         }
     } else if (shape === "disc") {
-        let { diameter, thickness, weight } = {
-            diameter: getValue('diameter'),
-            thickness: getValue('thickness'),
-            weight: getValue('weight')
-        };
+        let diameter = getValue('diameter');
+        let thickness = getValue('thickness');
+        let weight = getValue('weight');
         
-        const providedFields = {diameter, thickness, weight};
-        const nullCount = Object.values(providedFields).filter(v => v === null).length;
+        const providedFields = [diameter, thickness, weight];
+        const nullCount = providedFields.filter(v => v === null).length;
 
         if (nullCount === 1) {
             if (weight === null) {
@@ -116,47 +111,39 @@ export function ScrapCalculator() {
                 diameterField.value = newDiameter;
                 diameterField.isCalculated = true;
             }
+        } else {
+            // Clear previously calculated values
+            newFields.forEach(f => { if (f.isCalculated) f.value = ""; f.isCalculated = false; });
         }
     }
     
-    const finalWeight = getValue('weight') ?? (newFields.find(f => f.name === 'weight')?.isCalculated ? newFields.find(f => f.name === 'weight')?.value : null);
-    if (finalWeight && scrapPrice) {
-        setFinalPrice(Number(finalWeight) * scrapPrice);
+    weightValue = getValue('weight');
+    if (weightValue && scrapPrice > 0) {
+        setFinalPrice(Number(weightValue) * scrapPrice);
     } else {
         setFinalPrice(0);
     }
     setFields(newFields);
   };
 
-  const handleInputChange = (name: string, value: string) => {
+  const handleInputChange = (name: Field['name'], value: string) => {
     const updatedFields = fields.map((field) =>
-      field.name === name ? { ...field, value: value === "" ? "" : value } : field
+      field.name === name ? { ...field, value: value, isCalculated: false } : field
     );
-    // Parse to number before passing to calculation
-    const parsedFields = updatedFields.map(f => ({...f, value: f.value === "" ? "" : Number(f.value)}));
-    calculateAndUpdate(parsedFields);
+    calculateAndUpdate(updatedFields, name);
   };
   
-  const handleScrapPriceChange = (value: number | null) => {
-    const newPrice = value ?? 0;
-    setScrapPrice(newPrice);
+  const handleScrapPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPrice = e.target.valueAsNumber;
+    setScrapPrice(isNaN(newPrice) ? 0 : newPrice);
     const weightField = fields.find(f => f.name === 'weight');
     const weight = weightField?.value;
-    if (weight && newPrice) {
+    if (weight && newPrice > 0) {
         setFinalPrice(Number(weight) * newPrice);
     } else {
         setFinalPrice(0);
     }
   }
-
-
-  const getVisibleFields = () => {
-    const commonFields = ["thickness", "weight"];
-    if (shape === "rectangle") {
-      return ["width", "length", ...commonFields];
-    }
-    return ["diameter", ...commonFields];
-  };
 
   const handleShapeChange = (value: Shape | "") => {
     if (value) {
@@ -167,6 +154,20 @@ export function ScrapCalculator() {
     }
   };
 
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(value);
+  };
+
+  const getVisibleFields = () => {
+    const commonFields = ["thickness", "weight"];
+    if (shape === "rectangle") {
+      return ["width", "length", ...commonFields];
+    }
+    return ["diameter", ...commonFields];
+  };
 
   return (
     <Card>
@@ -184,7 +185,7 @@ export function ScrapCalculator() {
                 id="scrap-price"
                 type="number"
                 value={scrapPrice > 0 ? scrapPrice : ""}
-                onChange={(e) => handleScrapPriceChange(e.target.valueAsNumber)}
+                onChange={handleScrapPriceChange}
                 placeholder="Ex: 23.00"
                 />
             </div>
@@ -214,7 +215,8 @@ export function ScrapCalculator() {
                   value={field.value}
                   onChange={(e) => handleInputChange(field.name, e.target.value)}
                   placeholder={`Insira ${field.label.toLowerCase()}`}
-                  className={field.isCalculated ? "bg-primary/10 border-primary/50" : ""}
+                  className={field.isCalculated ? "bg-primary/10 border-primary/50 font-bold" : ""}
+                  readOnly={field.isCalculated}
                 />
               </div>
             ))}
@@ -229,3 +231,5 @@ export function ScrapCalculator() {
     </Card>
   );
 }
+
+    

@@ -12,6 +12,7 @@ import {
   SidebarMenuButton,
   SidebarInset,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Search, Warehouse } from "lucide-react";
 import { PriceControls } from "./price-controls";
@@ -20,9 +21,9 @@ import { Icon } from "./icons";
 import { Input } from "./ui/input";
 import { GlobalSearchResults } from "./global-search-results";
 import { ScrapCalculator } from "./scrap-calculator";
-import { DialogTitle } from "@radix-ui/react-dialog";
+import { SheetTitle } from "./ui/sheet";
 
-export function Dashboard() {
+function DashboardComponent() {
   const [costPrice, setCostPrice] = React.useState(30);
   const [markup, setMarkup] = React.useState(50);
   const [sellingPrice, setSellingPrice] = React.useState(
@@ -32,6 +33,8 @@ export function Dashboard() {
     CATEGORIES[0]?.id || ""
   );
   const [searchTerm, setSearchTerm] = React.useState("");
+  const { setOpenMobile, isMobile } = useSidebar();
+
 
   const handleCostChange = (newCost: number | null) => {
     const cost = newCost ?? 0;
@@ -56,6 +59,9 @@ export function Dashboard() {
   const handleSelectCategory = (categoryId: string) => {
     setSelectedCategoryId(categoryId);
     setSearchTerm(""); // Clear search when a category is selected
+    if (isMobile) {
+      setOpenMobile(false);
+    }
   }
 
   const selectedCategory =
@@ -75,7 +81,7 @@ export function Dashboard() {
   const isScrapCategory = selectedCategoryId === 'retalhos';
 
   return (
-    <SidebarProvider>
+    <>
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2">
@@ -142,6 +148,14 @@ export function Dashboard() {
           </div>
         </div>
       </SidebarInset>
-    </SidebarProvider>
+    </>
   );
+}
+
+export function Dashboard() {
+  return (
+    <SidebarProvider>
+      <DashboardComponent />
+    </SidebarProvider>
+  )
 }

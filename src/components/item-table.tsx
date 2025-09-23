@@ -150,7 +150,7 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
       <CardContent>
         <div className="border rounded-lg overflow-auto max-h-[calc(100vh-22rem)]">
           <Table>
-            <TableHeader>
+            <TableHeader className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
               <TableRow className="bg-primary/5 hover:bg-primary/10">
                 <TableHead>Descrição</TableHead>
                 <TableHead className="text-right">

@@ -55,7 +55,7 @@ export function GlobalSearchResults({ categories, sellingPrice, searchTerm }: Gl
         <Accordion type="multiple" className="w-full space-y-2" defaultValue={categories.map(c => c.id)}>
             {categories.map((category) => (
                 <AccordionItem value={category.id} key={category.id} className="border rounded-lg overflow-hidden bg-card">
-                    <AccordionTrigger className="px-6 py-4 bg-card hover:bg-primary/10 text-lg font-semibold">
+                    <AccordionTrigger className="px-6 py-4 hover:bg-primary/10 text-lg font-semibold">
                         {category.name} ({category.items.length})
                     </AccordionTrigger>
                     <AccordionContent className="p-0">

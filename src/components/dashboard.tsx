@@ -20,6 +20,7 @@ import { Icon } from "./icons";
 import { Input } from "./ui/input";
 import { GlobalSearchResults } from "./global-search-results";
 import { ScrapCalculator } from "./scrap-calculator";
+import { DialogTitle } from "@radix-ui/react-dialog";
 
 export function Dashboard() {
   const [costPrice, setCostPrice] = React.useState(30);

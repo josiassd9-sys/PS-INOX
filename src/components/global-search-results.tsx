@@ -54,12 +54,12 @@ export function GlobalSearchResults({ categories, sellingPrice, searchTerm }: Gl
         <h2 className="text-xl font-semibold">Resultados da Busca para "{searchTerm}"</h2>
         <Accordion type="multiple" className="w-full space-y-2" defaultValue={categories.map(c => c.id)}>
             {categories.map((category) => (
-                <AccordionItem value={category.id} key={category.id} className="border rounded-lg overflow-hidden">
-                    <AccordionTrigger className="px-6 py-4 bg-primary/5 hover:bg-primary/10 text-lg font-semibold">
+                <AccordionItem value={category.id} key={category.id} className="border rounded-lg overflow-hidden bg-card">
+                    <AccordionTrigger className="px-6 py-4 bg-card hover:bg-primary/10 text-lg font-semibold">
                         {category.name} ({category.items.length})
                     </AccordionTrigger>
-                    <AccordionContent>
-                        <div className="overflow-auto max-h-[calc(100vh-22rem)]">
+                    <AccordionContent className="p-0">
+                        <div className="overflow-auto max-h-[calc(100vh-22rem)] border-t">
                             <Table>
                                 <TableHeader className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
                                 <TableRow className="bg-primary/5 hover:bg-primary/10">

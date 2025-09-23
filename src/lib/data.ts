@@ -134,6 +134,7 @@ export const CATEGORIES: Category[] = [
     icon: 'Minus',
     unit: 'm',
     items: [
+        { id: 't-3/8-0.70', description: 'Tubo OD 3/8" (9.52mm) x 0.70mm', weight: (9.52 - 0.70) * 0.70 * TUBE_WEIGHT_CONSTANT },
         { id: 't-3/8-1.00', description: 'Tubo OD 3/8" (9.52mm) x 1.00mm', weight: (9.52 - 1.00) * 1.00 * TUBE_WEIGHT_CONSTANT },
         { id: 't-3/8-1.20', description: 'Tubo OD 3/8" (9.52mm) x 1.20mm', weight: (9.52 - 1.20) * 1.20 * TUBE_WEIGHT_CONSTANT },
         { id: 't-3/8-1.50', description: 'Tubo OD 3/8" (9.52mm) x 1.50mm', weight: (9.52 - 1.50) * 1.50 * TUBE_WEIGHT_CONSTANT },
@@ -317,6 +318,10 @@ export const CATEGORIES: Category[] = [
     icon: 'Layers',
     unit: 'm',
     items: [
+      // NPS 3/8"
+      { id: 'ts-3/8-sch5', description: 'Tubo Schedule 3/8" SCH 5 (17.14mm x 1.65mm)', weight: (17.14 - 1.65) * 1.65 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-3/8-sch10', description: 'Tubo Schedule 3/8" SCH 10 (17.14mm x 2.31mm)', weight: (17.14 - 2.31) * 2.31 * TUBE_WEIGHT_CONSTANT },
+      { id: 'ts-3/8-sch40', description: 'Tubo Schedule 3/8" SCH 40 (17.14mm x 3.20mm)', weight: (17.14 - 3.20) * 3.20 * TUBE_WEIGHT_CONSTANT },
       // NPS 1/2"
       { id: 'ts-1/2-sch5', description: 'Tubo Schedule 1/2" SCH 5 (21.34mm x 1.65mm)', weight: (21.34 - 1.65) * 1.65 * TUBE_WEIGHT_CONSTANT },
       { id: 'ts-1/2-sch10', description: 'Tubo Schedule 1/2" SCH 10 (21.34mm x 2.11mm)', weight: (21.34 - 2.11) * 2.11 * TUBE_WEIGHT_CONSTANT },
@@ -459,6 +464,8 @@ export const CATEGORIES: Category[] = [
     icon: 'Square',
     unit: 'm',
     items: [
+        { id: 'm-10x10-1.0', description: 'Metalon 10x10 x 1.00mm', weight: calculateSquareTubeWeight(10, 1.0) },
+        { id: 'm-10x10-1.2', description: 'Metalon 10x10 x 1.20mm', weight: calculateSquareTubeWeight(10, 1.2) },
         { id: 'm-15x15-1.0', description: 'Metalon 15x15 x 1.00mm', weight: calculateSquareTubeWeight(15, 1.0) },
         { id: 'm-15x15-1.2', description: 'Metalon 15x15 x 1.20mm', weight: calculateSquareTubeWeight(15, 1.2) },
         { id: 'm-15x15-1.5', description: 'Metalon 15x15 x 1.50mm', weight: calculateSquareTubeWeight(15, 1.5) },
@@ -520,3 +527,4 @@ export const CATEGORIES: Category[] = [
     
 
     
+

@@ -145,7 +145,7 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
         </Dialog>
       </div>
       <CardContent className="p-0">
-        <div className="border-t overflow-auto max-h-[calc(100vh-22rem)]">
+        <div className="border-t overflow-auto">
           <Table>
             <TableHeader className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
               <TableRow className="bg-primary/5 hover:bg-primary/10">

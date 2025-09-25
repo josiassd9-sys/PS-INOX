@@ -59,7 +59,7 @@ export function GlobalSearchResults({ categories, sellingPrice, searchTerm }: Gl
                         {category.name} ({category.items.length})
                     </AccordionTrigger>
                     <AccordionContent className="p-0">
-                        <div className="overflow-auto max-h-[calc(100vh-22rem)] border-t">
+                        <div className="overflow-auto border-t">
                             <Table>
                                 <TableHeader className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
                                 <TableRow className="bg-primary/5 hover:bg-primary/10">

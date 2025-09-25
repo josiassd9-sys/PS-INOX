@@ -4,8 +4,6 @@ import * as React from "react";
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,12 +27,9 @@ export function PriceControls({
 }: PriceControlsProps) {
 
   return (
-    <Card className="border-primary/20">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base">Parâmetros de Preço</CardTitle>
-      </CardHeader>
+    <Card className="border-none shadow-none">
       <CardContent className="pt-2">
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="cost-price" className="text-xs">Custo (R$/kg)</Label>
             <Input

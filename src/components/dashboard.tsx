@@ -13,6 +13,7 @@ import {
   SidebarInset,
   SidebarTrigger,
   useSidebar,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 import { Search, Warehouse, SlidersHorizontal } from "lucide-react";
 import { PriceControls } from "./price-controls";
@@ -21,13 +22,14 @@ import { Icon } from "./icons";
 import { Input } from "./ui/input";
 import { GlobalSearchResults } from "./global-search-results";
 import { ScrapCalculator } from "./scrap-calculator";
-import { Button } from "./ui/button";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { Card } from "./ui/card";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "./ui/button";
 
 function DashboardComponent() {
   const [costPrice, setCostPrice] = React.useState(30);
@@ -110,6 +112,31 @@ function DashboardComponent() {
             ))}
           </SidebarMenu>
         </SidebarContent>
+        {!isScrapCategory && (
+           <SidebarFooter>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="w-full justify-start gap-2">
+                  <SlidersHorizontal />
+                  <span>Ajustar Preços</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Ajustar Parâmetros de Preço</DialogTitle>
+                </DialogHeader>
+                <PriceControls
+                  costPrice={costPrice}
+                  markup={markup}
+                  sellingPrice={sellingPrice}
+                  onCostChange={handleCostChange}
+                  onMarkupChange={handleMarkupChange}
+                  onSellingPriceChange={handleSellingPriceChange}
+                />
+              </DialogContent>
+            </Dialog>
+           </SidebarFooter>
+        )}
       </Sidebar>
       <SidebarInset>
         <div className="p-4 md:p-6 flex flex-col gap-6">
@@ -117,26 +144,6 @@ function DashboardComponent() {
             <SidebarTrigger className="md:hidden"/>
           </header>
           <div className="space-y-4">
-            {!isScrapCategory && (
-              <Collapsible>
-                <CollapsibleTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start gap-2">
-                    <SlidersHorizontal className="size-4" />
-                    <span>Ajustar Parâmetros de Preço</span>
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="pt-4">
-                  <PriceControls
-                    costPrice={costPrice}
-                    markup={markup}
-                    sellingPrice={sellingPrice}
-                    onCostChange={handleCostChange}
-                    onMarkupChange={handleMarkupChange}
-                    onSellingPriceChange={handleSellingPriceChange}
-                  />
-                </CollapsibleContent>
-              </Collapsible>
-            )}
              <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input

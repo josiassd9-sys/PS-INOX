@@ -52,36 +52,45 @@ export function ScrapCalculator() {
     const calculatedFields = { ...fields };
 
     if (shape === 'rectangle') {
-        const w = getNum(width);
-        const l = getNum(length);
-        const t = getNum(thickness);
+        const w_mm = getNum(width);
+        const l_mm = getNum(length);
+        const t_mm = getNum(thickness);
         const kg = getNum(weight);
-        const filledCount = [w, l, t, kg].filter(v => v > 0).length;
+        const filledCount = [w_mm, l_mm, t_mm, kg].filter(v => v > 0).length;
 
-        if (filledCount === 3) {
-            if (kg === 0) calculatedFields.weight = String(Math.ceil((w / 1000) * (l / 1000) * (t / 1000) * DENSITY));
-            else if (t === 0) calculatedFields.thickness = String(Math.ceil((kg * 1000000000) / (w * l * DENSITY)));
-            else if (l === 0) calculatedFields.length = String(Math.ceil((kg * 1000000000) / (w * t * DENSITY)));
-            else if (w === 0) calculatedFields.width = String(Math.ceil((kg * 1000000000) / (l * t * DENSITY)));
+        if (filledCount >= 3) {
+            if (kg === 0 && w_mm > 0 && l_mm > 0 && t_mm > 0) {
+              const weight_calc = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
+              calculatedFields.weight = String(Math.ceil(weight_calc));
+            } else if (t_mm === 0 && w_mm > 0 && l_mm > 0 && kg > 0) {
+              const thickness_calc_mm = (kg / ((w_mm / 1000) * (l_mm / 1000) * DENSITY)) * 1000;
+              calculatedFields.thickness = String(Math.ceil(thickness_calc_mm));
+            } else if (l_mm === 0 && w_mm > 0 && t_mm > 0 && kg > 0) {
+              const length_calc_mm = (kg / ((w_mm / 1000) * (t_mm / 1000) * DENSITY)) * 1000;
+              calculatedFields.length = String(Math.ceil(length_calc_mm));
+            } else if (w_mm === 0 && l_mm > 0 && t_mm > 0 && kg > 0) {
+              const width_calc_mm = (kg / ((l_mm / 1000) * (t_mm / 1000) * DENSITY)) * 1000;
+              calculatedFields.width = String(Math.ceil(width_calc_mm));
+            }
         }
     } else { // disc
-        const d = getNum(diameter);
-        const t = getNum(thickness);
+        const d_mm = getNum(diameter);
+        const t_mm = getNum(thickness);
         const kg = getNum(weight);
-        const filledCount = [d, t, kg].filter(v => v > 0).length;
+        const filledCount = [d_mm, t_mm, kg].filter(v => v > 0).length;
 
-        if (filledCount === 2) {
-            if (kg === 0) {
-                const r_m = d / 2000;
-                const vol_m3 = Math.PI * r_m * r_m * (t / 1000);
+        if (filledCount >= 2) {
+            if (kg === 0 && d_mm > 0 && t_mm > 0) {
+                const r_m = d_mm / 2000;
+                const vol_m3 = Math.PI * r_m * r_m * (t_mm / 1000);
                 calculatedFields.weight = String(Math.ceil(vol_m3 * DENSITY));
-            } else if (t === 0) {
-                const r_m = d / 2000;
+            } else if (t_mm === 0 && d_mm > 0 && kg > 0) {
+                const r_m = d_mm / 2000;
                 const area_m2 = Math.PI * r_m * r_m;
                 calculatedFields.thickness = String(Math.ceil((kg / (area_m2 * DENSITY)) * 1000));
-            } else if (d === 0) {
+            } else if (d_mm === 0 && t_mm > 0 && kg > 0) {
                 const vol_m3 = kg / DENSITY;
-                const area_m2 = vol_m3 / (t / 1000);
+                const area_m2 = vol_m3 / (t_mm / 1000);
                 const r_m = Math.sqrt(area_m2 / Math.PI);
                 calculatedFields.diameter = String(Math.ceil(r_m * 2 * 1000));
             }
@@ -94,8 +103,11 @@ export function ScrapCalculator() {
   }
 
   React.useEffect(() => {
-    calculate();
-  }, [fields.width, fields.length, fields.thickness, fields.diameter, fields.weight, shape]);
+    const timer = setTimeout(() => {
+      calculate();
+    }, 500); // Add a small delay to avoid rapid recalculations
+    return () => clearTimeout(timer);
+  }, [fields, shape]);
 
   const displayFields = fields;
   const finalPrice = (Number(displayFields.weight) || 0) * (Number(scrapPrice) || 0);
@@ -146,7 +158,7 @@ export function ScrapCalculator() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="length">Compr.(mm)</Label>
-              <Input id="length" type="number" placeholder="Insira o comprimento" value={displayFields.length} onChange={handleInputChange('length')} />
+              <Input id="length" type="number" placeholder="Insira o compr." value={displayFields.length} onChange={handleInputChange('length')} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="weight">Peso(kg)</Label>

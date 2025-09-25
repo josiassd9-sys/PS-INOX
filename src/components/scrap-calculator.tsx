@@ -74,84 +74,87 @@ export function ScrapCalculator() {
     const t_mm = getNum(fields.thickness);
     const kg = getNum(fields.weight);
     const d_mm = getNum(fields.diameter);
-  
+
     let calculatedWeight: number | null = null;
   
     if (shape === 'rectangle') {
       const inputs = [w_mm > 0, l_mm > 0, t_mm > 0, kg > 0];
       const filledCount = inputs.filter(Boolean).length;
   
-      if (filledCount !== 3) {
+      if (filledCount < 3) {
         setRealWeight(null);
         return;
-      };
+      }
       
-      if (!kg) {
+      if (filledCount === 3) {
+          if (!kg) {
+            calculatedWeight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
+          } else if (!t_mm) {
+            const thickness = (kg / ((w_mm / 1000) * (l_mm / 1000) * DENSITY)) * 1000;
+            setFields(prev => ({ ...prev, thickness: thickness.toFixed(2)}));
+            calculatedWeight = kg;
+          } else if (!l_mm) {
+            const length = (kg / ((w_mm / 1000) * (t_mm / 1000) * DENSITY)) * 1000;
+            setFields(prev => ({ ...prev, length: length.toFixed(2)}));
+            calculatedWeight = kg;
+          } else if (!w_mm) {
+            const width = (kg / ((l_mm / 1000) * (t_mm / 1000) * DENSITY)) * 1000;
+            setFields(prev => ({ ...prev, width: width.toFixed(2)}));
+            calculatedWeight = kg;
+          }
+      } else { // 4 fields filled, recalculate weight based on dimensions
         calculatedWeight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
-      } else if (!t_mm) {
-        const thickness = (kg / ((w_mm / 1000) * (l_mm / 1000) * DENSITY)) * 1000;
-        setFields(prev => ({ ...prev, thickness: thickness.toFixed(2).replace('.', ',') }));
-        calculatedWeight = kg;
-      } else if (!l_mm) {
-        const length = (kg / ((w_mm / 1000) * (t_mm / 1000) * DENSITY)) * 1000;
-        setFields(prev => ({ ...prev, length: length.toFixed(2).replace('.', ',') }));
-        calculatedWeight = kg;
-      } else if (!w_mm) {
-        const width = (kg / ((l_mm / 1000) * (t_mm / 1000) * DENSITY)) * 1000;
-        setFields(prev => ({ ...prev, width: width.toFixed(2).replace('.', ',') }));
-        calculatedWeight = kg;
       }
 
     } else { // disc
       const inputs = [d_mm > 0, t_mm > 0, kg > 0];
       const filledCount = inputs.filter(Boolean).length;
   
-      if (filledCount !== 2) {
+      if (filledCount < 2) {
         setRealWeight(null);
         return;
       }
       
-      if (!kg) {
+      if (filledCount === 2) {
+          if (!kg) {
+            const r_m = d_mm / 2000;
+            const vol_m3 = Math.PI * r_m * r_m * (t_mm / 1000);
+            calculatedWeight = vol_m3 * DENSITY;
+          } else if (!t_mm) {
+            const r_m = d_mm / 2000;
+            const area_m2 = Math.PI * r_m * r_m;
+            const thickness = (kg / (area_m2 * DENSITY)) * 1000;
+            setFields(prev => ({ ...prev, thickness: thickness.toFixed(2) }));
+            calculatedWeight = kg;
+          } else if (!d_mm) {
+            const vol_m3 = kg / DENSITY;
+            const area_m2 = vol_m3 / (t_mm / 1000);
+            const r_m = Math.sqrt(area_m2 / Math.PI);
+            const diameter = r_m * 2 * 1000;
+            setFields(prev => ({ ...prev, diameter: diameter.toFixed(2) }));
+            calculatedWeight = kg;
+          }
+      } else { // 3 fields filled, recalculate weight based on dimensions
         const r_m = d_mm / 2000;
         const vol_m3 = Math.PI * r_m * r_m * (t_mm / 1000);
         calculatedWeight = vol_m3 * DENSITY;
-      } else if (!t_mm) {
-        const r_m = d_mm / 2000;
-        const area_m2 = Math.PI * r_m * r_m;
-        const thickness = (kg / (area_m2 * DENSITY)) * 1000;
-        setFields(prev => ({ ...prev, thickness: thickness.toFixed(2).replace('.', ',') }));
-        calculatedWeight = kg;
-      } else if (!d_mm) {
-        const vol_m3 = kg / DENSITY;
-        const area_m2 = vol_m3 / (t_mm / 1000);
-        const r_m = Math.sqrt(area_m2 / Math.PI);
-        const diameter = r_m * 2 * 1000;
-        setFields(prev => ({ ...prev, diameter: diameter.toFixed(2).replace('.', ',') }));
-        calculatedWeight = kg;
       }
     }
     
     if (calculatedWeight !== null) {
       setRealWeight(calculatedWeight);
-    } else {
-      // If weight is entered manually, that's the real weight
-      if (kg > 0 && (shape === 'rectangle' ? filledCount < 3 : filledCount < 2)) {
-         setRealWeight(kg);
-      } else {
-        setRealWeight(null);
-      }
     }
 
   }, [fields.width, fields.length, fields.thickness, fields.weight, fields.diameter, shape]);
 
   React.useEffect(() => {
     if (realWeight !== null) {
-      const roundedWeight = Math.ceil(realWeight);
-      const currentWeightField = fields.weight.replace(',', '.');
-      // Only update if the calculated rounded weight is different from what's in the field
-      if (String(roundedWeight) !== currentWeightField) {
-        setFields(prev => ({ ...prev, weight: String(roundedWeight).replace('.', ',') }));
-      }
+        const roundedWeight = Math.ceil(realWeight);
+        const currentWeightField = parseFloat(fields.weight.replace(',', '.')) || 0;
+        
+        if (roundedWeight !== currentWeightField) {
+            setFields(prev => ({ ...prev, weight: String(roundedWeight).replace('.', ',') }));
+        }
     }
   }, [realWeight]);
 

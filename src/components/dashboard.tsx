@@ -114,15 +114,27 @@ function DashboardComponent() {
       </Sidebar>
       <SidebarInset>
         <div className="p-4 md:p-6 flex flex-col gap-6">
-          <header className="flex items-center justify-between">
-            <SidebarTrigger className="md:hidden"/>
-            <div className="flex-1 flex justify-end">
+          <header className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="md:hidden"/>
+            </div>
+            <div className="relative flex-1">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                type="search"
+                placeholder="Buscar em todas as categorias..."
+                className="w-full rounded-lg bg-background pl-8"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+            <div className="flex items-center gap-2">
               {!isScrapCategory && (
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm" className="gap-2">
                       <SlidersHorizontal />
-                      <span className="hidden sm:inline">Ajustar Parâmetros</span>
+                      <span className="hidden sm:inline">Ajustar</span>
                     </Button>
                   </DialogTrigger>
                   <DialogContent>
@@ -142,18 +154,7 @@ function DashboardComponent() {
               )}
             </div>
           </header>
-          <div className="space-y-4">
-             <div className="relative flex-1 max-w-sm">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                type="search"
-                placeholder="Buscar em todas as categorias..."
-                className="w-full rounded-lg bg-background pl-8"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </div>
-          </div>
+          
           <div>
             {searchTerm ? (
               <GlobalSearchResults 

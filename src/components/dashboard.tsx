@@ -13,7 +13,6 @@ import {
   SidebarInset,
   SidebarTrigger,
   useSidebar,
-  SidebarFooter,
 } from "@/components/ui/sidebar";
 import { Search, Warehouse, SlidersHorizontal } from "lucide-react";
 import { PriceControls } from "./price-controls";
@@ -112,36 +111,36 @@ function DashboardComponent() {
             ))}
           </SidebarMenu>
         </SidebarContent>
-        {!isScrapCategory && (
-           <SidebarFooter>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="w-full justify-start gap-2">
-                  <SlidersHorizontal />
-                  <span>Ajustar Preços</span>
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Ajustar Parâmetros de Preço</DialogTitle>
-                </DialogHeader>
-                <PriceControls
-                  costPrice={costPrice}
-                  markup={markup}
-                  sellingPrice={sellingPrice}
-                  onCostChange={handleCostChange}
-                  onMarkupChange={handleMarkupChange}
-                  onSellingPriceChange={handleSellingPriceChange}
-                />
-              </DialogContent>
-            </Dialog>
-           </SidebarFooter>
-        )}
       </Sidebar>
       <SidebarInset>
         <div className="p-4 md:p-6 flex flex-col gap-6">
           <header className="flex items-center justify-between">
             <SidebarTrigger className="md:hidden"/>
+            <div className="flex-1 flex justify-end">
+              {!isScrapCategory && (
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <SlidersHorizontal />
+                      <span className="hidden sm:inline">Ajustar Parâmetros</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Ajustar Parâmetros de Preço</DialogTitle>
+                    </DialogHeader>
+                    <PriceControls
+                      costPrice={costPrice}
+                      markup={markup}
+                      sellingPrice={sellingPrice}
+                      onCostChange={handleCostChange}
+                      onMarkupChange={handleMarkupChange}
+                      onSellingPriceChange={handleSellingPriceChange}
+                    />
+                  </DialogContent>
+                </Dialog>
+              )}
+            </div>
           </header>
           <div className="space-y-4">
              <div className="relative flex-1 max-w-sm">

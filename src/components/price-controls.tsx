@@ -4,7 +4,6 @@ import * as React from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -32,7 +31,7 @@ export function PriceControls({
   return (
     <Card className="border-primary/20">
       <CardHeader className="pb-2">
-        <CardTitle>Parâmetros de Preço</CardTitle>
+        <CardTitle className="text-base">Parâmetros de Preço</CardTitle>
       </CardHeader>
       <CardContent className="pt-2">
         <div className="grid grid-cols-3 gap-2">

@@ -14,14 +14,20 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Search, Warehouse } from "lucide-react";
+import { Search, Warehouse, SlidersHorizontal } from "lucide-react";
 import { PriceControls } from "./price-controls";
 import { ItemTable } from "./item-table";
 import { Icon } from "./icons";
 import { Input } from "./ui/input";
 import { GlobalSearchResults } from "./global-search-results";
 import { ScrapCalculator } from "./scrap-calculator";
-import { SheetTitle } from "./ui/sheet";
+import { Button } from "./ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Card } from "./ui/card";
 
 function DashboardComponent() {
   const [costPrice, setCostPrice] = React.useState(30);
@@ -112,14 +118,24 @@ function DashboardComponent() {
           </header>
           <div className="space-y-4">
             {!isScrapCategory && (
-              <PriceControls
-                costPrice={costPrice}
-                markup={markup}
-                sellingPrice={sellingPrice}
-                onCostChange={handleCostChange}
-                onMarkupChange={handleMarkupChange}
-                onSellingPriceChange={handleSellingPriceChange}
-              />
+              <Collapsible>
+                <CollapsibleTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start gap-2">
+                    <SlidersHorizontal className="size-4" />
+                    <span>Ajustar Parâmetros de Preço</span>
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="pt-4">
+                  <PriceControls
+                    costPrice={costPrice}
+                    markup={markup}
+                    sellingPrice={sellingPrice}
+                    onCostChange={handleCostChange}
+                    onMarkupChange={handleMarkupChange}
+                    onSellingPriceChange={handleSellingPriceChange}
+                  />
+                </CollapsibleContent>
+              </Collapsible>
             )}
              <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />

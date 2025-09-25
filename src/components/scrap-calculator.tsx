@@ -103,24 +103,12 @@ export function ScrapCalculator() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
           <div className="flex-1">
             <CardTitle>Calculadora de Retalhos e Discos</CardTitle>
             <CardDescription className="mt-2">
               Preencha os campos para calcular o valor faltante.
             </CardDescription>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="scrap-price">Preço do Retalho (R$/kg)</Label>
-            <Input
-              id="scrap-price"
-              type="number"
-              value={scrapPrice}
-              onChange={(e) => setScrapPrice(e.target.value === "" ? "" : e.target.valueAsNumber)}
-              className="w-full md:w-40"
-            />
-          </div>
-        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex justify-center">
@@ -150,30 +138,51 @@ export function ScrapCalculator() {
                 <Label htmlFor="length">Comprimento (mm)</Label>
                 <Input id="length" type="number" placeholder="Insira o comprimento" value={displayFields.length} onChange={handleInputChange('length')} />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="thickness">Espessura (mm)</Label>
+                <Input id="thickness" type="number" placeholder="Insira a espessura" value={displayFields.thickness} onChange={handleInputChange('thickness')} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="weight">Peso (kg)</Label>
+                <Input id="weight" type="number" placeholder="Insira o peso" value={displayFields.weight} onChange={handleInputChange('weight')} />
+              </div>
             </>
           ) : (
-            <div className="space-y-2">
-              <Label htmlFor="diameter">Diâmetro (mm)</Label>
-              <Input id="diameter" type="number" placeholder="Insira o diâmetro" value={displayFields.diameter} onChange={handleInputChange('diameter')} />
-            </div>
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="diameter">Diâmetro (mm)</Label>
+                <Input id="diameter" type="number" placeholder="Insira o diâmetro" value={displayFields.diameter} onChange={handleInputChange('diameter')} />
+              </div>
+               <div className="space-y-2">
+                <Label htmlFor="thickness">Espessura (mm)</Label>
+                <Input id="thickness" type="number" placeholder="Insira a espessura" value={displayFields.thickness} onChange={handleInputChange('thickness')} />
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="weight">Peso (kg)</Label>
+                <Input id="weight" type="number" placeholder="Insira o peso" value={displayFields.weight} onChange={handleInputChange('weight')} />
+              </div>
+            </>
           )}
-          <div className="space-y-2">
-            <Label htmlFor="thickness">Espessura (mm)</Label>
-            <Input id="thickness" type="number" placeholder="Insira a espessura" value={displayFields.thickness} onChange={handleInputChange('thickness')} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="weight">Peso (kg)</Label>
-            <Input id="weight" type="number" placeholder="Insira o peso" value={displayFields.weight} onChange={handleInputChange('weight')} />
-          </div>
         </div>
 
-        <div className="space-y-2 pt-4">
-          <Label className="text-primary font-semibold text-lg">
-            Preço Final da Peça
-          </Label>
-          <div className="w-full rounded-md border border-primary/50 bg-primary/10 px-4 py-3 text-xl font-bold text-primary flex items-center">
-            {formatCurrency(finalPrice)}
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
+            <div className="space-y-2">
+                <Label htmlFor="scrap-price">Preço Retalho (R$/kg)</Label>
+                <Input
+                id="scrap-price"
+                type="number"
+                value={scrapPrice}
+                onChange={(e) => setScrapPrice(e.target.value === "" ? "" : e.target.valueAsNumber)}
+                />
+            </div>
+            <div className="space-y-2">
+                <Label className="text-primary font-semibold">
+                    Preço Final da Peça
+                </Label>
+                <div className="w-full rounded-md border border-primary/50 bg-primary/10 px-3 py-2 text-base md:text-sm font-bold text-primary h-10 flex items-center">
+                    {formatCurrency(finalPrice)}
+                </div>
+            </div>
         </div>
       </CardContent>
     </Card>

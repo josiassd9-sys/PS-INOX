@@ -137,30 +137,30 @@ export function ScrapCalculator() {
         {shape === "rectangle" ? (
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="width">Largura (mm)</Label>
+              <Label htmlFor="width">Largura(mm)</Label>
               <Input id="width" type="number" placeholder="Insira a largura" value={displayFields.width} onChange={handleInputChange('width')} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="thickness">Espessura (mm)</Label>
+              <Label htmlFor="thickness">Espessura(mm)</Label>
               <Input id="thickness" type="number" placeholder="Insira a espessura" value={displayFields.thickness} onChange={handleInputChange('thickness')} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="length">Compr. (mm)</Label>
+              <Label htmlFor="length">Compr.(mm)</Label>
               <Input id="length" type="number" placeholder="Insira o comprimento" value={displayFields.length} onChange={handleInputChange('length')} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="weight">Peso (kg)</Label>
+              <Label htmlFor="weight">Peso(kg)</Label>
               <Input id="weight" type="number" placeholder="Insira o peso" value={displayFields.weight} onChange={handleInputChange('weight')} />
             </div>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="diameter">Diâmetro (mm)</Label>
+              <Label htmlFor="diameter">Diâmetro(mm)</Label>
               <Input id="diameter" type="number" placeholder="Insira o diâmetro" value={displayFields.diameter} onChange={handleInputChange('diameter')} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="thickness">Espessura (mm)</Label>
+              <Label htmlFor="thickness">Espessura(mm)</Label>
               <Input id="thickness" type="number" placeholder="Insira a espessura" value={displayFields.thickness} onChange={handleInputChange('thickness')} />
             </div>
             <div className="space-y-2 col-span-2">

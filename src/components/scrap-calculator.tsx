@@ -147,7 +147,7 @@ export function ScrapCalculator() {
                 </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="diameter">Diâmetro (mm)</Label>
                     <Input id="diameter" type="number" placeholder="Insira o diâmetro" value={displayFields.diameter} onChange={handleInputChange('diameter')} />
@@ -156,21 +156,20 @@ export function ScrapCalculator() {
                     <Label htmlFor="thickness">Espessura (mm)</Label>
                     <Input id="thickness" type="number" placeholder="Insira a espessura" value={displayFields.thickness} onChange={handleInputChange('thickness')} />
                 </div>
-                <div className="space-y-2 md:col-span-2">
+                <div className="space-y-2 col-span-2">
                     <Label htmlFor="weight">Peso (kg)</Label>
                     <Input id="weight" type="number" placeholder="Insira o peso" value={displayFields.weight} onChange={handleInputChange('weight')} />
                 </div>
             </div>
           )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
-            <div className="flex items-center gap-2">
+        <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+            <div className="space-y-2">
                 <Label htmlFor="scrap-price" className="shrink-0">Preço Retalho (R$/kg)</Label>
                 <Input
                   id="scrap-price"
                   type="number"
                   step="0.01"
-                  className="max-w-28"
                   value={typeof scrapPrice === 'number' ? scrapPrice.toFixed(2) : scrapPrice}
                   onChange={(e) => setScrapPrice(e.target.value === "" ? "" : e.target.valueAsNumber)}
                 />

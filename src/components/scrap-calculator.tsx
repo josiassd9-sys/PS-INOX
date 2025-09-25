@@ -33,12 +33,12 @@ export function ScrapCalculator() {
   const [realWeight, setRealWeight] = React.useState<number | null>(null);
 
   const handleInputChange = (fieldName: FieldName, value: string) => {
-    // Only allow numeric input, including decimals
+    // Only allow numeric input, including decimals, but also allow empty string
     if (value === '' || /^[0-9]*\.?[0-9]*$/.test(value)) {
-      setFields(prev => ({
-        ...prev,
-        [fieldName]: value
-      }));
+        setFields(prev => ({
+            ...prev,
+            [fieldName]: value
+        }));
     }
   };
 
@@ -57,17 +57,17 @@ export function ScrapCalculator() {
     const t = parseFloat(fields.thickness) || 0;
     const kg = parseFloat(fields.weight) || 0;
     const d = parseFloat(fields.diameter) || 0;
-    
+
     let newFields = { ...fields };
-    let newRealWeight: number | null = null;
-    let shouldUpdate = false;
+    let newRealWeight: number | null = realWeight;
+    let calculationDone = false;
 
     if (shape === 'rectangle') {
-        const inputs = [w, l, t, kg];
-        const filledCount = inputs.filter(v => v > 0).length;
-
+        const inputs = [w > 0, l > 0, t > 0, kg > 0];
+        const filledCount = inputs.filter(Boolean).length;
+        
         if (filledCount === 3) {
-            shouldUpdate = true;
+            calculationDone = true;
             if (!kg && w > 0 && l > 0 && t > 0) {
                 const calculatedWeight = (w / 1000) * (l / 1000) * (t / 1000) * DENSITY;
                 newRealWeight = calculatedWeight;
@@ -75,22 +75,25 @@ export function ScrapCalculator() {
             } else if (!t && w > 0 && l > 0 && kg > 0) {
                 const calculatedThickness = (kg / ((w / 1000) * (l / 1000) * DENSITY)) * 1000;
                 newFields.thickness = calculatedThickness.toFixed(2);
+                newRealWeight = kg;
             } else if (!l && w > 0 && t > 0 && kg > 0) {
                 const calculatedLength = (kg / ((w / 1000) * (t / 1000) * DENSITY)) * 1000;
                 newFields.length = calculatedLength.toFixed(2);
+                newRealWeight = kg;
             } else if (!w && l > 0 && t > 0 && kg > 0) {
                 const calculatedWidth = (kg / ((l / 1000) * (t / 1000) * DENSITY)) * 1000;
                 newFields.width = calculatedWidth.toFixed(2);
+                newRealWeight = kg;
             } else {
-                shouldUpdate = false;
+                calculationDone = false;
             }
         }
     } else { // disc
-        const inputs = [d, t, kg];
-        const filledCount = inputs.filter(v => v > 0).length;
+        const inputs = [d > 0, t > 0, kg > 0];
+        const filledCount = inputs.filter(Boolean).length;
 
         if (filledCount === 2) {
-            shouldUpdate = true;
+            calculationDone = true;
             if (!kg && d > 0 && t > 0) {
                 const r_m = d / 2000;
                 const vol_m3 = Math.PI * r_m * r_m * (t / 1000);
@@ -102,33 +105,37 @@ export function ScrapCalculator() {
                 const area_m2 = Math.PI * r_m * r_m;
                 const calculatedThickness = (kg / (area_m2 * DENSITY)) * 1000;
                 newFields.thickness = calculatedThickness.toFixed(2);
+                newRealWeight = kg;
             } else if (!d && t > 0 && kg > 0) {
                 const vol_m3 = kg / DENSITY;
                 const area_m2 = vol_m3 / (t / 1000);
                 const r_m = Math.sqrt(area_m2 / Math.PI);
                 const calculatedDiameter = r_m * 2 * 1000;
                 newFields.diameter = calculatedDiameter.toFixed(2);
+                newRealWeight = kg;
             } else {
-                shouldUpdate = false;
+                calculationDone = false;
             }
         }
     }
     
-    // Only update state if something was calculated
-    if (shouldUpdate) {
+    if (calculationDone) {
         setFields(newFields);
         setRealWeight(newRealWeight);
     } else {
-        // If user manually changes weight, clear realWeight
-        if (kg > 0) {
-            const inputs = (shape === 'rectangle') ? [w, l, t] : [d, t];
-            if (inputs.filter(v => v > 0).length < inputs.length) {
-                setRealWeight(null);
-            }
+        const hasDim = shape === 'rectangle' ? (w > 0 && l > 0 && t > 0) : (d > 0 && t > 0);
+        if (hasDim && kg > 0) {
+            const calculatedWeight = shape === 'rectangle' 
+                ? (w / 1000) * (l / 1000) * (t / 1000) * DENSITY 
+                : Math.PI * (d/2000) * (d/2000) * (t / 1000) * DENSITY;
+            setRealWeight(calculatedWeight);
+        } else {
+             setRealWeight(null);
         }
     }
 
-  }, [fields.width, fields.length, fields.thickness, fields.weight, fields.diameter, shape]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fields, shape]);
 
 
   const finalPrice = (Number(fields.weight) || 0) * (Number(scrapPrice) || 0);
@@ -171,15 +178,15 @@ export function ScrapCalculator() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="width">Largura(mm)</Label>
-              <Input id="width" type="number" placeholder="Insira a largura" value={fields.width} onChange={(e) => handleInputChange('width', e.target.value)} />
+              <Input id="width" type="text" placeholder="Insira a largura" value={fields.width} onChange={(e) => handleInputChange('width', e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="thickness">Espessura(mm)</Label>
-              <Input id="thickness" type="number" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} />
+              <Input id="thickness" type="text" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="length">Compr.(mm)</Label>
-              <Input id="length" type="number" placeholder="Insira o compr." value={fields.length} onChange={(e) => handleInputChange('length', e.target.value)} />
+              <Input id="length" type="text" placeholder="Insira o compr." value={fields.length} onChange={(e) => handleInputChange('length', e.target.value)} />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
@@ -196,11 +203,11 @@ export function ScrapCalculator() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="diameter">Diâmetro(mm)</Label>
-              <Input id="diameter" type="number" placeholder="Insira o diâmetro" value={fields.diameter} onChange={(e) => handleInputChange('diameter', e.target.value)} />
+              <Input id="diameter" type="text" placeholder="Insira o diâmetro" value={fields.diameter} onChange={(e) => handleInputChange('diameter', e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="thickness">Espessura(mm)</Label>
-              <Input id="thickness" type="number" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} />
+              <Input id="thickness" type="text" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} />
             </div>
             <div className="space-y-2 col-span-2">
                 <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
@@ -218,7 +225,7 @@ export function ScrapCalculator() {
         <div className="grid grid-cols-3 gap-4 pt-4 border-t">
             <div className="space-y-2">
               <Label htmlFor="weight">Peso (kg)</Label>
-              <Input id="weight" type="number" placeholder="Insira o peso" value={fields.weight} onChange={(e) => handleInputChange('weight', e.target.value)} />
+              <Input id="weight" type="text" placeholder="Insira o peso" value={fields.weight} onChange={(e) => handleInputChange('weight', e.target.value)} />
             </div>
             <div className="space-y-2">
                 <Label>Peso Real (kg)</Label>

@@ -33,10 +33,13 @@ export function ScrapCalculator() {
   const [realWeight, setRealWeight] = React.useState<number | null>(null);
 
   const handleInputChange = (fieldName: FieldName, value: string) => {
-    setFields(prev => ({
-      ...prev,
-      [fieldName]: value
-    }));
+    // Only allow numeric input
+    if (value === '' || /^[0-9]*\.?[0-9]*$/.test(value)) {
+      setFields(prev => ({
+        ...prev,
+        [fieldName]: value
+      }));
+    }
   };
 
   const handleShapeChange = (value: Shape | "") => {
@@ -48,60 +51,65 @@ export function ScrapCalculator() {
   };
 
   React.useEffect(() => {
-    const w_mm = fields.width ? parseFloat(fields.width) : 0;
-    const l_mm = fields.length ? parseFloat(fields.length) : 0;
-    const t_mm = fields.thickness ? parseFloat(fields.thickness) : 0;
-    const kg = fields.weight ? parseFloat(fields.weight) : 0;
-    const d_mm = fields.diameter ? parseFloat(fields.diameter) : 0;
-
-    let newFields = { ...fields };
-    let calculatedWeight: number | null = null;
-    let weightWasCalculated = false;
-
+    const w_mm = parseFloat(fields.width) || 0;
+    const l_mm = parseFloat(fields.length) || 0;
+    const t_mm = parseFloat(fields.thickness) || 0;
+    const kg = parseFloat(fields.weight) || 0;
+    const d_mm = parseFloat(fields.diameter) || 0;
+  
+    const updateFields = (newValues: Partial<typeof fields>) => {
+      setFields(prev => ({ ...prev, ...newValues }));
+    };
+  
     if (shape === 'rectangle') {
       const filledCount = [w_mm > 0, l_mm > 0, t_mm > 0, kg > 0].filter(Boolean).length;
-      if (filledCount === 3) {
-        if (kg === 0 && w_mm > 0 && l_mm > 0 && t_mm > 0) {
-          calculatedWeight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
-          newFields.weight = String(Math.ceil(calculatedWeight));
-          weightWasCalculated = true;
-        } else if (t_mm === 0 && w_mm > 0 && l_mm > 0 && kg > 0) {
-          newFields.thickness = String(Math.ceil(kg / ((w_mm / 1000) * (l_mm / 1000) * DENSITY)));
-        } else if (l_mm === 0 && w_mm > 0 && t_mm > 0 && kg > 0) {
-          newFields.length = String(Math.ceil(kg / ((w_mm / 1000) * (t_mm / 1000) * DENSITY)));
-        } else if (w_mm === 0 && l_mm > 0 && t_mm > 0 && kg > 0) {
-          newFields.width = String(Math.ceil(kg / ((l_mm / 1000) * (t_mm / 1000) * DENSITY)));
-        }
+      if (filledCount !== 3) {
+        if(kg > 0) setRealWeight(null); // Clear real weight if weight is manually entered
+        return;
+      };
+  
+      if (!kg) {
+        const calculatedWeight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
+        setRealWeight(calculatedWeight);
+        updateFields({ weight: String(Math.ceil(calculatedWeight)) });
+      } else if (!t_mm) {
+        const calculatedThickness = (kg / ((w_mm / 1000) * (l_mm / 1000) * DENSITY));
+        updateFields({ thickness: String(Math.ceil(calculatedThickness)) });
+      } else if (!l_mm) {
+        const calculatedLength = (kg / ((w_mm / 1000) * (t_mm / 1000) * DENSITY));
+        updateFields({ length: String(Math.ceil(calculatedLength)) });
+      } else if (!w_mm) {
+        const calculatedWidth = (kg / ((l_mm / 1000) * (t_mm / 1000) * DENSITY));
+        updateFields({ width: String(Math.ceil(calculatedWidth)) });
       }
     } else { // disc
       const filledCount = [d_mm > 0, t_mm > 0, kg > 0].filter(Boolean).length;
-      if (filledCount === 2) {
-        if (kg === 0 && d_mm > 0 && t_mm > 0) {
-            const r_m = d_mm / 2000;
-            const vol_m3 = Math.PI * r_m * r_m * (t_mm / 1000);
-            calculatedWeight = vol_m3 * DENSITY;
-            newFields.weight = String(Math.ceil(calculatedWeight));
-            weightWasCalculated = true;
-        } else if (t_mm === 0 && d_mm > 0 && kg > 0) {
-            const r_m = d_mm / 2000;
-            const area_m2 = Math.PI * r_m * r_m;
-            newFields.thickness = String(Math.ceil(kg / (area_m2 * DENSITY)));
-        } else if (d_mm === 0 && t_mm > 0 && kg > 0) {
-            const vol_m3 = kg / DENSITY;
-            const area_m2 = vol_m3 / (t_mm / 1000);
-            const r_m = Math.sqrt(area_m2 / Math.PI);
-            newFields.diameter = String(Math.ceil(r_m * 2 * 1000));
-        }
+      if (filledCount !== 2) {
+        if(kg > 0) setRealWeight(null);
+        return;
+      }
+  
+      if (!kg) {
+        const r_m = d_mm / 2000;
+        const vol_m3 = Math.PI * r_m * r_m * (t_mm / 1000);
+        const calculatedWeight = vol_m3 * DENSITY;
+        setRealWeight(calculatedWeight);
+        updateFields({ weight: String(Math.ceil(calculatedWeight)) });
+      } else if (!t_mm) {
+        const r_m = d_mm / 2000;
+        const area_m2 = Math.PI * r_m * r_m;
+        const calculatedThickness = (kg / (area_m2 * DENSITY));
+        updateFields({ thickness: String(Math.ceil(calculatedThickness)) });
+      } else if (!d_mm) {
+        const vol_m3 = kg / DENSITY;
+        const area_m2 = vol_m3 / (t_mm / 1000);
+        const r_m = Math.sqrt(area_m2 / Math.PI);
+        const calculatedDiameter = r_m * 2 * 1000;
+        updateFields({ diameter: String(Math.ceil(calculatedDiameter)) });
       }
     }
-    
-    setRealWeight(weightWasCalculated ? calculatedWeight : null);
+  }, [fields.width, fields.length, fields.thickness, fields.weight, fields.diameter, shape]);
 
-    if(JSON.stringify(newFields) !== JSON.stringify(fields)) {
-        setFields(newFields);
-    }
-
-  }, [fields, shape]);
 
   const finalPrice = (Number(fields.weight) || 0) * (Number(scrapPrice) || 0);
 

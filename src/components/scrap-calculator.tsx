@@ -29,8 +29,6 @@ export function ScrapCalculator() {
     weight: "",
     diameter: "",
   });
-  const [realWeight, setRealWeight] = React.useState<number | null>(null);
-
 
   const handleInputChange = (fieldName: FieldName) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -38,16 +36,12 @@ export function ScrapCalculator() {
       ...prev,
       [fieldName]: value
     }));
-    if (fieldName !== 'weight') {
-      setRealWeight(null);
-    }
   };
 
   const handleShapeChange = (value: Shape | "") => {
     if (value) {
       setShape(value);
       setFields({ width: "", length: "", thickness: "", weight: "", diameter: "" });
-      setRealWeight(null);
     }
   };
 
@@ -56,7 +50,6 @@ export function ScrapCalculator() {
     const { width, length, thickness, weight, diameter } = fields;
     
     const calculatedFields = { ...fields };
-    let newRealWeight = null;
 
     if (shape === 'rectangle') {
         const w = getNum(width);
@@ -66,11 +59,8 @@ export function ScrapCalculator() {
         const filledCount = [w, l, t, kg].filter(v => v > 0).length;
 
         if (filledCount === 3) {
-            if (kg === 0) {
-              const real = (w / 1000) * (l / 1000) * (t / 1000) * DENSITY;
-              newRealWeight = real;
-              calculatedFields.weight = String(Math.ceil(real));
-            } else if (t === 0) calculatedFields.thickness = String(Math.ceil((kg * 1000000000) / (w * l * DENSITY)));
+            if (kg === 0) calculatedFields.weight = String(Math.ceil((w / 1000) * (l / 1000) * (t / 1000) * DENSITY));
+            else if (t === 0) calculatedFields.thickness = String(Math.ceil((kg * 1000000000) / (w * l * DENSITY)));
             else if (l === 0) calculatedFields.length = String(Math.ceil((kg * 1000000000) / (w * t * DENSITY)));
             else if (w === 0) calculatedFields.width = String(Math.ceil((kg * 1000000000) / (l * t * DENSITY)));
         }
@@ -84,9 +74,7 @@ export function ScrapCalculator() {
             if (kg === 0) {
                 const r_m = d / 2000;
                 const vol_m3 = Math.PI * r_m * r_m * (t / 1000);
-                const real = vol_m3 * DENSITY;
-                newRealWeight = real;
-                calculatedFields.weight = String(Math.ceil(real));
+                calculatedFields.weight = String(Math.ceil(vol_m3 * DENSITY));
             } else if (t === 0) {
                 const r_m = d / 2000;
                 const area_m2 = Math.PI * r_m * r_m;
@@ -99,10 +87,8 @@ export function ScrapCalculator() {
             }
         }
     }
-    // Use a functional update to ensure we have the latest state
-    setRealWeight(prev => newRealWeight !== null ? newRealWeight : prev);
     if(JSON.stringify(calculatedFields) !== JSON.stringify(fields)) {
-      setFields(calculatedFields);
+        setFields(calculatedFields);
     }
     return calculatedFields;
   }
@@ -122,13 +108,6 @@ export function ScrapCalculator() {
     }).format(value);
   };
   
-  const formatNumber = (value: number, digits: number = 3) => {
-    return new Intl.NumberFormat("pt-BR", {
-      minimumFractionDigits: digits,
-      maximumFractionDigits: digits,
-    }).format(value);
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -173,11 +152,6 @@ export function ScrapCalculator() {
                 <div className="space-y-2">
                     <Label htmlFor="weight">Peso (kg)</Label>
                     <Input id="weight" type="number" placeholder="Insira o peso" value={displayFields.weight} onChange={handleInputChange('weight')} />
-                    {realWeight !== null && (
-                      <div className="text-xs text-muted-foreground font-normal text-right pr-1">
-                          Peso real: {formatNumber(realWeight, 3)} kg
-                      </div>
-                    )}
                 </div>
             </div>
           ) : (
@@ -193,11 +167,6 @@ export function ScrapCalculator() {
                 <div className="space-y-2 col-span-1 md:col-span-2">
                     <Label htmlFor="weight">Peso (kg)</Label>
                     <Input id="weight" type="number" placeholder="Insira o peso" value={displayFields.weight} onChange={handleInputChange('weight')} />
-                    {realWeight !== null && (
-                      <div className="text-xs text-muted-foreground font-normal text-right pr-1">
-                          Peso real: {formatNumber(realWeight, 3)} kg
-                      </div>
-                    )}
                 </div>
             </div>
           )}

@@ -183,7 +183,7 @@ export function ScrapCalculator() {
           </div>
           <div className="space-y-2">
             <Label className="text-primary font-semibold">
-              Preço Final
+            (R$/Peça)
             </Label>
             <div className="w-full rounded-md border border-primary/50 bg-primary/10 px-3 py-2 text-base md:text-sm font-bold text-primary h-10 flex items-center">
               {formatCurrency(finalPrice)}

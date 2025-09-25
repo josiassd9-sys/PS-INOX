@@ -146,7 +146,7 @@ export function ScrapCalculator() {
                         <Input id="thickness" type="number" placeholder="Insira a espessura" value={displayFields.thickness} onChange={handleInputChange('thickness')} />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="length">Comprimento (mm)</Label>
+                        <Label htmlFor="length">Compr. (mm)</Label>
                         <Input id="length" type="number" placeholder="Insira o comprimento" value={displayFields.length} onChange={handleInputChange('length')} />
                     </div>
                     <div className="space-y-2">
@@ -175,7 +175,7 @@ export function ScrapCalculator() {
 
         <div className="grid grid-cols-2 gap-4 pt-4 border-t">
             <div className="space-y-2">
-                <Label htmlFor="scrap-price" className="shrink-0">Preço Retalho (R$/kg)</Label>
+                <Label htmlFor="scrap-price" className="shrink-0">Preço Retalho</Label>
                 <Input
                   id="scrap-price"
                   type="number"
@@ -186,7 +186,7 @@ export function ScrapCalculator() {
             </div>
             <div className="space-y-2">
                 <Label className="text-primary font-semibold">
-                    Preço Final da Peça
+                    Preço Final
                 </Label>
                 <div className="w-full rounded-md border border-primary/50 bg-primary/10 px-3 py-2 text-base md:text-sm font-bold text-primary h-10 flex items-center">
                     {formatCurrency(finalPrice)}

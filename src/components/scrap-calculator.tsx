@@ -128,7 +128,7 @@ export function ScrapCalculator() {
         </div>
 
         {shape === "rectangle" ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="width">Largura (mm)</Label>
                     <Input id="width" type="number" placeholder="Insira a largura" value={displayFields.width} onChange={handleInputChange('width')} />

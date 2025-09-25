@@ -33,11 +33,28 @@ export function ScrapCalculator() {
   const [realWeight, setRealWeight] = React.useState<number | null>(null);
 
   const handleInputChange = (fieldName: FieldName, value: string) => {
-    if (value === '' || /^[0-9]*\.?[0-9]*$/.test(value)) {
+    const sanitizedValue = value.replace(",", ".");
+    if (sanitizedValue === '' || /^[0-9]*\.?[0-9]*$/.test(sanitizedValue)) {
         setFields(prev => ({
             ...prev,
             [fieldName]: value
         }));
+    }
+  };
+
+  const handleScrapPriceChange = (value: string) => {
+    const sanitizedValue = value.replace(",", ".");
+    if (sanitizedValue === "") {
+      setScrapPrice("");
+      return;
+    }
+    if (/^[0-9]*\.?[0-9]{0,2}$/.test(sanitizedValue)) {
+        const numValue = parseFloat(sanitizedValue);
+        if (!isNaN(numValue)) {
+            setScrapPrice(numValue);
+        } else {
+            setScrapPrice("")
+        }
     }
   };
 
@@ -50,96 +67,95 @@ export function ScrapCalculator() {
   };
 
   React.useEffect(() => {
-    const w_mm = parseFloat(fields.width) || 0;
-    const l_mm = parseFloat(fields.length) || 0;
-    const t_mm = parseFloat(fields.thickness) || 0;
-    const kg = parseFloat(fields.weight) || 0;
-    const d_mm = parseFloat(fields.diameter) || 0;
+    const getNum = (val: string) => parseFloat(val.replace(',', '.')) || 0;
+
+    const w_mm = getNum(fields.width);
+    const l_mm = getNum(fields.length);
+    const t_mm = getNum(fields.thickness);
+    const kg = getNum(fields.weight);
+    const d_mm = getNum(fields.diameter);
   
     const updateFields = (updates: Partial<typeof fields>) => {
-      setFields(prev => ({ ...prev, ...updates }));
+        setFields(prev => ({ ...prev, ...updates }));
     };
+
+    let calculatedWeight: number | null = null;
   
     if (shape === 'rectangle') {
       const inputs = [w_mm > 0, l_mm > 0, t_mm > 0, kg > 0];
       const filledCount = inputs.filter(Boolean).length;
   
-      if (filledCount === 4 || filledCount < 3) {
-        if (w_mm > 0 && l_mm > 0 && t_mm > 0) {
-            setRealWeight((w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY);
-        } else if (kg > 0) {
-            setRealWeight(kg);
-        } else {
-            setRealWeight(null);
-        }
+      if (filledCount < 3) {
+        setRealWeight(null);
         return;
-      }
-  
-      // Calculate missing field
+      };
+      
       if (!kg && w_mm > 0 && l_mm > 0 && t_mm > 0) {
-        setRealWeight((w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY);
+        calculatedWeight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
       } else if (!t_mm && w_mm > 0 && l_mm > 0 && kg > 0) {
         const thickness = (kg / ((w_mm / 1000) * (l_mm / 1000) * DENSITY)) * 1000;
-        updateFields({ thickness: thickness.toFixed(2) });
-        setRealWeight(kg);
+        updateFields({ thickness: thickness.toFixed(2).replace('.', ',') });
+        calculatedWeight = kg;
       } else if (!l_mm && w_mm > 0 && t_mm > 0 && kg > 0) {
         const length = (kg / ((w_mm / 1000) * (t_mm / 1000) * DENSITY)) * 1000;
-        updateFields({ length: length.toFixed(2) });
-        setRealWeight(kg);
+        updateFields({ length: length.toFixed(2).replace('.', ',') });
+        calculatedWeight = kg;
       } else if (!w_mm && l_mm > 0 && t_mm > 0 && kg > 0) {
         const width = (kg / ((l_mm / 1000) * (t_mm / 1000) * DENSITY)) * 1000;
-        updateFields({ width: width.toFixed(2) });
-        setRealWeight(kg);
+        updateFields({ width: width.toFixed(2).replace('.', ',') });
+        calculatedWeight = kg;
+      } else if (w_mm > 0 && l_mm > 0 && t_mm > 0) {
+        calculatedWeight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
       }
+
     } else { // disc
       const inputs = [d_mm > 0, t_mm > 0, kg > 0];
       const filledCount = inputs.filter(Boolean).length;
   
-      if (filledCount === 3 || filledCount < 2) {
-        if (d_mm > 0 && t_mm > 0) {
-            const r_m = d_mm / 2000;
-            const vol_m3 = Math.PI * r_m * r_m * (t_mm / 1000);
-            setRealWeight(vol_m3 * DENSITY);
-        } else if (kg > 0) {
-            setRealWeight(kg);
-        } else {
-            setRealWeight(null);
-        }
+      if (filledCount < 2) {
+        setRealWeight(null);
         return;
       }
-  
+      
       if (!kg && d_mm > 0 && t_mm > 0) {
         const r_m = d_mm / 2000;
         const vol_m3 = Math.PI * r_m * r_m * (t_mm / 1000);
-        setRealWeight(vol_m3 * DENSITY);
+        calculatedWeight = vol_m3 * DENSITY;
       } else if (!t_mm && d_mm > 0 && kg > 0) {
         const r_m = d_mm / 2000;
         const area_m2 = Math.PI * r_m * r_m;
         const thickness = (kg / (area_m2 * DENSITY)) * 1000;
-        updateFields({ thickness: thickness.toFixed(2) });
-        setRealWeight(kg);
+        updateFields({ thickness: thickness.toFixed(2).replace('.', ',') });
+        calculatedWeight = kg;
       } else if (!d_mm && t_mm > 0 && kg > 0) {
         const vol_m3 = kg / DENSITY;
         const area_m2 = vol_m3 / (t_mm / 1000);
         const r_m = Math.sqrt(area_m2 / Math.PI);
         const diameter = r_m * 2 * 1000;
-        updateFields({ diameter: diameter.toFixed(2) });
-        setRealWeight(kg);
+        updateFields({ diameter: diameter.toFixed(2).replace('.', ',') });
+        calculatedWeight = kg;
+      } else if (d_mm > 0 && t_mm > 0) {
+        const r_m = d_mm / 2000;
+        const vol_m3 = Math.PI * r_m * r_m * (t_mm / 1000);
+        calculatedWeight = vol_m3 * DENSITY;
       }
     }
+    setRealWeight(calculatedWeight);
+
   }, [fields.width, fields.length, fields.thickness, fields.weight, fields.diameter, shape]);
 
   React.useEffect(() => {
     if (realWeight !== null) {
-        const roundedWeight = Math.ceil(realWeight);
-        if (String(roundedWeight) !== fields.weight) {
-            setFields(prev => ({ ...prev, weight: String(roundedWeight) }));
-        }
+      const roundedWeight = Math.ceil(realWeight);
+      const currentWeightField = fields.weight.replace(',', '.');
+      if (String(roundedWeight) !== currentWeightField) {
+        setFields(prev => ({ ...prev, weight: String(roundedWeight) }));
+      }
     }
   }, [realWeight]);
 
 
-  const finalPrice = (Number(fields.weight) || 0) * (Number(scrapPrice) || 0);
+  const finalPrice = (parseFloat(fields.weight.replace(',', '.')) || 0) * (Number(scrapPrice) || 0);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -192,11 +208,10 @@ export function ScrapCalculator() {
             <div className="space-y-2">
                 <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
                 <Input
-                id="scrap-price"
-                type="number"
-                step="0.01"
-                value={scrapPrice}
-                onChange={(e) => setScrapPrice(e.target.value === "" ? "" : e.target.valueAsNumber)}
+                  id="scrap-price"
+                  type="text"
+                  value={typeof scrapPrice === 'number' ? scrapPrice.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : ""}
+                  onChange={(e) => handleScrapPriceChange(e.target.value)}
                 />
             </div>
           </div>
@@ -213,11 +228,10 @@ export function ScrapCalculator() {
             <div className="space-y-2 col-span-2">
                 <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
                 <Input
-                id="scrap-price"
-                type="number"
-                step="0.01"
-                value={scrapPrice}
-                onChange={(e) => setScrapPrice(e.target.value === "" ? "" : e.target.valueAsNumber)}
+                  id="scrap-price"
+                  type="text"
+                  value={typeof scrapPrice === 'number' ? scrapPrice.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : ""}
+                  onChange={(e) => handleScrapPriceChange(e.target.value)}
                 />
             </div>
           </div>
@@ -231,7 +245,7 @@ export function ScrapCalculator() {
             <div className="space-y-2">
                 <Label>Peso Real (kg)</Label>
                 <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-sm h-10 flex items-center text-muted-foreground">
-                {realWeight !== null ? realWeight.toFixed(2) : "..."}
+                {realWeight !== null ? realWeight.toFixed(2).replace('.', ',') : "..."}
                 </div>
             </div>
             <div className="space-y-2">

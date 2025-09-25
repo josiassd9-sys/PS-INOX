@@ -169,11 +169,12 @@ export function ScrapCalculator() {
             <div className="flex items-center gap-2">
                 <Label htmlFor="scrap-price" className="shrink-0">Preço Retalho (R$/kg)</Label>
                 <Input
-                id="scrap-price"
-                type="number"
-                className="max-w-28"
-                value={scrapPrice}
-                onChange={(e) => setScrapPrice(e.target.value === "" ? "" : e.target.valueAsNumber)}
+                  id="scrap-price"
+                  type="number"
+                  step="0.01"
+                  className="max-w-28"
+                  value={typeof scrapPrice === 'number' ? scrapPrice.toFixed(2) : scrapPrice}
+                  onChange={(e) => setScrapPrice(e.target.value === "" ? "" : e.target.valueAsNumber)}
                 />
             </div>
             <div className="space-y-2">

@@ -111,14 +111,16 @@ function DashboardComponent() {
             <SidebarTrigger className="md:hidden"/>
           </header>
           <div className="space-y-4">
-            <PriceControls
-              costPrice={costPrice}
-              markup={markup}
-              sellingPrice={sellingPrice}
-              onCostChange={handleCostChange}
-              onMarkupChange={handleMarkupChange}
-              onSellingPriceChange={handleSellingPriceChange}
-            />
+            {!isScrapCategory && (
+              <PriceControls
+                costPrice={costPrice}
+                markup={markup}
+                sellingPrice={sellingPrice}
+                onCostChange={handleCostChange}
+                onMarkupChange={handleMarkupChange}
+                onSellingPriceChange={handleSellingPriceChange}
+              />
+            )}
              <div className="relative flex-1 max-w-sm">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input

@@ -30,6 +30,8 @@ export function ScrapCalculator() {
     diameter: "",
   });
 
+  const [realWeight, setRealWeight] = React.useState<number | null>(null);
+
   const handleInputChange = (fieldName: FieldName, value: string) => {
     setFields(prev => ({
       ...prev,
@@ -41,72 +43,75 @@ export function ScrapCalculator() {
     if (value) {
       setShape(value);
       setFields({ width: "", length: "", thickness: "", weight: "", diameter: "" });
+      setRealWeight(null);
     }
   };
 
   React.useEffect(() => {
     const getNum = (val: string) => (val !== "" ? parseFloat(val) : 0);
-    const { width, length, thickness, weight, diameter } = fields;
-    
+
+    const w_mm = getNum(fields.width);
+    const l_mm = getNum(fields.length);
+    const t_mm = getNum(fields.thickness);
+    const kg = getNum(fields.weight);
+    const d_mm = getNum(fields.diameter);
+
     let newFields = { ...fields };
-    let calculated = false;
-  
+    let calculatedWeight: number | null = null;
+    let didCalculate = false;
+
     if (shape === 'rectangle') {
-      const w_mm = getNum(width);
-      const l_mm = getNum(length);
-      const t_mm = getNum(thickness);
-      const kg = getNum(weight);
       const filledCount = [w_mm > 0, l_mm > 0, t_mm > 0, kg > 0].filter(Boolean).length;
-  
       if (filledCount >= 3) {
         if (kg === 0) {
-          const weight_calc = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
-          newFields.weight = String(Math.ceil(weight_calc));
-          calculated = true;
+          calculatedWeight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
+          newFields.weight = String(Math.ceil(calculatedWeight));
+          didCalculate = true;
         } else if (t_mm === 0 && w_mm > 0 && l_mm > 0) {
-          const thickness_calc_mm = (kg / ((w_mm / 1000) * (l_mm / 1000) * DENSITY)) * 1000;
-          newFields.thickness = String(Math.ceil(thickness_calc_mm));
-          calculated = true;
+          newFields.thickness = String(Math.ceil((kg / ((w_mm / 1000) * (l_mm / 1000) * DENSITY)) * 1000));
+          didCalculate = true;
         } else if (l_mm === 0 && w_mm > 0 && t_mm > 0) {
-          const length_calc_mm = (kg / ((w_mm / 1000) * (t_mm / 1000) * DENSITY)) * 1000;
-          newFields.length = String(Math.ceil(length_calc_mm));
-          calculated = true;
+          newFields.length = String(Math.ceil((kg / ((w_mm / 1000) * (t_mm / 1000) * DENSITY)) * 1000));
+          didCalculate = true;
         } else if (w_mm === 0 && l_mm > 0 && t_mm > 0) {
-          const width_calc_mm = (kg / ((l_mm / 1000) * (t_mm / 1000) * DENSITY)) * 1000;
-          newFields.width = String(Math.ceil(width_calc_mm));
-          calculated = true;
+          newFields.width = String(Math.ceil((kg / ((l_mm / 1000) * (t_mm / 1000) * DENSITY)) * 1000));
+          didCalculate = true;
         }
       }
     } else { // disc
-      const d_mm = getNum(diameter);
-      const t_mm = getNum(thickness);
-      const kg = getNum(weight);
       const filledCount = [d_mm > 0, t_mm > 0, kg > 0].filter(Boolean).length;
-  
       if (filledCount >= 2) {
         if (kg === 0 && d_mm > 0 && t_mm > 0) {
             const r_m = d_mm / 2000;
             const vol_m3 = Math.PI * r_m * r_m * (t_mm / 1000);
-            newFields.weight = String(Math.ceil(vol_m3 * DENSITY));
-            calculated = true;
+            calculatedWeight = vol_m3 * DENSITY;
+            newFields.weight = String(Math.ceil(calculatedWeight));
+            didCalculate = true;
         } else if (t_mm === 0 && d_mm > 0 && kg > 0) {
             const r_m = d_mm / 2000;
             const area_m2 = Math.PI * r_m * r_m;
             newFields.thickness = String(Math.ceil((kg / (area_m2 * DENSITY)) * 1000));
-            calculated = true;
+            didCalculate = true;
         } else if (d_mm === 0 && t_mm > 0 && kg > 0) {
             const vol_m3 = kg / DENSITY;
             const area_m2 = vol_m3 / (t_mm / 1000);
             const r_m = Math.sqrt(area_m2 / Math.PI);
             newFields.diameter = String(Math.ceil(r_m * 2 * 1000));
-            calculated = true;
+            didCalculate = true;
         }
       }
     }
-  
-    if(calculated && JSON.stringify(newFields) !== JSON.stringify(fields)) {
+    
+    setRealWeight(calculatedWeight);
+
+    if(didCalculate && JSON.stringify(newFields) !== JSON.stringify(fields)) {
         setFields(newFields);
     }
+
+    if (fields.weight !== "" && !didCalculate) {
+      setRealWeight(null);
+    }
+
   }, [fields, shape]);
 
   const finalPrice = (Number(fields.weight) || 0) * (Number(scrapPrice) || 0);
@@ -160,8 +165,14 @@ export function ScrapCalculator() {
               <Input id="length" type="number" placeholder="Insira o compr." value={fields.length} onChange={(e) => handleInputChange('length', e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="weight">Peso(kg)</Label>
-              <Input id="weight" type="number" placeholder="Insira o peso" value={fields.weight} onChange={(e) => handleInputChange('weight', e.target.value)} />
+                <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
+                <Input
+                id="scrap-price"
+                type="number"
+                step="0.01"
+                value={scrapPrice}
+                onChange={(e) => setScrapPrice(e.target.value === "" ? "" : e.target.valueAsNumber)}
+                />
             </div>
           </div>
         ) : (
@@ -175,31 +186,37 @@ export function ScrapCalculator() {
               <Input id="thickness" type="number" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} />
             </div>
             <div className="space-y-2 col-span-2">
-              <Label htmlFor="weight">Peso (kg)</Label>
-              <Input id="weight" type="number" placeholder="Insira o peso" value={fields.weight} onChange={(e) => handleInputChange('weight', e.target.value)} />
+                <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
+                <Input
+                id="scrap-price"
+                type="number"
+                step="0.01"
+                value={scrapPrice}
+                onChange={(e) => setScrapPrice(e.target.value === "" ? "" : e.target.valueAsNumber)}
+                />
             </div>
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-4 pt-4 border-t">
-          <div className="space-y-2">
-            <Label htmlFor="scrap-price">(R$/kg)</Label>
-            <Input
-              id="scrap-price"
-              type="number"
-              step="0.01"
-              value={scrapPrice}
-              onChange={(e) => setScrapPrice(e.target.value === "" ? "" : e.target.valueAsNumber)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-primary font-semibold">
-            (R$/Peça)
-            </Label>
-            <div className="w-full rounded-md border border-primary/50 bg-primary/10 px-3 py-2 text-base md:text-sm font-bold text-primary h-10 flex items-center">
-              {formatCurrency(finalPrice)}
+        <div className="grid grid-cols-3 gap-4 pt-4 border-t">
+            <div className="space-y-2">
+              <Label htmlFor="weight">Peso (kg)</Label>
+              <Input id="weight" type="number" placeholder="Insira o peso" value={fields.weight} onChange={(e) => handleInputChange('weight', e.target.value)} />
             </div>
-          </div>
+            <div className="space-y-2">
+                <Label>Peso Real (kg)</Label>
+                <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-sm h-10 flex items-center text-muted-foreground">
+                {realWeight !== null ? realWeight.toFixed(2) : "..."}
+                </div>
+            </div>
+            <div className="space-y-2">
+                <Label className="text-primary font-semibold">
+                Preço Peça (R$)
+                </Label>
+                <div className="w-full rounded-md border border-primary/50 bg-primary/10 px-3 py-2 text-base md:text-sm font-bold text-primary h-10 flex items-center">
+                {formatCurrency(finalPrice)}
+                </div>
+            </div>
         </div>
       </CardContent>
     </Card>

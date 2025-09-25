@@ -135,12 +135,12 @@ export function ScrapCalculator() {
                 <Input id="width" type="number" placeholder="Insira a largura" value={displayFields.width} onChange={handleInputChange('width')} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="length">Comprimento (mm)</Label>
-                <Input id="length" type="number" placeholder="Insira o comprimento" value={displayFields.length} onChange={handleInputChange('length')} />
-              </div>
-              <div className="space-y-2">
                 <Label htmlFor="thickness">Espessura (mm)</Label>
                 <Input id="thickness" type="number" placeholder="Insira a espessura" value={displayFields.thickness} onChange={handleInputChange('thickness')} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="length">Comprimento (mm)</Label>
+                <Input id="length" type="number" placeholder="Insira o comprimento" value={displayFields.length} onChange={handleInputChange('length')} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="weight">Peso (kg)</Label>

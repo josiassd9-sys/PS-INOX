@@ -130,35 +130,35 @@ export function ScrapCalculator() {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {shape === "rectangle" ? (
             <>
-              <div className="space-y-2">
-                <Label htmlFor="width">Largura (mm)</Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="width" className="w-28 text-right">Largura (mm)</Label>
                 <Input id="width" type="number" placeholder="Insira a largura" value={displayFields.width} onChange={handleInputChange('width')} />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="thickness">Espessura (mm)</Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="thickness" className="w-28 text-right">Espessura (mm)</Label>
                 <Input id="thickness" type="number" placeholder="Insira a espessura" value={displayFields.thickness} onChange={handleInputChange('thickness')} />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="length">Comprimento (mm)</Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="length" className="w-28 text-right">Comprimento (mm)</Label>
                 <Input id="length" type="number" placeholder="Insira o comprimento" value={displayFields.length} onChange={handleInputChange('length')} />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="weight">Peso (kg)</Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="weight" className="w-28 text-right">Peso (kg)</Label>
                 <Input id="weight" type="number" placeholder="Insira o peso" value={displayFields.weight} onChange={handleInputChange('weight')} />
               </div>
             </>
           ) : (
             <>
-              <div className="space-y-2">
-                <Label htmlFor="diameter">Diâmetro (mm)</Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="diameter" className="w-28 text-right">Diâmetro (mm)</Label>
                 <Input id="diameter" type="number" placeholder="Insira o diâmetro" value={displayFields.diameter} onChange={handleInputChange('diameter')} />
               </div>
-               <div className="space-y-2">
-                <Label htmlFor="thickness">Espessura (mm)</Label>
+               <div className="flex items-center gap-2">
+                <Label htmlFor="thickness" className="w-28 text-right">Espessura (mm)</Label>
                 <Input id="thickness" type="number" placeholder="Insira a espessura" value={displayFields.thickness} onChange={handleInputChange('thickness')} />
               </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="weight">Peso (kg)</Label>
+              <div className="flex items-center gap-2 md:col-span-2">
+                <Label htmlFor="weight" className="w-28 text-right">Peso (kg)</Label>
                 <Input id="weight" type="number" placeholder="Insira o peso" value={displayFields.weight} onChange={handleInputChange('weight')} />
               </div>
             </>

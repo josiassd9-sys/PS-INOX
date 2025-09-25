@@ -29,6 +29,8 @@ export function ScrapCalculator() {
     weight: "",
     diameter: "",
   });
+  const [realWeight, setRealWeight] = React.useState<number | null>(null);
+
 
   const handleInputChange = (fieldName: FieldName) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -36,12 +38,16 @@ export function ScrapCalculator() {
       ...prev,
       [fieldName]: value
     }));
+    if (fieldName !== 'weight') {
+      setRealWeight(null);
+    }
   };
 
   const handleShapeChange = (value: Shape | "") => {
     if (value) {
       setShape(value);
       setFields({ width: "", length: "", thickness: "", weight: "", diameter: "" });
+      setRealWeight(null);
     }
   };
 
@@ -50,6 +56,7 @@ export function ScrapCalculator() {
     const { width, length, thickness, weight, diameter } = fields;
     
     const calculatedFields = { ...fields };
+    let newRealWeight = null;
 
     if (shape === 'rectangle') {
         const w = getNum(width);
@@ -59,8 +66,11 @@ export function ScrapCalculator() {
         const filledCount = [w, l, t, kg].filter(v => v > 0).length;
 
         if (filledCount === 3) {
-            if (kg === 0) calculatedFields.weight = String(Math.ceil((w / 1000) * (l / 1000) * (t / 1000) * DENSITY));
-            else if (t === 0) calculatedFields.thickness = String(Math.ceil((kg * 1000000000) / (w * l * DENSITY)));
+            if (kg === 0) {
+              const real = (w / 1000) * (l / 1000) * (t / 1000) * DENSITY;
+              newRealWeight = real;
+              calculatedFields.weight = String(Math.ceil(real));
+            } else if (t === 0) calculatedFields.thickness = String(Math.ceil((kg * 1000000000) / (w * l * DENSITY)));
             else if (l === 0) calculatedFields.length = String(Math.ceil((kg * 1000000000) / (w * t * DENSITY)));
             else if (w === 0) calculatedFields.width = String(Math.ceil((kg * 1000000000) / (l * t * DENSITY)));
         }
@@ -74,7 +84,9 @@ export function ScrapCalculator() {
             if (kg === 0) {
                 const r_m = d / 2000;
                 const vol_m3 = Math.PI * r_m * r_m * (t / 1000);
-                calculatedFields.weight = String(Math.ceil(vol_m3 * DENSITY));
+                const real = vol_m3 * DENSITY;
+                newRealWeight = real;
+                calculatedFields.weight = String(Math.ceil(real));
             } else if (t === 0) {
                 const r_m = d / 2000;
                 const area_m2 = Math.PI * r_m * r_m;
@@ -87,16 +99,33 @@ export function ScrapCalculator() {
             }
         }
     }
+    // Use a functional update to ensure we have the latest state
+    setRealWeight(prev => newRealWeight !== null ? newRealWeight : prev);
+    if(JSON.stringify(calculatedFields) !== JSON.stringify(fields)) {
+      setFields(calculatedFields);
+    }
     return calculatedFields;
   }
 
-  const displayFields = calculate();
+  // Effect to run calculation when relevant fields change
+  React.useEffect(() => {
+    calculate();
+  }, [fields.width, fields.length, fields.thickness, fields.diameter, fields.weight, shape]);
+
+  const displayFields = fields;
   const finalPrice = (Number(displayFields.weight) || 0) * (Number(scrapPrice) || 0);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
+    }).format(value);
+  };
+  
+  const formatNumber = (value: number, digits: number = 3) => {
+    return new Intl.NumberFormat("pt-BR", {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
     }).format(value);
   };
 
@@ -128,7 +157,7 @@ export function ScrapCalculator() {
         </div>
 
         {shape === "rectangle" ? (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="width">Largura (mm)</Label>
                     <Input id="width" type="number" placeholder="Insira a largura" value={displayFields.width} onChange={handleInputChange('width')} />
@@ -144,10 +173,15 @@ export function ScrapCalculator() {
                 <div className="space-y-2">
                     <Label htmlFor="weight">Peso (kg)</Label>
                     <Input id="weight" type="number" placeholder="Insira o peso" value={displayFields.weight} onChange={handleInputChange('weight')} />
+                    {realWeight !== null && (
+                      <div className="text-xs text-muted-foreground font-normal text-right pr-1">
+                          Peso real: {formatNumber(realWeight, 3)} kg
+                      </div>
+                    )}
                 </div>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="diameter">Diâmetro (mm)</Label>
                     <Input id="diameter" type="number" placeholder="Insira o diâmetro" value={displayFields.diameter} onChange={handleInputChange('diameter')} />
@@ -156,14 +190,19 @@ export function ScrapCalculator() {
                     <Label htmlFor="thickness">Espessura (mm)</Label>
                     <Input id="thickness" type="number" placeholder="Insira a espessura" value={displayFields.thickness} onChange={handleInputChange('thickness')} />
                 </div>
-                <div className="space-y-2 col-span-2">
+                <div className="space-y-2 col-span-1 md:col-span-2">
                     <Label htmlFor="weight">Peso (kg)</Label>
                     <Input id="weight" type="number" placeholder="Insira o peso" value={displayFields.weight} onChange={handleInputChange('weight')} />
+                    {realWeight !== null && (
+                      <div className="text-xs text-muted-foreground font-normal text-right pr-1">
+                          Peso real: {formatNumber(realWeight, 3)} kg
+                      </div>
+                    )}
                 </div>
             </div>
           )}
 
-        <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
             <div className="space-y-2">
                 <Label htmlFor="scrap-price" className="shrink-0">Preço Retalho (R$/kg)</Label>
                 <Input

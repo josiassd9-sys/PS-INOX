@@ -119,7 +119,7 @@ function DashboardComponent() {
       </Sidebar>
       <SidebarInset>
         <div className="p-4 md:p-6 flex flex-col gap-6 h-screen">
-          <div className="bg-container-background text-container-foreground rounded-lg border flex-1 flex flex-col overflow-hidden">
+          <div className="bg-card rounded-lg border flex-1 flex flex-col overflow-hidden">
             <header className="flex items-center justify-between gap-4 p-4 border-b">
               <div className="flex items-center gap-2">
                 <SidebarTrigger className="md:hidden"/>
@@ -163,7 +163,7 @@ function DashboardComponent() {
             
             <div className="flex-1 flex flex-col overflow-hidden">
               {showCustomHeader && (
-                <div className="sticky top-0 z-10 bg-container-background/95 backdrop-blur-sm -mx-4 px-4">
+                <div className="sticky top-0 z-10 bg-card/95 backdrop-blur-sm -mx-4 px-4">
                     <div className="flex h-12 items-center border-b px-4 text-sm font-medium text-muted-foreground">
                         <div className="flex-1 px-4">Descrição</div>
                         <div className="w-1/3 px-4 text-center">{weightUnitLabel}</div>

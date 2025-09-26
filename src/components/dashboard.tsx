@@ -165,7 +165,7 @@ function DashboardComponent() {
               <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm -mx-4 px-4">
                   <div className="flex h-12 items-center border-b bg-primary/5 px-4 text-sm font-medium text-muted-foreground">
                       <div className="flex-1">Descrição</div>
-                      <div className="w-1/4 text-right">{weightUnitLabel}</div>
+                      <div className="w-1/4 text-center">{weightUnitLabel}</div>
                       <div className="w-1/4 text-right font-semibold text-primary">{priceUnitLabel}</div>
                   </div>
               </div>
@@ -183,7 +183,7 @@ function DashboardComponent() {
                 <ItemTable 
                   category={selectedCategory} 
                   sellingPrice={sellingPrice}
-                  showTableHeader={!showCustomHeader}
+                  showTableHeader={false}
                 />
               )}
             </div>

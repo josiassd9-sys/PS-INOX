@@ -29,6 +29,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "./ui/button";
+import { PackageChecker } from "./package-checker";
 
 function DashboardComponent() {
   const [costPrice, setCostPrice] = React.useState(30);
@@ -86,8 +87,9 @@ function DashboardComponent() {
   }, [searchTerm]);
   
   const isScrapCategory = selectedCategoryId === 'retalhos';
+  const isPackageCheckerCategory = selectedCategoryId === 'package-checker';
   
-  const showCustomHeader = !searchTerm && !isScrapCategory;
+  const showCustomHeader = !searchTerm && !isScrapCategory && !isPackageCheckerCategory;
   const unitLabel = selectedCategory.unit === "m" ? "m" : selectedCategory.unit === 'm²' ? "m²" : "un";
   const weightUnitLabel = `Peso (kg/${unitLabel})`;
   const priceUnitLabel = `Preço (R$/${unitLabel})`;
@@ -119,7 +121,7 @@ function DashboardComponent() {
       </Sidebar>
       <SidebarInset>
         <div className="p-4 md:p-6 flex flex-col gap-6 h-screen">
-          <div className="bg-card rounded-lg border flex-1 flex flex-col overflow-hidden">
+          <div className="bg-background rounded-lg border flex-1 flex flex-col overflow-hidden">
             <header className="flex items-center justify-between gap-4 p-4 border-b">
               <div className="flex items-center gap-2">
                 <SidebarTrigger className="md:hidden"/>
@@ -135,7 +137,7 @@ function DashboardComponent() {
                   />
               </div>
               <div className="flex items-center gap-2">
-                {!isScrapCategory && (
+                {!isScrapCategory && !isPackageCheckerCategory && (
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm" className="gap-2">
@@ -163,7 +165,7 @@ function DashboardComponent() {
             
             <div className="flex-1 flex flex-col overflow-hidden">
               {showCustomHeader && (
-                <div className="sticky top-0 z-10 bg-card/95 backdrop-blur-sm -mx-4 px-4">
+                <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm -mx-4 px-4">
                     <div className="flex h-12 items-center border-b px-4 text-sm font-medium text-muted-foreground">
                         <div className="flex-1 px-4">Descrição</div>
                         <div className="w-1/3 px-4 text-center">{weightUnitLabel}</div>
@@ -183,6 +185,10 @@ function DashboardComponent() {
                 ) : isScrapCategory ? (
                   <div className="p-4 md:p-6">
                     <ScrapCalculator />
+                  </div>
+                ) : isPackageCheckerCategory ? (
+                  <div className="p-4 md:p-6">
+                    <PackageChecker />
                   </div>
                 ) : (
                   <ItemTable 

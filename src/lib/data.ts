@@ -129,6 +129,13 @@ export const CATEGORIES: Category[] = [
     items: [],
   },
   {
+    id: 'package-checker',
+    name: 'Conferência de Pacote',
+    icon: 'PackageCheck',
+    unit: 'calc',
+    items: [],
+  },
+  {
     id: 'tubos-od',
     name: 'Tubos OD',
     icon: 'Minus',
@@ -527,4 +534,5 @@ export const CATEGORIES: Category[] = [
     
 
     
+
 

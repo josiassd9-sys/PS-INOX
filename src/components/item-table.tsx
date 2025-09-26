@@ -30,9 +30,10 @@ import { CutPriceCalculator } from "./cut-price-calculator";
 interface ItemTableProps {
   category: Category;
   sellingPrice: number;
+  showTableHeader?: boolean;
 }
 
-export function ItemTable({ category, sellingPrice }: ItemTableProps) {
+export function ItemTable({ category, sellingPrice, showTableHeader = true }: ItemTableProps) {
   const [items, setItems] = React.useState<SteelItem[]>(category.items);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
@@ -145,19 +146,21 @@ export function ItemTable({ category, sellingPrice }: ItemTableProps) {
         </Dialog>
       </div>
       <CardContent className="p-0">
-        <div className="border-t overflow-auto">
+        <div className="border-t">
           <Table>
-            <TableHeader className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
-              <TableRow className="bg-primary/5 hover:bg-primary/10">
-                <TableHead>Descrição</TableHead>
-                <TableHead className="text-right">
-                  Peso ({weightUnitLabel})
-                </TableHead>
-                <TableHead className="text-right font-semibold text-primary">
-                  Preço ({priceUnitLabel})
-                </TableHead>
-              </TableRow>
-            </TableHeader>
+            {showTableHeader && (
+              <TableHeader>
+                <TableRow className="bg-primary/5 hover:bg-primary/10">
+                  <TableHead>Descrição</TableHead>
+                  <TableHead className="text-right">
+                    Peso ({weightUnitLabel})
+                  </TableHead>
+                  <TableHead className="text-right font-semibold text-primary">
+                    Preço ({priceUnitLabel})
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+            )}
             <TableBody>
               {filteredItems.map((item) => {
                  const itemPrice = category.unit === 'm' ? Math.ceil(item.weight * sellingPrice) : item.weight * sellingPrice;

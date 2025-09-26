@@ -86,6 +86,11 @@ function DashboardComponent() {
   }, [searchTerm]);
   
   const isScrapCategory = selectedCategoryId === 'retalhos';
+  
+  const showCustomHeader = !searchTerm && !isScrapCategory;
+  const unitLabel = selectedCategory.unit === "m" ? "m" : selectedCategory.unit === 'm²' ? "m²" : "un";
+  const weightUnitLabel = `Peso (kg/${unitLabel})`;
+  const priceUnitLabel = `Preço (R$/${unitLabel})`;
 
   return (
     <>
@@ -113,7 +118,7 @@ function DashboardComponent() {
         </SidebarContent>
       </Sidebar>
       <SidebarInset>
-        <div className="p-4 md:p-6 flex flex-col gap-6">
+        <div className="p-4 md:p-6 flex flex-col gap-6 h-screen">
           <header className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="md:hidden"/>
@@ -155,21 +160,33 @@ function DashboardComponent() {
             </div>
           </header>
           
-          <div>
-            {searchTerm ? (
-              <GlobalSearchResults 
-                categories={filteredCategories}
-                sellingPrice={sellingPrice}
-                searchTerm={searchTerm}
-              />
-            ) : isScrapCategory ? (
-                <ScrapCalculator />
-            ) : (
-              <ItemTable 
-                category={selectedCategory} 
-                sellingPrice={sellingPrice} 
-              />
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {showCustomHeader && (
+              <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm -mx-4 px-4">
+                  <div className="flex h-12 items-center border-b bg-primary/5 px-4 text-sm font-medium text-muted-foreground">
+                      <div className="flex-1">Descrição</div>
+                      <div className="w-1/4 text-right">{weightUnitLabel}</div>
+                      <div className="w-1/4 text-right font-semibold text-primary">{priceUnitLabel}</div>
+                  </div>
+              </div>
             )}
+            <div className="flex-1 overflow-y-auto">
+              {searchTerm ? (
+                <GlobalSearchResults 
+                  categories={filteredCategories}
+                  sellingPrice={sellingPrice}
+                  searchTerm={searchTerm}
+                />
+              ) : isScrapCategory ? (
+                  <ScrapCalculator />
+              ) : (
+                <ItemTable 
+                  category={selectedCategory} 
+                  sellingPrice={sellingPrice}
+                  showTableHeader={!showCustomHeader}
+                />
+              )}
+            </div>
           </div>
         </div>
       </SidebarInset>

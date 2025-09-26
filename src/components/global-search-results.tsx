@@ -61,7 +61,7 @@ export function GlobalSearchResults({ categories, sellingPrice, searchTerm }: Gl
                     <AccordionContent className="p-0">
                         <div className="overflow-auto border-t">
                             <Table>
-                                <TableHeader className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
+                                <TableHeader>
                                 <TableRow className="bg-primary/5 hover:bg-primary/10">
                                     <TableHead>Descrição</TableHead>
                                     <TableHead className="text-right">Peso (kg/{category.unit === 'm' ? 'm' : category.unit})</TableHead>

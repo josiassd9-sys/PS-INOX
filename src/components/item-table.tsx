@@ -151,11 +151,11 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
             {showTableHeader && (
               <TableHeader>
                 <TableRow className="bg-primary/5 hover:bg-primary/10">
-                  <TableHead>Descrição</TableHead>
-                  <TableHead className="text-right">
+                  <TableHead className="flex-1">Descrição</TableHead>
+                  <TableHead className="w-1/4 text-center">
                     Peso ({weightUnitLabel})
                   </TableHead>
-                  <TableHead className="text-right font-semibold text-primary">
+                  <TableHead className="w-1/4 text-right font-semibold text-primary">
                     Preço ({priceUnitLabel})
                   </TableHead>
                 </TableRow>
@@ -171,16 +171,17 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
                             onClick={() => handleRowClick(item.id)}
                             className={cn(
                                 'even:bg-primary/5 odd:bg-transparent',
+                                'flex items-center',
                                 category.unit === 'm' && 'cursor-pointer',
                                 isSelected && 'bg-primary/20 hover:bg-primary/20',
                                 category.unit !== 'm' && 'hover:bg-primary/10',
                             )}
                             >
-                            <TableCell>{item.description}</TableCell>
-                            <TableCell className="text-right">
+                            <TableCell className="flex-1">{item.description}</TableCell>
+                            <TableCell className="w-1/4 text-center">
                                 {formatNumber(item.weight, 3)}
                             </TableCell>
-                            <TableCell className="text-right font-medium text-primary">
+                            <TableCell className="w-1/4 text-right font-medium text-primary">
                                 <div className="flex items-center justify-end gap-2">
                                   <span>{formatCurrency(itemPrice)}</span>
                                 </div>

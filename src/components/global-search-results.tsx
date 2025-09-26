@@ -62,10 +62,10 @@ export function GlobalSearchResults({ categories, sellingPrice, searchTerm }: Gl
                         <div className="overflow-auto border-t">
                             <Table>
                                 <TableHeader>
-                                <TableRow className="bg-primary/5 hover:bg-primary/10">
-                                    <TableHead>Descrição</TableHead>
-                                    <TableHead className="text-right">Peso (kg/{category.unit === 'm' ? 'm' : category.unit})</TableHead>
-                                    <TableHead className="text-right font-semibold text-primary">Preço (R$/{category.unit === 'm' ? 'm' : category.unit})</TableHead>
+                                <TableRow className="bg-primary/5 hover:bg-primary/10 flex items-center">
+                                    <TableHead className="flex-1">Descrição</TableHead>
+                                    <TableHead className="w-1/4 text-center">Peso (kg/{category.unit === 'm' ? 'm' : category.unit})</TableHead>
+                                    <TableHead className="w-1/4 text-right font-semibold text-primary">Preço (R$/{category.unit === 'm' ? 'm' : category.unit})</TableHead>
                                 </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -78,14 +78,15 @@ export function GlobalSearchResults({ categories, sellingPrice, searchTerm }: Gl
                                                     onClick={() => handleRowClick(item.id, category)}
                                                     className={cn(
                                                         'even:bg-primary/5 odd:bg-transparent',
+                                                        'flex items-center',
                                                         category.unit === 'm' && 'cursor-pointer',
                                                         isSelected && 'bg-primary/20 hover:bg-primary/20',
                                                         category.unit !== 'm' && 'hover:bg-primary/10',
                                                     )}
                                                 >
-                                                    <TableCell>{item.description}</TableCell>
-                                                    <TableCell className="text-right">{formatNumber(item.weight)}</TableCell>
-                                                    <TableCell className="text-right font-medium text-primary">
+                                                    <TableCell className="flex-1">{item.description}</TableCell>
+                                                    <TableCell className="w-1/4 text-center">{formatNumber(item.weight)}</TableCell>
+                                                    <TableCell className="w-1/4 text-right font-medium text-primary">
                                                         {formatCurrency(itemPrice)}
                                                         {category.unit === 'm' && (
                                                             <div className="text-xs text-muted-foreground font-normal">

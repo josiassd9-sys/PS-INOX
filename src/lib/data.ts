@@ -1,5 +1,5 @@
 
-export const STAINLESS_STEEL_DENSITY_KG_M3 = 8000;
+export const STAINLESS_STEEL_DENSITY_KG_M3 = 7980;
 const INCH_TO_MM = 25.4;
 
 // For tubes: Weight(kg/m) = (OD_mm - WT_mm) * WT_mm * (PI * DENSITY / 1000000)
@@ -530,9 +530,8 @@ export const CATEGORIES: Category[] = [
     ]
   },
 ];
-
+    
+    
     
 
     
-
-

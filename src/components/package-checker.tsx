@@ -42,9 +42,9 @@ export function PackageChecker() {
   }, [searchTerm, allItems]);
 
   const { totalLength, barCount, realPricePerMeter, pricePerBar } = React.useMemo(() => {
-    const weight = typeof packageWeight === "number" ? packageWeight : 0;
-    const price = typeof pricePerKg === "number" ? pricePerKg : 0;
-    const percentage = typeof invoicePercentage === "number" ? invoicePercentage : 100;
+    const weight = Number(packageWeight) || 0;
+    const price = Number(pricePerKg) || 0;
+    const percentage = Number(invoicePercentage) || 0;
 
     if (!selectedItem || weight <= 0 || price <= 0 || percentage <= 0) {
       return { totalLength: 0, barCount: 0, realPricePerMeter: 0, pricePerBar: 0 };
@@ -189,3 +189,5 @@ export function PackageChecker() {
     </Card>
   );
 }
+
+    

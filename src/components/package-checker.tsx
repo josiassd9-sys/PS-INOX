@@ -20,6 +20,8 @@ export function PackageChecker() {
   const [selectedItem, setSelectedItem] = React.useState<SteelItem | null>(null);
   const [packageWeight, setPackageWeight] = React.useState<number | "">("");
   const [pricePerKg, setPricePerKg] = React.useState<number | "">("");
+  const [invoicePercentage, setInvoicePercentage] = React.useState<number | "">(100);
+
 
   const handleItemSelect = (item: SteelItem) => {
     setSelectedItem(item);
@@ -42,18 +44,21 @@ export function PackageChecker() {
   const { totalLength, barCount, realPricePerMeter, pricePerBar } = React.useMemo(() => {
     const weight = typeof packageWeight === "number" ? packageWeight : 0;
     const price = typeof pricePerKg === "number" ? pricePerKg : 0;
+    const percentage = typeof invoicePercentage === "number" ? invoicePercentage : 100;
 
-    if (!selectedItem || weight <= 0 || price <= 0) {
+    if (!selectedItem || weight <= 0 || price <= 0 || percentage <= 0) {
       return { totalLength: 0, barCount: 0, realPricePerMeter: 0, pricePerBar: 0 };
     }
 
+    const realPricePerKg = price / (percentage / 100);
+
     const totalLength = weight / selectedItem.weight;
     const barCount = totalLength / 6;
-    const realPricePerMeter = selectedItem.weight * price;
+    const realPricePerMeter = selectedItem.weight * realPricePerKg;
     const pricePerBar = realPricePerMeter * 6;
 
     return { totalLength, barCount, realPricePerMeter, pricePerBar };
-  }, [selectedItem, packageWeight, pricePerKg]);
+  }, [selectedItem, packageWeight, pricePerKg, invoicePercentage]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -123,11 +128,11 @@ export function PackageChecker() {
         <div className={cn("space-y-4", !selectedItem && "opacity-50 pointer-events-none")}>
             <div className="space-y-2">
                 <Label htmlFor="package-weight">2. Insira os Dados do Pacote</Label>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Input
                     id="package-weight"
                     type="number"
-                    placeholder="Peso Total do Pacote (kg)"
+                    placeholder="Peso Total (kg)"
                     value={packageWeight}
                     onChange={(e) => setPackageWeight(e.target.value === '' ? '' : e.target.valueAsNumber)}
                     />
@@ -137,6 +142,13 @@ export function PackageChecker() {
                     placeholder="Preço Pago (R$/kg)"
                     value={pricePerKg}
                     onChange={(e) => setPricePerKg(e.target.value === '' ? '' : e.target.valueAsNumber)}
+                    />
+                     <Input
+                    id="invoice-percentage"
+                    type="number"
+                    placeholder="% da Nota"
+                    value={invoicePercentage}
+                    onChange={(e) => setInvoicePercentage(e.target.value === '' ? '' : e.target.valueAsNumber)}
                     />
                 </div>
             </div>

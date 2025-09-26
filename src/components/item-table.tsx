@@ -152,10 +152,10 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
               <TableHeader>
                 <TableRow className="bg-primary/5 hover:bg-primary/10">
                   <TableHead className="flex-1">Descrição</TableHead>
-                  <TableHead className="w-1/4 text-center">
+                  <TableHead className="w-1/3 text-center">
                     Peso ({weightUnitLabel})
                   </TableHead>
-                  <TableHead className="w-1/4 text-right font-semibold text-primary">
+                  <TableHead className="w-1/3 text-right font-semibold text-primary">
                     Preço ({priceUnitLabel})
                   </TableHead>
                 </TableRow>
@@ -178,10 +178,10 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
                             )}
                             >
                             <TableCell className="flex-1">{item.description}</TableCell>
-                            <TableCell className="w-1/4 text-center">
+                            <TableCell className="w-1/3 text-center">
                                 {formatNumber(item.weight, 3)}
                             </TableCell>
-                            <TableCell className="w-1/4 text-right font-medium text-primary">
+                            <TableCell className="w-1/3 text-right font-medium text-primary">
                                 <div className="flex items-center justify-end gap-2">
                                   <span>{formatCurrency(itemPrice)}</span>
                                 </div>

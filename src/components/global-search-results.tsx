@@ -64,8 +64,8 @@ export function GlobalSearchResults({ categories, sellingPrice, searchTerm }: Gl
                                 <TableHeader>
                                 <TableRow className="bg-primary/5 hover:bg-primary/10 flex items-center">
                                     <TableHead className="flex-1">Descrição</TableHead>
-                                    <TableHead className="w-1/4 text-center">Peso (kg/{category.unit === 'm' ? 'm' : category.unit})</TableHead>
-                                    <TableHead className="w-1/4 text-right font-semibold text-primary">Preço (R$/{category.unit === 'm' ? 'm' : category.unit})</TableHead>
+                                    <TableHead className="w-1/3 text-center">Peso (kg/{category.unit === 'm' ? 'm' : category.unit})</TableHead>
+                                    <TableHead className="w-1/3 text-right font-semibold text-primary">Preço (R$/{category.unit === 'm' ? 'm' : category.unit})</TableHead>
                                 </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -85,8 +85,8 @@ export function GlobalSearchResults({ categories, sellingPrice, searchTerm }: Gl
                                                     )}
                                                 >
                                                     <TableCell className="flex-1">{item.description}</TableCell>
-                                                    <TableCell className="w-1/4 text-center">{formatNumber(item.weight)}</TableCell>
-                                                    <TableCell className="w-1/4 text-right font-medium text-primary">
+                                                    <TableCell className="w-1/3 text-center">{formatNumber(item.weight)}</TableCell>
+                                                    <TableCell className="w-1/3 text-right font-medium text-primary">
                                                         {formatCurrency(itemPrice)}
                                                         {category.unit === 'm' && (
                                                             <div className="text-xs text-muted-foreground font-normal">

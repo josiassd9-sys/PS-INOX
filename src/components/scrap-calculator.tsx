@@ -159,7 +159,7 @@ export function ScrapCalculator() {
   };
   
   return (
-    <Card>
+    <Card className="border-0 shadow-none bg-transparent">
       <CardHeader>
           <div className="flex-1">
             <CardTitle>Calculadora de Retalhos</CardTitle>

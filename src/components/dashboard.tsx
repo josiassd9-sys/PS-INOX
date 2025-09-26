@@ -119,73 +119,79 @@ function DashboardComponent() {
       </Sidebar>
       <SidebarInset>
         <div className="p-4 md:p-6 flex flex-col gap-6 h-screen">
-          <header className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <SidebarTrigger className="md:hidden"/>
-            </div>
-            <div className="relative flex-1">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                type="search"
-                placeholder="Buscar em todas as categorias..."
-                className="w-full rounded-lg bg-background pl-8"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </div>
-            <div className="flex items-center gap-2">
-              {!isScrapCategory && (
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="gap-2">
-                      <SlidersHorizontal />
-                      <span className="hidden sm:inline">Ajustar</span>
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Ajustar Parâmetros de Preço</DialogTitle>
-                    </DialogHeader>
-                    <PriceControls
-                      costPrice={costPrice}
-                      markup={markup}
-                      sellingPrice={sellingPrice}
-                      onCostChange={handleCostChange}
-                      onMarkupChange={handleMarkupChange}
-                      onSellingPriceChange={handleSellingPriceChange}
-                    />
-                  </DialogContent>
-                </Dialog>
-              )}
-            </div>
-          </header>
-          
-          <div className="flex-1 flex flex-col overflow-hidden">
-            {showCustomHeader && (
-              <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm -mx-4 px-4">
-                  <div className="flex h-12 items-center border-b bg-primary/5 px-4 text-sm font-medium text-muted-foreground">
-                      <div className="flex-1 px-4">Descrição</div>
-                      <div className="w-1/3 px-4 text-center">{weightUnitLabel}</div>
-                      <div className="w-1/3 px-4 text-right font-semibold text-primary">{priceUnitLabel}</div>
-                  </div>
+          <div className="bg-card rounded-lg border flex-1 flex flex-col overflow-hidden">
+            <header className="flex items-center justify-between gap-4 p-4 border-b">
+              <div className="flex items-center gap-2">
+                <SidebarTrigger className="md:hidden"/>
               </div>
-            )}
-            <div className="flex-1 overflow-y-auto">
-              {searchTerm ? (
-                <GlobalSearchResults 
-                  categories={filteredCategories}
-                  sellingPrice={sellingPrice}
-                  searchTerm={searchTerm}
-                />
-              ) : isScrapCategory ? (
-                  <ScrapCalculator />
-              ) : (
-                <ItemTable 
-                  category={selectedCategory} 
-                  sellingPrice={sellingPrice}
-                  showTableHeader={false}
-                />
+              <div className="relative flex-1">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                  type="search"
+                  placeholder="Buscar em todas as categorias..."
+                  className="w-full rounded-lg bg-background pl-8"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+              </div>
+              <div className="flex items-center gap-2">
+                {!isScrapCategory && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="gap-2">
+                        <SlidersHorizontal />
+                        <span className="hidden sm:inline">Ajustar</span>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Ajustar Parâmetros de Preço</DialogTitle>
+                      </DialogHeader>
+                      <PriceControls
+                        costPrice={costPrice}
+                        markup={markup}
+                        sellingPrice={sellingPrice}
+                        onCostChange={handleCostChange}
+                        onMarkupChange={handleMarkupChange}
+                        onSellingPriceChange={handleSellingPriceChange}
+                      />
+                    </DialogContent>
+                  </Dialog>
+                )}
+              </div>
+            </header>
+            
+            <div className="flex-1 flex flex-col overflow-hidden">
+              {showCustomHeader && (
+                <div className="sticky top-0 z-10 bg-card/95 backdrop-blur-sm -mx-4 px-4">
+                    <div className="flex h-12 items-center border-b bg-primary/5 px-4 text-sm font-medium text-muted-foreground">
+                        <div className="flex-1 px-4">Descrição</div>
+                        <div className="w-1/3 px-4 text-center">{weightUnitLabel}</div>
+                        <div className="w-1/3 px-4 text-right font-semibold text-primary">{priceUnitLabel}</div>
+                    </div>
+                </div>
               )}
+              <div className="flex-1 overflow-y-auto">
+                {searchTerm ? (
+                  <div className="p-4 md:p-6">
+                    <GlobalSearchResults 
+                      categories={filteredCategories}
+                      sellingPrice={sellingPrice}
+                      searchTerm={searchTerm}
+                    />
+                  </div>
+                ) : isScrapCategory ? (
+                  <div className="p-4 md:p-6">
+                    <ScrapCalculator />
+                  </div>
+                ) : (
+                  <ItemTable 
+                    category={selectedCategory} 
+                    sellingPrice={sellingPrice}
+                    showTableHeader={false}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>

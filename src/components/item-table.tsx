@@ -91,7 +91,7 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
   const priceUnitLabel = `R$/${unitLabel}`;
 
   return (
-    <Card>
+    <Card className="border-0 shadow-none bg-transparent">
       <div className="flex items-center justify-between p-6 pb-4">
         <CardTitle>{category.name}</CardTitle>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -177,11 +177,11 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
                                 category.unit !== 'm' && 'hover:bg-primary/10',
                             )}
                             >
-                            <TableCell className="flex-1">{item.description}</TableCell>
-                            <TableCell className="w-1/3 text-center">
+                            <TableCell className="flex-1 px-8">{item.description}</TableCell>
+                            <TableCell className="w-1/3 text-center px-8">
                                 {formatNumber(item.weight, 3)}
                             </TableCell>
-                            <TableCell className="w-1/3 text-right font-medium text-primary">
+                            <TableCell className="w-1/3 text-right font-medium text-primary px-8">
                                 <div className="flex items-center justify-end gap-2">
                                   <span>{formatCurrency(itemPrice)}</span>
                                 </div>

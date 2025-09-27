@@ -19,7 +19,7 @@ export function PackageChecker() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [selectedItem, setSelectedItem] = React.useState<SteelItem | null>(null);
   const [packageWeight, setPackageWeight] = React.useState<number | "">("");
-  const [pricePerKg, setPricePerKg] = React.useState<number | "">("");
+  const [totalPrice, setTotalPrice] = React.useState<number | "">("");
   const [invoicePercentage, setInvoicePercentage] = React.useState<number | "">(100);
 
 
@@ -43,14 +43,15 @@ export function PackageChecker() {
 
   const { totalLength, barCount, realPricePerMeter, pricePerBar } = React.useMemo(() => {
     const weight = Number(packageWeight) || 0;
-    const price = Number(pricePerKg) || 0;
+    const price = Number(totalPrice) || 0;
     const percentage = Number(invoicePercentage) || 0;
 
     if (!selectedItem || weight <= 0 || price <= 0 || percentage <= 0) {
       return { totalLength: 0, barCount: 0, realPricePerMeter: 0, pricePerBar: 0 };
     }
-
-    const realPricePerKg = price / (percentage / 100);
+    
+    const realTotalPrice = price / (percentage / 100);
+    const realPricePerKg = realTotalPrice / weight;
 
     const totalLength = weight / selectedItem.weight;
     const barCount = totalLength / 6;
@@ -58,7 +59,7 @@ export function PackageChecker() {
     const pricePerBar = realPricePerMeter * 6;
 
     return { totalLength, barCount, realPricePerMeter, pricePerBar };
-  }, [selectedItem, packageWeight, pricePerKg, invoicePercentage]);
+  }, [selectedItem, packageWeight, totalPrice, invoicePercentage]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -137,11 +138,11 @@ export function PackageChecker() {
                     onChange={(e) => setPackageWeight(e.target.value === '' ? '' : e.target.valueAsNumber)}
                     />
                     <Input
-                    id="price-per-kg"
+                    id="total-price"
                     type="number"
-                    placeholder="Preço Pago (R$/kg)"
-                    value={pricePerKg}
-                    onChange={(e) => setPricePerKg(e.target.value === '' ? '' : e.target.valueAsNumber)}
+                    placeholder="Preço Total Pago (R$)"
+                    value={totalPrice}
+                    onChange={(e) => setTotalPrice(e.target.value === '' ? '' : e.target.valueAsNumber)}
                     />
                      <Input
                     id="invoice-percentage"
@@ -189,5 +190,3 @@ export function PackageChecker() {
     </Card>
   );
 }
-
-    

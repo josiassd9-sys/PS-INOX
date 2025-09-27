@@ -15,13 +15,16 @@ import { Search } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
 import { cn } from "@/lib/utils";
 
+type LastEdited = "weight" | "length";
+
 export function PackageChecker() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [selectedItem, setSelectedItem] = React.useState<SteelItem | null>(null);
-  const [packageWeight, setPackageWeight] = React.useState<number | "">("");
-  const [totalPrice, setTotalPrice] = React.useState<number | "">("");
-  const [invoicePercentage, setInvoicePercentage] = React.useState<number | "">(100);
-
+  const [packageWeight, setPackageWeight] = React.useState<string>("");
+  const [totalPrice, setTotalPrice] = React.useState<string>("");
+  const [invoicePercentage, setInvoicePercentage] = React.useState<string>("100");
+  const [totalLength, setTotalLength] = React.useState<string>("");
+  const [lastEdited, setLastEdited] = React.useState<LastEdited>("weight");
 
   const handleItemSelect = (item: SteelItem) => {
     setSelectedItem(item);
@@ -40,26 +43,46 @@ export function PackageChecker() {
       item.description.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [searchTerm, allItems]);
+  
+  React.useEffect(() => {
+    if (!selectedItem) {
+        setPackageWeight("");
+        setTotalLength("");
+        return;
+    };
 
-  const { totalLength, barCount, realPricePerMeter, pricePerBar } = React.useMemo(() => {
-    const weight = Number(packageWeight) || 0;
-    const price = Number(totalPrice) || 0;
-    const percentage = Number(invoicePercentage) || 0;
+    const weight = parseFloat(packageWeight.replace(',', '.')) || 0;
+    const length = parseFloat(totalLength.replace(',', '.')) || 0;
+    
+    if (lastEdited === 'weight' && weight > 0) {
+        const newLength = weight / selectedItem.weight;
+        setTotalLength(newLength.toFixed(2).replace('.', ','));
+    } else if (lastEdited === 'length' && length > 0) {
+        const newWeight = length * selectedItem.weight;
+        setPackageWeight(newWeight.toFixed(3).replace('.', ','));
+    }
 
-    if (!selectedItem || weight <= 0 || price <= 0 || percentage <= 0) {
-      return { totalLength: 0, barCount: 0, realPricePerMeter: 0, pricePerBar: 0 };
+  }, [packageWeight, totalLength, selectedItem, lastEdited]);
+  
+
+  const { barCount, realPricePerMeter, pricePerBar } = React.useMemo(() => {
+    const price = parseFloat(totalPrice.replace(',', '.')) || 0;
+    const percentage = parseFloat(invoicePercentage.replace(',', '.')) || 0;
+    const length = parseFloat(totalLength.replace(',', '.')) || 0;
+
+    if (!selectedItem || length <= 0 || price <= 0 || percentage <= 0) {
+      return { barCount: 0, realPricePerMeter: 0, pricePerBar: 0 };
     }
     
     const realTotalPrice = price / (percentage / 100);
-    const realPricePerKg = realTotalPrice / weight;
-
-    const totalLength = weight / selectedItem.weight;
-    const barCount = totalLength / 6;
-    const realPricePerMeter = selectedItem.weight * realPricePerKg;
+    
+    const barCount = length / 6;
+    const realPricePerMeter = realTotalPrice / length;
     const pricePerBar = realPricePerMeter * 6;
 
-    return { totalLength, barCount, realPricePerMeter, pricePerBar };
-  }, [selectedItem, packageWeight, totalPrice, invoicePercentage]);
+    return { barCount, realPricePerMeter, pricePerBar };
+  }, [selectedItem, totalPrice, invoicePercentage, totalLength]);
+
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -67,14 +90,25 @@ export function PackageChecker() {
       currency: "BRL",
     }).format(value);
   };
-  
+
   const formatNumber = (value: number, digits: number = 2) => {
     return new Intl.NumberFormat("pt-BR", {
       minimumFractionDigits: digits,
       maximumFractionDigits: digits,
     }).format(value);
   };
-
+  
+  const handleInputChange = (
+    setter: React.Dispatch<React.SetStateAction<string>>,
+    value: string,
+    field?: LastEdited
+  ) => {
+    const sanitizedValue = value.replace(/[^0-9,]/g, '').replace(',', '.');
+    if (/^\d*\.?\d*$/.test(sanitizedValue)) {
+      setter(sanitizedValue.replace('.', ','));
+      if(field) setLastEdited(field);
+    }
+  };
 
   return (
     <Card className="border-0 shadow-none bg-transparent">
@@ -131,25 +165,22 @@ export function PackageChecker() {
                 <Label htmlFor="package-weight">2. Insira os Dados do Pacote</Label>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Input
-                    id="package-weight"
-                    type="number"
-                    placeholder="Peso Total (kg)"
-                    value={packageWeight}
-                    onChange={(e) => setPackageWeight(e.target.value === '' ? '' : e.target.valueAsNumber)}
+                        id="package-weight"
+                        placeholder="Peso Total (kg)"
+                        value={packageWeight}
+                        onChange={(e) => handleInputChange(setPackageWeight, e.target.value, 'weight')}
                     />
                     <Input
-                    id="total-price"
-                    type="number"
-                    placeholder="Preço Total Pago (R$)"
-                    value={totalPrice}
-                    onChange={(e) => setTotalPrice(e.target.value === '' ? '' : e.target.valueAsNumber)}
+                        id="total-price"
+                        placeholder="Preço Total Pago (R$)"
+                        value={totalPrice}
+                        onChange={(e) => handleInputChange(setTotalPrice, e.target.value)}
                     />
                      <Input
-                    id="invoice-percentage"
-                    type="number"
-                    placeholder="% da Nota"
-                    value={invoicePercentage}
-                    onChange={(e) => setInvoicePercentage(e.target.value === '' ? '' : e.target.valueAsNumber)}
+                        id="invoice-percentage"
+                        placeholder="% da Nota"
+                        value={invoicePercentage}
+                        onChange={(e) => handleInputChange(setInvoicePercentage, e.target.value)}
                     />
                 </div>
             </div>
@@ -162,9 +193,13 @@ export function PackageChecker() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="space-y-1">
                     <Label className="text-xs text-muted-foreground">Metragem Total</Label>
-                    <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm font-semibold h-10 flex items-center">
-                        {formatNumber(totalLength)} m
-                    </div>
+                    <Input
+                        id="total-length"
+                        placeholder="Metragem Total (m)"
+                        value={totalLength}
+                        onChange={(e) => handleInputChange(setTotalLength, e.target.value, 'length')}
+                        className="font-semibold"
+                    />
                 </div>
                 <div className="space-y-1">
                     <Label className="text-xs text-muted-foreground">Qtd. Barras de 6m</Label>
@@ -175,7 +210,7 @@ export function PackageChecker() {
                 <div className="space-y-1">
                     <Label className="text-xs text-accent-price font-semibold">Preço Real por Metro</Label>
                     <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
-                        {formatCurrency(realPricePerMeter)}
+                      {realPricePerMeter > 0 ? `R$ ${realPricePerMeter.toFixed(5).replace('.', ',')}` : 'R$ 0,00'}
                     </div>
                 </div>
                 <div className="space-y-1">

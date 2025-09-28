@@ -1,12 +1,13 @@
 "use client";
 
-import { LucideProps, icons, RectangleHorizontal, Hexagon, Scissors, PackageCheck } from 'lucide-react';
+import { LucideProps, icons, RectangleHorizontal, Hexagon, Scissors, PackageCheck, Weight } from 'lucide-react';
 
 const customIcons = {
     RectangleHorizontal,
     Hexagon,
     Scissors,
-    PackageCheck
+    PackageCheck,
+    Weight
 }
 
 interface IconProps extends LucideProps {

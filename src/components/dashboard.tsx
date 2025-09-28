@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "./ui/button";
 import { PackageChecker } from "./package-checker";
+import { ScaleCalculator } from "./scale-calculator";
 
 function DashboardComponent() {
   const [costPrice, setCostPrice] = React.useState(30);
@@ -78,7 +79,7 @@ function DashboardComponent() {
   const filteredCategories = React.useMemo(() => {
     if (!searchTerm) return [];
     
-    return CATEGORIES.filter(cat => cat.id !== 'retalhos').map(category => {
+    return CATEGORIES.filter(cat => cat.id !== 'retalhos' && cat.id !== 'package-checker' && cat.id !== 'balanca').map(category => {
       const filteredItems = category.items.filter(item => 
         item.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -88,8 +89,9 @@ function DashboardComponent() {
   
   const isScrapCategory = selectedCategoryId === 'retalhos';
   const isPackageCheckerCategory = selectedCategoryId === 'package-checker';
+  const isScaleCategory = selectedCategoryId === 'balanca';
   
-  const showCustomHeader = !searchTerm && !isScrapCategory && !isPackageCheckerCategory;
+  const showCustomHeader = !searchTerm && !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory;
   const unitLabel = selectedCategory.unit === "m" ? "m" : selectedCategory.unit === 'm²' ? "m²" : "un";
   const weightUnitLabel = `Peso (kg/${unitLabel})`;
   const priceUnitLabel = `Preço (R$/${unitLabel})`;
@@ -137,7 +139,7 @@ function DashboardComponent() {
                   />
               </div>
               <div className="flex items-center gap-2">
-                {!isScrapCategory && !isPackageCheckerCategory && (
+                {!isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && (
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm" className="gap-2">
@@ -189,6 +191,10 @@ function DashboardComponent() {
                 ) : isPackageCheckerCategory ? (
                   <div className="p-4 md:p-6">
                     <PackageChecker />
+                  </div>
+                ) : isScaleCategory ? (
+                  <div className="p-4 md:p-6">
+                    <ScaleCalculator />
                   </div>
                 ) : (
                   <ItemTable 

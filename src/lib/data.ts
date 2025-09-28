@@ -136,6 +136,13 @@ export const CATEGORIES: Category[] = [
     items: [],
   },
   {
+    id: 'balanca',
+    name: 'Balança',
+    icon: 'Weight',
+    unit: 'calc',
+    items: [],
+  },
+  {
     id: 'tubos-od',
     name: 'Tubos OD',
     icon: 'Minus',

@@ -130,7 +130,7 @@ export const CATEGORIES: Category[] = [
   },
   {
     id: 'package-checker',
-    name: 'Conferência de Pacote',
+    name: 'Conferência',
     icon: 'PackageCheck',
     unit: 'calc',
     items: [],

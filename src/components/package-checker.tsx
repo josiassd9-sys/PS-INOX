@@ -113,7 +113,7 @@ export function PackageChecker() {
   return (
     <Card className="border-0 shadow-none bg-transparent">
       <CardHeader>
-        <CardTitle>Conferência de KG/MT</CardTitle>
+        <CardTitle>Conferência</CardTitle>
         <CardDescription className="mt-2">
           Selecione item e insira os dados para calculo de metragem e custo.
         </CardDescription>

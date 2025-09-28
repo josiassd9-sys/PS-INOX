@@ -16,15 +16,20 @@ import { ScrollArea } from "./ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 type LastEdited = "weight" | "length";
+type LastPriceFieldEdited = "total" | "perKg";
+
 
 export function PackageChecker() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [selectedItem, setSelectedItem] = React.useState<SteelItem | null>(null);
   const [packageWeight, setPackageWeight] = React.useState<string>("");
   const [totalPrice, setTotalPrice] = React.useState<string>("");
+  const [pricePerKg, setPricePerKg] = React.useState<string>("");
   const [invoicePercentage, setInvoicePercentage] = React.useState<string>("100");
   const [totalLength, setTotalLength] = React.useState<string>("");
   const [lastEdited, setLastEdited] = React.useState<LastEdited>("weight");
+  const [lastPriceFieldEdited, setLastPriceFieldEdited] = React.useState<LastPriceFieldEdited>("total");
+
 
   const handleItemSelect = (item: SteelItem) => {
     setSelectedItem(item);
@@ -63,11 +68,27 @@ export function PackageChecker() {
     }
 
   }, [packageWeight, totalLength, selectedItem, lastEdited]);
+
+  React.useEffect(() => {
+    const weight = parseFloat(packageWeight.replace(',', '.')) || 0;
+    const total = parseFloat(totalPrice.replace(',', '.')) || 0;
+    const perKg = parseFloat(pricePerKg.replace(',', '.')) || 0;
+  
+    if (weight > 0) {
+      if (lastPriceFieldEdited === 'total' && total > 0) {
+        const newPricePerKg = total / weight;
+        setPricePerKg(newPricePerKg.toFixed(2).replace('.', ','));
+      } else if (lastPriceFieldEdited === 'perKg' && perKg > 0) {
+        const newTotalPrice = perKg * weight;
+        setTotalPrice(newTotalPrice.toFixed(2).replace('.', ','));
+      }
+    }
+  }, [packageWeight, totalPrice, pricePerKg, lastPriceFieldEdited]);
   
 
   const { barCount, realPricePerMeter, pricePerBar } = React.useMemo(() => {
     const price = parseFloat(totalPrice.replace(',', '.')) || 0;
-    const percentage = parseFloat(invoicePercentage.replace(',', '.')) || 0;
+    const percentage = parseFloat(invoicePercentage.replace(',', '.')) || 100;
     const length = parseFloat(totalLength.replace(',', '.')) || 0;
 
     if (!selectedItem || length <= 0 || price <= 0 || percentage <= 0) {
@@ -101,12 +122,13 @@ export function PackageChecker() {
   const handleInputChange = (
     setter: React.Dispatch<React.SetStateAction<string>>,
     value: string,
-    field?: LastEdited
+    field?: LastEdited | 'total' | 'perKg'
   ) => {
     const sanitizedValue = value.replace(/[^0-9,]/g, '').replace(',', '.');
     if (/^\d*\.?\d*$/.test(sanitizedValue)) {
       setter(sanitizedValue.replace('.', ','));
-      if(field) setLastEdited(field);
+      if(field === 'weight' || field === 'length') setLastEdited(field);
+      if(field === 'total' || field === 'perKg') setLastPriceFieldEdited(field);
     }
   };
 
@@ -164,7 +186,7 @@ export function PackageChecker() {
         <div className={cn("space-y-4", !selectedItem && "opacity-50 pointer-events-none")}>
             <div className="space-y-2">
                 <Label htmlFor="package-weight">2. Insira os Dados </Label>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <Input
                         id="package-weight"
                         placeholder="Peso Total (kg)"
@@ -175,7 +197,13 @@ export function PackageChecker() {
                         id="total-price"
                         placeholder="Valor Total Pago (R$)"
                         value={totalPrice}
-                        onChange={(e) => handleInputChange(setTotalPrice, e.target.value)}
+                        onChange={(e) => handleInputChange(setTotalPrice, e.target.value, 'total')}
+                    />
+                    <Input
+                        id="price-per-kg"
+                        placeholder="R$/Kg"
+                        value={pricePerKg}
+                        onChange={(e) => handleInputChange(setPricePerKg, e.target.value, 'perKg')}
                     />
                      <div className="relative">
                         <Input

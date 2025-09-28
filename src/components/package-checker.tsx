@@ -132,6 +132,7 @@ export function PackageChecker() {
                 setSearchTerm(e.target.value);
                 if (selectedItem) setSelectedItem(null); // Clear selection when typing
               }}
+              className="pl-8"
             />
              {searchTerm && filteredItems.length > 0 && (
                 <Card className="absolute z-10 mt-1 w-full border-primary/20">
@@ -166,13 +167,13 @@ export function PackageChecker() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Input
                         id="package-weight"
-                        placeholder="Total (kg)"
+                        placeholder="Peso Total (kg)"
                         value={packageWeight}
                         onChange={(e) => handleInputChange(setPackageWeight, e.target.value, 'weight')}
                     />
                     <Input
                         id="total-price"
-                        placeholder="Total Pago (R$)"
+                        placeholder="Valor Total Pago (R$)"
                         value={totalPrice}
                         onChange={(e) => handleInputChange(setTotalPrice, e.target.value)}
                     />

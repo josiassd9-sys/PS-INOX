@@ -177,12 +177,16 @@ export function PackageChecker() {
                         value={totalPrice}
                         onChange={(e) => handleInputChange(setTotalPrice, e.target.value)}
                     />
-                     <Input
-                        id="invoice-percentage"
-                        placeholder="% da Nota"
-                        value={invoicePercentage}
-                        onChange={(e) => handleInputChange(setInvoicePercentage, e.target.value)}
-                    />
+                     <div className="relative">
+                        <Input
+                            id="invoice-percentage"
+                            placeholder="% da Nota"
+                            value={invoicePercentage}
+                            onChange={(e) => handleInputChange(setInvoicePercentage, e.target.value)}
+                            className="pr-6"
+                        />
+                        <span className="absolute inset-y-0 right-3 flex items-center text-muted-foreground text-sm pointer-events-none">%</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -211,7 +215,7 @@ export function PackageChecker() {
                 <div className="space-y-1">
                     <Label className="text-xs text-accent-price font-semibold">R$/Metro</Label>
                     <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
-                      {realPricePerMeter > 0 ? `R$ ${realPricePerMeter.toFixed(5).replace('.', ',')}` : 'R$ 0,00'}
+                      {realPricePerMeter > 0 ? `${realPricePerMeter.toFixed(5).replace('.', ',')}` : '0,00'}
                     </div>
                 </div>
                 <div className="space-y-1">

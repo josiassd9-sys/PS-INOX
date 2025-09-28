@@ -113,9 +113,9 @@ export function PackageChecker() {
   return (
     <Card className="border-0 shadow-none bg-transparent">
       <CardHeader>
-        <CardTitle>Conferência de Pacote</CardTitle>
+        <CardTitle>Conferência de KG/MT</CardTitle>
         <CardDescription className="mt-2">
-          Selecione um item e insira os dados do pacote para calcular a metragem e o custo real.
+          Selecione item e insira os dados para calculo de metragem e custo.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -126,7 +126,7 @@ export function PackageChecker() {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               id="search-item"
-              placeholder={selectedItem ? selectedItem.description : "Buscar item por descrição..."}
+              placeholder={selectedItem ? selectedItem.description : "........Buscar item........"}
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -162,17 +162,17 @@ export function PackageChecker() {
         {/* Inputs */}
         <div className={cn("space-y-4", !selectedItem && "opacity-50 pointer-events-none")}>
             <div className="space-y-2">
-                <Label htmlFor="package-weight">2. Insira os Dados do Pacote</Label>
+                <Label htmlFor="package-weight">2. Insira os Dados </Label>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Input
                         id="package-weight"
-                        placeholder="Peso Total (kg)"
+                        placeholder="Total (kg)"
                         value={packageWeight}
                         onChange={(e) => handleInputChange(setPackageWeight, e.target.value, 'weight')}
                     />
                     <Input
                         id="total-price"
-                        placeholder="Preço Total Pago (R$)"
+                        placeholder="Total Pago (R$)"
                         value={totalPrice}
                         onChange={(e) => handleInputChange(setTotalPrice, e.target.value)}
                     />
@@ -192,7 +192,7 @@ export function PackageChecker() {
             <h3 className="text-lg font-medium mb-4">Resultados</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="space-y-1">
-                    <Label className="text-xs text-muted-foreground">Metragem Total</Label>
+                    <Label className="text-xs text-muted-foreground">Qtd. MT</Label>
                     <Input
                         id="total-length"
                         placeholder="Metragem Total (m)"
@@ -202,19 +202,19 @@ export function PackageChecker() {
                     />
                 </div>
                 <div className="space-y-1">
-                    <Label className="text-xs text-muted-foreground">Qtd. Barras de 6m</Label>
+                    <Label className="text-xs text-muted-foreground">Qtd.Barras 6m</Label>
                     <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm font-semibold h-10 flex items-center">
                         {formatNumber(barCount, 3)}
                     </div>
                 </div>
                 <div className="space-y-1">
-                    <Label className="text-xs text-accent-price font-semibold">Preço Real por Metro</Label>
+                    <Label className="text-xs text-accent-price font-semibold">R$/Metro</Label>
                     <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
                       {realPricePerMeter > 0 ? `R$ ${realPricePerMeter.toFixed(5).replace('.', ',')}` : 'R$ 0,00'}
                     </div>
                 </div>
                 <div className="space-y-1">
-                    <Label className="text-xs text-accent-price font-semibold">Preço por Barra 6m</Label>
+                    <Label className="text-xs text-accent-price font-semibold">R$/Barra 6m</Label>
                     <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
                         {formatCurrency(pricePerBar)}
                     </div>

@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "./ui/button";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { PlusCircle, Trash2, Printer } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { Separator } from "./ui/separator";
 
@@ -203,10 +203,10 @@ export function ScaleCalculator() {
   };
 
   return (
-    <Card className="border-0 shadow-none bg-transparent">
-      <CardHeader>
+    <Card className="border-0 shadow-none bg-transparent" id="scale-calculator-printable-area">
+      <CardHeader className="print:pb-2">
         <CardTitle>Balança</CardTitle>
-        <CardDescription>
+        <CardDescription className="print:hidden">
           Insira os dados de pesagem para calcular o peso líquido.
         </CardDescription>
       </CardHeader>
@@ -222,16 +222,16 @@ export function ScaleCalculator() {
         </div>
 
         {weighingSets.map((set, setIndex) => (
-          <Card key={set.id} className="bg-card/50 pt-4">
+          <Card key={set.id} className="bg-card/50 pt-4 print:shadow-none print:border-border">
             <CardHeader className="flex-row items-center justify-between pt-0 pb-4">
                 <div className="space-y-1.5 flex-1">
                     <CardTitle className="text-xl">Conjunto de Pesagem {setIndex + 1}</CardTitle>
-                    <CardDescription>
+                    <CardDescription className="print:hidden">
                         {setIndex > 0 ? "Para o segundo caminhão/caixa (bitrem)." : "Para o primeiro caminhão/caixa."}
                     </CardDescription>
                 </div>
               {weighingSets.length > 1 && (
-                <Button variant="ghost" size="icon" onClick={() => removeWeighingSet(set.id)}>
+                <Button variant="ghost" size="icon" onClick={() => removeWeighingSet(set.id)} className="print:hidden">
                   <Trash2 className="text-destructive"/>
                 </Button>
               )}
@@ -270,7 +270,7 @@ export function ScaleCalculator() {
                 </div>
 
               {set.boxes.map((box) => (
-                <div key={box.id} className="space-y-4 rounded-lg border bg-background p-4 relative">
+                <div key={box.id} className="space-y-4 rounded-lg border bg-background p-4 relative print:border-border">
                   <div className="flex items-center justify-between">
                     <Input 
                       value={box.name}
@@ -278,7 +278,7 @@ export function ScaleCalculator() {
                       className="text-base font-semibold border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 h-auto bg-transparent w-full"
                     />
                     {set.boxes.length > 1 && (
-                      <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => removeMaterialBox(set.id, box.id)}>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 print:hidden" onClick={() => removeMaterialBox(set.id, box.id)}>
                           <Trash2 className="text-destructive h-4 w-4"/>
                       </Button>
                     )}
@@ -316,7 +316,7 @@ export function ScaleCalculator() {
                       </div>
                       <div className="space-y-2">
                           <Label className="text-accent-price font-semibold">Peso Líquido</Label>
-                          <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
+                          <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center print:bg-transparent print:border-accent-price">
                               {formatNumber(box.net)} kg
                           </div>
                       </div>
@@ -324,7 +324,7 @@ export function ScaleCalculator() {
                   </div>
                 </div>
               ))}
-              <Button variant="outline" size="sm" onClick={() => addMaterialBox(set.id)} className="gap-2">
+              <Button variant="outline" size="sm" onClick={() => addMaterialBox(set.id)} className="gap-2 print:hidden">
                 <PlusCircle />
                 Adicionar Material
               </Button>
@@ -332,21 +332,29 @@ export function ScaleCalculator() {
           </Card>
         ))}
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 print:hidden">
             <Button variant="secondary" onClick={addWeighingSet} className="gap-2">
                 <PlusCircle />
                 Adicionar Conjunto de Pesagem (Bitrem)
             </Button>
+        </div>
 
-            <Separator />
+        <Separator />
 
-            <div className="flex justify-end items-center gap-4 pt-4">
-                <h3 className="text-lg font-semibold">Total Geral Líquido:</h3>
-                <div className="text-2xl font-bold text-primary min-w-[150px] text-right">
-                    {formatNumber(grandTotalNet)} kg
-                </div>
+        <div className="flex justify-end items-center gap-4 pt-4">
+            <h3 className="text-lg font-semibold">Total Geral Líquido:</h3>
+            <div className="text-2xl font-bold text-primary min-w-[150px] text-right">
+                {formatNumber(grandTotalNet)} kg
             </div>
         </div>
+
+        <div className="flex justify-end pt-4 print:hidden">
+            <Button onClick={() => window.print()} className="gap-2">
+                <Printer />
+                Imprimir / Salvar PDF
+            </Button>
+        </div>
+
       </CardContent>
     </Card>
   );

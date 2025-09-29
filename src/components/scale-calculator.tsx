@@ -12,9 +12,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "./ui/button";
-import { PlusCircle, Trash2, Printer } from "lucide-react";
+import { PlusCircle, Trash2, Printer, Save, Download } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { Separator } from "./ui/separator";
+import { useToast } from "@/hooks/use-toast";
 
 interface MaterialBox {
   id: string;
@@ -34,7 +35,10 @@ interface WeighingSet {
   totalNet: number;
 }
 
+const LOCAL_STORAGE_KEY = "scaleCalculatorState";
+
 export function ScaleCalculator() {
+  const { toast } = useToast();
   const [customerName, setCustomerName] = React.useState("");
   const [weighingSets, setWeighingSets] = React.useState<WeighingSet[]>([
     {
@@ -46,6 +50,70 @@ export function ScaleCalculator() {
       totalNet: 0,
     },
   ]);
+
+  const saveStateToLocalStorage = () => {
+    try {
+      const stateToSave = {
+        customerName,
+        weighingSets,
+      };
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stateToSave));
+      toast({
+        title: "Progresso Salvo!",
+        description: "Sua pesagem foi salva localmente no seu dispositivo.",
+      });
+    } catch (error) {
+      console.error("Failed to save state to localStorage", error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao Salvar",
+        description: "Não foi possível salvar os dados. O armazenamento local pode estar cheio ou indisponível.",
+      });
+    }
+  };
+
+  const loadStateFromLocalStorage = () => {
+    try {
+      const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedState) {
+        const { customerName, weighingSets } = JSON.parse(savedState);
+        setCustomerName(customerName);
+        setWeighingSets(weighingSets);
+         toast({
+          title: "Dados Carregados",
+          description: "A última pesagem salva foi carregada.",
+        });
+      } else {
+        toast({
+            variant: "default",
+            title: "Nenhum dado salvo",
+            description: "Não há nenhuma pesagem salva para carregar.",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to load state from localStorage", error);
+       toast({
+        variant: "destructive",
+        title: "Erro ao Carregar",
+        description: "Não foi possível carregar os dados salvos.",
+      });
+    }
+  };
+  
+  React.useEffect(() => {
+    // Auto-load on initial component mount
+    try {
+      const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedState) {
+        const { customerName, weighingSets } = JSON.parse(savedState);
+        setCustomerName(customerName);
+        setWeighingSets(weighingSets);
+      }
+    } catch (error) {
+       console.error("Failed to auto-load state from localStorage", error);
+    }
+  }, []);
+
 
   const handleSetTextChange = (
     value: string,
@@ -104,6 +172,7 @@ export function ScaleCalculator() {
 
 
   React.useEffect(() => {
+    const allSets = JSON.stringify(weighingSets);
     setWeighingSets((prevSets) =>
       prevSets.map((set) => {
         let currentGross = parseFloat(set.gross.replace(",", ".")) || 0;
@@ -129,7 +198,8 @@ export function ScaleCalculator() {
         return { ...set, boxes: updatedBoxes, totalNet };
       })
     );
-  }, [weighingSets.map(s => s.gross).join(), weighingSets.flatMap(s => s.boxes.map(b => `${b.tare}${b.discount}${b.container}`)).join()]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(weighingSets.map(s => ({ gross: s.gross, boxes: s.boxes.map(b => ({ tare: b.tare, discount: b.discount, container: b.container }))})))]);
 
 
   const addMaterialBox = (setId: string) => {
@@ -348,7 +418,15 @@ export function ScaleCalculator() {
             </div>
         </div>
 
-        <div className="flex justify-end pt-4 print:hidden">
+        <div className="flex justify-end pt-4 gap-2 print:hidden">
+            <Button onClick={saveStateToLocalStorage} className="gap-2" variant="outline">
+                <Save />
+                Salvar Progresso
+            </Button>
+             <Button onClick={loadStateFromLocalStorage} className="gap-2" variant="outline">
+                <Download />
+                Carregar Última Pesagem
+            </Button>
             <Button onClick={() => window.print()} className="gap-2">
                 <Printer />
                 Imprimir / Salvar PDF

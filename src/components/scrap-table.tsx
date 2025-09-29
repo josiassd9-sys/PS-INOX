@@ -113,7 +113,7 @@ export function ScrapTable({ category }: ScrapTableProps) {
 
   return (
     <>
-    <div className="flex items-center justify-between -mt-6 -mx-6 mb-4 p-6 pb-0">
+    <div className="flex items-center justify-between mb-4">
         <div>
           {hasHiddenItems && (
             <Button size="sm" className="h-8 gap-1" variant="outline" onClick={showAllItems}>
@@ -189,7 +189,7 @@ export function ScrapTable({ category }: ScrapTableProps) {
           </DialogContent>
         </Dialog>
       </div>
-      <div className="-mx-6 -mt-6 border-t">
+      <div className="-mx-6 border-t">
         <Table>
           <TableHeader>
              <TableRow className="bg-primary/5 hover:bg-primary/10 flex">

@@ -18,6 +18,7 @@ import { Separator } from "./ui/separator";
 
 interface MaterialBox {
   id: string;
+  name: string;
   tare: string;
   discount: string;
   container: string;
@@ -37,7 +38,7 @@ export function ScaleCalculator() {
     {
       id: uuidv4(),
       gross: "",
-      boxes: [{ id: uuidv4(), tare: "", discount: "", container: "", net: 0 }],
+      boxes: [{ id: uuidv4(), name: "Material 1", tare: "", discount: "", container: "", net: 0 }],
       totalNet: 0,
     },
   ]);
@@ -67,6 +68,18 @@ export function ScaleCalculator() {
   };
   
   const handleBoxInputChange = (value: string, setId: string, boxId: string, field: keyof Omit<MaterialBox, 'id' | 'net'>) => {
+    
+    if (field === 'name') {
+      setWeighingSets(prevSets => prevSets.map(set => {
+        if (set.id !== setId) return set;
+        const updatedBoxes = set.boxes.map(box => 
+          box.id === boxId ? { ...box, name: value } : box
+        );
+        return { ...set, boxes: updatedBoxes };
+      }));
+      return;
+    }
+    
     const sanitizedValue = value.replace(/[^0-9,]/g, "").replace(",", ".");
     if (/^\d*\.?\d*$/.test(sanitizedValue)) {
       const newValue = sanitizedValue.replace(".", ",");
@@ -107,7 +120,7 @@ export function ScaleCalculator() {
               ...set,
               boxes: [
                 ...set.boxes,
-                { id: uuidv4(), tare: "", discount: "", container: "", net: 0 },
+                { id: uuidv4(), name: `Material ${set.boxes.length + 1}`, tare: "", discount: "", container: "", net: 0 },
               ],
             }
           : set
@@ -122,7 +135,7 @@ export function ScaleCalculator() {
         const updatedBoxes = set.boxes.filter((box) => box.id !== boxId);
         // If the last box is removed, add a new empty one to prevent an empty state
         if (updatedBoxes.length === 0) {
-          return { ...set, boxes: [{ id: uuidv4(), tare: "", discount: "", container: "", net: 0 }] };
+          return { ...set, boxes: [{ id: uuidv4(), name: "Material 1", tare: "", discount: "", container: "", net: 0 }] };
         }
         return { ...set, boxes: updatedBoxes };
       })
@@ -135,7 +148,7 @@ export function ScaleCalculator() {
       {
         id: uuidv4(),
         gross: "",
-        boxes: [{ id: uuidv4(), tare: "", discount: "", container: "", net: 0 }],
+        boxes: [{ id: uuidv4(), name: "Material 1", tare: "", discount: "", container: "", net: 0 }],
         totalNet: 0,
       },
     ]);
@@ -148,7 +161,7 @@ export function ScaleCalculator() {
             return [{
               id: uuidv4(),
               gross: "",
-              boxes: [{ id: uuidv4(), tare: "", discount: "", container: "", net: 0 }],
+              boxes: [{ id: uuidv4(), name: "Material 1", tare: "", discount: "", container: "", net: 0 }],
               totalNet: 0,
             }];
         }
@@ -212,14 +225,20 @@ export function ScaleCalculator() {
                     </div>
                 </div>
 
-              {set.boxes.map((box, boxIndex) => (
+              {set.boxes.map((box) => (
                 <div key={box.id} className="space-y-4 rounded-lg border bg-background p-4 relative">
-                  <h4 className="font-semibold text-primary">Material {boxIndex + 1}</h4>
-                  {set.boxes.length > 1 && (
-                     <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7" onClick={() => removeMaterialBox(set.id, box.id)}>
-                        <Trash2 className="text-destructive h-4 w-4"/>
-                     </Button>
-                  )}
+                  <div className="flex items-center justify-between">
+                    <Input 
+                      value={box.name}
+                      onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'name')}
+                      className="text-base font-semibold border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 h-auto bg-transparent w-full"
+                    />
+                    {set.boxes.length > 1 && (
+                      <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => removeMaterialBox(set.id, box.id)}>
+                          <Trash2 className="text-destructive h-4 w-4"/>
+                      </Button>
+                    )}
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-4">
                         <div className="space-y-2">
@@ -288,3 +307,5 @@ export function ScaleCalculator() {
     </Card>
   );
 }
+
+    

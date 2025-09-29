@@ -209,12 +209,10 @@ function DashboardComponent() {
                   </Dialog>
                 )}
                  {isScrapTableCategory && (
-                    <DialogTrigger asChild>
-                       <Button variant="outline" size="sm" className="gap-2" onClick={() => setIsScrapItemDialogOpen(true)}>
-                        <PlusCircle className="h-4 w-4" />
-                        <span className="hidden sm:inline">Adicionar</span>
-                      </Button>
-                    </DialogTrigger>
+                    <Button variant="outline" size="sm" className="gap-2" onClick={() => setIsScrapItemDialogOpen(true)}>
+                      <PlusCircle className="h-4 w-4" />
+                      <span className="hidden sm:inline">Adicionar</span>
+                    </Button>
                 )}
               </div>
             </header>

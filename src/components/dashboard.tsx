@@ -32,6 +32,7 @@ import { Button } from "./ui/button";
 import { PackageChecker } from "./package-checker";
 import { ScaleCalculator } from "./scale-calculator";
 import { ScrapTable } from "./scrap-table";
+import { cn } from "@/lib/utils";
 
 function DashboardComponent() {
   const [costPrice, setCostPrice] = React.useState(30);
@@ -162,7 +163,10 @@ function DashboardComponent() {
       <SidebarInset>
         <div className="p-4 md:p-6 flex flex-col gap-6 h-screen">
           <div className="bg-background rounded-lg border flex-1 flex flex-col overflow-hidden">
-            <header className="flex items-center justify-between gap-4 p-4 border-b">
+            <header className={cn(
+              "flex items-center justify-between gap-4 p-4 border-b",
+              isScrapTableCategory && !searchTerm && "mb-4"
+            )}>
               <div className="flex items-center gap-2">
                 <SidebarTrigger className="md:hidden"/>
                 <div className="hidden md:block">
@@ -205,14 +209,12 @@ function DashboardComponent() {
                   </Dialog>
                 )}
                  {isScrapTableCategory && (
-                  <Dialog open={isScrapItemDialogOpen} onOpenChange={setIsScrapItemDialogOpen}>
                     <DialogTrigger asChild>
-                       <Button variant="outline" size="sm" className="gap-2">
+                       <Button variant="outline" size="sm" className="gap-2" onClick={() => setIsScrapItemDialogOpen(true)}>
                         <PlusCircle className="h-4 w-4" />
                         <span className="hidden sm:inline">Adicionar</span>
                       </Button>
                     </DialogTrigger>
-                  </Dialog>
                 )}
               </div>
             </header>
@@ -228,7 +230,7 @@ function DashboardComponent() {
                 </div>
               )}
               <div className="flex-1 overflow-y-auto">
-                <div className="p-4 md:p-6">
+                <div className={cn(!isScrapTableCategory && "p-4 md:p-6")}>
                  {renderContent()}
                 </div>
               </div>

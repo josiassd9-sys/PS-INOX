@@ -113,7 +113,7 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen }: ScrapTab
 
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between">
         <div>
           {hasHiddenItems && (
             <Button size="sm" className="h-8 gap-1" variant="outline" onClick={showAllItems}>
@@ -185,7 +185,7 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen }: ScrapTab
         <div className="relative overflow-auto h-[calc(100vh-220px)]">
         <Table>
           <TableHeader className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
-             <TableRow className="bg-primary/5 hover:bg-primary/10 flex">
+             <TableRow className="bg-primary/5 hover:bg-primary/10 flex items-center">
                 <TableHead className="flex-1 px-8">Material (Composição)</TableHead>
                 <TableHead className="w-32 text-right font-semibold text-primary px-2">
                   Preço (R$/kg)

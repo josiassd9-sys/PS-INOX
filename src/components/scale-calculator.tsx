@@ -348,40 +348,40 @@ export function ScaleCalculator() {
                       </Button>
                     )}
                   </div>
-                   <div className="grid grid-cols-2 gap-2">
-                        <div className="space-y-2">
-                          <Label htmlFor={`tare-${box.id}`} className="text-xs text-muted-foreground">Tara (kg)</Label>
-                          <Input
-                            id={`tare-${box.id}`}
-                            value={box.tare}
-                            onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'tare')}
-                            placeholder="Peso"
-                          />
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-2">
+                      <Label htmlFor={`tare-${box.id}`} className="text-xs text-muted-foreground">Tara (kg)</Label>
+                      <Input
+                        id={`tare-${box.id}`}
+                        value={box.tare}
+                        onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'tare')}
+                        placeholder="Peso"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`discount-${box.id}`} className="text-xs text-muted-foreground">Desconto (kg)</Label>
+                      <Input
+                        id={`discount-${box.id}`}
+                        value={box.discount}
+                        onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'discount')}
+                        placeholder="Lixo, outros"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor={`container-${box.id}`} className="text-xs text-muted-foreground">Caçamba (kg)</Label>
+                      <Input
+                        id={`container-${box.id}`}
+                        value={box.container}
+                        onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'container')}
+                        placeholder="Peso"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                        <Label className="text-accent-price font-semibold text-xs">Peso Líquido</Label>
+                        <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-sm font-bold text-accent-price h-10 flex items-center print:bg-transparent print:border-accent-price">
+                            {formatNumber(box.net)} kg
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor={`discount-${box.id}`} className="text-xs text-muted-foreground">Desconto (kg)</Label>
-                          <Input
-                            id={`discount-${box.id}`}
-                            value={box.discount}
-                            onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'discount')}
-                            placeholder="Lixo, outros"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor={`container-${box.id}`} className="text-xs text-muted-foreground">Caçamba (kg)</Label>
-                          <Input
-                            id={`container-${box.id}`}
-                            value={box.container}
-                            onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'container')}
-                            placeholder="Peso"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                            <Label className="text-accent-price font-semibold text-xs">Peso Líquido</Label>
-                            <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-sm font-bold text-accent-price h-10 flex items-center print:bg-transparent print:border-accent-price">
-                                {formatNumber(box.net)} kg
-                            </div>
-                        </div>
+                    </div>
                   </div>
                 </div>
               ))}

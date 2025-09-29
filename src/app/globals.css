@@ -124,21 +124,22 @@
     .print\:pb-2 {
       padding-bottom: 0.5rem !important;
     }
-    .sidebar,
-    .sidebar-inset > .p-4 > .bg-background > header {
-      display: none;
-    }
-    .sidebar-inset {
-      padding: 0 !important;
-      margin: 0 !important;
-    }
-    .sidebar-inset > .p-4 {
-      padding: 0 !important;
-      height: auto !important;
-    }
-     .sidebar-inset > .p-4 > .bg-background {
-      border: none !important;
-      height: auto !important;
-     }
   }
+  
+  .sidebar,
+  .sidebar-inset > .p-4 > .bg-background > header {
+    display: none;
+  }
+  .sidebar-inset {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .sidebar-inset > .p-4 {
+    padding: 0 !important;
+    height: auto !important;
+  }
+   .sidebar-inset > .p-4 > .bg-background {
+    border: none !important;
+    height: auto !important;
+   }
 }

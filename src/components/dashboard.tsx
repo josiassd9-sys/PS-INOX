@@ -31,6 +31,7 @@ import {
 import { Button } from "./ui/button";
 import { PackageChecker } from "./package-checker";
 import { ScaleCalculator } from "./scale-calculator";
+import { ScrapTable } from "./scrap-table";
 
 function DashboardComponent() {
   const [costPrice, setCostPrice] = React.useState(30);
@@ -79,8 +80,8 @@ function DashboardComponent() {
   const filteredCategories = React.useMemo(() => {
     if (!searchTerm) return [];
     
-    return CATEGORIES.filter(cat => cat.id !== 'retalhos' && cat.id !== 'package-checker' && cat.id !== 'balanca').map(category => {
-      const filteredItems = category.items.filter(item => 
+    return CATEGORIES.filter(cat => cat.unit === 'm' || cat.unit === 'un').map(category => {
+      const filteredItems = (category.items as any[]).filter(item => 
         item.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
       return { ...category, items: filteredItems };
@@ -90,8 +91,9 @@ function DashboardComponent() {
   const isScrapCategory = selectedCategoryId === 'retalhos';
   const isPackageCheckerCategory = selectedCategoryId === 'package-checker';
   const isScaleCategory = selectedCategoryId === 'balanca';
+  const isScrapTableCategory = selectedCategoryId === 'tabela-sucata';
   
-  const showCustomHeader = !searchTerm && !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory;
+  const showCustomHeader = !searchTerm && !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory;
   const unitLabel = selectedCategory.unit === "m" ? "m" : selectedCategory.unit === 'm²' ? "m²" : "un";
   const weightUnitLabel = `Peso (kg/${unitLabel})`;
   const priceUnitLabel = `Preço (R$/${unitLabel})`;
@@ -100,7 +102,7 @@ function DashboardComponent() {
     if (searchTerm) {
       return (
         <GlobalSearchResults 
-          categories={filteredCategories}
+          categories={filteredCategories as any}
           sellingPrice={sellingPrice}
           searchTerm={searchTerm}
         />
@@ -115,9 +117,12 @@ function DashboardComponent() {
     if (isScaleCategory) {
       return <ScaleCalculator />;
     }
+    if (isScrapTableCategory) {
+        return <ScrapTable category={selectedCategory as any} />;
+    }
     return (
       <ItemTable 
-        category={selectedCategory} 
+        category={selectedCategory as any} 
         sellingPrice={sellingPrice}
         showTableHeader={false}
       />
@@ -171,7 +176,7 @@ function DashboardComponent() {
                   />
               </div>
               <div className="flex items-center gap-2">
-                {!isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && (
+                {!isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && (
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm" className="gap-2">

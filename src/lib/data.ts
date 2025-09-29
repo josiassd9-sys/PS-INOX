@@ -50,10 +50,18 @@ export type Category = {
   id: string;
   name: string;
   description: string;
-  items: SteelItem[];
+  items: SteelItem[] | ScrapItem[];
   icon: string;
-  unit: 'm' | 'm²' | 'un' | 'calc';
+  unit: 'm' | 'm²' | 'un' | 'calc' | 'kg';
 };
+
+export type ScrapItem = {
+  id: string;
+  material: string;
+  composition: string;
+  price: number;
+};
+
 
 const chapasGroup1: {thickness: number, desc: string}[] = [
     { thickness: 0.4, desc: '0.40mm' },
@@ -121,6 +129,13 @@ const generateChapas = (): SteelItem[] => {
     return items;
 };
 
+const scrapItems: ScrapItem[] = [
+    { id: 'scrap-1', material: 'Inox 304', composition: '18% Cr, 8% Ni', price: 8.50 },
+    { id: 'scrap-2', material: 'Inox 316', composition: '16% Cr, 10% Ni, 2% Mo', price: 12.30 },
+    { id: 'scrap-3', material: 'Inox 430', composition: '16% Cr', price: 4.20 },
+    { id: 'scrap-4', material: 'Ferro Fundido', composition: 'N/A', price: 1.80 },
+];
+
 export const CATEGORIES: Category[] = [
   {
     id: 'retalhos',
@@ -145,6 +160,14 @@ export const CATEGORIES: Category[] = [
     icon: 'Weight',
     unit: 'calc',
     items: [],
+  },
+  {
+    id: 'tabela-sucata',
+    name: 'Tabela Sucata',
+    description: 'Tabela de preços e composição de sucatas.',
+    icon: 'Trash2',
+    unit: 'kg',
+    items: scrapItems,
   },
   {
     id: 'tubos-od',

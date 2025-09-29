@@ -27,6 +27,8 @@ interface MaterialBox {
 
 interface WeighingSet {
   id: string;
+  driverName: string;
+  plate: string;
   gross: string;
   boxes: MaterialBox[];
   totalNet: number;
@@ -37,16 +39,31 @@ export function ScaleCalculator() {
   const [weighingSets, setWeighingSets] = React.useState<WeighingSet[]>([
     {
       id: uuidv4(),
+      driverName: "",
+      plate: "",
       gross: "",
       boxes: [{ id: uuidv4(), name: "Material 1", tare: "", discount: "", container: "", net: 0 }],
       totalNet: 0,
     },
   ]);
 
+  const handleSetTextChange = (
+    value: string,
+    setId: string,
+    field: keyof Omit<WeighingSet, "boxes" | "totalNet" | "id" | "gross">
+  ) => {
+    setWeighingSets((prevSets) =>
+      prevSets.map((set) => {
+        if (set.id !== setId) return set;
+        return { ...set, [field]: value };
+      })
+    );
+  };
+  
   const handleInputChange = (
     value: string,
     setId: string,
-    field: keyof Omit<WeighingSet, "boxes" | "totalNet" | "id">,
+    field: keyof Omit<WeighingSet, "boxes" | "totalNet" | "id" | "driverName" | "plate">,
   ) => {
     const sanitizedValue = value.replace(/[^0-9,]/g, "").replace(",", ".");
     if (/^\d*\.?\d*$/.test(sanitizedValue)) {
@@ -150,6 +167,8 @@ export function ScaleCalculator() {
       ...prevSets,
       {
         id: uuidv4(),
+        driverName: "",
+        plate: "",
         gross: "",
         boxes: [{ id: uuidv4(), name: "Material 1", tare: "", discount: "", container: "", net: 0 }],
         totalNet: 0,
@@ -163,6 +182,8 @@ export function ScaleCalculator() {
         if (updatedSets.length === 0) {
             return [{
               id: uuidv4(),
+              driverName: "",
+              plate: "",
               gross: "",
               boxes: [{ id: uuidv4(), name: "Material 1", tare: "", discount: "", container: "", net: 0 }],
               totalNet: 0,
@@ -203,7 +224,7 @@ export function ScaleCalculator() {
         {weighingSets.map((set, setIndex) => (
           <Card key={set.id} className="bg-card/50 pt-4">
             <CardHeader className="flex-row items-center justify-between pt-0 pb-4">
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 flex-1">
                     <CardTitle className="text-xl">Conjunto de Pesagem {setIndex + 1}</CardTitle>
                     <CardDescription>
                         {setIndex > 0 ? "Para o segundo caminhão/caixa (bitrem)." : "Para o primeiro caminhão/caixa."}
@@ -216,6 +237,26 @@ export function ScaleCalculator() {
               )}
             </CardHeader>
             <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor={`driver-name-${set.id}`}>Nome do Motorista</Label>
+                        <Input
+                            id={`driver-name-${set.id}`}
+                            value={set.driverName}
+                            onChange={(e) => handleSetTextChange(e.target.value, set.id, "driverName")}
+                            placeholder="Nome do motorista"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor={`plate-${set.id}`}>Placa do Veículo</Label>
+                        <Input
+                            id={`plate-${set.id}`}
+                            value={set.plate}
+                            onChange={(e) => handleSetTextChange(e.target.value, set.id, "plate")}
+                            placeholder="Placa do veículo"
+                        />
+                    </div>
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2 col-span-2 md:col-span-1">
                         <Label htmlFor={`gross-${set.id}`}>Bruto (kg)</Label>
@@ -242,43 +283,43 @@ export function ScaleCalculator() {
                       </Button>
                     )}
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor={`tare-${box.id}`}>Tara (kg)</Label>
-                          <Input
-                            id={`tare-${box.id}`}
-                            value={box.tare}
-                            onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'tare')}
-                            placeholder="Peso descarregado"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor={`discount-${box.id}`}>Desconto (kg)</Label>
-                          <Input
-                            id={`discount-${box.id}`}
-                            value={box.discount}
-                            onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'discount')}
-                            placeholder="Lixo, outros"
-                          />
-                        </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`tare-${box.id}`}>Tara (kg)</Label>
+                        <Input
+                          id={`tare-${box.id}`}
+                          value={box.tare}
+                          onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'tare')}
+                          placeholder="Peso descarregado"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`discount-${box.id}`}>Desconto (kg)</Label>
+                        <Input
+                          id={`discount-${box.id}`}
+                          value={box.discount}
+                          onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'discount')}
+                          placeholder="Lixo, outros"
+                        />
+                      </div>
                     </div>
                     <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor={`container-${box.id}`}>Caçamba (kg)</Label>
-                          <Input
-                            id={`container-${box.id}`}
-                            value={box.container}
-                            onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'container')}
-                            placeholder="Peso da caçamba"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                            <Label className="text-accent-price font-semibold">Peso Líquido</Label>
-                            <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
-                                {formatNumber(box.net)} kg
-                            </div>
-                        </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`container-${box.id}`}>Caçamba (kg)</Label>
+                        <Input
+                          id={`container-${box.id}`}
+                          value={box.container}
+                          onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'container')}
+                          placeholder="Peso da caçamba"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                          <Label className="text-accent-price font-semibold">Peso Líquido</Label>
+                          <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
+                              {formatNumber(box.net)} kg
+                          </div>
+                      </div>
                     </div>
                   </div>
                 </div>

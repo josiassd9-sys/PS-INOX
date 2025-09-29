@@ -91,7 +91,7 @@ export function ScaleCalculator() {
         });
       }
     } catch (error) {
-      console.error("Failed to load state from localStorage", error);
+       console.error("Failed to load state from localStorage", error);
        toast({
         variant: "destructive",
         title: "Erro ao Carregar",

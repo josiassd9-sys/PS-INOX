@@ -181,9 +181,10 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen }: ScrapTab
             </DialogContent>
         </Dialog>
       </div>
-      <div className="-mx-6 border-t">
+      <div className="-mx-6 border rounded-lg overflow-hidden">
+        <div className="relative overflow-auto h-[calc(100vh-220px)]">
         <Table>
-          <TableHeader>
+          <TableHeader className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
              <TableRow className="bg-primary/5 hover:bg-primary/10 flex">
                 <TableHead className="flex-1 px-8">Material (Composição)</TableHead>
                 <TableHead className="w-32 text-right font-semibold text-primary px-2">
@@ -231,6 +232,7 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen }: ScrapTab
             )}
           </TableBody>
         </Table>
+        </div>
       </div>
       </>
   );

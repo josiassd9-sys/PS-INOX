@@ -17,7 +17,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
   DialogClose,
 } from "./ui/dialog";
@@ -27,15 +26,16 @@ import { Icon } from "./icons";
 
 interface ScrapTableProps {
   category: Category;
+  isDialogOpen: boolean;
+  setIsDialogOpen: (open: boolean) => void;
 }
 
 const LOCAL_STORAGE_HIDDEN_KEY = "scrapTableHiddenItems";
 
-export function ScrapTable({ category }: ScrapTableProps) {
+export function ScrapTable({ category, isDialogOpen, setIsDialogOpen }: ScrapTableProps) {
   const [allItems, setAllItems] = React.useState<ScrapItem[]>(category.items as ScrapItem[]);
   const [hiddenItemIds, setHiddenItemIds] = React.useState<Set<string>>(new Set());
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-
+  
   const [newMaterial, setNewMaterial] = React.useState("");
   const [newComposition, setNewComposition] = React.useState("");
   const [newPrice, setNewPrice] = React.useState<number | "">("");
@@ -113,7 +113,7 @@ export function ScrapTable({ category }: ScrapTableProps) {
 
   return (
     <>
-    <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4">
         <div>
           {hasHiddenItems && (
             <Button size="sm" className="h-8 gap-1" variant="outline" onClick={showAllItems}>
@@ -124,16 +124,7 @@ export function ScrapTable({ category }: ScrapTableProps) {
             </Button>
           )}
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm" className="h-8 gap-1">
-              <PlusCircle className="h-3.5 w-3.5" />
-              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                Adicionar Item
-              </span>
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
+        <DialogContent>
             <DialogHeader>
               <DialogTitle>Adicionar Novo Item em {category.name}</DialogTitle>
             </DialogHeader>
@@ -187,7 +178,6 @@ export function ScrapTable({ category }: ScrapTableProps) {
               <Button onClick={handleAddItem}>Adicionar</Button>
             </DialogFooter>
           </DialogContent>
-        </Dialog>
       </div>
       <div className="-mx-6 border-t">
         <Table>
@@ -222,17 +212,17 @@ export function ScrapTable({ category }: ScrapTableProps) {
                 </TableCell>
                 <TableCell className="w-12 px-2">
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => toggleItemVisibility(item.id)}>
-                        <Icon name="Eye" className="h-4 w-4 text-muted-foreground" />
+                        <Icon name={hiddenItemIds.has(item.id) ? "EyeOff" : "Eye"} className="h-4 w-4 text-muted-foreground" />
                     </Button>
                 </TableCell>
               </TableRow>
             ))}
-             {hasHiddenItems && (
+             {hasHiddenItems && visibleItems.length === 0 && (
                 <TableRow className="odd:bg-transparent">
                   <TableCell colSpan={3} className="text-center text-muted-foreground py-4">
                     <button onClick={showAllItems} className="flex items-center gap-2 mx-auto text-sm hover:text-primary">
-                       <Icon name="EyeOff" />
-                       {hiddenItemIds.size} {hiddenItemIds.size > 1 ? "itens ocultos" : "item oculto"}. Clique para reexibir.
+                       <Icon name="Eye" />
+                       Todos os {hiddenItemIds.size} {hiddenItemIds.size > 1 ? "itens estão ocultos" : "item está oculto"}. Clique para reexibir.
                     </button>
                   </TableCell>
                 </TableRow>

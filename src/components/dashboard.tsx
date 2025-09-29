@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { CATEGORIES, type Category } from "@/lib/data";
+import { CATEGORIES, type Category, type ScrapItem } from "@/lib/data";
 import {
   SidebarProvider,
   Sidebar,
@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Search, Warehouse, SlidersHorizontal } from "lucide-react";
+import { Search, Warehouse, SlidersHorizontal, PlusCircle } from "lucide-react";
 import { PriceControls } from "./price-controls";
 import { ItemTable } from "./item-table";
 import { Icon } from "./icons";
@@ -44,6 +44,7 @@ function DashboardComponent() {
   );
   const [searchTerm, setSearchTerm] = React.useState("");
   const { setOpenMobile, isMobile } = useSidebar();
+  const [isScrapItemDialogOpen, setIsScrapItemDialogOpen] = React.useState(false);
 
 
   const handleCostChange = (newCost: number | null) => {
@@ -118,7 +119,11 @@ function DashboardComponent() {
       return <ScaleCalculator />;
     }
     if (isScrapTableCategory) {
-        return <ScrapTable category={selectedCategory as any} />;
+        return <ScrapTable 
+          category={selectedCategory as any}
+          isDialogOpen={isScrapItemDialogOpen}
+          setIsDialogOpen={setIsScrapItemDialogOpen}
+         />;
     }
     return (
       <ItemTable 
@@ -197,6 +202,16 @@ function DashboardComponent() {
                         onSellingPriceChange={handleSellingPriceChange}
                       />
                     </DialogContent>
+                  </Dialog>
+                )}
+                 {isScrapTableCategory && (
+                  <Dialog open={isScrapItemDialogOpen} onOpenChange={setIsScrapItemDialogOpen}>
+                    <DialogTrigger asChild>
+                       <Button variant="outline" size="sm" className="gap-2">
+                        <PlusCircle className="h-4 w-4" />
+                        <span className="hidden sm:inline">Adicionar</span>
+                      </Button>
+                    </DialogTrigger>
                   </Dialog>
                 )}
               </div>

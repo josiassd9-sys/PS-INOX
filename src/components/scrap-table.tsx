@@ -59,6 +59,13 @@ export function ScrapTable({ category }: ScrapTableProps) {
   const handleRemoveItem = (id: string) => {
     setItems(items.filter(item => item.id !== id));
   }
+
+  const handlePriceChange = (id: string, newPrice: number | string) => {
+    const priceAsNumber = typeof newPrice === 'string' ? parseFloat(newPrice) : newPrice;
+    if (!isNaN(priceAsNumber)) {
+        setItems(items.map(item => item.id === id ? { ...item, price: priceAsNumber } : item));
+    }
+  }
   
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -154,7 +161,12 @@ export function ScrapTable({ category }: ScrapTableProps) {
                   <div className="text-xs text-muted-foreground">{item.composition}</div>
                 </TableCell>
                 <TableCell className="w-1/3 text-right font-medium text-primary px-8">
-                    {formatCurrency(item.price)}
+                    <Input
+                        type="number"
+                        value={item.price}
+                        onChange={(e) => handlePriceChange(item.id, e.target.value)}
+                        className="h-8 text-right border-primary/20 bg-transparent"
+                    />
                 </TableCell>
                 <TableCell className="w-12 px-2">
                     <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleRemoveItem(item.id)}>

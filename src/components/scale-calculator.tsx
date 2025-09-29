@@ -280,7 +280,7 @@ export function ScaleCalculator() {
           Insira os dados de pesagem para calcular o peso líquido.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="customer-name">Nome do Cliente</Label>
           <Input
@@ -292,55 +292,50 @@ export function ScaleCalculator() {
         </div>
 
         {weighingSets.map((set, setIndex) => (
-          <Card key={set.id} className="bg-card/50 pt-4 print:shadow-none print:border-border">
-            <CardHeader className="flex-row items-center justify-between pt-0 pb-4">
-                <div className="space-y-1.5 flex-1">
-                    <CardTitle className="text-xl">Conjunto de Pesagem {setIndex + 1}</CardTitle>
-                    <CardDescription className="print:hidden">
-                        {setIndex > 0 ? "Para o segundo caminhão/caixa (bitrem)." : "Para o primeiro caminhão/caixa."}
-                    </CardDescription>
+          <Card key={set.id} className="bg-card/50 pt-2 print:shadow-none print:border-border">
+            <CardHeader className="flex-row items-center justify-between pt-2 pb-2">
+                <div className="space-y-1 flex-1">
+                    <CardTitle className="text-lg">Conjunto {setIndex + 1}</CardTitle>
                 </div>
               {weighingSets.length > 1 && (
-                <Button variant="ghost" size="icon" onClick={() => removeWeighingSet(set.id)} className="print:hidden">
+                <Button variant="ghost" size="icon" onClick={() => removeWeighingSet(set.id)} className="print:hidden h-8 w-8">
                   <Trash2 className="text-destructive"/>
                 </Button>
               )}
             </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <CardContent className="space-y-3 p-4 pt-0">
+                <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-2">
-                        <Label htmlFor={`driver-name-${set.id}`}>Nome do Motorista</Label>
+                        <Label htmlFor={`driver-name-${set.id}`} className="text-xs text-muted-foreground">Motorista</Label>
                         <Input
                             id={`driver-name-${set.id}`}
                             value={set.driverName}
                             onChange={(e) => handleSetTextChange(e.target.value, set.id, "driverName")}
-                            placeholder="Nome do motorista"
+                            placeholder="Nome"
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor={`plate-${set.id}`}>Placa do Veículo</Label>
+                        <Label htmlFor={`plate-${set.id}`} className="text-xs text-muted-foreground">Placa</Label>
                         <Input
                             id={`plate-${set.id}`}
                             value={set.plate}
                             onChange={(e) => handleSetTextChange(e.target.value, set.id, "plate")}
-                            placeholder="Placa do veículo"
+                            placeholder="Placa"
                         />
                     </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2 col-span-2 md:col-span-1">
-                        <Label htmlFor={`gross-${set.id}`}>Bruto (kg)</Label>
-                        <Input
-                            id={`gross-${set.id}`}
-                            value={set.gross}
-                            onChange={(e) => handleInputChange(e.target.value, set.id, "gross")}
-                            placeholder="Peso inicial"
-                        />
-                    </div>
+                <div className="space-y-2">
+                    <Label htmlFor={`gross-${set.id}`} className="text-xs text-muted-foreground">Bruto (kg)</Label>
+                    <Input
+                        id={`gross-${set.id}`}
+                        value={set.gross}
+                        onChange={(e) => handleInputChange(e.target.value, set.id, "gross")}
+                        placeholder="Peso inicial"
+                    />
                 </div>
 
               {set.boxes.map((box) => (
-                <div key={box.id} className="space-y-4 rounded-lg border bg-background p-4 relative print:border-border">
+                <div key={box.id} className="space-y-3 rounded-lg border bg-background p-3 relative print:border-border">
                   <div className="flex items-center justify-between">
                     <Input 
                       value={box.name}
@@ -353,19 +348,18 @@ export function ScaleCalculator() {
                       </Button>
                     )}
                   </div>
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-4">
+                   <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-2">
-                        <Label htmlFor={`tare-${box.id}`}>Tara (kg)</Label>
+                        <Label htmlFor={`tare-${box.id}`} className="text-xs text-muted-foreground">Tara (kg)</Label>
                         <Input
                           id={`tare-${box.id}`}
                           value={box.tare}
                           onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'tare')}
-                          placeholder="Peso descarregado"
+                          placeholder="Peso"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor={`discount-${box.id}`}>Desconto (kg)</Label>
+                        <Label htmlFor={`discount-${box.id}`} className="text-xs text-muted-foreground">Desconto (kg)</Label>
                         <Input
                           id={`discount-${box.id}`}
                           value={box.discount}
@@ -373,52 +367,49 @@ export function ScaleCalculator() {
                           placeholder="Lixo, outros"
                         />
                       </div>
-                    </div>
-                    <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor={`container-${box.id}`}>Caçamba (kg)</Label>
+                        <Label htmlFor={`container-${box.id}`} className="text-xs text-muted-foreground">Caçamba (kg)</Label>
                         <Input
                           id={`container-${box.id}`}
                           value={box.container}
                           onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'container')}
-                          placeholder="Peso da caçamba"
+                          placeholder="Peso"
                         />
                       </div>
                       <div className="space-y-2">
-                          <Label className="text-accent-price font-semibold">Peso Líquido</Label>
-                          <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center print:bg-transparent print:border-accent-price">
+                          <Label className="text-accent-price font-semibold text-xs">Peso Líquido</Label>
+                          <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-sm font-bold text-accent-price h-10 flex items-center print:bg-transparent print:border-accent-price">
                               {formatNumber(box.net)} kg
                           </div>
                       </div>
-                    </div>
                   </div>
                 </div>
               ))}
-              <Button variant="outline" size="sm" onClick={() => addMaterialBox(set.id)} className="gap-2 print:hidden">
-                <PlusCircle />
+              <Button variant="outline" size="sm" onClick={() => addMaterialBox(set.id)} className="gap-2 print:hidden h-9">
+                <PlusCircle className="h-4 w-4"/>
                 Adicionar Material
               </Button>
             </CardContent>
           </Card>
         ))}
 
-        <div className="flex flex-col gap-4 print:hidden">
-            <Button variant="secondary" onClick={addWeighingSet} className="gap-2">
-                <PlusCircle />
-                Adicionar Conjunto de Pesagem (Bitrem)
+        <div className="flex flex-col gap-2 print:hidden">
+            <Button variant="secondary" onClick={addWeighingSet} className="gap-2 h-9">
+                <PlusCircle className="h-4 w-4" />
+                Adicionar Conjunto (Bitrem)
             </Button>
         </div>
 
         <Separator />
 
-        <div className="flex justify-end items-center gap-4 pt-4">
+        <div className="flex justify-end items-center gap-4 pt-2">
             <h3 className="text-lg font-semibold">Total Geral Líquido:</h3>
             <div className="text-2xl font-bold text-primary min-w-[150px] text-right">
                 {formatNumber(grandTotalNet)} kg
             </div>
         </div>
 
-        <div className="flex justify-end pt-4 gap-2 print:hidden">
+        <div className="flex justify-end pt-2 gap-2 print:hidden">
             <Button onClick={saveStateToLocalStorage} className="gap-2" variant="outline">
                 <Save />
                 Salvar Progresso

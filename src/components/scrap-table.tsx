@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import type { Category, ScrapItem } from "@/lib/data";
 import { Button } from "./ui/button";
-import { PlusCircle, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -124,62 +124,64 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen }: ScrapTab
             </Button>
           )}
         </div>
-        <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Adicionar Novo Item em {category.name}</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="material" className="text-right">
-                  Material
-                </Label>
-                <Input
-                  id="material"
-                  value={newMaterial}
-                  onChange={(e) => setNewMaterial(e.target.value)}
-                  className="col-span-3"
-                  placeholder="Ex: Inox 304"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="composition" className="text-right">
-                  Composição
-                </Label>
-                <Input
-                  id="composition"
-                  value={newComposition}
-                  onChange={(e) => setNewComposition(e.target.value)}
-                  className="col-span-3"
-                   placeholder="Ex: 18% Cr, 8% Ni"
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="price" className="text-right">
-                  Preço (R$/kg)
-                </Label>
-                <Input
-                  id="price"
-                  type="number"
-                  value={newPrice}
-                  onChange={(e) =>
-                    setNewPrice(
-                      e.target.value === "" ? "" : e.target.valueAsNumber
-                    )
-                  }
-                  className="col-span-3"
-                   placeholder="Ex: 8.50"
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">Cancelar</Button>
-              </DialogClose>
-              <Button onClick={handleAddItem}>Adicionar</Button>
-            </DialogFooter>
-          </DialogContent>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent>
+                <DialogHeader>
+                <DialogTitle>Adicionar Novo Item em {category.name}</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="material" className="text-right">
+                    Material
+                    </Label>
+                    <Input
+                    id="material"
+                    value={newMaterial}
+                    onChange={(e) => setNewMaterial(e.target.value)}
+                    className="col-span-3"
+                    placeholder="Ex: Inox 304"
+                    />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="composition" className="text-right">
+                    Composição
+                    </Label>
+                    <Input
+                    id="composition"
+                    value={newComposition}
+                    onChange={(e) => setNewComposition(e.target.value)}
+                    className="col-span-3"
+                    placeholder="Ex: 18% Cr, 8% Ni"
+                    />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="price" className="text-right">
+                    Preço (R$/kg)
+                    </Label>
+                    <Input
+                    id="price"
+                    type="number"
+                    value={newPrice}
+                    onChange={(e) =>
+                        setNewPrice(
+                        e.target.value === "" ? "" : e.target.valueAsNumber
+                        )
+                    }
+                    className="col-span-3"
+                    placeholder="Ex: 8.50"
+                    />
+                </div>
+                </div>
+                <DialogFooter>
+                <DialogClose asChild>
+                    <Button variant="outline">Cancelar</Button>
+                </DialogClose>
+                <Button onClick={handleAddItem}>Adicionar</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
       </div>
-      <div className="-mx-6 border-t">
+      <div className="-mx-6 -mt-4 border-t">
         <Table>
           <TableHeader>
              <TableRow className="bg-primary/5 hover:bg-primary/10 flex">

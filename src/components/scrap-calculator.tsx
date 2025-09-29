@@ -159,101 +159,91 @@ export function ScrapCalculator() {
   };
   
   return (
-    <Card className="border-0 shadow-none bg-transparent">
-      <CardHeader>
-          <div className="flex-1">
-            <CardTitle>Calculadora de Retalhos</CardTitle>
-            <CardDescription className="mt-2">
-              Preencha os campos para calcular o valor.
-            </CardDescription>
-          </div>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="flex justify-center">
-          <ToggleGroup
-            type="single"
-            value={shape}
-            onValueChange={handleShapeChange}
-            className="w-full grid grid-cols-2"
-          >
-            <ToggleGroupItem value="rectangle" aria-label="Retangular" className="h-12 text-base">
-              Retangular
-            </ToggleGroupItem>
-            <ToggleGroupItem value="disc" aria-label="Disco" className="h-12 text-base">
-              Disco
-            </ToggleGroupItem>
-          </ToggleGroup>
-        </div>
+    <div className="space-y-6">
+      <div className="flex justify-center">
+        <ToggleGroup
+          type="single"
+          value={shape}
+          onValueChange={handleShapeChange}
+          className="w-full grid grid-cols-2"
+        >
+          <ToggleGroupItem value="rectangle" aria-label="Retangular" className="h-12 text-base">
+            Retangular
+          </ToggleGroupItem>
+          <ToggleGroupItem value="disc" aria-label="Disco" className="h-12 text-base">
+            Disco
+          </ToggleGroupItem>
+        </ToggleGroup>
+      </div>
 
-        {shape === "rectangle" ? (
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="width">Largura(mm)</Label>
-              <Input id="width" type="text" inputMode="decimal" placeholder="Insira a largura" value={fields.width} onChange={(e) => handleInputChange('width', e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="thickness">Espessura(mm)</Label>
-              <Input id="thickness" type="text" inputMode="decimal" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="length">Compr.(mm)</Label>
-              <Input id="length" type="text" inputMode="decimal" placeholder="Insira o compr." value={fields.length} onChange={(e) => handleInputChange('length', e.target.value)} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
-                <Input
-                  id="scrap-price"
-                  type="text"
-                  inputMode="decimal"
-                  value={typeof scrapPrice === 'number' ? scrapPrice.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}).replace(/\./g, ',') : ""}
-                  onChange={(e) => handleScrapPriceChange(e.target.value)}
-                />
-            </div>
+      {shape === "rectangle" ? (
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="width">Largura(mm)</Label>
+            <Input id="width" type="text" inputMode="decimal" placeholder="Insira a largura" value={fields.width} onChange={(e) => handleInputChange('width', e.target.value)} />
           </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="diameter">Diâmetro(mm)</Label>
-              <Input id="diameter" type="text" inputMode="decimal" placeholder="Insira o diâmetro" value={fields.diameter} onChange={(e) => handleInputChange('diameter', e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="thickness">Espessura(mm)</Label>
-              <Input id="thickness" type="text" inputMode="decimal" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} />
-            </div>
-            <div className="space-y-2 col-span-2">
-                <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
-                <Input
-                  id="scrap-price"
-                  type="text"
-                  inputMode="decimal"
-                  value={typeof scrapPrice === 'number' ? scrapPrice.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}).replace(/\./g, ',') : ""}
-                  onChange={(e) => handleScrapPriceChange(e.target.value)}
-                />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="thickness">Espessura(mm)</Label>
+            <Input id="thickness" type="text" inputMode="decimal" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} />
           </div>
-        )}
-
-        <div className="grid grid-cols-3 gap-4 pt-4 border-t">
-            <div className="space-y-2">
-              <Label htmlFor="weight">Peso (kg)</Label>
-              <Input id="weight" type="text" inputMode="decimal" placeholder="Insira o peso" value={fields.weight} onChange={(e) => handleInputChange('weight', e.target.value)} />
-            </div>
-            <div className="space-y-2">
-                <Label>P. Real (kg)</Label>
-                <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-sm h-10 flex items-center text-muted-foreground">
-                {realWeight !== null ? realWeight.toFixed(2).replace('.', ',') : "..."}
-                </div>
-            </div>
-            <div className="space-y-2">
-                <Label className="text-accent-price font-semibold">
-                R$ Peça
-                </Label>
-                <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
-                {formatCurrency(finalPrice)}
-                </div>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="length">Compr.(mm)</Label>
+            <Input id="length" type="text" inputMode="decimal" placeholder="Insira o compr." value={fields.length} onChange={(e) => handleInputChange('length', e.target.value)} />
+          </div>
+          <div className="space-y-2">
+              <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
+              <Input
+                id="scrap-price"
+                type="text"
+                inputMode="decimal"
+                value={typeof scrapPrice === 'number' ? scrapPrice.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}).replace(/\./g, ',') : ""}
+                onChange={(e) => handleScrapPriceChange(e.target.value)}
+              />
+          </div>
         </div>
-      </CardContent>
-    </Card>
+      ) : (
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="diameter">Diâmetro(mm)</Label>
+            <Input id="diameter" type="text" inputMode="decimal" placeholder="Insira o diâmetro" value={fields.diameter} onChange={(e) => handleInputChange('diameter', e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="thickness">Espessura(mm)</Label>
+            <Input id="thickness" type="text" inputMode="decimal" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} />
+          </div>
+          <div className="space-y-2 col-span-2">
+              <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
+              <Input
+                id="scrap-price"
+                type="text"
+                inputMode="decimal"
+                value={typeof scrapPrice === 'number' ? scrapPrice.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}).replace(/\./g, ',') : ""}
+                onChange={(e) => handleScrapPriceChange(e.target.value)}
+              />
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-3 gap-4 pt-4 border-t">
+          <div className="space-y-2">
+            <Label htmlFor="weight">Peso (kg)</Label>
+            <Input id="weight" type="text" inputMode="decimal" placeholder="Insira o peso" value={fields.weight} onChange={(e) => handleInputChange('weight', e.target.value)} />
+          </div>
+          <div className="space-y-2">
+              <Label>P. Real (kg)</Label>
+              <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-sm h-10 flex items-center text-muted-foreground">
+              {realWeight !== null ? realWeight.toFixed(2).replace('.', ',') : "..."}
+              </div>
+          </div>
+          <div className="space-y-2">
+              <Label className="text-accent-price font-semibold">
+              R$ Peça
+              </Label>
+              <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
+              {formatCurrency(finalPrice)}
+              </div>
+          </div>
+      </div>
+    </div>
   );
 }

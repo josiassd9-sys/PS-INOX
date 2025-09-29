@@ -5,7 +5,6 @@ import * as React from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -91,7 +90,7 @@ export function ScaleCalculator() {
         });
       }
     } catch (error) {
-       console.error("Failed to load state from localStorage", error);
+      console.error("Failed to load state from localStorage", error);
        toast({
         variant: "destructive",
         title: "Erro ao Carregar",
@@ -268,14 +267,7 @@ export function ScaleCalculator() {
   };
 
   return (
-    <Card className="border-0 shadow-none bg-transparent" id="scale-calculator-printable-area">
-      <CardHeader className="print:pb-2">
-        <CardTitle>Balança</CardTitle>
-        <CardDescription className="print:hidden">
-          Insira os dados de pesagem para calcular o peso líquido.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div id="scale-calculator-printable-area" className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="customer-name">Nome do Cliente</Label>
           <Input
@@ -418,12 +410,6 @@ export function ScaleCalculator() {
                 Imprimir / Salvar PDF
             </Button>
         </div>
-
-      </CardContent>
-    </Card>
+    </div>
   );
 }
-
-    
-
-    

@@ -96,6 +96,34 @@ function DashboardComponent() {
   const weightUnitLabel = `Peso (kg/${unitLabel})`;
   const priceUnitLabel = `Preço (R$/${unitLabel})`;
 
+  const renderContent = () => {
+    if (searchTerm) {
+      return (
+        <GlobalSearchResults 
+          categories={filteredCategories}
+          sellingPrice={sellingPrice}
+          searchTerm={searchTerm}
+        />
+      );
+    }
+    if (isScrapCategory) {
+      return <ScrapCalculator />;
+    }
+    if (isPackageCheckerCategory) {
+      return <PackageChecker />;
+    }
+    if (isScaleCategory) {
+      return <ScaleCalculator />;
+    }
+    return (
+      <ItemTable 
+        category={selectedCategory} 
+        sellingPrice={sellingPrice}
+        showTableHeader={false}
+      />
+    );
+  }
+
   return (
     <>
       <Sidebar>
@@ -127,6 +155,10 @@ function DashboardComponent() {
             <header className="flex items-center justify-between gap-4 p-4 border-b">
               <div className="flex items-center gap-2">
                 <SidebarTrigger className="md:hidden"/>
+                <div className="hidden md:block">
+                  <h2 className="text-lg font-semibold">{searchTerm ? 'Resultados da Busca' : selectedCategory.name}</h2>
+                  <p className="text-sm text-muted-foreground">{searchTerm ? `Buscando por "${searchTerm}"` : selectedCategory.description}</p>
+                </div>
               </div>
               <div className="relative flex-1">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -176,33 +208,9 @@ function DashboardComponent() {
                 </div>
               )}
               <div className="flex-1 overflow-y-auto">
-                {searchTerm ? (
-                  <div className="p-4 md:p-6">
-                    <GlobalSearchResults 
-                      categories={filteredCategories}
-                      sellingPrice={sellingPrice}
-                      searchTerm={searchTerm}
-                    />
-                  </div>
-                ) : isScrapCategory ? (
-                  <div className="p-4 md:p-6">
-                    <ScrapCalculator />
-                  </div>
-                ) : isPackageCheckerCategory ? (
-                  <div className="p-4 md:p-6">
-                    <PackageChecker />
-                  </div>
-                ) : isScaleCategory ? (
-                  <div className="p-4 md:p-6">
-                    <ScaleCalculator />
-                  </div>
-                ) : (
-                  <ItemTable 
-                    category={selectedCategory} 
-                    sellingPrice={sellingPrice}
-                    showTableHeader={false}
-                  />
-                )}
+                <div className="p-4 md:p-6">
+                 {renderContent()}
+                </div>
               </div>
             </div>
           </div>

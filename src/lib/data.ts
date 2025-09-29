@@ -49,6 +49,7 @@ export type SteelItem = {
 export type Category = {
   id: string;
   name: string;
+  description: string;
   items: SteelItem[];
   icon: string;
   unit: 'm' | 'm²' | 'un' | 'calc';
@@ -124,6 +125,7 @@ export const CATEGORIES: Category[] = [
   {
     id: 'retalhos',
     name: 'Retalhos',
+    description: 'Preencha os campos para calcular o valor.',
     icon: 'Scissors',
     unit: 'calc',
     items: [],
@@ -131,6 +133,7 @@ export const CATEGORIES: Category[] = [
   {
     id: 'package-checker',
     name: 'Conferência',
+    description: 'Selecione item e insira os dados para calculo de metragem e custo.',
     icon: 'PackageCheck',
     unit: 'calc',
     items: [],
@@ -138,6 +141,7 @@ export const CATEGORIES: Category[] = [
   {
     id: 'balanca',
     name: 'Balança',
+    description: 'Insira os dados de pesagem para calcular o peso líquido.',
     icon: 'Weight',
     unit: 'calc',
     items: [],
@@ -145,6 +149,7 @@ export const CATEGORIES: Category[] = [
   {
     id: 'tubos-od',
     name: 'Tubos OD',
+    description: 'Tubos redondos com medidas em polegadas e parede em milímetros.',
     icon: 'Minus',
     unit: 'm',
     items: [
@@ -211,6 +216,7 @@ export const CATEGORIES: Category[] = [
   {
     id: 'chapas',
     name: 'Chapas',
+    description: 'Chapas de aço inoxidável em diversas espessuras e dimensões.',
     icon: 'Square',
     unit: 'un',
     items: generateChapas(),
@@ -218,6 +224,7 @@ export const CATEGORIES: Category[] = [
   {
     id: 'barras-redondas',
     name: 'Barras Redondas',
+    description: 'Barras redondas maciças em diversas bitolas.',
     icon: 'Circle',
     unit: 'm',
     items: [
@@ -263,6 +270,7 @@ export const CATEGORIES: Category[] = [
   {
     id: 'barra-quadrada',
     name: 'Barra Quadrada',
+    description: 'Barras quadradas maciças em diversas bitolas.',
     icon: 'Square',
     unit: 'm',
     items: [
@@ -296,6 +304,7 @@ export const CATEGORIES: Category[] = [
   {
     id: 'barra-sextavada',
     name: 'Barra Sextavada',
+    description: 'Barras sextavadas maciças em diversas bitolas.',
     icon: 'Hexagon',
     unit: 'm',
     items: [
@@ -329,6 +338,7 @@ export const CATEGORIES: Category[] = [
   {
     id: 'tubos-schedule',
     name: 'Tubos Schedule',
+    description: 'Tubos redondos para condução de fluídos, norma Schedule.',
     icon: 'Layers',
     unit: 'm',
     items: [
@@ -394,6 +404,7 @@ export const CATEGORIES: Category[] = [
   {
     id: 'cantoneiras',
     name: 'Cantoneiras',
+    description: 'Cantoneiras em "L" com diversas medidas.',
     icon: 'FlipHorizontal',
     unit: 'm',
     items: [
@@ -420,6 +431,7 @@ export const CATEGORIES: Category[] = [
   {
     id: 'barras-chatas',
     name: 'Barras Chatas',
+    description: 'Barras chatas (retangulares) em diversas medidas.',
     icon: 'RectangleHorizontal',
     unit: 'm',
     items: [
@@ -456,6 +468,7 @@ export const CATEGORIES: Category[] = [
   {
     id: 'metalon-quadrado',
     name: 'Metalon Quadrado',
+    description: 'Tubos quadrados (metalon) em diversas medidas.',
     icon: 'Square',
     unit: 'm',
     items: [
@@ -489,6 +502,7 @@ export const CATEGORIES: Category[] = [
   {
     id: 'metalon-retangular',
     name: 'Metalon Retangular',
+    description: 'Tubos retangulares (metalon) em diversas medidas.',
     icon: 'RectangleHorizontal',
     unit: 'm',
     items: [

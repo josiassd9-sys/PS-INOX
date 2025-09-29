@@ -91,9 +91,9 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
   const priceUnitLabel = `R$/${unitLabel}`;
 
   return (
-    <Card className="border-0 shadow-none bg-transparent">
-      <div className="flex items-center justify-between p-6 pb-4">
-        <CardTitle>{category.name}</CardTitle>
+    <>
+    <div className="flex items-center justify-between -mt-6 -mx-6 mb-4 p-6 pb-0">
+        <div/>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" className="h-8 gap-1">
@@ -145,72 +145,70 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
           </DialogContent>
         </Dialog>
       </div>
-      <CardContent className="p-0">
-        <div className="border-t">
-          <Table>
-            {showTableHeader && (
-              <TableHeader>
-                <TableRow className="bg-primary/5 hover:bg-primary/10">
-                  <TableHead className="flex-1">Descrição</TableHead>
-                  <TableHead className="w-1/3 text-center">
-                    Peso ({weightUnitLabel})
-                  </TableHead>
-                  <TableHead className="w-1/3 text-right font-semibold text-primary">
-                    Preço ({priceUnitLabel})
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-            )}
-            <TableBody>
-              {filteredItems.map((item) => {
-                 const itemPrice = category.unit === 'm' ? Math.ceil(item.weight * sellingPrice) : item.weight * sellingPrice;
-                 const isSelected = selectedItemId === item.id;
-                return (
-                    <React.Fragment key={item.id}>
-                        <TableRow 
-                            onClick={() => handleRowClick(item.id)}
-                            className={cn(
-                                'even:bg-primary/5 odd:bg-transparent',
-                                'flex items-center',
-                                category.unit === 'm' && 'cursor-pointer',
-                                isSelected && 'bg-primary/20 hover:bg-primary/20',
-                                category.unit !== 'm' && 'hover:bg-primary/10',
-                            )}
-                            >
-                            <TableCell className="flex-1 px-8">{item.description}</TableCell>
-                            <TableCell className="w-1/3 text-center px-8">
-                                {formatNumber(item.weight, 3)}
-                            </TableCell>
-                            <TableCell className="w-1/3 text-right font-medium text-primary px-8">
-                                <div className="flex items-center justify-end gap-2">
-                                  <span>{formatCurrency(itemPrice)}</span>
-                                </div>
-                                {category.unit === 'm' && (
-                                    <div className="text-xs text-muted-foreground font-normal">
-                                        {formatCurrency(itemPrice * 6)} / barra
-                                    </div>
-                                )}
-                            </TableCell>
-                        </TableRow>
-                        {isSelected && category.unit === 'm' && (
-                             <TableRow>
-                                <TableCell colSpan={3} className="p-0">
-                                    <div className="p-4 bg-primary/5">
-                                    <CutPriceCalculator
-                                        selectedItem={item}
-                                        sellingPrice={sellingPrice}
-                                        onClose={() => setSelectedItemId(null)}
-                                    />
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </React.Fragment>
-              )})}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+      <div className="-mx-6 -mt-6 border-t">
+        <Table>
+          {showTableHeader && (
+            <TableHeader>
+              <TableRow className="bg-primary/5 hover:bg-primary/10">
+                <TableHead className="flex-1">Descrição</TableHead>
+                <TableHead className="w-1/3 text-center">
+                  Peso ({weightUnitLabel})
+                </TableHead>
+                <TableHead className="w-1/3 text-right font-semibold text-primary">
+                  Preço ({priceUnitLabel})
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+          )}
+          <TableBody>
+            {filteredItems.map((item) => {
+                const itemPrice = category.unit === 'm' ? Math.ceil(item.weight * sellingPrice) : item.weight * sellingPrice;
+                const isSelected = selectedItemId === item.id;
+              return (
+                  <React.Fragment key={item.id}>
+                      <TableRow 
+                          onClick={() => handleRowClick(item.id)}
+                          className={cn(
+                              'even:bg-primary/5 odd:bg-transparent',
+                              'flex items-center',
+                              category.unit === 'm' && 'cursor-pointer',
+                              isSelected && 'bg-primary/20 hover:bg-primary/20',
+                              category.unit !== 'm' && 'hover:bg-primary/10',
+                          )}
+                          >
+                          <TableCell className="flex-1 px-8">{item.description}</TableCell>
+                          <TableCell className="w-1/3 text-center px-8">
+                              {formatNumber(item.weight, 3)}
+                          </TableCell>
+                          <TableCell className="w-1/3 text-right font-medium text-primary px-8">
+                              <div className="flex items-center justify-end gap-2">
+                                <span>{formatCurrency(itemPrice)}</span>
+                              </div>
+                              {category.unit === 'm' && (
+                                  <div className="text-xs text-muted-foreground font-normal">
+                                      {formatCurrency(itemPrice * 6)} / barra
+                                  </div>
+                              )}
+                          </TableCell>
+                      </TableRow>
+                      {isSelected && category.unit === 'm' && (
+                            <TableRow>
+                              <TableCell colSpan={3} className="p-0">
+                                  <div className="p-4 bg-primary/5">
+                                  <CutPriceCalculator
+                                      selectedItem={item}
+                                      sellingPrice={sellingPrice}
+                                      onClose={() => setSelectedItemId(null)}
+                                  />
+                                  </div>
+                              </TableCell>
+                          </TableRow>
+                      )}
+                  </React.Fragment>
+            )})}
+          </TableBody>
+        </Table>
+      </div>
+      </>
   );
 }

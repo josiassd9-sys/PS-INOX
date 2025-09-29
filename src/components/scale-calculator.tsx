@@ -290,7 +290,7 @@ export function ScaleCalculator() {
           <Card key={set.id} className="bg-card/50 pt-2 print:shadow-none print:border-border">
             <CardHeader className="flex-row items-center justify-between pt-2 pb-2">
                 <div className="space-y-1 flex-1">
-                    <CardTitle className="text-lg">Conjunto {setIndex + 1}</CardTitle>
+                    <CardTitle className="text-lg">Pesagem {setIndex + 1}</CardTitle>
                 </div>
               {weighingSets.length > 1 && (
                 <Button variant="ghost" size="icon" onClick={() => removeWeighingSet(set.id)} className="print:hidden h-8 w-8">
@@ -298,7 +298,7 @@ export function ScaleCalculator() {
                 </Button>
               )}
             </CardHeader>
-            <CardContent className="space-y-3 p-4 pt-0">
+            <CardContent className="space-y-3 p-3 pt-0">
                 <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-2">
                         <Label htmlFor={`driver-name-${set.id}`} className="text-xs text-muted-foreground">Motorista</Label>
@@ -391,7 +391,7 @@ export function ScaleCalculator() {
         <div className="flex flex-col gap-2 print:hidden">
             <Button variant="secondary" onClick={addWeighingSet} className="gap-2 h-9">
                 <PlusCircle className="h-4 w-4" />
-                Adicionar Conjunto (Bitrem)
+                Adicionar Pesagem (Bitrem)
             </Button>
         </div>
 
@@ -423,5 +423,7 @@ export function ScaleCalculator() {
     </Card>
   );
 }
+
+    
 
     

@@ -185,6 +185,8 @@ export function PackageChecker() {
                       <Label htmlFor="package-weight" className="text-xs text-muted-foreground">Peso Total (kg)</Label>
                       <Input
                           id="package-weight"
+                          type="text"
+                          inputMode="decimal"
                           placeholder="Peso Total (kg)"
                           value={packageWeight}
                           onChange={(e) => handleInputChange(setPackageWeight, e.target.value, 'weight')}
@@ -195,6 +197,8 @@ export function PackageChecker() {
                       <div className="relative">
                           <Input
                               id="invoice-percentage"
+                              type="text"
+                              inputMode="decimal"
                               placeholder="% da Nota"
                               value={invoicePercentage}
                               onChange={(e) => handleInputChange(setInvoicePercentage, e.target.value)}
@@ -209,6 +213,8 @@ export function PackageChecker() {
                       <Label htmlFor="total-price" className="text-xs text-muted-foreground">Valor Total Pago (R$)</Label>
                       <Input
                           id="total-price"
+                          type="text"
+                          inputMode="decimal"
                           placeholder="Valor Total Pago (R$)"
                           value={totalPrice}
                           onChange={(e) => handleInputChange(setTotalPrice, e.target.value, 'total')}
@@ -218,6 +224,8 @@ export function PackageChecker() {
                       <Label htmlFor="price-per-kg" className="text-xs text-muted-foreground">R$/Kg</Label>
                       <Input
                           id="price-per-kg"
+                          type="text"
+                          inputMode="decimal"
                           placeholder="R$/Kg"
                           value={pricePerKg}
                           onChange={(e) => handleInputChange(setPricePerKg, e.target.value, 'perKg')}
@@ -238,6 +246,8 @@ export function PackageChecker() {
                       <Label htmlFor="total-length" className="text-xs text-muted-foreground">Qtd. MT</Label>
                       <Input
                           id="total-length"
+                          type="text"
+                          inputMode="decimal"
                           placeholder="Metragem Total (m)"
                           value={totalLength}
                           onChange={(e) => handleInputChange(setTotalLength, e.target.value, 'length')}
@@ -271,3 +281,5 @@ export function PackageChecker() {
     </div>
   );
 }
+
+    

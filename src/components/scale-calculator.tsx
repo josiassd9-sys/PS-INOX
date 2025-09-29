@@ -315,6 +315,8 @@ export function ScaleCalculator() {
                     <Label htmlFor={`gross-${set.id}`} className="text-xs text-muted-foreground">Bruto (kg)</Label>
                     <Input
                         id={`gross-${set.id}`}
+                        type="text"
+                        inputMode="decimal"
                         value={set.gross}
                         onChange={(e) => handleInputChange(e.target.value, set.id, "gross")}
                         placeholder="Peso inicial"
@@ -340,6 +342,8 @@ export function ScaleCalculator() {
                         <Label htmlFor={`tare-${box.id}`} className="text-xs text-muted-foreground">Tara (kg)</Label>
                         <Input
                           id={`tare-${box.id}`}
+                          type="text"
+                          inputMode="decimal"
                           value={box.tare}
                           onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'tare')}
                           placeholder="Peso"
@@ -349,6 +353,8 @@ export function ScaleCalculator() {
                         <Label htmlFor={`discount-${box.id}`} className="text-xs text-muted-foreground">Desconto (kg)</Label>
                         <Input
                           id={`discount-${box.id}`}
+                          type="text"
+                          inputMode="decimal"
                           value={box.discount}
                           onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'discount')}
                           placeholder="Lixo, outros"
@@ -358,6 +364,8 @@ export function ScaleCalculator() {
                         <Label htmlFor={`container-${box.id}`} className="text-xs text-muted-foreground">Caçamba (kg)</Label>
                         <Input
                           id={`container-${box.id}`}
+                          type="text"
+                          inputMode="decimal"
                           value={box.container}
                           onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'container')}
                           placeholder="Peso"
@@ -413,5 +421,7 @@ export function ScaleCalculator() {
     </div>
   );
 }
+
+    
 
     

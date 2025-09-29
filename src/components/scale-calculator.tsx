@@ -220,38 +220,42 @@ export function ScaleCalculator() {
                         <Trash2 className="text-destructive h-4 w-4"/>
                      </Button>
                   )}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor={`tare-${box.id}`}>Tara (kg)</Label>
-                      <Input
-                        id={`tare-${box.id}`}
-                        value={box.tare}
-                        onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'tare')}
-                        placeholder="Peso descarregado"
-                      />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor={`tare-${box.id}`}>Tara (kg)</Label>
+                          <Input
+                            id={`tare-${box.id}`}
+                            value={box.tare}
+                            onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'tare')}
+                            placeholder="Peso descarregado"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor={`discount-${box.id}`}>Desconto (kg)</Label>
+                          <Input
+                            id={`discount-${box.id}`}
+                            value={box.discount}
+                            onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'discount')}
+                            placeholder="Lixo, outros"
+                          />
+                        </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor={`discount-${box.id}`}>Desconto (kg)</Label>
-                      <Input
-                        id={`discount-${box.id}`}
-                        value={box.discount}
-                        onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'discount')}
-                        placeholder="Lixo, outros"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor={`container-${box.id}`}>Caçamba (kg)</Label>
-                      <Input
-                        id={`container-${box.id}`}
-                        value={box.container}
-                        onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'container')}
-                        placeholder="Peso da caçamba"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                        <Label className="text-accent-price font-semibold">Peso Líquido</Label>
-                        <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
-                            {formatNumber(box.net)} kg
+                    <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor={`container-${box.id}`}>Caçamba (kg)</Label>
+                          <Input
+                            id={`container-${box.id}`}
+                            value={box.container}
+                            onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'container')}
+                            placeholder="Peso da caçamba"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-accent-price font-semibold">Peso Líquido</Label>
+                            <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
+                                {formatNumber(box.net)} kg
+                            </div>
                         </div>
                     </div>
                   </div>

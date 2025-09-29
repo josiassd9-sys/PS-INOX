@@ -186,7 +186,7 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen }: ScrapTab
           <TableHeader>
              <TableRow className="bg-primary/5 hover:bg-primary/10 flex">
                 <TableHead className="flex-1 px-8">Material (Composição)</TableHead>
-                <TableHead className="w-1/3 text-right font-semibold text-primary px-8">
+                <TableHead className="w-40 text-right font-semibold text-primary px-4">
                   Preço (R$/kg)
                 </TableHead>
                  <TableHead className="w-12 px-2"></TableHead>
@@ -199,7 +199,7 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen }: ScrapTab
                   <div className="font-medium">{item.material}</div>
                   <div className="text-xs text-muted-foreground">{item.composition}</div>
                 </TableCell>
-                <TableCell className="w-1/3 text-right font-medium text-primary px-8">
+                <TableCell className="w-40 text-right font-medium text-primary px-4">
                     <Input
                         type="text"
                         inputMode="decimal"

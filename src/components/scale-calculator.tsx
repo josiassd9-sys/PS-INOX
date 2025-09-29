@@ -47,7 +47,6 @@ export function ScaleCalculator() {
     value: string,
     setId: string,
     field: keyof Omit<WeighingSet, "boxes" | "totalNet" | "id">,
-    boxId?: string
   ) => {
     const sanitizedValue = value.replace(/[^0-9,]/g, "").replace(",", ".");
     if (/^\d*\.?\d*$/.test(sanitizedValue)) {
@@ -55,12 +54,6 @@ export function ScaleCalculator() {
       setWeighingSets((prevSets) =>
         prevSets.map((set) => {
           if (set.id !== setId) return set;
-          if (boxId) {
-            const updatedBoxes = set.boxes.map((box) =>
-              box.id === boxId ? { ...box, [field]: newValue } : box
-            );
-            return { ...set, boxes: updatedBoxes };
-          }
           return { ...set, [field]: newValue };
         })
       );
@@ -68,7 +61,6 @@ export function ScaleCalculator() {
   };
   
   const handleBoxInputChange = (value: string, setId: string, boxId: string, field: keyof Omit<MaterialBox, 'id' | 'net'>) => {
-    
     if (field === 'name') {
       setWeighingSets(prevSets => prevSets.map(set => {
         if (set.id !== setId) return set;
@@ -97,15 +89,26 @@ export function ScaleCalculator() {
   React.useEffect(() => {
     setWeighingSets((prevSets) =>
       prevSets.map((set) => {
-        const gross = parseFloat(set.gross.replace(",", ".")) || 0;
-        const updatedBoxes = set.boxes.map((box) => {
+        let currentGross = parseFloat(set.gross.replace(",", ".")) || 0;
+        
+        const updatedBoxes = set.boxes.map((box, index) => {
           const tare = parseFloat(box.tare.replace(",", ".")) || 0;
           const discount = parseFloat(box.discount.replace(",", ".")) || 0;
           const container = parseFloat(box.container.replace(",", ".")) || 0;
-          const net = gross - tare - discount - container;
+
+          // For the first box, use the set's gross weight.
+          // For subsequent boxes, use the previous box's tare weight.
+          const grossForThisBox = index === 0 ? currentGross : parseFloat(set.boxes[index - 1].tare.replace(",", ".")) || 0;
+          
+          let net = 0;
+          if (grossForThisBox > 0 && tare > 0 && grossForThisBox >= tare) {
+              net = grossForThisBox - tare - discount - container;
+          }
+
           return { ...box, net };
         });
-        const totalNet = updatedBoxes.reduce((acc, box) => acc + box.net, 0);
+
+        const totalNet = updatedBoxes.reduce((acc, box) => acc + (box.net > 0 ? box.net : 0), 0);
         return { ...set, boxes: updatedBoxes, totalNet };
       })
     );
@@ -307,5 +310,3 @@ export function ScaleCalculator() {
     </Card>
   );
 }
-
-    

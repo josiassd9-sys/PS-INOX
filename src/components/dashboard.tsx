@@ -34,6 +34,7 @@ import { ScaleCalculator } from "./scale-calculator";
 import { ScrapTable } from "./scrap-table";
 import { cn } from "@/lib/utils";
 import { AstmStandards } from "./astm-standards";
+import { ManufacturingProcesses } from "./manufacturing-processes";
 
 function DashboardComponent() {
   const [costPrice, setCostPrice] = React.useState(30);
@@ -96,8 +97,9 @@ function DashboardComponent() {
   const isScaleCategory = selectedCategoryId === 'balanca';
   const isScrapTableCategory = selectedCategoryId === 'tabela-sucata';
   const isAstmStandardsCategory = selectedCategoryId === 'normas-astm';
+  const isManufacturingProcessesCategory = selectedCategoryId === 'processos-fabricacao';
   
-  const showCustomHeader = !searchTerm && !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory;
+  const showCustomHeader = !searchTerm && !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory;
   const unitLabel = selectedCategory.unit === "m" ? "m" : selectedCategory.unit === 'm²' ? "m²" : "un";
   const weightUnitLabel = `Peso (kg/${unitLabel})`;
   const priceUnitLabel = `Preço (R$/${unitLabel})`;
@@ -131,6 +133,9 @@ function DashboardComponent() {
     }
     if (isAstmStandardsCategory) {
         return <AstmStandards />;
+    }
+    if (isManufacturingProcessesCategory) {
+        return <ManufacturingProcesses />;
     }
     return (
       <ItemTable 
@@ -191,7 +196,7 @@ function DashboardComponent() {
                   />
               </div>
               <div className="flex items-center gap-2">
-                {!isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && (
+                {!isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && (
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm" className="gap-2">

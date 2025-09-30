@@ -662,6 +662,14 @@ export const CATEGORIES: Category[] = [
     icon: 'Book',
     unit: 'calc',
     items: [],
+  },
+  {
+    id: 'processos-fabricacao',
+    name: 'Processos',
+    description: 'Processos de produção e trabalho com aço inoxidável.',
+    icon: 'Factory',
+    unit: 'calc',
+    items: [],
   }
 ];
     
@@ -673,5 +681,6 @@ export const CATEGORIES: Category[] = [
     
 
     
+
 
 

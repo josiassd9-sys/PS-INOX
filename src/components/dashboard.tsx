@@ -101,7 +101,7 @@ function DashboardComponent() {
   const priceUnitLabel = `Preço (R$/${unitLabel})`;
 
   const renderContent = () => {
-    if (searchTerm) {
+    if (searchTerm && !isScrapTableCategory) {
       return (
         <GlobalSearchResults 
           categories={filteredCategories as any}
@@ -124,6 +124,7 @@ function DashboardComponent() {
           category={selectedCategory as any}
           isDialogOpen={isScrapItemDialogOpen}
           setIsDialogOpen={setIsScrapItemDialogOpen}
+          searchTerm={searchTerm}
          />;
     }
     return (
@@ -165,13 +166,13 @@ function DashboardComponent() {
           <div className="bg-background rounded-lg border flex-1 flex flex-col overflow-hidden">
             <header className={cn(
               "flex items-center justify-between gap-4 p-4 border-b",
-              isScrapTableCategory && !searchTerm && "mb-4"
+              isScrapTableCategory && "mb-4"
             )}>
               <div className="flex items-center gap-2">
                 <SidebarTrigger className="md:hidden"/>
                 <div className="hidden md:block">
-                  <h2 className="text-lg font-semibold">{searchTerm ? 'Resultados da Busca' : selectedCategory.name}</h2>
-                  <p className="text-sm text-muted-foreground">{searchTerm ? `Buscando por "${searchTerm}"` : selectedCategory.description}</p>
+                  <h2 className="text-lg font-semibold">{searchTerm && !isScrapTableCategory ? 'Resultados da Busca' : selectedCategory.name}</h2>
+                  <p className="text-sm text-muted-foreground">{searchTerm && !isScrapTableCategory ? `Buscando por "${searchTerm}"` : selectedCategory.description}</p>
                 </div>
               </div>
               <div className="relative flex-1">

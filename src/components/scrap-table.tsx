@@ -28,11 +28,12 @@ interface ScrapTableProps {
   category: Category;
   isDialogOpen: boolean;
   setIsDialogOpen: (open: boolean) => void;
+  searchTerm: string;
 }
 
 const LOCAL_STORAGE_HIDDEN_KEY = "scrapTableHiddenItems";
 
-export function ScrapTable({ category, isDialogOpen, setIsDialogOpen }: ScrapTableProps) {
+export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm }: ScrapTableProps) {
   const [allItems, setAllItems] = React.useState<ScrapItem[]>(category.items as ScrapItem[]);
   const [hiddenItemIds, setHiddenItemIds] = React.useState<Set<string>>(new Set());
   
@@ -108,7 +109,18 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen }: ScrapTab
     }));
   }
 
-  const visibleItems = allItems.filter(item => !hiddenItemIds.has(item.id));
+  const filteredAndVisibleItems = React.useMemo(() => {
+    const visibleItems = allItems.filter(item => !hiddenItemIds.has(item.id));
+    if (!searchTerm) {
+      return visibleItems;
+    }
+    return visibleItems.filter(item => 
+      item.material.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.composition.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [allItems, hiddenItemIds, searchTerm]);
+
+
   const hasHiddenItems = hiddenItemIds.size > 0;
 
   return (
@@ -194,40 +206,43 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen }: ScrapTab
               </TableRow>
           </TableHeader>
           <TableBody>
-            {visibleItems.map((item) => (
-              <TableRow key={item.id} className="even:bg-primary/5 odd:bg-transparent flex items-center">
-                <TableCell className="flex-1 px-8">
-                  <div className="font-medium">{item.material}</div>
-                  <div className="text-xs text-muted-foreground">{item.composition}</div>
-                </TableCell>
-                <TableCell className="w-32 text-right font-medium text-primary px-2">
-                    <Input
-                        type="text"
-                        inputMode="decimal"
-                        value={item.price.toFixed(2).replace('.', ',')}
-                        onBlur={(e) => handlePriceChange(item.id, e.target.value)}
-                        onChange={(e) => {
-                            const value = e.target.value;
-                            setAllItems(prevItems => prevItems.map(i => i.id === item.id ? {...i, price: parseFloat(value.replace(',', '.')) || 0} : i))
-                        }}
-                        className="h-8 text-right border-primary/20 bg-transparent"
-                    />
-                </TableCell>
-                <TableCell className="w-12 px-2">
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => toggleItemVisibility(item.id)}>
-                        <Icon name={hiddenItemIds.has(item.id) ? "EyeOff" : "Eye"} className="h-4 w-4 text-muted-foreground" />
-                    </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-             {hasHiddenItems && visibleItems.length === 0 && (
-                <TableRow className="odd:bg-transparent">
-                  <TableCell colSpan={3} className="text-center text-muted-foreground py-4">
-                    <button onClick={showAllItems} className="flex items-center gap-2 mx-auto text-sm hover:text-primary">
-                       <Icon name="Eye" />
-                       Todos os {hiddenItemIds.size} {hiddenItemIds.size > 1 ? "itens estão ocultos" : "item está oculto"}. Clique para reexibir.
-                    </button>
-                  </TableCell>
+            {filteredAndVisibleItems.length > 0 ? (
+                filteredAndVisibleItems.map((item) => (
+                <TableRow key={item.id} className="even:bg-primary/5 odd:bg-transparent flex items-center">
+                    <TableCell className="flex-1 px-8">
+                    <div className="font-medium">{item.material}</div>
+                    <div className="text-xs text-muted-foreground">{item.composition}</div>
+                    </TableCell>
+                    <TableCell className="w-32 text-right font-medium text-primary px-2">
+                        <Input
+                            type="text"
+                            inputMode="decimal"
+                            value={item.price.toFixed(2).replace('.', ',')}
+                            onBlur={(e) => handlePriceChange(item.id, e.target.value)}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                setAllItems(prevItems => prevItems.map(i => i.id === item.id ? {...i, price: parseFloat(value.replace(',', '.')) || 0} : i))
+                            }}
+                            className="h-8 text-right border-primary/20 bg-transparent"
+                        />
+                    </TableCell>
+                    <TableCell className="w-12 px-2">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => toggleItemVisibility(item.id)}>
+                            <Icon name={hiddenItemIds.has(item.id) ? "EyeOff" : "Eye"} className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                    </TableCell>
+                </TableRow>
+                ))
+            ) : (
+                <TableRow>
+                    <TableCell colSpan={3} className="text-center text-muted-foreground py-10">
+                    {searchTerm ? `Nenhum item encontrado para "${searchTerm}"` : (
+                        <button onClick={showAllItems} className="flex items-center gap-2 mx-auto text-sm hover:text-primary">
+                        <Icon name="Eye" />
+                        Todos os {hiddenItemIds.size} {hiddenItemIds.size > 1 ? "itens estão ocultos" : "item está oculto"}. Clique para reexibir.
+                        </button>
+                    )}
+                    </TableCell>
                 </TableRow>
             )}
           </TableBody>

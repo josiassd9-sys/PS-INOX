@@ -655,6 +655,14 @@ export const CATEGORIES: Category[] = [
         { id: 'mr-150x50-3.0', description: 'Metalon 150x50 x 3.00mm', weight: calculateRectangularTubeWeight(150, 50, 3.0) },
     ]
   },
+  {
+    id: 'normas-astm',
+    name: 'Normas ASTM',
+    description: 'Guia de normas técnicas para aço inoxidável.',
+    icon: 'Book',
+    unit: 'calc',
+    items: [],
+  }
 ];
     
     
@@ -665,4 +673,5 @@ export const CATEGORIES: Category[] = [
     
 
     
+
 

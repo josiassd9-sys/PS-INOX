@@ -33,6 +33,7 @@ import { PackageChecker } from "./package-checker";
 import { ScaleCalculator } from "./scale-calculator";
 import { ScrapTable } from "./scrap-table";
 import { cn } from "@/lib/utils";
+import { AstmStandards } from "./astm-standards";
 
 function DashboardComponent() {
   const [costPrice, setCostPrice] = React.useState(30);
@@ -94,8 +95,9 @@ function DashboardComponent() {
   const isPackageCheckerCategory = selectedCategoryId === 'package-checker';
   const isScaleCategory = selectedCategoryId === 'balanca';
   const isScrapTableCategory = selectedCategoryId === 'tabela-sucata';
+  const isAstmStandardsCategory = selectedCategoryId === 'normas-astm';
   
-  const showCustomHeader = !searchTerm && !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory;
+  const showCustomHeader = !searchTerm && !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory;
   const unitLabel = selectedCategory.unit === "m" ? "m" : selectedCategory.unit === 'm²' ? "m²" : "un";
   const weightUnitLabel = `Peso (kg/${unitLabel})`;
   const priceUnitLabel = `Preço (R$/${unitLabel})`;
@@ -126,6 +128,9 @@ function DashboardComponent() {
           setIsDialogOpen={setIsScrapItemDialogOpen}
           searchTerm={searchTerm}
          />;
+    }
+    if (isAstmStandardsCategory) {
+        return <AstmStandards />;
     }
     return (
       <ItemTable 
@@ -186,7 +191,7 @@ function DashboardComponent() {
                   />
               </div>
               <div className="flex items-center gap-2">
-                {!isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && (
+                {!isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && (
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm" className="gap-2">

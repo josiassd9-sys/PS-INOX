@@ -162,7 +162,7 @@ const scrapItems: ScrapItem[] = [
 
   // Cobre
   { id: 'scrap-cu-1', material: 'Sucata Cobre Misto (Tubos, Chapas)', composition: 'Peças de cobre diversas, pode conter solda', price: 35.00 },
-  { id: 'scrap-cu-2', material: 'Sucata Cobre (Fio 1ª qualidade)', composition: 'Fios e cabos limpos, sem impurezas', price: 40.00 },
+  { id: 'scrap-cu-2', material: 'Sucata Fio de Cobre (1ª qualidade)', composition: 'Fios e cabos limpos, sem impurezas', price: 40.00 },
   { id: 'scrap-cu-3', material: 'Cavaco de Cobre', composition: 'Varia conforme a usinagem', price: 30.00 },
 
   // Latão e Bronze
@@ -204,29 +204,29 @@ const scrapItems: ScrapItem[] = [
 ];
 
 const tubosAliancaItems: SteelItem[] = [
-  { id: 'ta-21.3-2.00', description: 'Tubo DIN 21,30mm x 2.00mm', weight: (21.30 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-21.3-2.35', description: 'Tubo DIN 21,30mm x 2.35mm', weight: (21.30 - 2.35) * 2.35 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-26.9-2.00', description: 'Tubo DIN 26,90mm x 2.00mm', weight: (26.90 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-26.9-2.35', description: 'Tubo DIN 26,90mm x 2.35mm', weight: (26.90 - 2.35) * 2.35 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-33.7-2.00', description: 'Tubo DIN 33,70mm x 2.00mm', weight: (33.70 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-33.7-2.65', description: 'Tubo DIN 33,70mm x 2.65mm', weight: (33.70 - 2.65) * 2.65 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-33.7-3.00', description: 'Tubo DIN 33,70mm x 3.00mm', weight: (33.70 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-42.4-2.00', description: 'Tubo DIN 42,40mm x 2.00mm', weight: (42.40 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-42.4-2.65', description: 'Tubo DIN 42,40mm x 2.65mm', weight: (42.40 - 2.65) * 2.65 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-42.4-3.00', description: 'Tubo DIN 42,40mm x 3.00mm', weight: (42.40 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-48.3-2.00', description: 'Tubo DIN 48,30mm x 2.00mm', weight: (48.30 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-48.3-2.65', description: 'Tubo DIN 48,30mm x 2.65mm', weight: (48.30 - 2.65) * 2.65 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-48.3-3.00', description: 'Tubo DIN 48,30mm x 3.00mm', weight: (48.30 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-60.3-2.00', description: 'Tubo DIN 60,30mm x 2.00mm', weight: (60.30 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-60.3-2.65', description: 'Tubo DIN 60,30mm x 2.65mm', weight: (60.30 - 2.65) * 2.65 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-60.3-3.00', description: 'Tubo DIN 60,30mm x 3.00mm', weight: (60.30 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-76.1-2.00', description: 'Tubo DIN 76,10mm x 2.00mm', weight: (76.10 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-76.1-3.00', description: 'Tubo DIN 76,10mm x 3.00mm', weight: (76.10 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-88.9-2.00', description: 'Tubo DIN 88,90mm x 2.00mm', weight: (88.90 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-88.9-3.00', description: 'Tubo DIN 88,90mm x 3.00mm', weight: (88.90 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-101.6-2.00', description: 'Tubo DIN 101,60mm x 2.00mm', weight: (101.60 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-101.6-3.00', description: 'Tubo DIN 101,60mm x 3.00mm', weight: (101.60 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
-  { id: 'ta-114.3-3.00', description: 'Tubo DIN 114,30mm x 3.00mm', weight: (114.30 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-21.3-2.00', description: 'Tubo DIN 21,30mm x 2.00mm (DI 17,30mm)', weight: (21.30 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-21.3-2.35', description: 'Tubo DIN 21,30mm x 2.35mm (DI 16,60mm)', weight: (21.30 - 2.35) * 2.35 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-26.9-2.00', description: 'Tubo DIN 26,90mm x 2.00mm (DI 22,90mm)', weight: (26.90 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-26.9-2.35', description: 'Tubo DIN 26,90mm x 2.35mm (DI 22,20mm)', weight: (26.90 - 2.35) * 2.35 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-33.7-2.00', description: 'Tubo DIN 33,70mm x 2.00mm (DI 29,70mm)', weight: (33.70 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-33.7-2.65', description: 'Tubo DIN 33,70mm x 2.65mm (DI 28,40mm)', weight: (33.70 - 2.65) * 2.65 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-33.7-3.00', description: 'Tubo DIN 33,70mm x 3.00mm (DI 27,70mm)', weight: (33.70 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-42.4-2.00', description: 'Tubo DIN 42,40mm x 2.00mm (DI 38,40mm)', weight: (42.40 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-42.4-2.65', description: 'Tubo DIN 42,40mm x 2.65mm (DI 37,10mm)', weight: (42.40 - 2.65) * 2.65 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-42.4-3.00', description: 'Tubo DIN 42,40mm x 3.00mm (DI 36,40mm)', weight: (42.40 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-48.3-2.00', description: 'Tubo DIN 48,30mm x 2.00mm (DI 44,30mm)', weight: (48.30 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-48.3-2.65', description: 'Tubo DIN 48,30mm x 2.65mm (DI 43,00mm)', weight: (48.30 - 2.65) * 2.65 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-48.3-3.00', description: 'Tubo DIN 48,30mm x 3.00mm (DI 42,30mm)', weight: (48.30 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-60.3-2.00', description: 'Tubo DIN 60,30mm x 2.00mm (DI 56,30mm)', weight: (60.30 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-60.3-2.65', description: 'Tubo DIN 60,30mm x 2.65mm (DI 55,00mm)', weight: (60.30 - 2.65) * 2.65 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-60.3-3.00', description: 'Tubo DIN 60,30mm x 3.00mm (DI 54,30mm)', weight: (60.30 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-76.1-2.00', description: 'Tubo DIN 76,10mm x 2.00mm (DI 72,10mm)', weight: (76.10 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-76.1-3.00', description: 'Tubo DIN 76,10mm x 3.00mm (DI 70,10mm)', weight: (76.10 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-88.9-2.00', description: 'Tubo DIN 88,90mm x 2.00mm (DI 84,90mm)', weight: (88.90 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-88.9-3.00', description: 'Tubo DIN 88,90mm x 3.00mm (DI 82,90mm)', weight: (88.90 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-101.6-2.00', description: 'Tubo DIN 101,60mm x 2.00mm (DI 97,60mm)', weight: (101.60 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-101.6-3.00', description: 'Tubo DIN 101,60mm x 3.00mm (DI 95,60mm)', weight: (101.60 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-114.3-3.00', description: 'Tubo DIN 114,30mm x 3.00mm (DI 108,30mm)', weight: (114.30 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
 ];
 
 export const CATEGORIES: Category[] = [
@@ -665,3 +665,4 @@ export const CATEGORIES: Category[] = [
     
 
     
+

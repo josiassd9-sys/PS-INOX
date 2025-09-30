@@ -93,7 +93,7 @@ export function AstmStandards() {
       <Accordion type="single" collapsible className="w-full">
           {standards.map(standard => (
               <AccordionItem value={standard.id} key={standard.id}>
-                  <AccordionTrigger className="text-base font-semibold hover:bg-primary/10 px-4">{standard.title} - <span className="text-sm font-normal text-muted-foreground ml-2 flex-1 text-left truncate">{standard.summary}</span></AccordionTrigger>
+                  <AccordionTrigger className="text-base font-semibold hover:bg-primary/10 px-4">{standard.title} - <span className="text-sm font-normal text-muted-foreground ml-2 flex-1 text-left">{standard.summary}</span></AccordionTrigger>
                   <AccordionContent className="px-6 py-4 border-t bg-primary/5">
                       <p className="text-base whitespace-pre-wrap">{standard.details}</p>
                   </AccordionContent>

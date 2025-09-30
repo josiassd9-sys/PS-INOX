@@ -149,7 +149,7 @@ const scrapItems: ScrapItem[] = [
   { id: 'scrap-13', material: 'Sucata 45/20', composition: 'Equivalente ao Aço 4520: Cr: 45% / Ni: 20%', price: 19.30 },
   { id: 'scrap-14', material: 'Sucata CD4MCu', composition: 'Cr: 25% / Ni: 5% / Mo: 2% / Cu: 1–2%', price: 4.50 },
   { id: 'scrap-15', material: 'Sucata SAF 2205', composition: 'Cr: 22% / Ni: 5% / Mo: 3% / N: 0,15%', price: 8.50 },
-  { id: 'scrap-16', material: 'Sucata SAF 2507', composition: 'Cr: 25% / Ni: 7% / Mo: 4% / N: 0,3%', price: 9.50 },
+  { id: 'scrap-16', material: 'Sucata SAF Duplex 2507', composition: 'Cr: 25% / Ni: 7% / Mo: 4% / N: 0,3%', price: 9.50 },
   { id: 'scrap-18', material: 'Sucata Manganês 12%', composition: 'Mn: 11–14% / C: 1,0–1,4% / Fe balanceado', price: 2.00 },
 
   // Alumínio
@@ -160,7 +160,7 @@ const scrapItems: ScrapItem[] = [
   { id: 'scrap-al-5', material: 'Cavaco de Alumínio', composition: 'Varia conforme a usinagem', price: 3.50 },
 
   // Cobre
-  { id: 'scrap-cu-1', material: 'Sucata Cobre Misto (Tubos, etc)', composition: 'Peças de cobre diversas, pode conter solda', price: 35.00 },
+  { id: 'scrap-cu-1', material: 'Sucata Cobre Misto (Tubos, Chapas)', composition: 'Peças de cobre diversas, pode conter solda', price: 35.00 },
   { id: 'scrap-cu-2', material: 'Sucata Cobre (Fio 1ª qualidade)', composition: 'Fios e cabos limpos, sem impurezas', price: 40.00 },
   { id: 'scrap-cu-3', material: 'Cavaco de Cobre', composition: 'Varia conforme a usinagem', price: 30.00 },
 
@@ -623,6 +623,8 @@ export const CATEGORIES: Category[] = [
 ];
     
     
+    
+
     
 
     

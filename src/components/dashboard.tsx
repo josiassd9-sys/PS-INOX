@@ -130,7 +130,7 @@ function DashboardComponent() {
       <ItemTable 
         category={selectedCategory as any} 
         sellingPrice={sellingPrice}
-        showTableHeader={false}
+        showTableHeader={!showCustomHeader}
       />
     );
   }
@@ -228,7 +228,7 @@ function DashboardComponent() {
                 </div>
               )}
               <div className="flex-1 overflow-y-auto">
-                <div className={cn(!isScrapTableCategory && "p-4 md:p-6")}>
+                <div className={cn("p-4 md:p-6", isScrapTableCategory && "p-0 md:p-0")}>
                  {renderContent()}
                 </div>
               </div>

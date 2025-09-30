@@ -92,8 +92,7 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
 
   return (
     <>
-    <div className="flex items-center justify-between -mt-6 -mx-6 mb-4 p-6 pb-0">
-        <div/>
+      <div className="flex items-center justify-end mb-4">
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" className="h-8 gap-1">
@@ -145,7 +144,7 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
           </DialogContent>
         </Dialog>
       </div>
-      <div className="-mx-6 -mt-6 border-t">
+      <div className="border rounded-lg overflow-hidden">
         <Table>
           {showTableHeader && (
             <TableHeader>
@@ -176,11 +175,11 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
                               category.unit !== 'm' && 'hover:bg-primary/10',
                           )}
                           >
-                          <TableCell className="flex-1 px-8">{item.description}</TableCell>
-                          <TableCell className="w-1/3 text-center px-8">
+                          <TableCell className="flex-1 px-4">{item.description}</TableCell>
+                          <TableCell className="w-1/3 text-center px-4">
                               {formatNumber(item.weight, 3)}
                           </TableCell>
-                          <TableCell className="w-1/3 text-right font-medium text-primary px-8">
+                          <TableCell className="w-1/3 text-right font-medium text-primary px-4">
                               <div className="flex items-center justify-end gap-2">
                                 <span>{formatCurrency(itemPrice)}</span>
                               </div>

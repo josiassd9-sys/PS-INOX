@@ -139,15 +139,17 @@ const scrapItems: ScrapItem[] = [
   { id: 'scrap-6', material: 'Sucata Baixa Liga', composition: 'Ni: 1,5% / Cr: 12% / Mn: 6%', price: 1.50 },
   { id: 'scrap-7', material: 'Sucata 201 / 15-5 / 17-4 / 23-04', composition: '201: Cr: 16–18%, Ni: 3,5–5,5%, Mn: 5–7% | 15-5 PH: Cr: 15%, Ni: 4–5%, Cu: 3% | 17-4 PH: Cr: 15–17%, Ni: 3–5%, Cu: 3–5%', price: 2.70 },
   { id: 'scrap-8', material: 'Sucata Inox 301 / Resist. 304', composition: 'Cr: 16–18% / Ni: 6–8% / Mn: ≤2%', price: 4.40 },
+  { id: 'scrap-321', material: 'Sucata Inox 321', composition: 'Cr: 17-19% / Ni: 9-12% / Ti: 5xC a 0.70%', price: 5.60 },
   { id: 'scrap-9', material: 'Sucata Inox 304 / Ni-resist 1', composition: 'Cr: 18–20% / Ni: 8–10,5% / Mn: ≤2%', price: 5.50 },
   { id: 'scrap-10', material: 'Sucata Inox 309', composition: 'Cr: 22–24% / Ni: 12–15% / Mn: ≤2%', price: 7.50 },
   { id: 'scrap-11', material: 'Sucata Inox 310', composition: 'Cr: 24–26% / Ni: 19–22% / Mn: ≤2%', price: 12.50 },
+  { id: 'scrap-17', material: 'Sucata Inox 316', composition: 'Cr: 16–18% / Ni: 10–14% / Mo: 2–3%', price: 10.70 },
+  { id: 'scrap-904', material: 'Sucata Alloy 904L', composition: 'Cr: 19-23% / Ni: 23-28% / Mo: 4-5% / Cu: 1-2%', price: 15.50 },
   { id: 'scrap-12', material: 'Sucata 35/20', composition: 'Equivalente ao Aço 3520: Cr: 35% / Ni: 20%', price: 16.40 },
   { id: 'scrap-13', material: 'Sucata 45/20', composition: 'Equivalente ao Aço 4520: Cr: 45% / Ni: 20%', price: 19.30 },
   { id: 'scrap-14', material: 'Sucata CD4MCu', composition: 'Cr: 25% / Ni: 5% / Mo: 2% / Cu: 1–2%', price: 4.50 },
   { id: 'scrap-15', material: 'Sucata SAF 2205', composition: 'Cr: 22% / Ni: 5% / Mo: 3% / N: 0,15%', price: 8.50 },
   { id: 'scrap-16', material: 'Sucata SAF 2507', composition: 'Cr: 25% / Ni: 7% / Mo: 4% / N: 0,3%', price: 9.50 },
-  { id: 'scrap-17', material: 'Sucata Inox 316', composition: 'Cr: 16–18% / Ni: 10–14% / Mo: 2–3%', price: 10.70 },
   { id: 'scrap-18', material: 'Sucata Manganês 12%', composition: 'Mn: 11–14% / C: 1,0–1,4% / Fe balanceado', price: 2.00 },
 
   // Alumínio
@@ -158,8 +160,8 @@ const scrapItems: ScrapItem[] = [
   { id: 'scrap-al-5', material: 'Cavaco de Alumínio', composition: 'Varia conforme a usinagem', price: 3.50 },
 
   // Cobre
-  { id: 'scrap-cu-1', material: 'Sucata Cobre Misto', composition: 'Peças de cobre diversas, pode conter solda', price: 35.00 },
-  { id: 'scrap-cu-2', material: 'Sucata Cobre (1ª qualidade)', composition: 'Fios e tubos limpos, sem impurezas', price: 40.00 },
+  { id: 'scrap-cu-1', material: 'Sucata Cobre Misto (Tubos, etc)', composition: 'Peças de cobre diversas, pode conter solda', price: 35.00 },
+  { id: 'scrap-cu-2', material: 'Sucata Cobre (Fio 1ª qualidade)', composition: 'Fios e cabos limpos, sem impurezas', price: 40.00 },
   { id: 'scrap-cu-3', material: 'Cavaco de Cobre', composition: 'Varia conforme a usinagem', price: 30.00 },
 
   // Latão e Bronze
@@ -175,6 +177,7 @@ const scrapItems: ScrapItem[] = [
 
   // Outros Metais
   { id: 'scrap-fe-1', material: 'Sucata Ferro (Cavaco ou Estamparia)', composition: 'Fe: 99,5% / C: ≤0,25%', price: 0.50 },
+  { id: 'scrap-gv-1', material: 'Sucata Galvalume', composition: 'Aço revestido com 55% Al, 43.5% Zn, 1.5% Si', price: 0.70 },
   
   // Cavacos de Inox
   { id: 'scrap-21', material: 'Cavaco Inox 201', composition: 'Cr: 16–18% / Ni: 3,5–5,5% / Mn: 5–7%', price: 2.10 },

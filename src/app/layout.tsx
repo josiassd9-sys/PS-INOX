@@ -3,7 +3,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Inox PriceCalc',
+  manifest: "/manifest.json",
+  title: 'PS INOX',
   description: 'Calculadora de preços para produtos de aço inoxidável',
 };
 

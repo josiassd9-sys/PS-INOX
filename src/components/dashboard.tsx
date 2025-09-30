@@ -26,7 +26,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "./ui/button";
 import { PackageChecker } from "./package-checker";
@@ -141,7 +140,7 @@ function DashboardComponent() {
         <SidebarHeader>
           <div className="flex items-center gap-2">
             <Warehouse className="size-6 text-primary" />
-            <h1 className="text-lg font-semibold">Inox PriceCalc</h1>
+            <h1 className="text-lg font-semibold">PS INOX</h1>
           </div>
         </SidebarHeader>
         <SidebarContent>

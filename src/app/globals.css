@@ -43,24 +43,24 @@
   }
 
   .dark {
-    --background: 240 6% 10%; /* Fundo mais escuro */
+    --background: 240 5% 8%; /* Fundo bem escuro */
     --foreground: 0 0% 98%;
-    --card: 240 5% 14%; /* Cards um pouco mais claros */
+    --card: 240 5% 18%; /* Cards muito mais claros */
     --card-foreground: 0 0% 98%;
     --popover: 240 6% 9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 158 60% 55%; /* Primário mais saturado */
+    --primary: 158 60% 55%; 
     --primary-foreground: 158 44% 98%;
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
+    --accent: 240 5% 24%; /* Accent mais claro */
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 4% 22%; /* Bordas mais visíveis */
-    --input: 240 5% 16%; /* Inputs mais claros que o fundo */
+    --border: 240 4% 30%; /* Bordas mais claras */
+    --input: 240 5% 18%; /* Inputs muito mais claros */
     --ring: 158 60% 55%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
@@ -70,13 +70,13 @@
 
     --accent-price: 38 95% 55%;
 
-    --sidebar-background: 240 5% 14%; /* Sidebar igual aos cards */
+    --sidebar-background: 240 5% 18%; /* Sidebar igual aos cards */
     --sidebar-foreground: 0 0% 98%;
     --sidebar-primary: 158 60% 55%;
     --sidebar-primary-foreground: 158 44% 98%;
-    --sidebar-accent: 240 6% 18%;
+    --sidebar-accent: 240 6% 22%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 240 4% 22%;
+    --sidebar-border: 240 4% 30%;
     --sidebar-ring: 158-60-55;
   }
 }

@@ -1,4 +1,5 @@
 
+
 export const STAINLESS_STEEL_DENSITY_KG_M3 = 7980;
 const INCH_TO_MM = 25.4;
 
@@ -202,6 +203,32 @@ const scrapItems: ScrapItem[] = [
   { id: 'scrap-36', material: 'Aço Ferro Fundido Cinzento', composition: 'C: 2,5–4% / Si: 1–3% / Mn: 0,2–1% / Fe balanceado', price: 0 },
 ];
 
+const tubosAliancaItems: SteelItem[] = [
+  { id: 'ta-21.3-2.00', description: 'Tubo DIN 21,30mm x 2.00mm', weight: (21.30 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-21.3-2.35', description: 'Tubo DIN 21,30mm x 2.35mm', weight: (21.30 - 2.35) * 2.35 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-26.9-2.00', description: 'Tubo DIN 26,90mm x 2.00mm', weight: (26.90 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-26.9-2.35', description: 'Tubo DIN 26,90mm x 2.35mm', weight: (26.90 - 2.35) * 2.35 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-33.7-2.00', description: 'Tubo DIN 33,70mm x 2.00mm', weight: (33.70 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-33.7-2.65', description: 'Tubo DIN 33,70mm x 2.65mm', weight: (33.70 - 2.65) * 2.65 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-33.7-3.00', description: 'Tubo DIN 33,70mm x 3.00mm', weight: (33.70 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-42.4-2.00', description: 'Tubo DIN 42,40mm x 2.00mm', weight: (42.40 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-42.4-2.65', description: 'Tubo DIN 42,40mm x 2.65mm', weight: (42.40 - 2.65) * 2.65 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-42.4-3.00', description: 'Tubo DIN 42,40mm x 3.00mm', weight: (42.40 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-48.3-2.00', description: 'Tubo DIN 48,30mm x 2.00mm', weight: (48.30 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-48.3-2.65', description: 'Tubo DIN 48,30mm x 2.65mm', weight: (48.30 - 2.65) * 2.65 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-48.3-3.00', description: 'Tubo DIN 48,30mm x 3.00mm', weight: (48.30 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-60.3-2.00', description: 'Tubo DIN 60,30mm x 2.00mm', weight: (60.30 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-60.3-2.65', description: 'Tubo DIN 60,30mm x 2.65mm', weight: (60.30 - 2.65) * 2.65 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-60.3-3.00', description: 'Tubo DIN 60,30mm x 3.00mm', weight: (60.30 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-76.1-2.00', description: 'Tubo DIN 76,10mm x 2.00mm', weight: (76.10 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-76.1-3.00', description: 'Tubo DIN 76,10mm x 3.00mm', weight: (76.10 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-88.9-2.00', description: 'Tubo DIN 88,90mm x 2.00mm', weight: (88.90 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-88.9-3.00', description: 'Tubo DIN 88,90mm x 3.00mm', weight: (88.90 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-101.6-2.00', description: 'Tubo DIN 101,60mm x 2.00mm', weight: (101.60 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-101.6-3.00', description: 'Tubo DIN 101,60mm x 3.00mm', weight: (101.60 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
+  { id: 'ta-114.3-3.00', description: 'Tubo DIN 114,30mm x 3.00mm', weight: (114.30 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
+];
+
 export const CATEGORIES: Category[] = [
   {
     id: 'retalhos',
@@ -301,6 +328,14 @@ export const CATEGORIES: Category[] = [
         { id: 't-12-2.00', description: 'Tubo OD 12" (304.80mm) x 2.00mm (DI 300.80mm)', weight: (304.80 - 2.00) * 2.00 * TUBE_WEIGHT_CONSTANT },
         { id: 't-12-3.00', description: 'Tubo OD 12" (304.80mm) x 3.00mm (DI 298.80mm)', weight: (304.80 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT },
     ],
+  },
+  {
+    id: 'tubos-alianca',
+    name: 'Tubos Aliança (DIN)',
+    description: 'Tubos redondos padrão DIN 2458.',
+    icon: 'GalleryVertical',
+    unit: 'm',
+    items: tubosAliancaItems,
   },
   {
     id: 'chapas',

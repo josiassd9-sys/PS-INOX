@@ -13,7 +13,6 @@ import { STAINLESS_STEEL_DENSITY_KG_M3 } from "@/lib/data";
 import { Button } from "./ui/button";
 import { PlusCircle, Printer, Save, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Separator } from "./ui/separator";
 
 type Shape = "rectangle" | "disc";
 type FieldName = "width" | "length" | "thickness" | "weight" | "diameter" | "material";
@@ -69,7 +68,6 @@ export function ScrapCalculator() {
     }
   };
 
-
   const handleInputChange = (fieldName: FieldName, value: string) => {
     const sanitizedValue = fieldName === 'material' ? value : value.replace(",", ".");
     
@@ -81,6 +79,14 @@ export function ScrapCalculator() {
         [fieldName]: fieldName === 'material' ? sanitizedValue : value
     }));
   };
+
+  const handleScrapPriceChange = (value: string) => {
+    const sanitizedValue = value.replace(",", ".");
+     if (sanitizedValue !== '' && !/^[0-9]*\.?[0-9]*$/.test(sanitizedValue)) {
+        return;
+    }
+    setScrapPrice(value);
+  }
 
   const handleShapeChange = (value: Shape | "") => {
     if (value) {
@@ -255,7 +261,7 @@ export function ScrapCalculator() {
         
         <div className="grid grid-cols-2 gap-4 mt-4">
             <div className="space-y-2"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
-            <div className="space-y-2"><Label htmlFor="scrap-price">Preço (R$/kg)</Label><Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleInputChange('scrap-price' as any, e.target.value)} /></div>
+            <div className="space-y-2"><Label htmlFor="scrap-price">Preço (R$/kg)</Label><Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} /></div>
         </div>
 
         <div className="grid grid-cols-3 gap-4 pt-4 mt-4 border-t">

@@ -23,7 +23,7 @@ interface ScrapPiece {
     description: string;
     weight: number;
     price: number;
-    pricePerKg: number;
+    pricePerKg?: number;
     length?: number;
     unit?: 'm' | 'kg';
 }
@@ -205,7 +205,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
 
   let finalPrice;
   if (prefilledItem) {
-    const pricePerMeter = prefilledItem.weight * pricePerUnit;
+    const pricePerMeter = Math.ceil(sellingPrice * prefilledItem.weight);
     const lengthInMeters = getNumPrice(fields.scrapLength) / 1000;
     finalPrice = lengthInMeters * pricePerMeter;
   } else {
@@ -232,7 +232,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
         }
         description = `${prefilledItem.description} x ${formatNumber(scrapLength_mm, {minimumFractionDigits: 0})} mm`;
         weight = calculatedWeight || 0;
-        const pricePerMeter = sellingPrice * prefilledItem.weight;
+        const pricePerMeter = Math.ceil(sellingPrice * prefilledItem.weight);
 
         newPiece = {
             id: uuidv4(),
@@ -399,9 +399,11 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                                           {item.unit === 'm' && item.length ? (
                                                 <>
                                                     <div>{formatNumber(item.length / 1000, { minimumFractionDigits: 3, maximumFractionDigits: 3 })} m</div>
-                                                    <div className="text-xs text-muted-foreground font-normal">
-                                                        {formatNumber(item.pricePerKg, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/m
-                                                    </div>
+                                                    {item.pricePerKg && (
+                                                        <div className="text-xs text-muted-foreground font-normal">
+                                                            {`${item.pricePerKg.toFixed(2).replace('.', ',')}/m`}
+                                                        </div>
+                                                    )}
                                                 </>
                                             ) : (
                                                 <>

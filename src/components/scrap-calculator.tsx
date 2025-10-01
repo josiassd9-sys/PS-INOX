@@ -234,7 +234,7 @@ export function ScrapCalculator() {
 
   const handleSave = () => {
     saveListToLocalStorage(scrapList);
-    toast({ title: "Lista Salva!", description: "Sua lista de retalhos foi salva com sucesso." });
+    toast({ title: "Lista Salva!", description: "Sua lista de materiais foi salva com sucesso." });
   }
 
   return (
@@ -280,7 +280,7 @@ export function ScrapCalculator() {
       
       {scrapList.length > 0 && (
         <div id="scrap-list-section" className="space-y-4 pt-4 mt-6 border-t">
-            <h2 className="text-lg font-semibold text-center">Lista de Retalhos</h2>
+            <h2 className="text-lg font-semibold text-center">Lista de Materiais</h2>
             <Card>
                 <CardContent className="p-0">
                     <div className="overflow-auto">

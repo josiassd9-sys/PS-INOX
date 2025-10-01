@@ -125,7 +125,7 @@ function DashboardComponent() {
       );
     }
     if (isScrapCategory) {
-      return <ScrapCalculator prefilledItem={prefillScrapItem} onClearPrefill={() => setPrefillScrapItem(null)}/>;
+      return <ScrapCalculator prefilledItem={prefillScrapItem} onClearPrefill={() => setPrefillScrapItem(null)} sellingPrice={sellingPrice} />;
     }
     if (isPackageCheckerCategory) {
       return <PackageChecker />;

@@ -28,12 +28,13 @@ interface ScrapPiece {
 interface ScrapCalculatorProps {
     prefilledItem: SteelItem | null;
     onClearPrefill: () => void;
+    sellingPrice: number;
 }
 
 const DENSITY = STAINLESS_STEEL_DENSITY_KG_M3;
 const LOCAL_STORAGE_KEY = "scrapCalculatorList";
 
-export function ScrapCalculator({ prefilledItem, onClearPrefill }: ScrapCalculatorProps) {
+export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }: ScrapCalculatorProps) {
   const { toast } = useToast();
   const [shape, setShape] = React.useState<Shape>("rectangle");
   const [scrapPrice, setScrapPrice] = React.useState<string>("23");
@@ -109,6 +110,15 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill }: ScrapCalculat
     }
   };
   
+  React.useEffect(() => {
+    if (prefilledItem && sellingPrice) {
+        setScrapPrice(sellingPrice.toFixed(2).replace('.', ','));
+    } else {
+        setScrapPrice("23"); 
+    }
+  }, [prefilledItem, sellingPrice]);
+
+
   React.useEffect(() => {
     const getNum = (val: string) => parseFloat(val.replace(',', '.')) || 0;
     

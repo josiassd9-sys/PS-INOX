@@ -89,7 +89,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill }: ScrapCalculat
 
   const handleScrapPriceChange = (value: string) => {
     const sanitizedValue = value.replace(",", ".");
-     if (sanitizedValue !== '' && !/^[0-9]*\.?[0:9]*$/.test(sanitizedValue)) {
+     if (sanitizedValue !== '' && !/^[0-9]*\.?[0-9]*$/.test(sanitizedValue)) {
         return;
     }
     setScrapPrice(value);
@@ -211,7 +211,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill }: ScrapCalculat
             toast({ variant: "destructive", title: "Comprimento inválido", description: "O comprimento do retalho deve ser maior que zero." });
             return;
         }
-        description = `Retalho ${prefilledItem.categoryName || ''} ${prefilledItem.description} com ${formatNumber(scrapLength_mm, {minimumFractionDigits: 0})} mm`;
+        description = `${prefilledItem.description} x ${formatNumber(scrapLength_mm, {minimumFractionDigits: 0})} mm`;
     } else if (shape === 'rectangle') {
         const t = getNum(fields.thickness);
         const w = getNum(fields.width);
@@ -297,17 +297,24 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill }: ScrapCalculat
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                   {shape === "rectangle" ? (
                       <>
-                      <div className="space-y-2"><Label htmlFor="width">Largura(mm)</Label><Input id="width" type="text" inputMode="decimal" placeholder="Insira a largura" value={fields.width} onChange={(e) => handleInputChange('width', e.target.value)} /></div>
-                      <div className="space-y-2"><Label htmlFor="length">Compr.(mm)</Label><Input id="length" type="text" inputMode="decimal" placeholder="Insira o compr." value={fields.length} onChange={(e) => handleInputChange('length', e.target.value)} /></div>
+                        <div className="space-y-2"><Label htmlFor="width">Largura(mm)</Label><Input id="width" type="text" inputMode="decimal" placeholder="Insira a largura" value={fields.width} onChange={(e) => handleInputChange('width', e.target.value)} /></div>
+                        <div className="space-y-2"><Label htmlFor="length">Compr.(mm)</Label><Input id="length" type="text" inputMode="decimal" placeholder="Insira o compr." value={fields.length} onChange={(e) => handleInputChange('length', e.target.value)} /></div>
+                        <div className="grid grid-cols-3 gap-4 md:col-span-2">
+                            <div className="space-y-2"><Label htmlFor="thickness">Espessura(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
+                            <div className="space-y-2"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
+                            <div className="space-y-2"><Label htmlFor="scrap-price">Preço (R$/kg)</Label><Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} /></div>
+                        </div>
                       </>
                   ) : (
-                      <div className="space-y-2"><Label htmlFor="diameter">Diâmetro(mm)</Label><Input id="diameter" type="text" inputMode="decimal" placeholder="Insira o diâmetro" value={fields.diameter} onChange={(e) => handleInputChange('diameter', e.target.value)} /></div>
+                    <>
+                        <div className="space-y-2"><Label htmlFor="diameter">Diâmetro(mm)</Label><Input id="diameter" type="text" inputMode="decimal" placeholder="Insira o diâmetro" value={fields.diameter} onChange={(e) => handleInputChange('diameter', e.target.value)} /></div>
+                         <div className="space-y-2"><Label htmlFor="thickness">Espessura(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
+                        <div className="grid grid-cols-2 gap-4 md:col-span-2">
+                            <div className="space-y-2"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
+                            <div className="space-y-2"><Label htmlFor="scrap-price">Preço (R$/kg)</Label><Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} /></div>
+                        </div>
+                    </>
                   )}
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                    <div className="space-y-2"><Label htmlFor="thickness">Espessura(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
-                    <div className="space-y-2"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
-                    <div className="space-y-2"><Label htmlFor="scrap-price">Preço (R$/kg)</Label><Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} /></div>
                 </div>
             </>
         )}

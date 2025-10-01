@@ -26,6 +26,7 @@ export function CutPriceCalculator({
   onClose,
 }: CutPriceCalculatorProps) {
   const [cutLength, setCutLength] = React.useState<number | "">("");
+  const [pieceWeight, setPieceWeight] = React.useState(0);
   const [finalPrice, setFinalPrice] = React.useState(0);
   const [currentCutPercentage, setCurrentCutPercentage] = React.useState(0);
 
@@ -52,15 +53,20 @@ export function CutPriceCalculator({
 
   React.useEffect(() => {
     if (cutLength !== "" && cutLength > 0) {
+      const lengthInMeters = Number(cutLength) / 1000;
+      const weight = selectedItem.weight * lengthInMeters;
+      setPieceWeight(weight);
+      
       const dynamicPercentage = calculateDynamicPercentage(Number(cutLength));
       setCurrentCutPercentage(dynamicPercentage);
       
       const pricePerMeter = selectedItem.weight * sellingPrice;
-      const piecePrice = pricePerMeter * (Number(cutLength) / 1000);
+      const piecePrice = pricePerMeter * lengthInMeters;
       const finalPriceWithCut = piecePrice * (1 + dynamicPercentage / 100);
       setFinalPrice(Math.ceil(finalPriceWithCut));
     } else {
       setCurrentCutPercentage(0);
+      setPieceWeight(0);
       setFinalPrice(0);
     }
   }, [cutLength, sellingPrice, selectedItem]);
@@ -70,6 +76,7 @@ export function CutPriceCalculator({
     // Reset cut length when item changes or when selling price changes
     setCutLength("");
     setFinalPrice(0);
+    setPieceWeight(0);
     setCurrentCutPercentage(0);
   }, [selectedItem, sellingPrice]);
 
@@ -77,6 +84,13 @@ export function CutPriceCalculator({
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
+    }).format(value);
+  };
+  
+  const formatNumber = (value: number, digits: number = 3) => {
+    return new Intl.NumberFormat("pt-BR", {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
     }).format(value);
   };
 
@@ -98,30 +112,40 @@ export function CutPriceCalculator({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="cut-length">Comprimento do Corte (mm)</Label>
-            <Input
-              id="cut-length"
-              type="number"
-              value={cutLength}
-              onChange={(e) =>
-                setCutLength(
-                  e.target.value === "" ? "" : e.target.valueAsNumber
-                )
-              }
-              placeholder="Ex: 500"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Acréscimo de Corte (%)</Label>
-            <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm font-semibold h-10 flex items-center">
-              {currentCutPercentage.toFixed(2)}%
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="cut-length">Comprimento do Corte (mm)</Label>
+              <Input
+                id="cut-length"
+                type="number"
+                value={cutLength}
+                onChange={(e) =>
+                  setCutLength(
+                    e.target.value === "" ? "" : e.target.valueAsNumber
+                  )
+                }
+                placeholder="Ex: 500"
+              />
+            </div>
+            <div className="space-y-2">
+                <Label>Peso da Peça (kg)</Label>
+                <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm font-semibold h-10 flex items-center">
+                    {formatNumber(pieceWeight, 3)}
+                </div>
             </div>
           </div>
-          <div className="space-y-2">
-            <Label className="text-accent-price font-semibold">Preço Final da Peça</Label>
-            <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
-              {formatCurrency(finalPrice)}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+                <Label>Acréscimo de Corte (%)</Label>
+                <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm font-semibold h-10 flex items-center">
+                {currentCutPercentage.toFixed(2)}%
+                </div>
+            </div>
+            <div className="space-y-2">
+                <Label className="text-accent-price font-semibold">Preço Final da Peça</Label>
+                <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
+                {formatCurrency(finalPrice)}
+                </div>
             </div>
           </div>
         </div>

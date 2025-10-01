@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { CATEGORIES, type Category, type ScrapItem } from "@/lib/data";
+import { CATEGORIES, type Category, type ScrapItem, SteelItem } from "@/lib/data";
 import {
   SidebarProvider,
   Sidebar,
@@ -48,6 +48,7 @@ function DashboardComponent() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const { setOpenMobile, isMobile } = useSidebar();
   const [isScrapItemDialogOpen, setIsScrapItemDialogOpen] = React.useState(false);
+  const [prefillScrapItem, setPrefillScrapItem] = React.useState<SteelItem | null>(null);
 
 
   const handleCostChange = (newCost: number | null) => {
@@ -73,10 +74,17 @@ function DashboardComponent() {
   const handleSelectCategory = (categoryId: string) => {
     setSelectedCategoryId(categoryId);
     setSearchTerm(""); // Clear search when a category is selected
+    setPrefillScrapItem(null); // Clear prefill item
     if (isMobile) {
       setOpenMobile(false);
     }
   }
+
+  const handlePrefillScrapItem = (item: SteelItem) => {
+    setPrefillScrapItem(item);
+    setSelectedCategoryId('retalhos');
+    setSearchTerm("");
+  };
 
   const selectedCategory =
     CATEGORIES.find((c) => c.id === selectedCategoryId) || CATEGORIES[0];
@@ -111,11 +119,13 @@ function DashboardComponent() {
           categories={filteredCategories as any}
           sellingPrice={sellingPrice}
           searchTerm={searchTerm}
+          onPrefillScrap={handlePrefillScrapItem}
+          isScrapCalculatorActive={isScrapCategory}
         />
       );
     }
     if (isScrapCategory) {
-      return <ScrapCalculator />;
+      return <ScrapCalculator prefilledItem={prefillScrapItem} onClearPrefill={() => setPrefillScrapItem(null)}/>;
     }
     if (isPackageCheckerCategory) {
       return <PackageChecker />;

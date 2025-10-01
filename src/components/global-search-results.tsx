@@ -11,22 +11,27 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { cn } from "@/lib/utils";
 import { CutPriceCalculator } from "./cut-price-calculator";
+import { PlusCircle } from "lucide-react";
 
 interface GlobalSearchResultsProps {
     categories: Category[];
     sellingPrice: number;
     searchTerm: string;
+    onPrefillScrap: (item: SteelItem) => void;
+    isScrapCalculatorActive: boolean;
 }
 
-export function GlobalSearchResults({ categories, sellingPrice, searchTerm }: GlobalSearchResultsProps) {
+export function GlobalSearchResults({ categories, sellingPrice, searchTerm, onPrefillScrap, isScrapCalculatorActive }: GlobalSearchResultsProps) {
     const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
 
-    const handleRowClick = (itemId: string, category: Category) => {
-        if (category.unit === 'm') {
-          if (selectedItemId === itemId) {
+    const handleRowClick = (item: SteelItem, category: Category) => {
+        if (isScrapCalculatorActive) {
+            onPrefillScrap(item);
+        } else if (category.unit === 'm') {
+          if (selectedItemId === item.id) {
             setSelectedItemId(null); // Deselect if clicking the same item
           } else {
-            setSelectedItemId(itemId);
+            setSelectedItemId(item.id);
           }
         }
     };
@@ -75,16 +80,21 @@ export function GlobalSearchResults({ categories, sellingPrice, searchTerm }: Gl
                                         return (
                                             <React.Fragment key={item.id}>
                                                 <TableRow
-                                                    onClick={() => handleRowClick(item.id, category)}
+                                                    onClick={() => handleRowClick(item, category)}
                                                     className={cn(
                                                         'even:bg-primary/5 odd:bg-transparent',
                                                         'flex items-center',
-                                                        category.unit === 'm' && 'cursor-pointer',
+                                                        (category.unit === 'm' || isScrapCalculatorActive) && 'cursor-pointer',
                                                         isSelected && 'bg-primary/20 hover:bg-primary/20',
-                                                        category.unit !== 'm' && 'hover:bg-primary/10',
+                                                        !isSelected && 'hover:bg-primary/10',
                                                     )}
                                                 >
-                                                    <TableCell className="flex-1">{item.description}</TableCell>
+                                                    <TableCell className="flex-1 flex justify-between items-center">
+                                                        {item.description}
+                                                        {isScrapCalculatorActive && (
+                                                            <PlusCircle className="h-5 w-5 text-primary/50 ml-4" />
+                                                        )}
+                                                    </TableCell>
                                                     <TableCell className="w-1/3 text-center">{formatNumber(item.weight)}</TableCell>
                                                     <TableCell className="w-1/3 text-right font-medium text-primary">
                                                         {formatCurrency(itemPrice)}
@@ -95,7 +105,7 @@ export function GlobalSearchResults({ categories, sellingPrice, searchTerm }: Gl
                                                         )}
                                                     </TableCell>
                                                 </TableRow>
-                                                {isSelected && category.unit === 'm' && (
+                                                {isSelected && category.unit === 'm' && !isScrapCalculatorActive && (
                                                     <TableRow>
                                                         <TableCell colSpan={3} className="p-0">
                                                             <div className="p-4 bg-primary/5">

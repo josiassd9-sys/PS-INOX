@@ -29,7 +29,7 @@ export function PriceControls({
   return (
     <Card className="border-none shadow-none">
       <CardContent className="pt-2">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="cost-price" className="text-xs">Custo (R$/kg)</Label>
             <Input

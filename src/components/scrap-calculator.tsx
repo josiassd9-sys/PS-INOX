@@ -24,6 +24,8 @@ interface ScrapPiece {
     weight: number;
     price: number;
     pricePerKg: number;
+    length?: number;
+    unit?: 'm' | 'kg';
 }
 
 interface ScrapCalculatorProps {
@@ -199,7 +201,17 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
   }, [fields.width, fields.length, fields.thickness, fields.weight, fields.diameter, shape, prefilledItem, fields.scrapLength]);
 
   const getNumPrice = (val: string) => parseFloat(val.replace(',', '.')) || 0;
-  const finalPrice = getNumPrice(fields.weight) * getNumPrice(scrapPrice);
+  const pricePerUnit = getNumPrice(scrapPrice);
+
+  let finalPrice;
+  if (prefilledItem) {
+    const pricePerMeter = prefilledItem.weight * pricePerUnit;
+    const lengthInMeters = getNumPrice(fields.scrapLength) / 1000;
+    finalPrice = lengthInMeters * pricePerMeter;
+  } else {
+    finalPrice = getNumPrice(fields.weight) * pricePerUnit;
+  }
+
 
   const formatNumber = (value: string | number, options?: Intl.NumberFormatOptions) => {
     const num = typeof value === 'string' ? parseFloat(value.replace(',', '.')) : value;
@@ -208,15 +220,10 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
   }
 
   const addToList = () => {
-    const weight = getNumPrice(fields.weight);
-    const pricePerKg = getNumPrice(scrapPrice);
-
-    if (weight <= 0) {
-        toast({ variant: "destructive", title: "Peso inválido", description: "O peso da peça deve ser maior que zero." });
-        return;
-    }
-
     let description = "";
+    let weight = 0;
+    let newPiece: ScrapPiece;
+
     if (prefilledItem) {
         const scrapLength_mm = getNumPrice(fields.scrapLength);
         if (scrapLength_mm <= 0) {
@@ -224,33 +231,55 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
             return;
         }
         description = `${prefilledItem.description} x ${formatNumber(scrapLength_mm, {minimumFractionDigits: 0})} mm`;
-    } else if (shape === 'rectangle') {
-        const t = getNumPrice(fields.thickness);
-        const w = getNumPrice(fields.width);
-        const l = getNumPrice(fields.length);
-        if (t <= 0 || w <= 0 || l <= 0) {
-            toast({ variant: "destructive", title: "Dimensões inválidas", description: "Espessura, largura e comprimento devem ser preenchidos." });
-            return;
-        }
-        const dims = [w, l].sort((a,b) => a-b);
-        description = `Retalho Chapa ${fields.material} ${formatNumber(t, {minimumFractionDigits: 2})}x${formatNumber(dims[0], {minimumFractionDigits: 0})}x${formatNumber(dims[1], {minimumFractionDigits: 0})} mm`;
-    } else { // disc
-        const t = getNumPrice(fields.thickness);
-        const d = getNumPrice(fields.diameter);
-        if (t <= 0 || d <= 0) {
-            toast({ variant: "destructive", title: "Dimensões inválidas", description: "Espessura e diâmetro devem ser preenchidos." });
-            return;
-        }
-        description = `Retalho Disco ${fields.material} ${formatNumber(t, {minimumFractionDigits: 2})} Ø${formatNumber(d, {minimumFractionDigits: 0})} mm`;
-    }
+        weight = calculatedWeight || 0;
+        const pricePerMeter = sellingPrice * prefilledItem.weight;
 
-    const newPiece: ScrapPiece = {
-        id: uuidv4(),
-        description,
-        weight: Math.ceil(weight),
-        price: finalPrice,
-        pricePerKg: pricePerKg,
-    };
+        newPiece = {
+            id: uuidv4(),
+            description,
+            weight: Math.ceil(weight),
+            price: (scrapLength_mm / 1000) * pricePerMeter,
+            pricePerKg: pricePerMeter, // This is price per meter here
+            length: scrapLength_mm,
+            unit: 'm',
+        };
+
+    } else { // Manual scrap
+        weight = getNumPrice(fields.weight);
+        if (weight <= 0) {
+            toast({ variant: "destructive", title: "Peso inválido", description: "O peso da peça deve ser maior que zero." });
+            return;
+        }
+
+        if (shape === 'rectangle') {
+            const t = getNumPrice(fields.thickness);
+            const w = getNumPrice(fields.width);
+            const l = getNumPrice(fields.length);
+            if (t <= 0 || w <= 0 || l <= 0) {
+                toast({ variant: "destructive", title: "Dimensões inválidas", description: "Espessura, largura e comprimento devem ser preenchidos." });
+                return;
+            }
+            const dims = [w, l].sort((a,b) => a-b);
+            description = `Retalho Chapa ${fields.material} ${formatNumber(t, {minimumFractionDigits: 2})}x${formatNumber(dims[0], {minimumFractionDigits: 0})}x${formatNumber(dims[1], {minimumFractionDigits: 0})} mm`;
+        } else { // disc
+            const t = getNumPrice(fields.thickness);
+            const d = getNumPrice(fields.diameter);
+            if (t <= 0 || d <= 0) {
+                toast({ variant: "destructive", title: "Dimensões inválidas", description: "Espessura e diâmetro devem ser preenchidos." });
+                return;
+            }
+            description = `Retalho Disco ${fields.material} ${formatNumber(t, {minimumFractionDigits: 2})} Ø${formatNumber(d, {minimumFractionDigits: 0})} mm`;
+        }
+
+        newPiece = {
+            id: uuidv4(),
+            description,
+            weight: Math.ceil(weight),
+            price: finalPrice,
+            pricePerKg: pricePerUnit,
+            unit: 'kg',
+        };
+    }
 
     const newList = [...scrapList, newPiece];
     setScrapList(newList);
@@ -267,7 +296,6 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     toast({ title: "Peça removida." });
   }
 
-  const totalListWeight = scrapList.reduce((acc, item) => acc + item.weight, 0);
   const totalListPrice = scrapList.reduce((acc, item) => acc + item.price, 0);
 
   const handlePrint = () => {
@@ -278,6 +306,8 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     saveListToLocalStorage(scrapList);
     toast({ title: "Lista Salva!", description: "Sua lista de materiais foi salva com sucesso." });
   }
+
+  const totalListWeight = scrapList.reduce((acc, item) => item.unit === 'kg' ? acc + item.weight : acc, 0);
 
   return (
     <div className="space-y-6">
@@ -321,7 +351,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                   ) : (
                     <>
                         <div className="space-y-2"><Label htmlFor="diameter">Diâmetro(mm)</Label><Input id="diameter" type="text" inputMode="decimal" placeholder="Insira o diâmetro" value={fields.diameter} onChange={(e) => handleInputChange('diameter', e.target.value)} /></div>
-                        <div className="space-y-2"><Label htmlFor="thickness">Espessura(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
+                         <div className="space-y-2"><Label htmlFor="thickness">Espessura(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
                         <div className="grid grid-cols-2 gap-4 md:col-span-2">
                             <div className="space-y-2"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
                             <div className="space-y-2"><Label htmlFor="scrap-price">Preço (R$/kg)</Label><Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} disabled={!!prefilledItem}/></div>
@@ -356,7 +386,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                            <thead className="text-left">
                                 <tr className="border-b">
                                     <th className="p-4 font-medium">Descrição</th>
-                                    <th className="p-4 font-medium text-right">Peso (kg)</th>
+                                    <th className="p-4 font-medium text-right">Peso/Compr.</th>
                                     <th className="p-4 font-medium text-right text-primary">Preço (R$)</th>
                                     <th className="w-10 p-2 print:hidden"></th>
                                 </tr>
@@ -366,12 +396,23 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                                    <tr key={item.id} className="border-b last:border-0 even:bg-primary/5">
                                        <td className="p-4">{item.description}</td>
                                        <td className="p-4 text-right">
-                                           <div>{formatNumber(item.weight, {minimumFractionDigits: 0})} kg</div>
-                                           {item.pricePerKg && (
-                                            <div className="text-xs text-muted-foreground font-normal">
-                                                {`${item.pricePerKg.toFixed(2).replace('.', ',')}/kg`}
-                                           </div>
-                                           )}
+                                          {item.unit === 'm' && item.length ? (
+                                                <>
+                                                    <div>{formatNumber(item.length / 1000, { minimumFractionDigits: 3, maximumFractionDigits: 3 })} m</div>
+                                                    <div className="text-xs text-muted-foreground font-normal">
+                                                        {formatNumber(item.pricePerKg, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/m
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div>{formatNumber(item.weight, {minimumFractionDigits: 0})} kg</div>
+                                                    {item.pricePerKg && (
+                                                        <div className="text-xs text-muted-foreground font-normal">
+                                                            {`${item.pricePerKg.toFixed(2).replace('.', ',')}/kg`}
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )}
                                        </td>
                                        <td className="p-4 text-right font-medium text-primary">{formatNumber(item.price, {style: 'currency', currency: 'BRL'})}</td>
                                        <td className="p-2 text-center print:hidden">

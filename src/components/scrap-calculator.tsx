@@ -368,7 +368,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                                        <td className="p-4 text-right">
                                            <div>{formatNumber(item.weight, {minimumFractionDigits: 0})}</div>
                                            <div className="text-xs text-muted-foreground font-normal">
-                                                {formatNumber(item.pricePerKg, {style: 'currency', currency: 'BRL'})}/kg
+                                                {formatNumber(item.pricePerKg, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                                            </div>
                                        </td>
                                        <td className="p-4 text-right font-medium text-primary">{formatNumber(item.price, {style: 'currency', currency: 'BRL'})}</td>

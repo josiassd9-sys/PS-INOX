@@ -149,97 +149,105 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
 
   React.useEffect(() => {
     const getNum = (val: string) => parseFloat(val.replace(',', '.')) || 0;
-    
+    let weight: number | null = null;
+    let newFields = { ...fields };
+
     if (prefilledItem) {
         const scrapLength_mm = getNum(fields.scrapLength);
         if (scrapLength_mm > 0 && prefilledItem.weight > 0) {
-            const weight = (scrapLength_mm / 1000) * prefilledItem.weight;
-            setFields(prev => ({...prev, weight: Math.ceil(weight).toString()}));
-            setCalculatedWeight(weight);
+            const calculated = (scrapLength_mm / 1000) * prefilledItem.weight;
+            weight = calculated;
+            setFields(prev => ({...prev, weight: Math.ceil(calculated).toString()}));
+            setCalculatedWeight(calculated);
 
             const dynamicPercentage = calculateDynamicPercentage(scrapLength_mm);
             setCurrentCutPercentage(dynamicPercentage);
-            
-            const pricePerMeter = Math.ceil(sellingPrice * prefilledItem.weight);
-            const piecePrice = pricePerMeter * (scrapLength_mm / 1000);
-            const finalPriceWithCut = piecePrice * (1 + dynamicPercentage / 100);
-            setFinalPrice(Math.ceil(finalPriceWithCut));
-
         } else {
-             setFields(prev => ({...prev, weight: ''}));
+            setFields(prev => ({...prev, weight: ''}));
             setCalculatedWeight(null);
             setCurrentCutPercentage(0);
-            setFinalPrice(0);
         }
-        return;
-    }
-
-    const w_mm = getNum(fields.width);
-    const l_mm = getNum(fields.length);
-    const t_mm = getNum(fields.thickness);
-    const kg = getNum(fields.weight);
-    const d_mm = getNum(fields.diameter);
-
-    let weight: number | null = null;
-    let newFields = { ...fields };
-  
-    if (shape === 'rectangle') {
-      const inputs = [w_mm > 0, l_mm > 0, t_mm > 0, kg > 0];
-      const filledCount = inputs.filter(Boolean).length;
-  
-      if (filledCount >= 3) {
-          if (kg > 0 && t_mm > 0 && l_mm > 0 && w_mm === 0) {
-            const width = (kg / ((l_mm / 1000) * (t_mm / 1000) * DENSITY)) * 1000;
-            newFields.width = width.toFixed(2).replace('.', ',');
-            weight = kg;
-          } else if (kg > 0 && t_mm > 0 && w_mm > 0 && l_mm === 0) {
-            const length = (kg / ((w_mm / 1000) * (t_mm / 1000) * DENSITY)) * 1000;
-            newFields.length = length.toFixed(2).replace('.', ',');
-            weight = kg;
-          } else if (kg > 0 && w_mm > 0 && l_mm > 0 && t_mm === 0) {
-            const thickness = (kg / ((w_mm / 1000) * (l_mm / 1000) * DENSITY)) * 1000;
-            newFields.thickness = thickness.toFixed(2).replace('.', ',');
-            weight = kg;
-          } else if (w_mm > 0 && l_mm > 0 && t_mm > 0) {
-            weight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
-            newFields.weight = Math.ceil(weight).toString().replace('.', ',');
-          }
-      }
-    } else { // disc
-      const inputs = [d_mm > 0, t_mm > 0, kg > 0];
-      const filledCount = inputs.filter(Boolean).length;
-  
-      if (filledCount >= 2) {
-          if (kg > 0 && t_mm > 0 && d_mm === 0) {
-            const vol_m3 = kg / DENSITY;
-            const area_m2 = vol_m3 / (t_mm / 1000);
-            const r_m = Math.sqrt(area_m2 / Math.PI);
-            const diameter = r_m * 2 * 1000;
-            newFields.diameter = diameter.toFixed(2).replace('.', ',');
-            weight = kg;
-          } else if (kg > 0 && d_mm > 0 && t_mm === 0) {
-            const r_m = d_mm / 2000;
-            const area_m2 = Math.PI * r_m * r_m;
-            const thickness = (kg / (area_m2 * DENSITY)) * 1000;
-            newFields.thickness = thickness.toFixed(2).replace('.', ',');
-            weight = kg;
-          } else if (d_mm > 0 && t_mm > 0) {
-            const r_m = d_mm / 2000;
-            const vol_m3 = Math.PI * r_m * r_m * (t_mm / 1000);
-            weight = vol_m3 * DENSITY;
-            newFields.weight = Math.ceil(weight).toString().replace('.', ',');
-          }
-      }
-    }
+    } else {
+      const w_mm = getNum(fields.width);
+      const l_mm = getNum(fields.length);
+      const t_mm = getNum(fields.thickness);
+      const kg = getNum(fields.weight);
+      const d_mm = getNum(fields.diameter);
+      
+      if (shape === 'rectangle') {
+        const inputs = [w_mm > 0, l_mm > 0, t_mm > 0, kg > 0];
+        const filledCount = inputs.filter(Boolean).length;
     
-    setFields(newFields);
-    setCalculatedWeight(weight);
-    if (!prefilledItem && weight !== null) {
-      const pricePerKg = parseFloat(scrapPrice.replace(',', '.')) || 0;
-      setFinalPrice(weight * pricePerKg);
+        if (filledCount >= 3) {
+            if (kg > 0 && t_mm > 0 && l_mm > 0 && w_mm === 0) {
+              const width = (kg / ((l_mm / 1000) * (t_mm / 1000) * DENSITY)) * 1000;
+              newFields.width = width.toFixed(2).replace('.', ',');
+              weight = kg;
+            } else if (kg > 0 && t_mm > 0 && w_mm > 0 && l_mm === 0) {
+              const length = (kg / ((w_mm / 1000) * (t_mm / 1000) * DENSITY)) * 1000;
+              newFields.length = length.toFixed(2).replace('.', ',');
+              weight = kg;
+            } else if (kg > 0 && w_mm > 0 && l_mm > 0 && t_mm === 0) {
+              const thickness = (kg / ((w_mm / 1000) * (l_mm / 1000) * DENSITY)) * 1000;
+              newFields.thickness = thickness.toFixed(2).replace('.', ',');
+              weight = kg;
+            } else if (w_mm > 0 && l_mm > 0 && t_mm > 0) {
+              weight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
+              newFields.weight = Math.ceil(weight).toString().replace('.', ',');
+            }
+        }
+      } else { // disc
+        const inputs = [d_mm > 0, t_mm > 0, kg > 0];
+        const filledCount = inputs.filter(Boolean).length;
+    
+        if (filledCount >= 2) {
+            if (kg > 0 && t_mm > 0 && d_mm === 0) {
+              const vol_m3 = kg / DENSITY;
+              const area_m2 = vol_m3 / (t_mm / 1000);
+              const r_m = Math.sqrt(area_m2 / Math.PI);
+              const diameter = r_m * 2 * 1000;
+              newFields.diameter = diameter.toFixed(2).replace('.', ',');
+              weight = kg;
+            } else if (kg > 0 && d_mm > 0 && t_mm === 0) {
+              const r_m = d_mm / 2000;
+              const area_m2 = Math.PI * r_m * r_m;
+              const thickness = (kg / (area_m2 * DENSITY)) * 1000;
+              newFields.thickness = thickness.toFixed(2).replace('.', ',');
+              weight = kg;
+            } else if (d_mm > 0 && t_mm > 0) {
+              const r_m = d_mm / 2000;
+              const vol_m3 = Math.PI * r_m * r_m * (t_mm / 1000);
+              weight = vol_m3 * DENSITY;
+              newFields.weight = Math.ceil(weight).toString().replace('.', ',');
+            }
+        }
+      }
+      
+      setFields(newFields);
+      setCalculatedWeight(weight);
     }
+  }, [fields.width, fields.length, fields.thickness, fields.weight, fields.diameter, shape, prefilledItem, fields.scrapLength]);
+  
+  React.useEffect(() => {
+      const getNum = (val: string) => parseFloat(val.replace(',', '.')) || 0;
+      let piecePrice = 0;
 
-  }, [fields.width, fields.length, fields.thickness, fields.weight, fields.diameter, shape, prefilledItem, fields.scrapLength, sellingPrice, scrapPrice]);
+      if (prefilledItem) {
+          const scrapLength_mm = getNum(fields.scrapLength);
+          if (scrapLength_mm > 0 && prefilledItem.weight > 0) {
+              const pricePerMeter = Math.ceil(sellingPrice * prefilledItem.weight);
+              piecePrice = pricePerMeter * (scrapLength_mm / 1000);
+          }
+      } else if (calculatedWeight !== null) {
+          const pricePerKg = getNum(scrapPrice);
+          piecePrice = calculatedWeight * pricePerKg;
+      }
+      
+      const finalPriceWithCut = piecePrice * (1 + currentCutPercentage / 100);
+      setFinalPrice(Math.ceil(finalPriceWithCut));
+
+  }, [calculatedWeight, scrapPrice, sellingPrice, prefilledItem, fields.scrapLength, currentCutPercentage]);
+
 
   const addToList = () => {
     let description = "";
@@ -404,10 +412,14 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
              {prefilledItem && (
                 <>
                 <div className="space-y-2">
-                    <Label>Acréscimo de Corte (%)</Label>
-                    <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm font-semibold h-10 flex items-center">
-                    {currentCutPercentage.toFixed(2)}%
-                    </div>
+                    <Label htmlFor="cut-percentage">Acréscimo de Corte (%)</Label>
+                    <Input
+                        id="cut-percentage"
+                        type="number"
+                        value={currentCutPercentage > 0 ? currentCutPercentage.toFixed(2) : ""}
+                        onChange={(e) => setCurrentCutPercentage(e.target.valueAsNumber || 0)}
+                        placeholder="Ex: 20"
+                    />
                 </div>
                 </>
              )}
@@ -445,7 +457,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                                    <tr key={item.id} className="border-b last:border-0 even:bg-primary/5">
                                        <td className="p-4">{item.description}</td>
                                        <td className="p-4 text-right">
-                                          {item.unit === 'm' && item.length ? (
+                                           {item.unit === 'm' && item.length ? (
                                                 <>
                                                     <div>{formatNumber(item.length / 1000, { minimumFractionDigits: 3, maximumFractionDigits: 3 })} m</div>
                                                     {item.pricePerKg && (

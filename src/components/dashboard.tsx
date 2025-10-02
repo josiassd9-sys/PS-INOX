@@ -249,7 +249,7 @@ function DashboardComponent() {
                 </div>
               )}
               <div className="flex-1 overflow-y-auto">
-                <div className={cn("p-4 md:p-6", isScrapTableCategory && "p-0 md:p-0")}>
+                <div className={cn("p-4 md:p-6", (isScrapTableCategory || isScrapCategory) && "p-0 md:p-0")}>
                  {renderContent()}
                 </div>
               </div>

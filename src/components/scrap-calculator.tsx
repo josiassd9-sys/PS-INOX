@@ -349,7 +349,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
   const totalListWeight = scrapList.reduce((acc, item) => item.unit === 'kg' ? acc + item.weight : acc, 0);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full p-4">
       <div id="scrap-calculator-form">
         {prefilledItem ? (
             <div className="mb-4 space-y-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
@@ -441,15 +441,15 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
       </div>
       
       {scrapList.length > 0 && (
-        <div id="scrap-list-section" className="space-y-4 pt-4 mt-6 border-t flex-1 flex flex-col min-h-0">
-            <h2 className="text-lg font-semibold text-center">Lista de Materiais</h2>
+        <div id="scrap-list-section" className="border-t flex-1 flex flex-col min-h-0 pt-4 mt-4">
+            <h2 className="text-lg font-semibold text-center mb-4">Lista de Materiais</h2>
             <Card className="flex-1 overflow-hidden flex flex-col">
                 <CardContent className="p-0 flex-1 overflow-y-auto">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm table-fixed">
                            <thead className="text-left sticky top-0 bg-background z-10">
                                 <tr className="border-b">
-                                    <th className="p-4 font-medium w-auto break-words">Descrição</th>
+                                    <th className="p-4 font-medium break-words w-auto">Descrição</th>
                                     <th className="p-4 font-medium text-right w-24">Peso/Compr.</th>
                                     <th className="p-4 font-medium text-right text-primary w-28">Preço (R$)</th>
                                 </tr>
@@ -510,7 +510,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                 </CardContent>
             </Card>
 
-            <div className="flex justify-end gap-2 print:hidden">
+            <div className="flex justify-end gap-2 print:hidden pt-4">
                 <Button variant="outline" className="gap-2" onClick={handleSave}><Save/> Salvar</Button>
                 <Button className="gap-2" onClick={handlePrint}><Printer/> Imprimir</Button>
             </div>

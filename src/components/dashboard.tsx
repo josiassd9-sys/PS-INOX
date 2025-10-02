@@ -195,16 +195,18 @@ function DashboardComponent() {
                   <p className="text-sm text-muted-foreground">{searchTerm && !isScrapTableCategory ? `Buscando por "${searchTerm}"` : selectedCategory.description}</p>
                 </div>
               </div>
-              <div className="relative flex-1">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                  type="search"
-                  placeholder="Buscar em todas as categorias..."
-                  className="w-full rounded-lg bg-background pl-8"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-              </div>
+              {!isScrapTableCategory && (
+                <div className="relative flex-1">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                    type="search"
+                    placeholder="Buscar em todas as categorias..."
+                    className="w-full rounded-lg bg-background pl-8"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+              )}
               <div className="flex items-center gap-1">
                 {!isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && (
                   <Dialog>

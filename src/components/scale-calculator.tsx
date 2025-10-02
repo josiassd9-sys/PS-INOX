@@ -205,7 +205,7 @@ export function ScaleCalculator() {
         return { ...set, boxes: updatedBoxes, totalNet };
       })
     );
-  }, [JSON.stringify(weighingSets), weighingMode]);
+  }, [weighingSets, weighingMode]);
 
 
   const addMaterialBox = (setId: string) => {

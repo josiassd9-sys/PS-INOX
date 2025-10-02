@@ -49,6 +49,7 @@ function DashboardComponent() {
   const { setOpenMobile, isMobile } = useSidebar();
   const [isScrapItemDialogOpen, setIsScrapItemDialogOpen] = React.useState(false);
   const [prefillScrapItem, setPrefillScrapItem] = React.useState<SteelItem | null>(null);
+  const [customerName, setCustomerName] = React.useState("");
 
 
   const handleCostChange = (newCost: number | null) => {
@@ -131,7 +132,7 @@ function DashboardComponent() {
       return <PackageChecker />;
     }
     if (isScaleCategory) {
-      return <ScaleCalculator />;
+      return <ScaleCalculator customerName={customerName} onCustomerNameChange={setCustomerName} />;
     }
     if (isScrapTableCategory) {
         return <ScrapTable 
@@ -194,7 +195,18 @@ function DashboardComponent() {
                   <p className="text-sm text-muted-foreground">{searchTerm && !isScrapTableCategory ? `Buscando por "${searchTerm}"` : selectedCategory.description}</p>
                 </div>
               </div>
-              {!isScaleCategory && (
+              
+              {isScaleCategory ? (
+                 <div className="relative flex-1">
+                    <Input
+                        id="customer-name"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        placeholder="Digite o nome do cliente"
+                        className="w-full rounded-lg bg-background"
+                    />
+                </div>
+              ) : (
                 <div className="relative flex-1">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -206,6 +218,7 @@ function DashboardComponent() {
                     />
                 </div>
               )}
+              
               <div className="flex items-center gap-1">
                 {!isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && (
                   <Dialog>

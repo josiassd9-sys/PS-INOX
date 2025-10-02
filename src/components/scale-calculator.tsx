@@ -59,10 +59,14 @@ const sanitizeWeighingSets = (sets: any): WeighingSet[] => {
   }));
 };
 
+interface ScaleCalculatorProps {
+    customerName: string;
+    onCustomerNameChange: (name: string) => void;
+}
 
-export function ScaleCalculator() {
+
+export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCalculatorProps) {
   const { toast } = useToast();
-  const [customerName, setCustomerName] = React.useState("");
   const [weighingMode, setWeighingMode] = React.useState<WeighingMode>("unloading");
   const [weighingSets, setWeighingSets] = React.useState<WeighingSet[]>([
     {
@@ -105,7 +109,7 @@ export function ScaleCalculator() {
         
         if (parsedState && typeof parsedState === 'object') {
             const { customerName, weighingSets, weighingMode } = parsedState;
-            setCustomerName(customerName || "");
+            onCustomerNameChange(customerName || "");
             
             const sanitizedSets = sanitizeWeighingSets(weighingSets);
 
@@ -148,7 +152,7 @@ export function ScaleCalculator() {
       });
       // Reset to a clean state if loading fails
       localStorage.removeItem(LOCAL_STORAGE_KEY);
-      setCustomerName("");
+      onCustomerNameChange("");
       setWeighingSets([
         {
           id: uuidv4(),
@@ -170,7 +174,7 @@ export function ScaleCalculator() {
         const parsedState = JSON.parse(savedState);
          if (parsedState && typeof parsedState === 'object') {
             const { customerName, weighingSets, weighingMode } = parsedState;
-            if(customerName) setCustomerName(customerName);
+            if(customerName) onCustomerNameChange(customerName);
             const sanitizedSets = sanitizeWeighingSets(weighingSets);
             if (sanitizedSets.length > 0) {
               setWeighingSets(sanitizedSets);
@@ -182,6 +186,7 @@ export function ScaleCalculator() {
        console.error("Failed to auto-load state from localStorage", error);
        localStorage.removeItem(LOCAL_STORAGE_KEY);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
@@ -363,15 +368,6 @@ export function ScaleCalculator() {
     <div id="scale-calculator-printable-area" className="space-y-1">
         <div className="space-y-1">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                <div className="space-y-1 flex-1">
-                <Label htmlFor="customer-name">Nome do Cliente</Label>
-                <Input
-                    id="customer-name"
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    placeholder="Digite o nome do cliente"
-                />
-                </div>
                 <div className="space-y-1">
                     <Label>Modo de Pesagem</Label>
                     <ToggleGroup type="single" value={weighingMode} onValueChange={handleModeChange} className="w-full grid grid-cols-2">

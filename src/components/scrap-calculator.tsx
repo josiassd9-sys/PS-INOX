@@ -13,6 +13,8 @@ import { STAINLESS_STEEL_DENSITY_KG_M3, SteelItem } from "@/lib/data";
 import { Button } from "./ui/button";
 import { PlusCircle, Printer, Save, Trash2, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { SwipeToDelete } from "./ui/swipe-to-delete";
+import { AnimatePresence, motion } from "framer-motion";
 
 type Shape = "rectangle" | "disc";
 type FieldName = "width" | "length" | "thickness" | "weight" | "diameter" | "material" | "scrapLength";
@@ -376,19 +378,19 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
 
                 <div className="space-y-4 mt-6">
                   {shape === "rectangle" ? (
-                      <>
+                    <div className="space-y-4">
                         <div className="flex gap-4">
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="width">Largura(mm)</Label><Input id="width" type="text" inputMode="decimal" placeholder="Insira a largura" value={fields.width} onChange={(e) => handleInputChange('width', e.target.value)} /></div>
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="length">Compr.(mm)</Label><Input id="length" type="text" inputMode="decimal" placeholder="Insira o compr." value={fields.length} onChange={(e) => handleInputChange('length', e.target.value)} /></div>
                         </div>
-                         <div className="flex gap-4">
+                        <div className="flex gap-4">
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="thickness">Espessura(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="scrap-price">Preço (R$/kg)</Label><Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} disabled={!!prefilledItem}/></div>
                         </div>
-                      </>
+                    </div>
                   ) : (
-                    <>
+                    <div className="space-y-4">
                         <div className="flex gap-4">
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="diameter">Diâmetro(mm)</Label><Input id="diameter" type="text" inputMode="decimal" placeholder="Insira o diâmetro" value={fields.diameter} onChange={(e) => handleInputChange('diameter', e.target.value)} /></div>
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="thickness">Espessura(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
@@ -397,7 +399,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="scrap-price">Preço (R$/kg)</Label><Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} disabled={!!prefilledItem}/></div>
                         </div>
-                    </>
+                    </div>
                   )}
                 </div>
             </>
@@ -418,11 +420,8 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                 </div>
              )}
             <div className="flex gap-4">
+                <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="weight">Peso (kg)</Label><Input id="weight" type="text" inputMode="decimal" placeholder="Peso" value={fields.weight} onChange={(e) => handleInputChange('weight', e.target.value)} /></div>
                 <div className="space-y-2 flex-1 min-w-0">
-                    <Label htmlFor="weight">Peso (kg)</Label>
-                    <Input id="weight" type="text" inputMode="decimal" placeholder="Peso" value={fields.weight} onChange={(e) => handleInputChange('weight', e.target.value)} />
-                </div>
-                 <div className="space-y-2 flex-1 min-w-0">
                     <Label>P. Real (kg)</Label>
                     <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm h-10 flex items-center text-muted-foreground">{calculatedWeight !== null ? formatNumber(calculatedWeight, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "..."}</div>
                 </div>
@@ -453,49 +452,57 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                                     <th className="p-4 font-medium w-auto break-words">Descrição</th>
                                     <th className="p-4 font-medium text-right w-24">Peso/Compr.</th>
                                     <th className="p-4 font-medium text-right text-primary w-28">Preço (R$)</th>
-                                    <th className="w-12 p-2 print:hidden"></th>
                                 </tr>
                            </thead>
                            <tbody>
+                               <AnimatePresence>
                                {scrapList.map(item => (
-                                   <tr key={item.id} className="border-b last:border-0 even:bg-primary/5">
-                                       <td className="p-4 break-words">{item.description}</td>
-                                       <td className="p-4 text-right">
-                                           {item.unit === 'm' && item.length ? (
-                                                <>
-                                                    <div>{formatNumber(item.length / 1000, { minimumFractionDigits: 3, maximumFractionDigits: 3 })} m</div>
-                                                    {item.pricePerKg && (
-                                                        <div className="text-xs text-muted-foreground font-normal">
-                                                            {`${formatNumber(item.pricePerKg, {style: 'currency', currency: 'BRL'})}/m`}
-                                                        </div>
-                                                    )}
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <div>{formatNumber(item.weight, {minimumFractionDigits: 0})} kg</div>
-                                                    {item.pricePerKg && (
-                                                        <div className="text-xs text-muted-foreground font-normal">
-                                                            {`${formatNumber(item.pricePerKg, {style: 'currency', currency: 'BRL'})}/kg`}
-                                                        </div>
-                                                    )}
-                                                </>
-                                            )}
-                                       </td>
-                                       <td className="p-4 text-right font-medium text-primary">{formatNumber(item.price, {style: 'currency', currency: 'BRL'})}</td>
-                                       <td className="p-2 text-center print:hidden">
-                                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => removeFromList(item.id)}>
-                                               <Trash2 className="h-4 w-4 text-destructive"/>
-                                           </Button>
-                                       </td>
-                                   </tr>
+                                   <motion.tr
+                                     key={item.id}
+                                     layout
+                                     initial={{ opacity: 0, height: 0 }}
+                                     animate={{ opacity: 1, height: 'auto' }}
+                                     exit={{ opacity: 0, x: -200, transition: { duration: 0.2 } }}
+                                     className="border-b last:border-0 even:bg-primary/5"
+                                   >
+                                     <td colSpan={3} className="p-0">
+                                       <SwipeToDelete onDelete={() => removeFromList(item.id)}>
+                                         <div className="flex items-center">
+                                           <div className="p-4 flex-1 w-full break-words">{item.description}</div>
+                                           <div className="p-4 text-right w-24">
+                                             {item.unit === 'm' && item.length ? (
+                                               <>
+                                                 <div>{formatNumber(item.length / 1000, { minimumFractionDigits: 3, maximumFractionDigits: 3 })} m</div>
+                                                 {item.pricePerKg && (
+                                                   <div className="text-xs text-muted-foreground font-normal">
+                                                     {`${formatNumber(item.pricePerKg, { style: 'currency', currency: 'BRL' })}/m`}
+                                                   </div>
+                                                 )}
+                                               </>
+                                             ) : (
+                                               <>
+                                                 <div>{formatNumber(item.weight, { minimumFractionDigits: 0 })} kg</div>
+                                                 {item.pricePerKg && (
+                                                   <div className="text-xs text-muted-foreground font-normal">
+                                                     {`${formatNumber(item.pricePerKg, { style: 'currency', currency: 'BRL' })}/kg`}
+                                                   </div>
+                                                 )}
+                                               </>
+                                             )}
+                                           </div>
+                                           <div className="p-4 text-right font-medium text-primary w-28">{formatNumber(item.price, { style: 'currency', currency: 'BRL' })}</div>
+                                         </div>
+                                       </SwipeToDelete>
+                                     </td>
+                                   </motion.tr>
                                ))}
+                               </AnimatePresence>
                            </tbody>
                            <tfoot className="font-semibold border-t sticky bottom-0 bg-background/95">
                                 <tr>
                                     <td className="p-4">TOTAL</td>
                                     <td className="p-4 text-right">{formatNumber(totalListWeight, {minimumFractionDigits: 0})} kg</td>
                                     <td className="p-4 text-right text-primary">{formatNumber(totalListPrice, {style: 'currency', currency: 'BRL'})}</td>
-                                    <td className="print:hidden"></td>
                                 </tr>
                            </tfoot>
                         </table>

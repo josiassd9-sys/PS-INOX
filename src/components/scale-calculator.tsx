@@ -190,7 +190,7 @@ export function ScaleCalculator() {
           const container = parseFloat(box.container.replace(",", ".")) || 0;
           
           let net = 0;
-          if (startWeight > 0 && endWeight > 0 && startWeight >= endWeight) {
+          if (startWeight > 0 && endWeight > 0) {
              if (weighingMode === 'unloading') {
                 net = startWeight - endWeight - discount - container;
              } else { // loading

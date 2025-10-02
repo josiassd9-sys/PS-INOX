@@ -182,7 +182,7 @@ function DashboardComponent() {
         </SidebarContent>
       </Sidebar>
       <SidebarInset>
-        <div className="p-4 md:p-6 flex flex-col gap-6 h-screen">
+        <div className={cn("p-1 h-screen flex flex-col gap-1", isScrapCategory ? "p-1 gap-1" : "md:p-2 md:gap-2")}>
           <div className="bg-background rounded-lg border flex-1 flex flex-col overflow-hidden">
             <header className={cn(
               "flex items-center justify-between gap-4 p-4 border-b",

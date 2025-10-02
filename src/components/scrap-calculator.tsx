@@ -376,26 +376,26 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                     </ToggleGroup>
                 </div>
 
-                <div className="space-y-4 mt-6">
+                <div className="space-y-2 mt-4">
                   {shape === "rectangle" ? (
-                    <div className="space-y-4">
-                        <div className="flex gap-4">
+                    <div className="space-y-2">
+                        <div className="flex gap-2">
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="width">Largura(mm)</Label><Input id="width" type="text" inputMode="decimal" placeholder="Insira a largura" value={fields.width} onChange={(e) => handleInputChange('width', e.target.value)} /></div>
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="length">Compr.(mm)</Label><Input id="length" type="text" inputMode="decimal" placeholder="Insira o compr." value={fields.length} onChange={(e) => handleInputChange('length', e.target.value)} /></div>
                         </div>
-                        <div className="flex gap-4">
+                        <div className="flex gap-2">
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="thickness">Espessura(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="scrap-price">Preço (R$/kg)</Label><Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} disabled={!!prefilledItem}/></div>
                         </div>
                     </div>
                   ) : (
-                    <div className="space-y-4">
-                        <div className="flex gap-4">
+                    <div className="space-y-2">
+                        <div className="flex gap-2">
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="diameter">Diâmetro(mm)</Label><Input id="diameter" type="text" inputMode="decimal" placeholder="Insira o diâmetro" value={fields.diameter} onChange={(e) => handleInputChange('diameter', e.target.value)} /></div>
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="thickness">Espessura(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
                         </div>
-                        <div className="flex gap-4">
+                        <div className="flex gap-2">
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="scrap-price">Preço (R$/kg)</Label><Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} disabled={!!prefilledItem}/></div>
                         </div>
@@ -405,7 +405,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
             </>
         )}
         
-        <div className="pt-4 mt-4 border-t space-y-4">
+        <div className="pt-2 mt-2 border-t space-y-2">
              {prefilledItem && (
                 <div className="space-y-2 flex-1 min-w-0">
                     <Label htmlFor="cut-percentage">Acréscimo de Corte (%)</Label>
@@ -419,7 +419,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                     />
                 </div>
              )}
-            <div className="flex gap-4">
+            <div className="flex gap-2">
                 <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="weight">Peso (kg)</Label><Input id="weight" type="text" inputMode="decimal" placeholder="Peso" value={fields.weight} onChange={(e) => handleInputChange('weight', e.target.value)} /></div>
                 <div className="space-y-2 flex-1 min-w-0">
                     <Label>P. Real (kg)</Label>
@@ -441,15 +441,15 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
       </div>
       
       {scrapList.length > 0 && (
-        <div id="scrap-list-section" className="border-t flex-1 flex flex-col min-h-0 pt-4 mt-4">
-            <h2 className="text-lg font-semibold text-center mb-4">Lista de Materiais</h2>
+        <div id="scrap-list-section" className="border-t flex-1 flex flex-col min-h-0 pt-1 mt-2">
+            <h2 className="text-lg font-semibold text-center mb-2">Lista de Materiais</h2>
             <Card className="flex-1 overflow-hidden flex flex-col">
                 <CardContent className="p-0 flex-1 overflow-y-auto">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm table-fixed">
                            <thead className="text-left sticky top-0 bg-background z-10">
                                 <tr className="border-b">
-                                    <th className="p-4 font-medium break-words w-auto">Descrição</th>
+                                    <th className="p-4 font-medium w-auto break-words">Descrição</th>
                                     <th className="p-4 font-medium text-right w-24">Peso/Compr.</th>
                                     <th className="p-4 font-medium text-right text-primary w-28">Preço (R$)</th>
                                 </tr>
@@ -510,7 +510,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                 </CardContent>
             </Card>
 
-            <div className="flex justify-end gap-2 print:hidden pt-4">
+            <div className="flex justify-end gap-2 print:hidden pt-2">
                 <Button variant="outline" className="gap-2" onClick={handleSave}><Save/> Salvar</Button>
                 <Button className="gap-2" onClick={handlePrint}><Printer/> Imprimir</Button>
             </div>

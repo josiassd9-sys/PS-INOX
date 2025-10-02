@@ -512,23 +512,17 @@ export function ScaleCalculator() {
         <div className="flex justify-end pt-1 gap-1 print:hidden">
             <Button onClick={saveStateToLocalStorage} className="gap-1" variant="outline">
                 <Save />
-                Salvar Progresso
+                <span className="hidden sm:inline">Salvar</span>
             </Button>
              <Button onClick={loadStateFromLocalStorage} className="gap-1" variant="outline">
                 <Download />
-                Carregar Última Pesagem
+                <span className="hidden sm:inline">Carregar</span>
             </Button>
             <Button onClick={() => window.print()} className="gap-1">
                 <Printer />
-                Imprimir / Salvar PDF
+                <span className="hidden sm:inline">Imprimir</span>
             </Button>
         </div>
     </div>
   );
 }
-
-    
-
-    
-
-

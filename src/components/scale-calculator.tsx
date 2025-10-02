@@ -40,6 +40,26 @@ type WeighingMode = "unloading" | "loading";
 
 const LOCAL_STORAGE_KEY = "scaleCalculatorState";
 
+const sanitizeWeighingSets = (sets: any): WeighingSet[] => {
+  if (!Array.isArray(sets)) return [];
+  return sets.map(set => ({
+    id: set.id || uuidv4(),
+    driverName: set.driverName || "",
+    plate: set.plate || "",
+    initialWeight: set.initialWeight || "",
+    totalNet: set.totalNet || 0,
+    boxes: Array.isArray(set.boxes) ? set.boxes.map((box: any) => ({
+      id: box.id || uuidv4(),
+      name: box.name || "",
+      weight: box.weight || "",
+      discount: box.discount || "",
+      container: box.container || "",
+      net: box.net || 0,
+    })) : [],
+  }));
+};
+
+
 export function ScaleCalculator() {
   const { toast } = useToast();
   const [customerName, setCustomerName] = React.useState("");
@@ -83,12 +103,14 @@ export function ScaleCalculator() {
       if (savedState) {
         const parsedState = JSON.parse(savedState);
         
-        // Data validation
         if (parsedState && typeof parsedState === 'object') {
             const { customerName, weighingSets, weighingMode } = parsedState;
             setCustomerName(customerName || "");
-            if (Array.isArray(weighingSets) && weighingSets.length > 0) {
-              setWeighingSets(weighingSets);
+            
+            const sanitizedSets = sanitizeWeighingSets(weighingSets);
+
+            if (sanitizedSets.length > 0) {
+              setWeighingSets(sanitizedSets);
             } else {
                setWeighingSets([
                 {
@@ -149,8 +171,9 @@ export function ScaleCalculator() {
          if (parsedState && typeof parsedState === 'object') {
             const { customerName, weighingSets, weighingMode } = parsedState;
             if(customerName) setCustomerName(customerName);
-             if (Array.isArray(weighingSets) && weighingSets.length > 0) {
-              setWeighingSets(weighingSets);
+            const sanitizedSets = sanitizeWeighingSets(weighingSets);
+            if (sanitizedSets.length > 0) {
+              setWeighingSets(sanitizedSets);
             }
             if(weighingMode) setWeighingMode(weighingMode);
         }
@@ -231,12 +254,12 @@ export function ScaleCalculator() {
           if (cumulativeWeight > 0 && boxWeight > 0) {
             net = cumulativeWeight - boxWeight - discount - container;
           }
-          cumulativeWeight = boxWeight; // Próximo peso inicial é o peso final atual
+          cumulativeWeight = boxWeight;
         } else { // Carregamento
           if (cumulativeWeight >= 0 && boxWeight > 0) {
             net = boxWeight - cumulativeWeight - discount - container;
           }
-          cumulativeWeight = boxWeight; // Próximo peso inicial é o peso final atual
+          cumulativeWeight = boxWeight;
         }
 
         return { ...box, net: net > 0 ? net : 0 };
@@ -249,6 +272,7 @@ export function ScaleCalculator() {
 
   React.useEffect(() => {
     const newWeighingSets = calculateWeighingSets(weighingSets, weighingMode);
+    // Deep comparison to avoid infinite loops
     if (JSON.stringify(newWeighingSets) !== JSON.stringify(weighingSets)) {
         setWeighingSets(newWeighingSets);
     }
@@ -501,5 +525,3 @@ export function ScaleCalculator() {
     </div>
   );
 }
-
-    

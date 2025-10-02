@@ -13,7 +13,6 @@ import { STAINLESS_STEEL_DENSITY_KG_M3, SteelItem } from "@/lib/data";
 import { Button } from "./ui/button";
 import { PlusCircle, Printer, Save, Trash2, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
 
 type Shape = "rectangle" | "disc";
 type FieldName = "width" | "length" | "thickness" | "weight" | "diameter" | "material" | "scrapLength";
@@ -448,19 +447,19 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
             <Card className="flex-1 overflow-hidden flex flex-col">
                 <CardContent className="p-0 flex-1 overflow-y-auto">
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
+                        <table className="w-full text-sm table-fixed">
                            <thead className="text-left sticky top-0 bg-background z-10">
                                 <tr className="border-b">
-                                    <th className="p-4 font-medium flex-1 min-w-[200px]">Descrição</th>
-                                    <th className="p-4 font-medium text-right w-32">Peso/Compr.</th>
-                                    <th className="p-4 font-medium text-right text-primary w-32">Preço (R$)</th>
-                                    <th className="w-10 p-2 print:hidden"></th>
+                                    <th className="p-4 font-medium w-auto break-words">Descrição</th>
+                                    <th className="p-4 font-medium text-right w-24">Peso/Compr.</th>
+                                    <th className="p-4 font-medium text-right text-primary w-28">Preço (R$)</th>
+                                    <th className="w-12 p-2 print:hidden"></th>
                                 </tr>
                            </thead>
                            <tbody>
                                {scrapList.map(item => (
                                    <tr key={item.id} className="border-b last:border-0 even:bg-primary/5">
-                                       <td className="p-4">{item.description}</td>
+                                       <td className="p-4 break-words">{item.description}</td>
                                        <td className="p-4 text-right">
                                            {item.unit === 'm' && item.length ? (
                                                 <>

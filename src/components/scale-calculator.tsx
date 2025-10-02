@@ -81,14 +81,35 @@ export function ScaleCalculator() {
     try {
       const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (savedState) {
-        const { customerName, weighingSets, weighingMode } = JSON.parse(savedState);
-        setCustomerName(customerName || "");
-        setWeighingSets(weighingSets || []);
-        setWeighingMode(weighingMode || "unloading");
-         toast({
-          title: "Dados Carregados",
-          description: "A última pesagem salva foi carregada.",
-        });
+        const parsedState = JSON.parse(savedState);
+        
+        // Data validation
+        if (parsedState && typeof parsedState === 'object') {
+            const { customerName, weighingSets, weighingMode } = parsedState;
+            setCustomerName(customerName || "");
+            if (Array.isArray(weighingSets) && weighingSets.length > 0) {
+              setWeighingSets(weighingSets);
+            } else {
+               setWeighingSets([
+                {
+                  id: uuidv4(),
+                  driverName: "",
+                  plate: "",
+                  initialWeight: "",
+                  boxes: [{ id: uuidv4(), name: "Material 1", weight: "", discount: "", container: "", net: 0 }],
+                  totalNet: 0,
+                },
+              ]);
+            }
+            setWeighingMode(weighingMode || "unloading");
+            toast({
+                title: "Dados Carregados",
+                description: "A última pesagem salva foi carregada.",
+            });
+        } else {
+             throw new Error("Invalid data format in localStorage");
+        }
+
       } else {
         toast({
             variant: "default",
@@ -101,8 +122,22 @@ export function ScaleCalculator() {
        toast({
         variant: "destructive",
         title: "Erro ao Carregar",
-        description: "Não foi possível carregar os dados salvos.",
+        description: "Não foi possível carregar os dados salvos. O formato pode ser inválido.",
       });
+      // Reset to a clean state if loading fails
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
+      setCustomerName("");
+      setWeighingSets([
+        {
+          id: uuidv4(),
+          driverName: "",
+          plate: "",
+          initialWeight: "",
+          boxes: [{ id: uuidv4(), name: "Material 1", weight: "", discount: "", container: "", net: 0 }],
+          totalNet: 0,
+        },
+      ]);
+      setWeighingMode("unloading");
     }
   };
   
@@ -110,13 +145,19 @@ export function ScaleCalculator() {
     try {
       const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (savedState) {
-        const { customerName, weighingSets, weighingMode } = JSON.parse(savedState);
-        setCustomerName(customerName || "");
-        setWeighingSets(weighingSets || []);
-        setWeighingMode(weighingMode || "unloading");
+        const parsedState = JSON.parse(savedState);
+         if (parsedState && typeof parsedState === 'object') {
+            const { customerName, weighingSets, weighingMode } = parsedState;
+            setCustomerName(customerName || "");
+             if (Array.isArray(weighingSets) && weighingSets.length > 0) {
+              setWeighingSets(weighingSets);
+            }
+            setWeighingMode(weighingMode || "unloading");
+        }
       }
     } catch (error) {
        console.error("Failed to auto-load state from localStorage", error);
+       localStorage.removeItem(LOCAL_STORAGE_KEY);
     }
   }, []);
 
@@ -453,5 +494,7 @@ export function ScaleCalculator() {
     </div>
   );
 }
+
+    
 
     

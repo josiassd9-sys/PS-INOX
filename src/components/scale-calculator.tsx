@@ -509,7 +509,7 @@ export function ScaleCalculator() {
             </div>
         </div>
 
-        <div className="flex justify-end flex-wrap pt-1 gap-1 print:hidden">
+        <div className="flex justify-end pt-1 gap-1 print:hidden">
             <Button onClick={saveStateToLocalStorage} className="gap-1" variant="outline">
                 <Save />
                 Salvar Progresso
@@ -530,4 +530,5 @@ export function ScaleCalculator() {
     
 
     
+
 

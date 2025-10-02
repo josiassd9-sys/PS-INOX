@@ -441,8 +441,8 @@ export function ScaleCalculator() {
                       </Button>
                     )}
                   </div>
-                  <div className="flex flex-wrap gap-1">
-                      <div className="space-y-1 w-[calc(50%-0.25rem)]">
+                  <div className="grid grid-cols-3 gap-1">
+                      <div className="space-y-1">
                         <Label htmlFor={`weight-${box.id}`} className="text-xs text-muted-foreground">{boxWeightLabel}</Label>
                         <Input
                           id={`weight-${box.id}`}
@@ -453,7 +453,7 @@ export function ScaleCalculator() {
                           placeholder="Peso"
                         />
                       </div>
-                      <div className="space-y-1 w-[calc(50%-0.25rem)]">
+                      <div className="space-y-1">
                         <Label htmlFor={`discount-${box.id}`} className="text-xs text-muted-foreground">Desconto (kg)</Label>
                         <Input
                           id={`discount-${box.id}`}
@@ -464,7 +464,7 @@ export function ScaleCalculator() {
                           placeholder="Lixo, outros"
                         />
                       </div>
-                      <div className="space-y-1 w-[calc(50%-0.25rem)]">
+                      <div className="space-y-1">
                         <Label htmlFor={`container-${box.id}`} className="text-xs text-muted-foreground">Caçamba (kg)</Label>
                         <Input
                           id={`container-${box.id}`}
@@ -475,11 +475,11 @@ export function ScaleCalculator() {
                           placeholder="Peso"
                         />
                       </div>
-                      <div className="space-y-1 w-[calc(50%-0.25rem)]">
-                          <Label className="text-accent-price font-semibold text-xs">Peso Líquido</Label>
-                          <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-1 text-sm font-bold text-accent-price h-10 flex items-center print:bg-transparent print:border-accent-price">
-                              {formatNumber(box.net)} kg
-                          </div>
+                  </div>
+                  <div className="space-y-1">
+                      <Label className="text-accent-price font-semibold text-xs">Peso Líquido</Label>
+                      <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-1 text-sm font-bold text-accent-price h-10 flex items-center print:bg-transparent print:border-accent-price">
+                          {formatNumber(box.net)} kg
                       </div>
                   </div>
                 </div>
@@ -525,5 +525,7 @@ export function ScaleCalculator() {
     </div>
   );
 }
+
+    
 
     

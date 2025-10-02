@@ -17,6 +17,7 @@ import { Separator } from "./ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
 import { cn } from "@/lib/utils";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
 
 interface MaterialBox {
   id: string;
@@ -39,6 +40,17 @@ interface WeighingSet {
 type WeighingMode = "unloading" | "loading";
 
 const LOCAL_STORAGE_KEY = "scaleCalculatorState";
+
+const getInitialWeighingSet = (): WeighingSet[] => ([
+    {
+      id: uuidv4(),
+      driverName: "",
+      plate: "",
+      initialWeight: "",
+      boxes: [{ id: uuidv4(), name: "Material 1", weight: "", discount: "", container: "", net: 0 }],
+      totalNet: 0,
+    },
+]);
 
 const sanitizeWeighingSets = (sets: any): WeighingSet[] => {
   if (!Array.isArray(sets)) return [];
@@ -68,16 +80,7 @@ interface ScaleCalculatorProps {
 export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCalculatorProps) {
   const { toast } = useToast();
   const [weighingMode, setWeighingMode] = React.useState<WeighingMode>("unloading");
-  const [weighingSets, setWeighingSets] = React.useState<WeighingSet[]>([
-    {
-      id: uuidv4(),
-      driverName: "",
-      plate: "",
-      initialWeight: "",
-      boxes: [{ id: uuidv4(), name: "Material 1", weight: "", discount: "", container: "", net: 0 }],
-      totalNet: 0,
-    },
-  ]);
+  const [weighingSets, setWeighingSets] = React.useState<WeighingSet[]>(getInitialWeighingSet());
 
   const saveStateToLocalStorage = () => {
     try {
@@ -116,16 +119,7 @@ export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCal
             if (sanitizedSets.length > 0) {
               setWeighingSets(sanitizedSets);
             } else {
-               setWeighingSets([
-                {
-                  id: uuidv4(),
-                  driverName: "",
-                  plate: "",
-                  initialWeight: "",
-                  boxes: [{ id: uuidv4(), name: "Material 1", weight: "", discount: "", container: "", net: 0 }],
-                  totalNet: 0,
-                },
-              ]);
+               setWeighingSets(getInitialWeighingSet());
             }
             setWeighingMode(weighingMode || "unloading");
             toast({
@@ -151,22 +145,21 @@ export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCal
         description: "Não foi possível carregar os dados salvos. O formato pode ser inválido.",
       });
       // Reset to a clean state if loading fails
+      handleClearAll();
       localStorage.removeItem(LOCAL_STORAGE_KEY);
-      onCustomerNameChange("");
-      setWeighingSets([
-        {
-          id: uuidv4(),
-          driverName: "",
-          plate: "",
-          initialWeight: "",
-          boxes: [{ id: uuidv4(), name: "Material 1", weight: "", discount: "", container: "", net: 0 }],
-          totalNet: 0,
-        },
-      ]);
-      setWeighingMode("unloading");
     }
   };
   
+  const handleClearAll = () => {
+    onCustomerNameChange("");
+    setWeighingSets(getInitialWeighingSet());
+    setWeighingMode("unloading");
+    toast({
+        title: "Campos Limpos",
+        description: "Você pode iniciar uma nova pesagem.",
+    });
+  }
+
   React.useEffect(() => {
     try {
       const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -332,14 +325,7 @@ export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCal
     setWeighingSets(prevSets => {
         const updatedSets = prevSets.filter(set => set.id !== setId);
         if (updatedSets.length === 0) {
-            return [{
-              id: uuidv4(),
-              driverName: "",
-              plate: "",
-              initialWeight: "",
-              boxes: [{ id: uuidv4(), name: "Material 1", weight: "", discount: "", container: "", net: 0 }],
-              totalNet: 0,
-            }];
+            return [getInitialWeighingSet()[0]];
         }
         return updatedSets;
     });
@@ -506,6 +492,26 @@ export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCal
         </div>
 
         <div className="flex justify-end pt-1 gap-1 print:hidden">
+            <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    <Button variant="destructive" className="gap-1">
+                        <Trash2 />
+                        <span className="hidden sm:inline">Limpar</span>
+                    </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Esta ação não pode ser desfeita. Isso limpará todos os campos da pesagem atual.
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleClearAll}>Continuar</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
             <Button onClick={saveStateToLocalStorage} className="gap-1" variant="outline">
                 <Save />
                 <span className="hidden sm:inline">Salvar</span>

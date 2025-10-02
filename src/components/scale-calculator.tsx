@@ -148,11 +148,11 @@ export function ScaleCalculator() {
         const parsedState = JSON.parse(savedState);
          if (parsedState && typeof parsedState === 'object') {
             const { customerName, weighingSets, weighingMode } = parsedState;
-            setCustomerName(customerName || "");
+            if(customerName) setCustomerName(customerName);
              if (Array.isArray(weighingSets) && weighingSets.length > 0) {
               setWeighingSets(weighingSets);
             }
-            setWeighingMode(weighingMode || "unloading");
+            if(weighingMode) setWeighingMode(weighingMode);
         }
       }
     } catch (error) {
@@ -217,35 +217,41 @@ export function ScaleCalculator() {
     }
   };
 
+  const calculateWeighingSets = (sets: WeighingSet[], mode: WeighingMode) => {
+    return sets.map((set) => {
+      let cumulativeWeight = parseFloat(set.initialWeight.replace(",", ".")) || 0;
+      const updatedBoxes = set.boxes.map((box) => {
+        const boxWeight = parseFloat(box.weight.replace(",", ".")) || 0;
+        const discount = parseFloat(box.discount.replace(",", ".")) || 0;
+        const container = parseFloat(box.container.replace(",", ".")) || 0;
+        
+        let net = 0;
+        if (mode === 'unloading') {
+          if (cumulativeWeight > 0 && boxWeight > 0) {
+            net = cumulativeWeight - boxWeight - discount - container;
+          }
+          cumulativeWeight = boxWeight; // Next start weight is the current end weight
+        } else { // loading
+          if (cumulativeWeight >= 0 && boxWeight > 0) {
+            net = boxWeight - cumulativeWeight - discount - container;
+          }
+          cumulativeWeight = boxWeight; // Next start weight is the current end weight
+        }
+
+        return { ...box, net };
+      });
+
+      const totalNet = updatedBoxes.reduce((acc, box) => acc + (box.net > 0 ? box.net : 0), 0);
+      return { ...set, boxes: updatedBoxes, totalNet };
+    });
+  };
 
   React.useEffect(() => {
-    setWeighingSets((prevSets) =>
-      prevSets.map((set) => {
-        const updatedBoxes = set.boxes.map((box, index) => {
-          const startWeight = index === 0 
-            ? parseFloat(set.initialWeight.replace(",", ".")) || 0
-            : parseFloat(set.boxes[index-1].weight.replace(",", ".")) || 0;
-            
-          const endWeight = parseFloat(box.weight.replace(",", ".")) || 0;
-          const discount = parseFloat(box.discount.replace(",", ".")) || 0;
-          const container = parseFloat(box.container.replace(",", ".")) || 0;
-          
-          let net = 0;
-          if (startWeight > 0 && endWeight > 0) {
-             if (weighingMode === 'unloading') {
-                net = startWeight - endWeight - discount - container;
-             } else { // loading
-                net = endWeight - startWeight - discount - container;
-             }
-          }
-
-          return { ...box, net };
-        });
-
-        const totalNet = updatedBoxes.reduce((acc, box) => acc + (box.net > 0 ? box.net : 0), 0);
-        return { ...set, boxes: updatedBoxes, totalNet };
-      })
-    );
+    const newWeighingSets = calculateWeighingSets(weighingSets, weighingMode);
+    // Only update state if the calculated values are different to prevent infinite loop
+    if (JSON.stringify(newWeighingSets) !== JSON.stringify(weighingSets)) {
+      setWeighingSets(newWeighingSets);
+    }
   }, [weighingSets, weighingMode]);
 
 
@@ -494,7 +500,3 @@ export function ScaleCalculator() {
     </div>
   );
 }
-
-    
-
-    

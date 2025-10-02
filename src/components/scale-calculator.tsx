@@ -383,8 +383,8 @@ export function ScaleCalculator() {
         </div>
 
         {weighingSets.map((set, setIndex) => (
-          <Card key={set.id} className="bg-card/50 pt-2 print:shadow-none print:border-border">
-            <CardHeader className="flex-row items-center justify-between pt-2 pb-2">
+          <Card key={set.id} className="bg-card/50 pt-1 print:shadow-none print:border-border">
+            <CardHeader className="flex-row items-center justify-between pt-1 pb-1">
                 <div className="space-y-1 flex-1">
                     <CardTitle className="text-lg">Pesagem {setIndex + 1}</CardTitle>
                 </div>
@@ -395,7 +395,7 @@ export function ScaleCalculator() {
               )}
             </CardHeader>
             <CardContent className="space-y-1 p-1 pt-0">
-                <div className="grid grid-cols-2 gap-1">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
                     <div className="space-y-1">
                         <Label htmlFor={`driver-name-${set.id}`} className="text-xs text-muted-foreground">Motorista</Label>
                         <Input
@@ -414,17 +414,17 @@ export function ScaleCalculator() {
                             placeholder="Placa"
                         />
                     </div>
-                </div>
-                <div className="space-y-1">
-                    <Label htmlFor={`initialWeight-${set.id}`} className="text-xs text-muted-foreground">{initialWeightLabel}</Label>
-                    <Input
-                        id={`initialWeight-${set.id}`}
-                        type="text"
-                        inputMode="decimal"
-                        value={set.initialWeight}
-                        onChange={(e) => handleInputChange(e.target.value, set.id, "initialWeight")}
-                        placeholder="Peso inicial"
-                    />
+                     <div className="space-y-1">
+                        <Label htmlFor={`initialWeight-${set.id}`} className="text-xs text-muted-foreground">{initialWeightLabel}</Label>
+                        <Input
+                            id={`initialWeight-${set.id}`}
+                            type="text"
+                            inputMode="decimal"
+                            value={set.initialWeight}
+                            onChange={(e) => handleInputChange(e.target.value, set.id, "initialWeight")}
+                            placeholder="Peso inicial"
+                        />
+                    </div>
                 </div>
 
               {set.boxes.map((box) => (
@@ -477,7 +477,7 @@ export function ScaleCalculator() {
                       </div>
                       <div className="space-y-1 w-[calc(50%-0.25rem)]">
                           <Label className="text-accent-price font-semibold text-xs">Peso Líquido</Label>
-                          <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-sm font-bold text-accent-price h-10 flex items-center print:bg-transparent print:border-accent-price">
+                          <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-1 text-sm font-bold text-accent-price h-10 flex items-center print:bg-transparent print:border-accent-price">
                               {formatNumber(box.net)} kg
                           </div>
                       </div>
@@ -501,14 +501,14 @@ export function ScaleCalculator() {
 
         <Separator />
 
-        <div className="flex justify-end items-center gap-1 pt-2">
+        <div className="flex justify-end items-center gap-1 pt-1">
             <h3 className="text-lg font-semibold">Total Geral Líquido:</h3>
             <div className="text-2xl font-bold text-primary min-w-[150px] text-right">
                 {formatNumber(grandTotalNet)} kg
             </div>
         </div>
 
-        <div className="flex justify-end flex-wrap pt-2 gap-1 print:hidden">
+        <div className="flex justify-end flex-wrap pt-1 gap-1 print:hidden">
             <Button onClick={saveStateToLocalStorage} className="gap-1" variant="outline">
                 <Save />
                 Salvar Progresso

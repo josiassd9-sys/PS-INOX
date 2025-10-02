@@ -395,7 +395,7 @@ export function ScaleCalculator() {
               )}
             </CardHeader>
             <CardContent className="space-y-1 p-1 pt-0">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
+                <div className="grid grid-cols-3 gap-1">
                     <div className="space-y-1">
                         <Label htmlFor={`driver-name-${set.id}`} className="text-xs text-muted-foreground">Motorista</Label>
                         <Input

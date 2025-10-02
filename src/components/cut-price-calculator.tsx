@@ -111,9 +111,9 @@ export function CutPriceCalculator({
 
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+        <div className="space-y-1">
+          <div className="flex gap-1">
+            <div className="space-y-1 flex-1">
               <Label htmlFor="cut-length">Comprimento do Corte (mm)</Label>
               <Input
                 id="cut-length"
@@ -127,21 +127,21 @@ export function CutPriceCalculator({
                 placeholder="Ex: 500"
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1 flex-1">
                 <Label>Peso da Peça (kg)</Label>
                 <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm font-semibold h-10 flex items-center">
                     {formatNumber(pieceWeight, 3)}
                 </div>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+          <div className="flex gap-1">
+            <div className="space-y-1 flex-1">
                 <Label>Acréscimo de Corte (%)</Label>
                 <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm font-semibold h-10 flex items-center">
                 {currentCutPercentage.toFixed(2)}%
                 </div>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1 flex-1">
                 <Label className="text-accent-price font-semibold">Preço Final da Peça</Label>
                 <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
                 {formatCurrency(finalPrice)}

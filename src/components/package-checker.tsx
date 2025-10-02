@@ -133,9 +133,9 @@ export function PackageChecker() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-1">
       {/* Item Selection */}
-      <div className="space-y-2">
+      <div className="space-y-1">
         <Label htmlFor="search-item">1. Selecione o Item</Label>
         <div className="relative">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -152,12 +152,12 @@ export function PackageChecker() {
             {searchTerm && filteredItems.length > 0 && (
               <Card className="absolute z-10 mt-1 w-full border-primary/20">
                   <ScrollArea className="h-60">
-                      <div className="p-2">
+                      <div className="p-1">
                       {filteredItems.map(item => (
                           <div 
                               key={item.id}
                               onClick={() => handleItemSelect(item)}
-                              className="cursor-pointer rounded-md p-2 text-sm hover:bg-primary/10"
+                              className="cursor-pointer rounded-md p-1 text-sm hover:bg-primary/10"
                           >
                               {item.description}
                               <p className="text-xs text-muted-foreground">{formatNumber(item.weight, 3)} kg/m</p>
@@ -169,19 +169,19 @@ export function PackageChecker() {
           )}
         </div>
         {selectedItem && (
-          <div className="mt-2 text-sm text-primary font-medium p-2 bg-primary/10 rounded-md">
+          <div className="mt-1 text-sm text-primary font-medium p-1 bg-primary/10 rounded-md">
               Item selecionado: {selectedItem.description} ({formatNumber(selectedItem.weight, 3)} kg/m)
           </div>
         )}
       </div>
       
       {/* Inputs */}
-      <div className={cn("space-y-4", !selectedItem && "opacity-50 pointer-events-none")}>
-          <div className="space-y-2">
+      <div className={cn("space-y-1", !selectedItem && "opacity-50 pointer-events-none")}>
+          <div className="space-y-1">
               <Label>2. Insira os Dados </Label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="space-y-4">
-                  <div className="space-y-1.5">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
+                <div className="space-y-1">
+                  <div className="space-y-1">
                       <Label htmlFor="package-weight" className="text-xs text-muted-foreground">Peso Total (kg)</Label>
                       <Input
                           id="package-weight"
@@ -192,7 +192,7 @@ export function PackageChecker() {
                           onChange={(e) => handleInputChange(setPackageWeight, e.target.value, 'weight')}
                       />
                   </div>
-                    <div className="space-y-1.5">
+                    <div className="space-y-1">
                       <Label htmlFor="invoice-percentage" className="text-xs text-muted-foreground">% da Nota</Label>
                       <div className="relative">
                           <Input
@@ -208,8 +208,8 @@ export function PackageChecker() {
                       </div>
                   </div>
                 </div>
-                <div className="space-y-4">
-                  <div className="space-y-1.5">
+                <div className="space-y-1">
+                  <div className="space-y-1">
                       <Label htmlFor="total-price" className="text-xs text-muted-foreground">Valor Total Pago (R$)</Label>
                       <Input
                           id="total-price"
@@ -220,7 +220,7 @@ export function PackageChecker() {
                           onChange={(e) => handleInputChange(setTotalPrice, e.target.value, 'total')}
                       />
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-1">
                       <Label htmlFor="price-per-kg" className="text-xs text-muted-foreground">R$/Kg</Label>
                       <Input
                           id="price-per-kg"
@@ -238,11 +238,11 @@ export function PackageChecker() {
 
 
       {/* Results */}
-      <div className={cn("pt-4 border-t", !selectedItem && "opacity-50 pointer-events-none")}>
-          <h3 className="text-lg font-medium mb-4">Resultados</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="space-y-4">
-                  <div className="space-y-1.5">
+      <div className={cn("pt-1 border-t", !selectedItem && "opacity-50 pointer-events-none")}>
+          <h3 className="text-lg font-medium mb-1">Resultados</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
+              <div className="space-y-1">
+                  <div className="space-y-1">
                       <Label htmlFor="total-length" className="text-xs text-muted-foreground">Qtd. MT</Label>
                       <Input
                           id="total-length"
@@ -254,21 +254,21 @@ export function PackageChecker() {
                           className="font-semibold"
                       />
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-1">
                       <Label className="text-xs text-accent-price font-semibold">R$/Metro</Label>
                       <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
                         {realPricePerMeter > 0 ? `${realPricePerMeter.toFixed(5).replace('.', ',')}` : '0,00'}
                       </div>
                   </div>
               </div>
-              <div className="space-y-4">
-                    <div className="space-y-1.5">
+              <div className="space-y-1">
+                    <div className="space-y-1">
                       <Label className="text-xs text-muted-foreground">Qtd.Barras 6m</Label>
                       <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm font-semibold h-10 flex items-center">
                           {formatNumber(barCount, 3)}
                       </div>
                   </div>
-                    <div className="space-y-1.5">
+                    <div className="space-y-1">
                       <Label className="text-xs text-accent-price font-semibold">R$/Barra 6m</Label>
                       <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
                           {formatCurrency(pricePerBar)}
@@ -281,5 +281,3 @@ export function PackageChecker() {
     </div>
   );
 }
-
-    

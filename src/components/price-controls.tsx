@@ -29,8 +29,8 @@ export function PriceControls({
   return (
     <Card className="border-none shadow-none">
       <CardContent className="pt-2">
-        <div className="grid grid-cols-3 gap-4">
-          <div className="space-y-2">
+        <div className="grid grid-cols-3 gap-1">
+          <div className="space-y-1">
             <Label htmlFor="cost-price" className="text-xs">Custo (R$/kg)</Label>
             <Input
               id="cost-price"
@@ -40,7 +40,7 @@ export function PriceControls({
               placeholder="Ex: 25.50"
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="markup" className="text-xs">Margem (%)</Label>
             <Input
               id="markup"
@@ -50,7 +50,7 @@ export function PriceControls({
               placeholder="Ex: 40"
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label htmlFor="selling-price" className="text-primary font-semibold text-xs">Venda (R$/kg)</Label>
             <Input
               id="selling-price"

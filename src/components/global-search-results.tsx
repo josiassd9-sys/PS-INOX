@@ -55,12 +55,12 @@ export function GlobalSearchResults({ categories, sellingPrice, searchTerm, onPr
     }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-1">
         <h2 className="text-xl font-semibold">Resultados da Busca para "{searchTerm}"</h2>
-        <Accordion type="multiple" className="w-full space-y-2" defaultValue={categories.map(c => c.id)}>
+        <Accordion type="multiple" className="w-full space-y-1" defaultValue={categories.map(c => c.id)}>
             {categories.map((category) => (
                 <AccordionItem value={category.id} key={category.id} className="border rounded-lg overflow-hidden bg-card">
-                    <AccordionTrigger className="px-6 py-4 hover:bg-primary/10 text-lg font-semibold">
+                    <AccordionTrigger className="px-1 py-1 hover:bg-primary/10 text-lg font-semibold">
                         {category.name} ({category.items.length})
                     </AccordionTrigger>
                     <AccordionContent className="p-0">
@@ -92,7 +92,7 @@ export function GlobalSearchResults({ categories, sellingPrice, searchTerm, onPr
                                                     <TableCell className="flex-1 flex justify-between items-center">
                                                         {item.description}
                                                         {isScrapCalculatorActive && (
-                                                            <PlusCircle className="h-5 w-5 text-primary/50 ml-4" />
+                                                            <PlusCircle className="h-5 w-5 text-primary/50 ml-1" />
                                                         )}
                                                     </TableCell>
                                                     <TableCell className="w-1/3 text-center">{formatNumber(item.weight)}</TableCell>
@@ -108,7 +108,7 @@ export function GlobalSearchResults({ categories, sellingPrice, searchTerm, onPr
                                                 {isSelected && category.unit === 'm' && !isScrapCalculatorActive && (
                                                     <TableRow>
                                                         <TableCell colSpan={3} className="p-0">
-                                                            <div className="p-4 bg-primary/5">
+                                                            <div className="p-1 bg-primary/5">
                                                                 <CutPriceCalculator
                                                                     selectedItem={item}
                                                                     sellingPrice={sellingPrice}

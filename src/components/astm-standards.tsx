@@ -75,7 +75,7 @@ const standards = [
 export function AstmStandards() {
   return (
     <>
-      <Card className="mb-6 border-primary/20 bg-primary/5">
+      <Card className="mb-1 border-primary/20 bg-primary/5">
         <CardHeader>
           <CardTitle className="text-xl">Acabamentos e Tratamentos</CardTitle>
           <CardDescription>
@@ -83,9 +83,9 @@ export function AstmStandards() {
           </CardDescription>
         </CardHeader>
         <CardContent className="text-sm">
-          <p className="mb-2"><strong className="text-foreground">Recozimento:</strong> Tratamento térmico que alivia as tensões internas do material, geralmente após processos de soldagem ou conformação. Melhora a ductilidade e a resistência à corrosão.</p>
-          <p className="mb-2"><strong className="text-foreground">Decapagem e Passivação:</strong> Processo químico que remove impurezas da superfície e restaura a camada passiva de óxido de cromo, que é a responsável pela resistência à corrosão do aço inox.</p>
-          <p className="mb-2"><strong className="text-foreground">Acabamento Polido:</strong> Obtido por lixamento com abrasivos finos. Pode ser sanitário (para higiene) ou brilhante (estético). A norma A270 é um exemplo focado em acabamento sanitário.</p>
+          <p className="mb-1"><strong className="text-foreground">Recozimento:</strong> Tratamento térmico que alivia as tensões internas do material, geralmente após processos de soldagem ou conformação. Melhora a ductilidade e a resistência à corrosão.</p>
+          <p className="mb-1"><strong className="text-foreground">Decapagem e Passivação:</strong> Processo químico que remove impurezas da superfície e restaura a camada passiva de óxido de cromo, que é a responsável pela resistência à corrosão do aço inox.</p>
+          <p className="mb-1"><strong className="text-foreground">Acabamento Polido:</strong> Obtido por lixamento com abrasivos finos. Pode ser sanitário (para higiene) ou brilhante (estético). A norma A270 é um exemplo focado em acabamento sanitário.</p>
           <p><strong className="text-foreground">Acabamento Escovado (Acetinado):</strong> Cria um visual com riscos finos e uniformes, menos reflexivo que o polido. Muito comum em aplicações arquitetônicas e ornamentais, cobertas pela norma A554.</p>
         </CardContent>
       </Card>
@@ -93,8 +93,8 @@ export function AstmStandards() {
       <Accordion type="single" collapsible className="w-full">
           {standards.map(standard => (
               <AccordionItem value={standard.id} key={standard.id}>
-                  <AccordionTrigger className="text-base font-semibold hover:bg-primary/10 px-4">{standard.title} - <span className="text-sm font-normal text-muted-foreground ml-2 flex-1 text-left">{standard.summary}</span></AccordionTrigger>
-                  <AccordionContent className="px-6 py-4 border-t bg-primary/5">
+                  <AccordionTrigger className="text-base font-semibold hover:bg-primary/10 px-1">{standard.title} - <span className="text-sm font-normal text-muted-foreground ml-1 flex-1 text-left">{standard.summary}</span></AccordionTrigger>
+                  <AccordionContent className="px-1 py-1 border-t bg-primary/5">
                       <p className="text-base whitespace-pre-wrap">{standard.details}</p>
                   </AccordionContent>
               </AccordionItem>

@@ -92,7 +92,7 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
 
   return (
     <>
-      <div className="flex items-center justify-end mb-4">
+      <div className="flex items-center justify-end mb-1">
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button size="sm" className="h-8 gap-1">
@@ -106,8 +106,8 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
             <DialogHeader>
               <DialogTitle>Adicionar Novo Item em {category.name}</DialogTitle>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid gap-1 py-1">
+              <div className="grid grid-cols-4 items-center gap-1">
                 <Label htmlFor="description" className="text-right">
                   Descrição
                 </Label>
@@ -118,7 +118,7 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
                   className="col-span-3"
                 />
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
+              <div className="grid grid-cols-4 items-center gap-1">
                 <Label htmlFor="weight" className="text-right">
                   Peso ({weightUnitLabel})
                 </Label>
@@ -175,12 +175,12 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
                               category.unit !== 'm' && 'hover:bg-primary/10',
                           )}
                           >
-                          <TableCell className="flex-1 px-4">{item.description}</TableCell>
-                          <TableCell className="w-1/3 text-center px-4">
+                          <TableCell className="flex-1 px-1">{item.description}</TableCell>
+                          <TableCell className="w-1/3 text-center px-1">
                               {formatNumber(item.weight, 3)}
                           </TableCell>
-                          <TableCell className="w-1/3 text-right font-medium text-primary px-4">
-                              <div className="flex items-center justify-end gap-2">
+                          <TableCell className="w-1/3 text-right font-medium text-primary px-1">
+                              <div className="flex items-center justify-end gap-1">
                                 <span>{formatCurrency(itemPrice)}</span>
                               </div>
                               {category.unit === 'm' && (
@@ -193,7 +193,7 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
                       {isSelected && category.unit === 'm' && (
                             <TableRow>
                               <TableCell colSpan={3} className="p-0">
-                                  <div className="p-4 bg-primary/5">
+                                  <div className="p-1 bg-primary/5">
                                   <CutPriceCalculator
                                       selectedItem={item}
                                       sellingPrice={sellingPrice}

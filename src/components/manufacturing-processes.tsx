@@ -57,7 +57,7 @@ const processes = [
 export function ManufacturingProcesses() {
   return (
     <>
-      <Card className="mb-6 border-primary/20 bg-primary/5">
+      <Card className="mb-1 border-primary/20 bg-primary/5">
         <CardHeader>
           <CardTitle className="text-xl">Processos de Fabricação e Transformação do Aço Inox</CardTitle>
           <CardDescription>
@@ -69,8 +69,8 @@ export function ManufacturingProcesses() {
       <Accordion type="single" collapsible className="w-full">
           {processes.map(process => (
               <AccordionItem value={process.id} key={process.id}>
-                  <AccordionTrigger className="text-base font-semibold hover:bg-primary/10 px-4">{process.title}</AccordionTrigger>
-                  <AccordionContent className="px-6 py-4 border-t bg-primary/5">
+                  <AccordionTrigger className="text-base font-semibold hover:bg-primary/10 px-1">{process.title}</AccordionTrigger>
+                  <AccordionContent className="px-1 py-1 border-t bg-primary/5">
                       <p className="text-base whitespace-pre-wrap">{process.details}</p>
                   </AccordionContent>
               </AccordionItem>

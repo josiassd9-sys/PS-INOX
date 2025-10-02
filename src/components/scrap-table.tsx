@@ -141,8 +141,8 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
                 <DialogHeader>
                 <DialogTitle>Adicionar Novo Item em {category.name}</DialogTitle>
                 </DialogHeader>
-                <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
+                <div className="grid gap-1 py-1">
+                <div className="grid grid-cols-4 items-center gap-1">
                     <Label htmlFor="material" className="text-right">
                     Material
                     </Label>
@@ -154,7 +154,7 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
                     placeholder="Ex: Inox 304"
                     />
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
+                <div className="grid grid-cols-4 items-center gap-1">
                     <Label htmlFor="composition" className="text-right">
                     Composição
                     </Label>
@@ -166,7 +166,7 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
                     placeholder="Ex: 18% Cr, 8% Ni"
                     />
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
+                <div className="grid grid-cols-4 items-center gap-1">
                     <Label htmlFor="price" className="text-right">
                     Preço (R$/kg)
                     </Label>
@@ -193,27 +193,27 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
             </DialogContent>
         </Dialog>
       </div>
-      <div className="-mx-6 border rounded-lg overflow-hidden">
+      <div className="-mx-1 border rounded-lg overflow-hidden">
         <div className="relative overflow-auto h-[calc(100vh-220px)]">
         <Table>
           <TableHeader className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
              <TableRow className="bg-primary/5 hover:bg-primary/10 flex items-center">
-                <TableHead className="flex-1 px-8">Material (Composição)</TableHead>
-                <TableHead className="w-32 text-right font-semibold text-primary px-2">
+                <TableHead className="flex-1 px-1">Material (Composição)</TableHead>
+                <TableHead className="w-32 text-right font-semibold text-primary px-1">
                   Preço (R$/kg)
                 </TableHead>
-                 <TableHead className="w-12 px-2"></TableHead>
+                 <TableHead className="w-12 px-1"></TableHead>
               </TableRow>
           </TableHeader>
           <TableBody>
             {filteredAndVisibleItems.length > 0 ? (
                 filteredAndVisibleItems.map((item) => (
                 <TableRow key={item.id} className="even:bg-primary/5 odd:bg-transparent flex items-center">
-                    <TableCell className="flex-1 px-8">
+                    <TableCell className="flex-1 px-1">
                     <div className="font-medium">{item.material}</div>
                     <div className="text-xs text-muted-foreground">{item.composition}</div>
                     </TableCell>
-                    <TableCell className="w-32 text-right font-medium text-primary px-2">
+                    <TableCell className="w-32 text-right font-medium text-primary px-1">
                         <Input
                             type="text"
                             inputMode="decimal"
@@ -226,7 +226,7 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
                             className="h-8 text-right border-primary/20 bg-transparent"
                         />
                     </TableCell>
-                    <TableCell className="w-12 px-2">
+                    <TableCell className="w-12 px-1">
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => toggleItemVisibility(item.id)}>
                             <Icon name={hiddenItemIds.has(item.id) ? "EyeOff" : "Eye"} className="h-4 w-4 text-muted-foreground" />
                         </Button>
@@ -237,7 +237,7 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
                 <TableRow>
                     <TableCell colSpan={3} className="text-center text-muted-foreground py-10">
                     {searchTerm ? `Nenhum item encontrado para "${searchTerm}"` : (
-                        <button onClick={showAllItems} className="flex items-center gap-2 mx-auto text-sm hover:text-primary">
+                        <button onClick={showAllItems} className="flex items-center gap-1 mx-auto text-sm hover:text-primary">
                         <Icon name="Eye" />
                         Todos os {hiddenItemIds.size} {hiddenItemIds.size > 1 ? "itens estão ocultos" : "item está oculto"}. Clique para reexibir.
                         </button>

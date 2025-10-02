@@ -360,10 +360,10 @@ export function ScaleCalculator() {
 
 
   return (
-    <div id="scale-calculator-printable-area" className="space-y-4">
-        <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="space-y-2 flex-1">
+    <div id="scale-calculator-printable-area" className="space-y-1">
+        <div className="space-y-1">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                <div className="space-y-1 flex-1">
                 <Label htmlFor="customer-name">Nome do Cliente</Label>
                 <Input
                     id="customer-name"
@@ -372,7 +372,7 @@ export function ScaleCalculator() {
                     placeholder="Digite o nome do cliente"
                 />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1">
                     <Label>Modo de Pesagem</Label>
                     <ToggleGroup type="single" value={weighingMode} onValueChange={handleModeChange} className="w-full grid grid-cols-2">
                         <ToggleGroupItem value="unloading" aria-label="Descarregamento" className="h-10">Descarregamento</ToggleGroupItem>
@@ -394,9 +394,9 @@ export function ScaleCalculator() {
                 </Button>
               )}
             </CardHeader>
-            <CardContent className="space-y-3 p-3 pt-0">
-                <div className="grid grid-cols-2 gap-2">
-                    <div className="space-y-2">
+            <CardContent className="space-y-1 p-1 pt-0">
+                <div className="grid grid-cols-2 gap-1">
+                    <div className="space-y-1">
                         <Label htmlFor={`driver-name-${set.id}`} className="text-xs text-muted-foreground">Motorista</Label>
                         <Input
                             id={`driver-name-${set.id}`}
@@ -405,7 +405,7 @@ export function ScaleCalculator() {
                             placeholder="Nome"
                         />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                         <Label htmlFor={`plate-${set.id}`} className="text-xs text-muted-foreground">Placa</Label>
                         <Input
                             id={`plate-${set.id}`}
@@ -415,7 +415,7 @@ export function ScaleCalculator() {
                         />
                     </div>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1">
                     <Label htmlFor={`initialWeight-${set.id}`} className="text-xs text-muted-foreground">{initialWeightLabel}</Label>
                     <Input
                         id={`initialWeight-${set.id}`}
@@ -428,7 +428,7 @@ export function ScaleCalculator() {
                 </div>
 
               {set.boxes.map((box) => (
-                <div key={box.id} className="space-y-3 rounded-lg border bg-background p-3 relative print:border-border">
+                <div key={box.id} className="space-y-1 rounded-lg border bg-background p-1 relative print:border-border">
                   <div className="flex items-center justify-between">
                     <Input 
                       value={box.name}
@@ -441,8 +441,8 @@ export function ScaleCalculator() {
                       </Button>
                     )}
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                      <div className="space-y-2 w-[calc(50%-0.25rem)]">
+                  <div className="flex flex-wrap gap-1">
+                      <div className="space-y-1 w-[calc(50%-0.25rem)]">
                         <Label htmlFor={`weight-${box.id}`} className="text-xs text-muted-foreground">{boxWeightLabel}</Label>
                         <Input
                           id={`weight-${box.id}`}
@@ -453,7 +453,7 @@ export function ScaleCalculator() {
                           placeholder="Peso"
                         />
                       </div>
-                      <div className="space-y-2 w-[calc(50%-0.25rem)]">
+                      <div className="space-y-1 w-[calc(50%-0.25rem)]">
                         <Label htmlFor={`discount-${box.id}`} className="text-xs text-muted-foreground">Desconto (kg)</Label>
                         <Input
                           id={`discount-${box.id}`}
@@ -464,7 +464,7 @@ export function ScaleCalculator() {
                           placeholder="Lixo, outros"
                         />
                       </div>
-                      <div className="space-y-2 w-[calc(50%-0.25rem)]">
+                      <div className="space-y-1 w-[calc(50%-0.25rem)]">
                         <Label htmlFor={`container-${box.id}`} className="text-xs text-muted-foreground">Caçamba (kg)</Label>
                         <Input
                           id={`container-${box.id}`}
@@ -475,7 +475,7 @@ export function ScaleCalculator() {
                           placeholder="Peso"
                         />
                       </div>
-                      <div className="space-y-2 w-[calc(50%-0.25rem)]">
+                      <div className="space-y-1 w-[calc(50%-0.25rem)]">
                           <Label className="text-accent-price font-semibold text-xs">Peso Líquido</Label>
                           <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-sm font-bold text-accent-price h-10 flex items-center print:bg-transparent print:border-accent-price">
                               {formatNumber(box.net)} kg
@@ -484,7 +484,7 @@ export function ScaleCalculator() {
                   </div>
                 </div>
               ))}
-              <Button variant="outline" size="sm" onClick={() => addMaterialBox(set.id)} className="gap-2 print:hidden h-9">
+              <Button variant="outline" size="sm" onClick={() => addMaterialBox(set.id)} className="gap-1 print:hidden h-9">
                 <PlusCircle className="h-4 w-4"/>
                 Adicionar Material
               </Button>
@@ -492,8 +492,8 @@ export function ScaleCalculator() {
           </Card>
         ))}
 
-        <div className="flex flex-col gap-2 print:hidden">
-            <Button variant="secondary" onClick={addWeighingSet} className="gap-2 h-9">
+        <div className="flex flex-col gap-1 print:hidden">
+            <Button variant="secondary" onClick={addWeighingSet} className="gap-1 h-9">
                 <PlusCircle className="h-4 w-4" />
                 Adicionar Pesagem (Bitrem)
             </Button>
@@ -501,23 +501,23 @@ export function ScaleCalculator() {
 
         <Separator />
 
-        <div className="flex justify-end items-center gap-4 pt-2">
+        <div className="flex justify-end items-center gap-1 pt-2">
             <h3 className="text-lg font-semibold">Total Geral Líquido:</h3>
             <div className="text-2xl font-bold text-primary min-w-[150px] text-right">
                 {formatNumber(grandTotalNet)} kg
             </div>
         </div>
 
-        <div className="flex justify-end flex-wrap pt-2 gap-2 print:hidden">
-            <Button onClick={saveStateToLocalStorage} className="gap-2" variant="outline">
+        <div className="flex justify-end flex-wrap pt-2 gap-1 print:hidden">
+            <Button onClick={saveStateToLocalStorage} className="gap-1" variant="outline">
                 <Save />
                 Salvar Progresso
             </Button>
-             <Button onClick={loadStateFromLocalStorage} className="gap-2" variant="outline">
+             <Button onClick={loadStateFromLocalStorage} className="gap-1" variant="outline">
                 <Download />
                 Carregar Última Pesagem
             </Button>
-            <Button onClick={() => window.print()} className="gap-2">
+            <Button onClick={() => window.print()} className="gap-1">
                 <Printer />
                 Imprimir / Salvar PDF
             </Button>

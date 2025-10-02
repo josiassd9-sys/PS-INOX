@@ -160,7 +160,7 @@ function DashboardComponent() {
     <>
       <Sidebar>
         <SidebarHeader>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <Warehouse className="size-6 text-primary" />
             <h1 className="text-lg font-semibold">PS INOX</h1>
           </div>
@@ -182,13 +182,13 @@ function DashboardComponent() {
         </SidebarContent>
       </Sidebar>
       <SidebarInset>
-        <div className={cn("p-1 h-screen flex flex-col gap-1", isScrapCategory ? "p-1 gap-1" : "md:p-2 md:gap-2")}>
+        <div className={cn("p-1 h-screen flex flex-col gap-1", isScrapCategory ? "p-1 gap-1" : "p-1")}>
           <div className="bg-background rounded-lg border flex-1 flex flex-col overflow-hidden">
             <header className={cn(
-              "flex items-center justify-between gap-4 p-4 border-b",
-              isScrapTableCategory && "mb-4"
+              "flex items-center justify-between gap-1 p-1 border-b",
+              isScrapTableCategory && "mb-1"
             )}>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <SidebarTrigger className="md:hidden"/>
                 <div className="hidden md:block">
                   <h2 className="text-lg font-semibold">{searchTerm && !isScrapTableCategory ? 'Resultados da Busca' : selectedCategory.name}</h2>
@@ -205,11 +205,11 @@ function DashboardComponent() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   />
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 {!isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && (
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-2">
+                      <Button variant="outline" size="sm" className="gap-1">
                         <SlidersHorizontal />
                         <span className="hidden sm:inline">Ajustar</span>
                       </Button>
@@ -230,7 +230,7 @@ function DashboardComponent() {
                   </Dialog>
                 )}
                  {isScrapTableCategory && (
-                    <Button variant="outline" size="sm" className="gap-2" onClick={() => setIsScrapItemDialogOpen(true)}>
+                    <Button variant="outline" size="sm" className="gap-1" onClick={() => setIsScrapItemDialogOpen(true)}>
                       <PlusCircle className="h-4 w-4" />
                       <span className="hidden sm:inline">Adicionar</span>
                     </Button>
@@ -240,16 +240,16 @@ function DashboardComponent() {
             
             <div className="flex-1 flex flex-col overflow-hidden">
               {showCustomHeader && (
-                <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm -mx-4 px-4">
-                    <div className="flex h-12 items-center border-b px-4 text-sm font-medium text-muted-foreground">
-                        <div className="flex-1 px-4">Descrição</div>
-                        <div className="w-1/3 px-4 text-center">{weightUnitLabel}</div>
-                        <div className="w-1/3 px-4 text-right font-semibold text-primary">{priceUnitLabel}</div>
+                <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm -mx-1 px-1">
+                    <div className="flex h-12 items-center border-b px-1 text-sm font-medium text-muted-foreground">
+                        <div className="flex-1 px-1">Descrição</div>
+                        <div className="w-1/3 px-1 text-center">{weightUnitLabel}</div>
+                        <div className="w-1/3 px-1 text-right font-semibold text-primary">{priceUnitLabel}</div>
                     </div>
                 </div>
               )}
               <div className="flex-1 overflow-y-auto">
-                <div className={cn("p-4 md:p-6", (isScrapTableCategory || isScrapCategory) && "p-0 md:p-0")}>
+                <div className={cn("p-1", (isScrapTableCategory || isScrapCategory) && "p-0 md:p-0")}>
                  {renderContent()}
                 </div>
               </div>

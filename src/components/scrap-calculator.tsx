@@ -406,17 +406,16 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
         
         <div className="pt-4 mt-4 border-t space-y-4">
              {prefilledItem && (
-                <div className="flex flex-wrap gap-4">
-                    <div className="space-y-2 flex-1 min-w-0">
-                        <Label htmlFor="cut-percentage">Acréscimo de Corte (%)</Label>
-                        <Input
-                            id="cut-percentage"
-                            type="number"
-                            value={currentCutPercentage > 0 ? currentCutPercentage.toFixed(2) : ""}
-                            onChange={(e) => setCurrentCutPercentage(e.target.valueAsNumber || 0)}
-                            placeholder="Ex: 20"
-                        />
-                    </div>
+                <div className="space-y-2 flex-1 min-w-0">
+                    <Label htmlFor="cut-percentage">Acréscimo de Corte (%)</Label>
+                    <Input
+                        id="cut-percentage"
+                        type="text"
+                        inputMode="decimal"
+                        value={currentCutPercentage > 0 ? formatNumber(currentCutPercentage, {minimumFractionDigits: 2}) : ""}
+                        onChange={(e) => setCurrentCutPercentage(parseFloat(e.target.value.replace(',', '.')) || 0)}
+                        placeholder="Ex: 20"
+                    />
                 </div>
              )}
             <div className="flex gap-4">
@@ -448,13 +447,13 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
             <h2 className="text-lg font-semibold text-center">Lista de Materiais</h2>
             <Card className="flex-1 overflow-hidden flex flex-col">
                 <CardContent className="p-0 flex-1 overflow-y-auto">
-                    <div className="overflow-auto">
+                    <div className="overflow-x-auto">
                         <table className="w-full text-sm">
-                           <thead className="text-left">
+                           <thead className="text-left sticky top-0 bg-background z-10">
                                 <tr className="border-b">
-                                    <th className="p-4 font-medium">Descrição</th>
-                                    <th className="p-4 font-medium text-right">Peso/Compr.</th>
-                                    <th className="p-4 font-medium text-right text-primary">Preço (R$)</th>
+                                    <th className="p-4 font-medium flex-1 min-w-[200px]">Descrição</th>
+                                    <th className="p-4 font-medium text-right w-32">Peso/Compr.</th>
+                                    <th className="p-4 font-medium text-right text-primary w-32">Preço (R$)</th>
                                     <th className="w-10 p-2 print:hidden"></th>
                                 </tr>
                            </thead>
@@ -468,7 +467,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                                                     <div>{formatNumber(item.length / 1000, { minimumFractionDigits: 3, maximumFractionDigits: 3 })} m</div>
                                                     {item.pricePerKg && (
                                                         <div className="text-xs text-muted-foreground font-normal">
-                                                            {`${item.pricePerKg.toFixed(2).replace('.', ',')}/m`}
+                                                            {`${formatNumber(item.pricePerKg, {style: 'currency', currency: 'BRL'})}/m`}
                                                         </div>
                                                     )}
                                                 </>
@@ -477,7 +476,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                                                     <div>{formatNumber(item.weight, {minimumFractionDigits: 0})} kg</div>
                                                     {item.pricePerKg && (
                                                         <div className="text-xs text-muted-foreground font-normal">
-                                                            {`${item.pricePerKg.toFixed(2).replace('.', ',')}/kg`}
+                                                            {`${formatNumber(item.pricePerKg, {style: 'currency', currency: 'BRL'})}/kg`}
                                                         </div>
                                                     )}
                                                 </>
@@ -492,7 +491,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                                    </tr>
                                ))}
                            </tbody>
-                           <tfoot className="font-semibold border-t">
+                           <tfoot className="font-semibold border-t sticky bottom-0 bg-background/95">
                                 <tr>
                                     <td className="p-4">TOTAL</td>
                                     <td className="p-4 text-right">{formatNumber(totalListWeight, {minimumFractionDigits: 0})} kg</td>

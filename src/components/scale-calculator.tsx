@@ -427,7 +427,7 @@ export function ScaleCalculator() {
                     </div>
                 </div>
 
-              {set.boxes.map((box) => (
+              {set.boxes.map((box, boxIndex) => (
                 <div key={box.id} className="space-y-1 rounded-lg border bg-background p-1 relative print:border-border">
                   <div className="flex items-center justify-between">
                     <Input 
@@ -476,28 +476,29 @@ export function ScaleCalculator() {
                         />
                       </div>
                   </div>
-                  <div className="space-y-1">
-                      <Label className="text-accent-price font-semibold text-xs">Peso Líquido</Label>
-                      <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-1 text-sm font-bold text-accent-price h-10 flex items-center print:bg-transparent print:border-accent-price">
-                          {formatNumber(box.net)} kg
-                      </div>
+                  <div className="grid grid-cols-3 gap-1 items-end">
+                    <div className="space-y-1">
+                        <Label className="text-accent-price font-semibold text-xs">Peso Líquido</Label>
+                        <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-1 text-sm font-bold text-accent-price h-10 flex items-center print:bg-transparent print:border-accent-price">
+                            {formatNumber(box.net)} kg
+                        </div>
+                    </div>
+                     <Button variant="outline" size="sm" onClick={() => addMaterialBox(set.id)} className="gap-1 print:hidden h-10">
+                        <PlusCircle className="h-4 w-4"/>
+                        Material
+                    </Button>
+                     {weighingSets.length < 2 && setIndex === weighingSets.length -1 && (
+                        <Button variant="secondary" onClick={addWeighingSet} className="gap-1 h-10 print:hidden">
+                            <PlusCircle className="h-4 w-4" />
+                            Bitrem
+                        </Button>
+                    )}
                   </div>
                 </div>
               ))}
-              <Button variant="outline" size="sm" onClick={() => addMaterialBox(set.id)} className="gap-1 print:hidden h-9">
-                <PlusCircle className="h-4 w-4"/>
-                Adicionar Material
-              </Button>
             </CardContent>
           </Card>
         ))}
-
-        <div className="flex flex-col gap-1 print:hidden">
-            <Button variant="secondary" onClick={addWeighingSet} className="gap-1 h-9">
-                <PlusCircle className="h-4 w-4" />
-                Adicionar Pesagem (Bitrem)
-            </Button>
-        </div>
 
         <Separator />
 

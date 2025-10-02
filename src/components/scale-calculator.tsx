@@ -219,12 +219,12 @@ export function ScaleCalculator() {
 
   const calculateWeighingSets = (sets: WeighingSet[], mode: WeighingMode): WeighingSet[] => {
     return sets.map((set) => {
-      let cumulativeWeight = parseFloat((set.initialWeight || "").replace(",", ".")) || 0;
+      let cumulativeWeight = parseFloat((set.initialWeight || "0").replace(",", ".")) || 0;
       
       const updatedBoxes = set.boxes.map((box) => {
-        const boxWeight = parseFloat((box.weight || "").replace(",", ".")) || 0;
-        const discount = parseFloat((box.discount || "").replace(",", ".")) || 0;
-        const container = parseFloat((box.container || "").replace(",", ".")) || 0;
+        const boxWeight = parseFloat((box.weight || "0").replace(",", ".")) || 0;
+        const discount = parseFloat((box.discount || "0").replace(",", ".")) || 0;
+        const container = parseFloat((box.container || "0").replace(",", ".")) || 0;
         
         let net = 0;
         if (mode === 'unloading') { // Descarregamento
@@ -250,8 +250,9 @@ export function ScaleCalculator() {
   React.useEffect(() => {
     const newWeighingSets = calculateWeighingSets(weighingSets, weighingMode);
     if (JSON.stringify(newWeighingSets) !== JSON.stringify(weighingSets)) {
-      setWeighingSets(newWeighingSets);
+        setWeighingSets(newWeighingSets);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [weighingSets, weighingMode]);
 
 
@@ -500,3 +501,5 @@ export function ScaleCalculator() {
     </div>
   );
 }
+
+    

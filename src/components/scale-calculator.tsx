@@ -384,7 +384,7 @@ export function ScaleCalculator() {
 
         {weighingSets.map((set, setIndex) => (
           <Card key={set.id} className="bg-card/50 pt-1 print:shadow-none print:border-border">
-            <CardHeader className="flex-row items-center justify-between pt-1 pb-1">
+            <CardHeader className="flex-row items-center justify-between p-1">
                 <div className="space-y-1 flex-1">
                     <CardTitle className="text-lg">Pesagem {setIndex + 1}</CardTitle>
                 </div>
@@ -525,3 +525,5 @@ export function ScaleCalculator() {
     </div>
   );
 }
+
+    

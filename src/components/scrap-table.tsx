@@ -193,8 +193,8 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
             </DialogContent>
         </Dialog>
       </div>
-      <div className="-mx-1 border rounded-lg overflow-hidden">
-        <div className="relative overflow-auto h-[calc(100vh-220px)]">
+      <div className="-mx-1 border rounded-lg overflow-hidden flex-1 flex flex-col">
+        <div className="relative overflow-auto flex-1">
         <Table>
           <TableHeader className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
              <TableRow className="bg-primary/5 hover:bg-primary/10 flex items-center">

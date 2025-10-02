@@ -348,7 +348,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
   const totalListWeight = scrapList.reduce((acc, item) => item.unit === 'kg' ? acc + item.weight : acc, 0);
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col h-full">
       <div id="scrap-calculator-form">
         {prefilledItem ? (
             <div className="mb-4 space-y-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
@@ -382,7 +382,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="width">Largura(mm)</Label><Input id="width" type="text" inputMode="decimal" placeholder="Insira a largura" value={fields.width} onChange={(e) => handleInputChange('width', e.target.value)} /></div>
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="length">Compr.(mm)</Label><Input id="length" type="text" inputMode="decimal" placeholder="Insira o compr." value={fields.length} onChange={(e) => handleInputChange('length', e.target.value)} /></div>
                         </div>
-                        <div className="flex gap-4">
+                         <div className="flex gap-4">
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="thickness">Espessura(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
                             <div className="space-y-2 flex-1 min-w-0"><Label htmlFor="scrap-price">Preço (R$/kg)</Label><Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} disabled={!!prefilledItem}/></div>
@@ -426,7 +426,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                 </div>
                  <div className="space-y-2 flex-1 min-w-0">
                     <Label>P. Real (kg)</Label>
-                    <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-sm h-10 flex items-center text-muted-foreground">{calculatedWeight !== null ? formatNumber(calculatedWeight, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "..."}</div>
+                    <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm h-10 flex items-center text-muted-foreground">{calculatedWeight !== null ? formatNumber(calculatedWeight, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "..."}</div>
                 </div>
                 <div className="space-y-2 flex-1 min-w-0">
                     <Label className="text-accent-price font-semibold">R$ Peça</Label>
@@ -444,10 +444,10 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
       </div>
       
       {scrapList.length > 0 && (
-        <div id="scrap-list-section" className="space-y-4 pt-4 mt-6 border-t">
+        <div id="scrap-list-section" className="space-y-4 pt-4 mt-6 border-t flex-1 flex flex-col min-h-0">
             <h2 className="text-lg font-semibold text-center">Lista de Materiais</h2>
-            <Card>
-                <CardContent className="p-0">
+            <Card className="flex-1 overflow-hidden flex flex-col">
+                <CardContent className="p-0 flex-1 overflow-y-auto">
                     <div className="overflow-auto">
                         <table className="w-full text-sm">
                            <thead className="text-left">

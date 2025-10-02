@@ -419,7 +419,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                     </div>
                 </div>
              )}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="weight">Peso (kg)</Label>
                     <Input id="weight" type="text" inputMode="decimal" placeholder="Peso" value={fields.weight} onChange={(e) => handleInputChange('weight', e.target.value)} />
@@ -428,7 +428,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                     <Label>P. Real (kg)</Label>
                     <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-sm h-10 flex items-center text-muted-foreground">{calculatedWeight !== null ? formatNumber(calculatedWeight, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : "..."}</div>
                 </div>
-                <div className="space-y-2 col-span-2">
+                <div className="space-y-2">
                     <Label className="text-accent-price font-semibold">R$ Peça</Label>
                     <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">{formatNumber(finalPrice, {style: 'currency', currency: 'BRL'})}</div>
                 </div>

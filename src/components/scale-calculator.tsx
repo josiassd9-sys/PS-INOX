@@ -217,38 +217,38 @@ export function ScaleCalculator() {
     }
   };
 
-  const calculateWeighingSets = (sets: WeighingSet[], mode: WeighingMode) => {
+  const calculateWeighingSets = (sets: WeighingSet[], mode: WeighingMode): WeighingSet[] => {
     return sets.map((set) => {
-      let cumulativeWeight = parseFloat(set.initialWeight.replace(",", ".")) || 0;
+      let cumulativeWeight = parseFloat((set.initialWeight || "").replace(",", ".")) || 0;
+      
       const updatedBoxes = set.boxes.map((box) => {
-        const boxWeight = parseFloat(box.weight.replace(",", ".")) || 0;
-        const discount = parseFloat(box.discount.replace(",", ".")) || 0;
-        const container = parseFloat(box.container.replace(",", ".")) || 0;
+        const boxWeight = parseFloat((box.weight || "").replace(",", ".")) || 0;
+        const discount = parseFloat((box.discount || "").replace(",", ".")) || 0;
+        const container = parseFloat((box.container || "").replace(",", ".")) || 0;
         
         let net = 0;
-        if (mode === 'unloading') {
+        if (mode === 'unloading') { // Descarregamento
           if (cumulativeWeight > 0 && boxWeight > 0) {
             net = cumulativeWeight - boxWeight - discount - container;
           }
-          cumulativeWeight = boxWeight; // Next start weight is the current end weight
-        } else { // loading
+          cumulativeWeight = boxWeight; // Próximo peso inicial é o peso final atual
+        } else { // Carregamento
           if (cumulativeWeight >= 0 && boxWeight > 0) {
             net = boxWeight - cumulativeWeight - discount - container;
           }
-          cumulativeWeight = boxWeight; // Next start weight is the current end weight
+          cumulativeWeight = boxWeight; // Próximo peso inicial é o peso final atual
         }
 
-        return { ...box, net };
+        return { ...box, net: net > 0 ? net : 0 };
       });
 
-      const totalNet = updatedBoxes.reduce((acc, box) => acc + (box.net > 0 ? box.net : 0), 0);
+      const totalNet = updatedBoxes.reduce((acc, box) => acc + box.net, 0);
       return { ...set, boxes: updatedBoxes, totalNet };
     });
   };
 
   React.useEffect(() => {
     const newWeighingSets = calculateWeighingSets(weighingSets, weighingMode);
-    // Only update state if the calculated values are different to prevent infinite loop
     if (JSON.stringify(newWeighingSets) !== JSON.stringify(weighingSets)) {
       setWeighingSets(newWeighingSets);
     }

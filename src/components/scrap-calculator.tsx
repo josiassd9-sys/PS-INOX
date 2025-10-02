@@ -232,6 +232,9 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
   React.useEffect(() => {
       const getNum = (val: string) => parseFloat(val.replace(',', '.')) || 0;
       let piecePrice = 0;
+      
+      // Use the rounded weight from the input field for price calculation
+      const roundedWeight = getNum(fields.weight);
 
       if (prefilledItem) {
           const scrapLength_mm = getNum(fields.scrapLength);
@@ -239,15 +242,15 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
               const pricePerMeter = Math.ceil(sellingPrice * prefilledItem.weight);
               piecePrice = pricePerMeter * (scrapLength_mm / 1000);
           }
-      } else if (calculatedWeight !== null) {
+      } else if (roundedWeight > 0) {
           const pricePerKg = getNum(scrapPrice);
-          piecePrice = calculatedWeight * pricePerKg;
+          piecePrice = roundedWeight * pricePerKg;
       }
       
       const finalPriceWithCut = piecePrice * (1 + currentCutPercentage / 100);
       setFinalPrice(Math.ceil(finalPriceWithCut));
 
-  }, [calculatedWeight, scrapPrice, sellingPrice, prefilledItem, fields.scrapLength, currentCutPercentage]);
+  }, [fields.weight, scrapPrice, sellingPrice, prefilledItem, fields.scrapLength, currentCutPercentage]);
 
 
   const addToList = () => {
@@ -441,7 +444,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
       </div>
       
       {scrapList.length > 0 && (
-        <div id="scrap-list-section" className="border-t flex-1 flex flex-col min-h-0 pt-1 mt-2">
+        <div id="scrap-list-section" className="border-t flex-1 flex flex-col min-h-0 pt-1 mt-1">
             <h2 className="text-lg font-semibold text-center mb-1">Lista de Materiais</h2>
             <Card className="flex-1 overflow-hidden flex flex-col">
                 <CardContent className="p-0 flex-1 overflow-y-auto">
@@ -449,9 +452,9 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                         <table className="w-full text-sm table-fixed">
                            <thead className="text-left sticky top-0 bg-background z-10">
                                 <tr className="border-b">
-                                    <th className="p-4 font-medium w-auto break-words">Descrição</th>
-                                    <th className="p-4 font-medium text-right w-24">Peso/Compr.</th>
-                                    <th className="p-4 font-medium text-right text-primary w-28">Preço (R$)</th>
+                                    <th className="p-1 font-medium w-auto break-words">Descrição</th>
+                                    <th className="p-1 font-medium text-right w-24">Peso/Compr.</th>
+                                    <th className="p-1 font-medium text-right text-primary w-28">Preço (R$)</th>
                                 </tr>
                            </thead>
                            <tbody>
@@ -468,8 +471,8 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                                      <td colSpan={3} className="p-0">
                                        <SwipeToDelete onDelete={() => removeFromList(item.id)}>
                                          <div className="flex items-center">
-                                           <div className="p-4 flex-1 w-full break-words">{item.description}</div>
-                                           <div className="p-4 text-right w-24">
+                                           <div className="p-1 flex-1 w-full break-words">{item.description}</div>
+                                           <div className="p-1 text-right w-24">
                                              {item.unit === 'm' && item.length ? (
                                                <>
                                                  <div>{formatNumber(item.length / 1000, { minimumFractionDigits: 3, maximumFractionDigits: 3 })} m</div>
@@ -490,7 +493,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                                                </>
                                              )}
                                            </div>
-                                           <div className="p-4 text-right font-medium text-primary w-28">{formatNumber(item.price, { style: 'currency', currency: 'BRL' })}</div>
+                                           <div className="p-1 text-right font-medium text-primary w-28">{formatNumber(item.price, { style: 'currency', currency: 'BRL' })}</div>
                                          </div>
                                        </SwipeToDelete>
                                      </td>
@@ -500,9 +503,9 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                            </tbody>
                            <tfoot className="font-semibold border-t sticky bottom-0 bg-background/95">
                                 <tr>
-                                    <td className="p-4">TOTAL</td>
-                                    <td className="p-4 text-right">{formatNumber(totalListWeight, {minimumFractionDigits: 0})} kg</td>
-                                    <td className="p-4 text-right text-primary">{formatNumber(totalListPrice, {style: 'currency', currency: 'BRL'})}</td>
+                                    <td className="p-1">TOTAL</td>
+                                    <td className="p-1 text-right">{formatNumber(totalListWeight, {minimumFractionDigits: 0})} kg</td>
+                                    <td className="p-1 text-right text-primary">{formatNumber(totalListPrice, {style: 'currency', currency: 'BRL'})}</td>
                                 </tr>
                            </tfoot>
                         </table>
@@ -510,9 +513,9 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                 </CardContent>
             </Card>
 
-            <div className="flex justify-end gap-2 print:hidden pt-2">
-                <Button variant="outline" className="gap-2" onClick={handleSave}><Save/> Salvar</Button>
-                <Button className="gap-2" onClick={handlePrint}><Printer/> Imprimir</Button>
+            <div className="flex justify-end gap-1 print:hidden pt-1">
+                <Button variant="outline" className="gap-1" onClick={handleSave}><Save/> Salvar</Button>
+                <Button className="gap-1" onClick={handlePrint}><Printer/> Imprimir</Button>
             </div>
         </div>
       )}

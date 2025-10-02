@@ -45,21 +45,21 @@
 
   .dark {
     --background: 220 15% 20%;
-    --foreground: 220 20% 98%;
+    --foreground: 0 0% 100%;
     --card: 220 25% 15%;
-    --card-foreground: 220 20% 98%;
+    --card-foreground: 0 0% 100%;
     --popover: 220 20% 11%;
-    --popover-foreground: 220 20% 98%;
+    --popover-foreground: 0 0% 100%;
     --primary: 205 90% 50%;
-    --primary-foreground: 205 90% 98%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 220 20% 22%;
-    --secondary-foreground: 220 20% 98%;
+    --secondary-foreground: 0 0% 100%;
     --muted: 220 20% 18%;
-    --muted-foreground: 220 20% 60%;
+    --muted-foreground: 0 0% 90%;
     --accent: 220 20% 22%;
-    --accent-foreground: 220 20% 98%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 63% 31%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 0 0% 100%;
     --border: 220 20% 22%;
     --input: 220 20% 95%;
     --ring: 205 90% 50%;

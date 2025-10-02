@@ -11,13 +11,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "./ui/button";
-import { PlusCircle, Trash2, Printer, Save, Download } from "lucide-react";
+import { PlusCircle, Printer, Save, Download, Sparkles } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { Separator } from "./ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
 import { cn } from "@/lib/utils";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
+import { Icon } from "./icons";
 
 interface MaterialBox {
   id: string;
@@ -53,22 +54,23 @@ const getInitialWeighingSet = (): WeighingSet[] => ([
 ]);
 
 const sanitizeWeighingSets = (sets: any): WeighingSet[] => {
-  if (!Array.isArray(sets)) return [];
-  return sets.map(set => ({
+  if (!Array.isArray(sets)) return getInitialWeighingSet();
+  const sanitized = sets.map(set => ({
     id: set.id || uuidv4(),
     driverName: set.driverName || "",
     plate: set.plate || "",
     initialWeight: set.initialWeight || "",
     totalNet: set.totalNet || 0,
-    boxes: Array.isArray(set.boxes) ? set.boxes.map((box: any) => ({
+    boxes: Array.isArray(set.boxes) && set.boxes.length > 0 ? set.boxes.map((box: any) => ({
       id: box.id || uuidv4(),
       name: box.name || "",
       weight: box.weight || "",
       discount: box.discount || "",
       container: box.container || "",
       net: box.net || 0,
-    })) : [],
+    })) : [{ id: uuidv4(), name: "Material 1", weight: "", discount: "", container: "", net: 0 }],
   }));
+  return sanitized.length > 0 ? sanitized : getInitialWeighingSet();
 };
 
 interface ScaleCalculatorProps {
@@ -372,7 +374,7 @@ export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCal
                 </div>
               {weighingSets.length > 1 && (
                 <Button variant="ghost" size="icon" onClick={() => removeWeighingSet(set.id)} className="print:hidden h-8 w-8">
-                  <Trash2 className="text-destructive"/>
+                  <Icon name="Trash2" className="text-destructive"/>
                 </Button>
               )}
             </CardHeader>
@@ -419,7 +421,7 @@ export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCal
                     />
                     {set.boxes.length > 1 && (
                       <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 print:hidden" onClick={() => removeMaterialBox(set.id, box.id)}>
-                          <Trash2 className="text-destructive h-4 w-4"/>
+                          <Icon name="Trash2" className="text-destructive h-4 w-4"/>
                       </Button>
                     )}
                   </div>
@@ -495,7 +497,7 @@ export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCal
             <AlertDialog>
                 <AlertDialogTrigger asChild>
                     <Button variant="destructive" className="gap-1">
-                        <Trash2 />
+                        <Icon name="Sparkles" />
                         <span className="hidden sm:inline">Limpar</span>
                     </Button>
                 </AlertDialogTrigger>

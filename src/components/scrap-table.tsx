@@ -116,7 +116,7 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
     }
     return visibleItems.filter(item => 
       item.material.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.composition.toLowerCase().includes(searchTerm.toLowerCase())
+      (item.composition && item.composition.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   }, [allItems, hiddenItemIds, searchTerm]);
 
@@ -125,7 +125,7 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
 
   return (
     <>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-1">
         <div>
           {hasHiddenItems && (
             <Button size="sm" className="h-8 gap-1" variant="outline" onClick={showAllItems}>

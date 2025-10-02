@@ -15,11 +15,13 @@ import { PlusCircle, Trash2, Printer, Save, Download } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { Separator } from "./ui/separator";
 import { useToast } from "@/hooks/use-toast";
+import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
+import { cn } from "@/lib/utils";
 
 interface MaterialBox {
   id: string;
   name: string;
-  tare: string;
+  weight: string; // Can be tare or gross depending on mode
   discount: string;
   container: string;
   net: number;
@@ -29,23 +31,26 @@ interface WeighingSet {
   id: string;
   driverName: string;
   plate: string;
-  gross: string;
+  initialWeight: string; // Gross for unloading, Tare for loading
   boxes: MaterialBox[];
   totalNet: number;
 }
+
+type WeighingMode = "unloading" | "loading";
 
 const LOCAL_STORAGE_KEY = "scaleCalculatorState";
 
 export function ScaleCalculator() {
   const { toast } = useToast();
   const [customerName, setCustomerName] = React.useState("");
+  const [weighingMode, setWeighingMode] = React.useState<WeighingMode>("unloading");
   const [weighingSets, setWeighingSets] = React.useState<WeighingSet[]>([
     {
       id: uuidv4(),
       driverName: "",
       plate: "",
-      gross: "",
-      boxes: [{ id: uuidv4(), name: "Material 1", tare: "", discount: "", container: "", net: 0 }],
+      initialWeight: "",
+      boxes: [{ id: uuidv4(), name: "Material 1", weight: "", discount: "", container: "", net: 0 }],
       totalNet: 0,
     },
   ]);
@@ -55,6 +60,7 @@ export function ScaleCalculator() {
       const stateToSave = {
         customerName,
         weighingSets,
+        weighingMode,
       };
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stateToSave));
       toast({
@@ -75,9 +81,10 @@ export function ScaleCalculator() {
     try {
       const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (savedState) {
-        const { customerName, weighingSets } = JSON.parse(savedState);
-        setCustomerName(customerName);
-        setWeighingSets(weighingSets);
+        const { customerName, weighingSets, weighingMode } = JSON.parse(savedState);
+        setCustomerName(customerName || "");
+        setWeighingSets(weighingSets || []);
+        setWeighingMode(weighingMode || "unloading");
          toast({
           title: "Dados Carregados",
           description: "A última pesagem salva foi carregada.",
@@ -100,13 +107,13 @@ export function ScaleCalculator() {
   };
   
   React.useEffect(() => {
-    // Auto-load on initial component mount
     try {
       const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (savedState) {
-        const { customerName, weighingSets } = JSON.parse(savedState);
-        setCustomerName(customerName);
-        setWeighingSets(weighingSets);
+        const { customerName, weighingSets, weighingMode } = JSON.parse(savedState);
+        setCustomerName(customerName || "");
+        setWeighingSets(weighingSets || []);
+        setWeighingMode(weighingMode || "unloading");
       }
     } catch (error) {
        console.error("Failed to auto-load state from localStorage", error);
@@ -117,7 +124,7 @@ export function ScaleCalculator() {
   const handleSetTextChange = (
     value: string,
     setId: string,
-    field: keyof Omit<WeighingSet, "boxes" | "totalNet" | "id" | "gross">
+    field: keyof Omit<WeighingSet, "boxes" | "totalNet" | "id" | "initialWeight">
   ) => {
     setWeighingSets((prevSets) =>
       prevSets.map((set) => {
@@ -173,18 +180,22 @@ export function ScaleCalculator() {
   React.useEffect(() => {
     setWeighingSets((prevSets) =>
       prevSets.map((set) => {
-        let currentGross = parseFloat(set.gross.replace(",", ".")) || 0;
-        
         const updatedBoxes = set.boxes.map((box, index) => {
-          const tare = parseFloat(box.tare.replace(",", ".")) || 0;
+          const startWeight = index === 0 
+            ? parseFloat(set.initialWeight.replace(",", ".")) || 0
+            : parseFloat(set.boxes[index-1].weight.replace(",", ".")) || 0;
+            
+          const endWeight = parseFloat(box.weight.replace(",", ".")) || 0;
           const discount = parseFloat(box.discount.replace(",", ".")) || 0;
           const container = parseFloat(box.container.replace(",", ".")) || 0;
-
-          const grossForThisBox = index === 0 ? currentGross : parseFloat(set.boxes[index - 1].tare.replace(",", ".")) || 0;
           
           let net = 0;
-          if (grossForThisBox > 0 && tare > 0 && grossForThisBox >= tare) {
-              net = grossForThisBox - tare - discount - container;
+          if (startWeight > 0 && endWeight > 0 && startWeight >= endWeight) {
+             if (weighingMode === 'unloading') {
+                net = startWeight - endWeight - discount - container;
+             } else { // loading
+                net = endWeight - startWeight - discount - container;
+             }
           }
 
           return { ...box, net };
@@ -194,7 +205,7 @@ export function ScaleCalculator() {
         return { ...set, boxes: updatedBoxes, totalNet };
       })
     );
-  }, [JSON.stringify(weighingSets.map(s => ({ gross: s.gross, boxes: s.boxes.map(b => ({ tare: b.tare, discount: b.discount, container: b.container }))})))]);
+  }, [JSON.stringify(weighingSets), weighingMode]);
 
 
   const addMaterialBox = (setId: string) => {
@@ -205,7 +216,7 @@ export function ScaleCalculator() {
               ...set,
               boxes: [
                 ...set.boxes,
-                { id: uuidv4(), name: `Material ${set.boxes.length + 1}`, tare: "", discount: "", container: "", net: 0 },
+                { id: uuidv4(), name: `Material ${set.boxes.length + 1}`, weight: "", discount: "", container: "", net: 0 },
               ],
             }
           : set
@@ -219,7 +230,7 @@ export function ScaleCalculator() {
         if (set.id !== setId) return set;
         const updatedBoxes = set.boxes.filter((box) => box.id !== boxId);
         if (updatedBoxes.length === 0) {
-          return { ...set, boxes: [{ id: uuidv4(), name: "Material 1", tare: "", discount: "", container: "", net: 0 }] };
+          return { ...set, boxes: [{ id: uuidv4(), name: "Material 1", weight: "", discount: "", container: "", net: 0 }] };
         }
         return { ...set, boxes: updatedBoxes };
       })
@@ -233,8 +244,8 @@ export function ScaleCalculator() {
         id: uuidv4(),
         driverName: "",
         plate: "",
-        gross: "",
-        boxes: [{ id: uuidv4(), name: "Material 1", tare: "", discount: "", container: "", net: 0 }],
+        initialWeight: "",
+        boxes: [{ id: uuidv4(), name: "Material 1", weight: "", discount: "", container: "", net: 0 }],
         totalNet: 0,
       },
     ]);
@@ -248,8 +259,8 @@ export function ScaleCalculator() {
               id: uuidv4(),
               driverName: "",
               plate: "",
-              gross: "",
-              boxes: [{ id: uuidv4(), name: "Material 1", tare: "", discount: "", container: "", net: 0 }],
+              initialWeight: "",
+              boxes: [{ id: uuidv4(), name: "Material 1", weight: "", discount: "", container: "", net: 0 }],
               totalNet: 0,
             }];
         }
@@ -265,17 +276,38 @@ export function ScaleCalculator() {
       maximumFractionDigits: 2,
     }).format(value);
   };
+  
+  const handleModeChange = (mode: WeighingMode | "") => {
+    if (mode) {
+        setWeighingMode(mode);
+    }
+  }
+
+  const initialWeightLabel = weighingMode === 'unloading' ? 'Bruto (Saída)' : 'Tara (Entrada)';
+  const boxWeightLabel = weighingMode === 'unloading' ? 'Tara (kg)' : 'Bruto (kg)';
+
 
   return (
     <div id="scale-calculator-printable-area" className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="customer-name">Nome do Cliente</Label>
-          <Input
-            id="customer-name"
-            value={customerName}
-            onChange={(e) => setCustomerName(e.target.value)}
-            placeholder="Digite o nome do cliente"
-          />
+        <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="space-y-2 flex-1">
+                <Label htmlFor="customer-name">Nome do Cliente</Label>
+                <Input
+                    id="customer-name"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="Digite o nome do cliente"
+                />
+                </div>
+                <div className="space-y-2">
+                    <Label>Modo de Pesagem</Label>
+                    <ToggleGroup type="single" value={weighingMode} onValueChange={handleModeChange} className="w-full grid grid-cols-2">
+                        <ToggleGroupItem value="unloading" aria-label="Descarregamento" className="h-10">Descarregamento</ToggleGroupItem>
+                        <ToggleGroupItem value="loading" aria-label="Carregamento" className="h-10">Carregamento</ToggleGroupItem>
+                    </ToggleGroup>
+                </div>
+            </div>
         </div>
 
         {weighingSets.map((set, setIndex) => (
@@ -312,13 +344,13 @@ export function ScaleCalculator() {
                     </div>
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor={`gross-${set.id}`} className="text-xs text-muted-foreground">Bruto (kg)</Label>
+                    <Label htmlFor={`initialWeight-${set.id}`} className="text-xs text-muted-foreground">{initialWeightLabel}</Label>
                     <Input
-                        id={`gross-${set.id}`}
+                        id={`initialWeight-${set.id}`}
                         type="text"
                         inputMode="decimal"
-                        value={set.gross}
-                        onChange={(e) => handleInputChange(e.target.value, set.id, "gross")}
+                        value={set.initialWeight}
+                        onChange={(e) => handleInputChange(e.target.value, set.id, "initialWeight")}
                         placeholder="Peso inicial"
                     />
                 </div>
@@ -339,13 +371,13 @@ export function ScaleCalculator() {
                   </div>
                   <div className="flex flex-wrap gap-2">
                       <div className="space-y-2 w-[calc(50%-0.25rem)]">
-                        <Label htmlFor={`tare-${box.id}`} className="text-xs text-muted-foreground">Tara (kg)</Label>
+                        <Label htmlFor={`weight-${box.id}`} className="text-xs text-muted-foreground">{boxWeightLabel}</Label>
                         <Input
-                          id={`tare-${box.id}`}
+                          id={`weight-${box.id}`}
                           type="text"
                           inputMode="decimal"
-                          value={box.tare}
-                          onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'tare')}
+                          value={box.weight}
+                          onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'weight')}
                           placeholder="Peso"
                         />
                       </div>
@@ -421,7 +453,5 @@ export function ScaleCalculator() {
     </div>
   );
 }
-
-    
 
     

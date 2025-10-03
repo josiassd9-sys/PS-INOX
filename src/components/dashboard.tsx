@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -23,7 +24,9 @@ import { GlobalSearchResults } from "./global-search-results";
 import { ScrapCalculator } from "./scrap-calculator";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -35,6 +38,7 @@ import { ScrapTable } from "./scrap-table";
 import { cn } from "@/lib/utils";
 import { AstmStandards } from "./astm-standards";
 import { ManufacturingProcesses } from "./manufacturing-processes";
+import { useToast } from "@/hooks/use-toast";
 
 interface PriceParams {
   costPrice: number;
@@ -42,7 +46,18 @@ interface PriceParams {
   sellingPrice: number;
 }
 
+const PRICE_PARAMS_LOCAL_STORAGE_KEY = "priceParamsState";
+
 const initializePriceParams = (): Record<string, PriceParams> => {
+  try {
+    const savedParams = localStorage.getItem(PRICE_PARAMS_LOCAL_STORAGE_KEY);
+    if (savedParams) {
+      return JSON.parse(savedParams);
+    }
+  } catch (error) {
+    console.error("Failed to load price params from localStorage", error);
+  }
+
   const params: Record<string, PriceParams> = {
     global: { costPrice: 30, markup: 50, sellingPrice: 45 },
   };
@@ -61,6 +76,7 @@ const initializePriceParams = (): Record<string, PriceParams> => {
 };
 
 function DashboardComponent() {
+  const { toast } = useToast();
   const [priceParams, setPriceParams] = React.useState<Record<string, PriceParams>>(initializePriceParams());
   const [selectedCategoryId, setSelectedCategoryId] = React.useState(CATEGORIES[0]?.id || "");
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -68,6 +84,23 @@ function DashboardComponent() {
   const [isScrapItemDialogOpen, setIsScrapItemDialogOpen] = React.useState(false);
   const [prefillScrapItem, setPrefillScrapItem] = React.useState<SteelItem | null>(null);
   const [customerName, setCustomerName] = React.useState("");
+  
+  const savePriceParams = () => {
+    try {
+      localStorage.setItem(PRICE_PARAMS_LOCAL_STORAGE_KEY, JSON.stringify(priceParams));
+      toast({
+        title: "Preços Salvos!",
+        description: "Os custos e margens foram salvos com sucesso.",
+      });
+    } catch (error) {
+       console.error("Failed to save price params to localStorage", error);
+       toast({
+        variant: "destructive",
+        title: "Erro ao Salvar",
+        description: "Não foi possível salvar os parâmetros de preço.",
+      });
+    }
+  };
 
   const selectedCategory = CATEGORIES.find((c) => c.id === selectedCategoryId) || CATEGORIES[0];
   const currentPriceParamsKey = selectedCategory.hasOwnPriceControls ? selectedCategoryId : 'global';
@@ -181,7 +214,7 @@ function DashboardComponent() {
     );
   }
   
-  const showPriceControls = !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory;
+  const showPriceControls = !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory;
 
   return (
     <>
@@ -217,8 +250,8 @@ function DashboardComponent() {
               <div className="flex items-center gap-1">
                 <SidebarTrigger className="md:hidden"/>
                 <div className="hidden md:block">
-                  <h2 className="text-lg font-semibold">{searchTerm && !isScrapTableCategory ? 'Resultados da Busca' : selectedCategory.name}</h2>
-                  <p className="text-sm text-muted-foreground">{searchTerm && !isScrapTableCategory ? `Buscando por "${searchTerm}"` : selectedCategory.description}</p>
+                  <h2 className="text-lg font-semibold">{searchTerm ? 'Resultados da Busca' : selectedCategory.name}</h2>
+                  <p className="text-sm text-muted-foreground">{searchTerm ? `Buscando por "${searchTerm}"` : selectedCategory.description}</p>
                 </div>
               </div>
               
@@ -232,12 +265,23 @@ function DashboardComponent() {
                         className="w-full rounded-lg bg-background"
                     />
                 </div>
-              ) : (
+              ) : isScrapTableCategory ? (
                 <div className="relative flex-1">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                     type="search"
-                    placeholder={isScrapTableCategory ? "Buscar em sucatas..." : "Buscar em todas as categorias..."}
+                    placeholder="Buscar em sucatas..."
+                    className="w-full rounded-lg bg-background pl-8"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+              ) : !isScrapCategory && !isPackageCheckerCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && (
+                <div className="relative flex-1">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                    type="search"
+                    placeholder="Buscar em todas as categorias..."
                     className="w-full rounded-lg bg-background pl-8"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -266,6 +310,11 @@ function DashboardComponent() {
                         onMarkupChange={(v) => handlePriceChange('markup', v)}
                         onSellingPriceChange={(v) => handlePriceChange('sellingPrice', v)}
                       />
+                      <DialogFooter>
+                        <DialogClose asChild>
+                           <Button onClick={savePriceParams}>Salvar</Button>
+                        </DialogClose>
+                      </DialogFooter>
                     </DialogContent>
                   </Dialog>
                 )}
@@ -308,3 +357,5 @@ export function Dashboard() {
     </SidebarProvider>
   )
 }
+
+    

@@ -172,14 +172,11 @@ function DashboardComponent() {
   const priceUnitLabel = `Preço (R$/${unitLabel})`;
 
   const renderContent = () => {
-    let sellingPrice = currentPriceParams.sellingPrice;
-    if (isScrapCategory && prefillScrapItem) {
-        sellingPrice = prefillSellingPrice;
-    }
+    const showSearchResults = searchTerm && filteredCategories.length > 0;
 
-    if (searchTerm && !isScrapCategory) {
+    if (showSearchResults) {
       return (
-        <GlobalSearchResults 
+        <GlobalSearchResults
           categories={filteredCategories as any}
           priceParams={priceParams}
           searchTerm={searchTerm}
@@ -188,8 +185,9 @@ function DashboardComponent() {
         />
       );
     }
+
     if (isScrapCategory) {
-      return <ScrapCalculator prefilledItem={prefillScrapItem} onClearPrefill={() => setPrefillScrapItem(null)} sellingPrice={sellingPrice} />;
+      return <ScrapCalculator prefilledItem={prefillScrapItem} onClearPrefill={() => setPrefillScrapItem(null)} sellingPrice={prefillSellingPrice} />;
     }
     if (isPackageCheckerCategory) {
       return <PackageChecker />;
@@ -214,14 +212,14 @@ function DashboardComponent() {
     return (
       <ItemTable 
         category={selectedCategory as any} 
-        sellingPrice={sellingPrice}
+        sellingPrice={currentPriceParams.sellingPrice}
         showTableHeader={!showCustomHeader}
       />
     );
   }
   
   const showPriceControls = !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory;
-  const showGlobalSearch = !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory;
+  const showGlobalSearch = !isPackageCheckerCategory && !isScaleCategory;
 
   return (
     <>
@@ -364,7 +362,3 @@ export function Dashboard() {
     </SidebarProvider>
   )
 }
-
-    
-
-    

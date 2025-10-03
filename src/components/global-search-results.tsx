@@ -17,16 +17,16 @@ interface GlobalSearchResultsProps {
     categories: Category[];
     priceParams: Record<string, { costPrice: number; markup: number; sellingPrice: number }>;
     searchTerm: string;
-    onPrefillScrap: (item: SteelItem) => void;
+    onPrefillScrap: (item: SteelItem, sellingPrice: number) => void;
     isScrapCalculatorActive: boolean;
 }
 
 export function GlobalSearchResults({ categories, priceParams, searchTerm, onPrefillScrap, isScrapCalculatorActive }: GlobalSearchResultsProps) {
     const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
 
-    const handleRowClick = (item: SteelItem, category: Category) => {
+    const handleRowClick = (item: SteelItem, category: Category, sellingPrice: number) => {
         if (isScrapCalculatorActive) {
-            onPrefillScrap(item);
+            onPrefillScrap(item, sellingPrice);
         } else if (category.unit === 'm') {
           if (selectedItemId === item.id) {
             setSelectedItemId(null); // Deselect if clicking the same item
@@ -84,7 +84,7 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
                                             return (
                                                 <React.Fragment key={item.id}>
                                                     <TableRow
-                                                        onClick={() => handleRowClick(item, category)}
+                                                        onClick={() => handleRowClick(item, category, sellingPrice)}
                                                         className={cn(
                                                             'even:bg-primary/5 odd:bg-transparent',
                                                             'flex items-center',

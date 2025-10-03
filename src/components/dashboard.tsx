@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import * as React from "react";
@@ -83,6 +84,7 @@ function DashboardComponent() {
   const { setOpenMobile, isMobile } = useSidebar();
   const [isScrapItemDialogOpen, setIsScrapItemDialogOpen] = React.useState(false);
   const [prefillScrapItem, setPrefillScrapItem] = React.useState<SteelItem | null>(null);
+  const [prefillSellingPrice, setPrefillSellingPrice] = React.useState<number>(0);
   const [customerName, setCustomerName] = React.useState("");
   
   const savePriceParams = () => {
@@ -139,8 +141,9 @@ function DashboardComponent() {
     }
   };
 
-  const handlePrefillScrapItem = (item: SteelItem) => {
+  const handlePrefillScrapItem = (item: SteelItem, sellingPrice: number) => {
     setPrefillScrapItem(item);
+    setPrefillSellingPrice(sellingPrice);
     setSelectedCategoryId('retalhos');
     setSearchTerm("");
   };
@@ -169,9 +172,12 @@ function DashboardComponent() {
   const priceUnitLabel = `Preço (R$/${unitLabel})`;
 
   const renderContent = () => {
-    const sellingPrice = currentPriceParams.sellingPrice;
+    let sellingPrice = currentPriceParams.sellingPrice;
+    if (isScrapCategory && prefillScrapItem) {
+        sellingPrice = prefillSellingPrice;
+    }
 
-    if (searchTerm && !isScrapTableCategory) {
+    if (searchTerm && !isScrapCategory) {
       return (
         <GlobalSearchResults 
           categories={filteredCategories as any}

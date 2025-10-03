@@ -3,7 +3,7 @@
 "use client";
 
 import * as React from "react";
-import { CATEGORIES, type Category, type ScrapItem, SteelItem } from "@/lib/data";
+import { ALL_CATEGORIES, CATEGORY_GROUPS, type Category, type ScrapItem, SteelItem } from "@/lib/data";
 import {
   SidebarProvider,
   Sidebar,
@@ -15,6 +15,8 @@ import {
   SidebarInset,
   SidebarTrigger,
   useSidebar,
+  SidebarGroup,
+  SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import { Search, Warehouse, SlidersHorizontal, PlusCircle } from "lucide-react";
 import { PriceControls } from "./price-controls";
@@ -62,7 +64,7 @@ const initializePriceParams = (): Record<string, PriceParams> => {
   const params: Record<string, PriceParams> = {
     global: { costPrice: 30, markup: 50, sellingPrice: 45 },
   };
-  CATEGORIES.forEach(cat => {
+  ALL_CATEGORIES.forEach(cat => {
     if (cat.hasOwnPriceControls) {
       const costPrice = cat.defaultCostPrice || 0;
       const markup = cat.defaultMarkup || 0;
@@ -79,7 +81,7 @@ const initializePriceParams = (): Record<string, PriceParams> => {
 function DashboardComponent() {
   const { toast } = useToast();
   const [priceParams, setPriceParams] = React.useState<Record<string, PriceParams>>(initializePriceParams());
-  const [selectedCategoryId, setSelectedCategoryId] = React.useState(CATEGORIES[0]?.id || "");
+  const [selectedCategoryId, setSelectedCategoryId] = React.useState(ALL_CATEGORIES[0]?.id || "");
   const [searchTerm, setSearchTerm] = React.useState("");
   const { setOpenMobile, isMobile } = useSidebar();
   const [isScrapItemDialogOpen, setIsScrapItemDialogOpen] = React.useState(false);
@@ -104,7 +106,7 @@ function DashboardComponent() {
     }
   };
 
-  const selectedCategory = CATEGORIES.find((c) => c.id === selectedCategoryId) || CATEGORIES[0];
+  const selectedCategory = ALL_CATEGORIES.find((c) => c.id === selectedCategoryId) || ALL_CATEGORIES[0];
   const currentPriceParamsKey = selectedCategory.hasOwnPriceControls ? selectedCategoryId : 'global';
   const currentPriceParams = priceParams[currentPriceParamsKey];
 
@@ -151,7 +153,7 @@ function DashboardComponent() {
   const filteredCategories = React.useMemo(() => {
     if (!searchTerm) return [];
     
-    return CATEGORIES.filter(cat => cat.unit === 'm' || cat.unit === 'un').map(category => {
+    return ALL_CATEGORIES.filter(cat => cat.unit === 'm' || cat.unit === 'un').map(category => {
       const filteredItems = (category.items as any[]).filter(item => 
         item.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -219,7 +221,8 @@ function DashboardComponent() {
   }
   
   const showPriceControls = !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory;
-  const showGlobalSearch = !isPackageCheckerCategory && !isScaleCategory;
+  const showGlobalSearch = !isPackageCheckerCategory && !isScaleCategory && (!isScrapCategory || !!searchTerm);
+
 
   return (
     <>
@@ -232,16 +235,21 @@ function DashboardComponent() {
         </SidebarHeader>
         <SidebarContent>
           <SidebarMenu>
-            {CATEGORIES.map((category) => (
-              <SidebarMenuItem key={category.id}>
-                <SidebarMenuButton
-                  onClick={() => handleSelectCategory(category.id)}
-                  isActive={selectedCategoryId === category.id && !searchTerm}
-                >
-                  <Icon name={category.icon as any} />
-                  <span>{category.name}</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+            {CATEGORY_GROUPS.map((group, index) => (
+              <SidebarGroup key={index}>
+                <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
+                {group.items.map((category) => (
+                  <SidebarMenuItem key={category.id}>
+                    <SidebarMenuButton
+                      onClick={() => handleSelectCategory(category.id)}
+                      isActive={selectedCategoryId === category.id && !searchTerm}
+                    >
+                      <Icon name={category.icon as any} />
+                      <span>{category.name}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarGroup>
             ))}
           </SidebarMenu>
         </SidebarContent>
@@ -343,7 +351,7 @@ function DashboardComponent() {
                 </div>
               )}
               <div className="flex-1 overflow-y-auto">
-                <div className={cn("p-1", (isScrapTableCategory || isScrapCategory) && "p-0 md:p-0")}>
+                <div className={cn("p-1", (isScrapTableCategory || (isScrapCategory && !searchTerm)) && "p-0 md:p-0")}>
                  {renderContent()}
                 </div>
               </div>

@@ -3,6 +3,7 @@
 
 
 
+
 export const STAINLESS_STEEL_DENSITY_KG_M3 = 7980;
 const INCH_TO_MM = 25.4;
 
@@ -80,6 +81,11 @@ export type ScrapItem = {
   material: string;
   composition: string;
   price: number;
+};
+
+export type CategoryGroup = {
+    title: string;
+    items: Category[];
 };
 
 
@@ -296,8 +302,7 @@ const generateBrassRods = (): SteelItem[] => {
     }));
 };
 
-
-export const CATEGORIES: Category[] = [
+const CATEGORIES: Category[] = [
   {
     id: 'retalhos',
     name: 'Retalhos',
@@ -773,7 +778,51 @@ export const CATEGORIES: Category[] = [
     items: [],
   }
 ];
-    
+
+export const CATEGORY_GROUPS: CategoryGroup[] = [
+    {
+        title: 'FERRAMENTAS',
+        items: [
+            CATEGORIES.find(c => c.id === 'retalhos')!,
+            CATEGORIES.find(c => c.id === 'package-checker')!,
+            CATEGORIES.find(c => c.id === 'balanca')!,
+            CATEGORIES.find(c => c.id === 'tabela-sucata')!,
+        ]
+    },
+    {
+        title: 'MATERIAIS (AÇO INOX)',
+        items: [
+            CATEGORIES.find(c => c.id === 'tubos-od')!,
+            CATEGORIES.find(c => c.id === 'tubos-schedule')!,
+            CATEGORIES.find(c => c.id === 'tubos-alianca')!,
+            CATEGORIES.find(c => c.id === 'metalon-quadrado')!,
+            CATEGORIES.find(c => c.id === 'metalon-retangular')!,
+            CATEGORIES.find(c => c.id === 'barras-redondas')!,
+            CATEGORIES.find(c => c.id === 'barra-quadrada')!,
+            CATEGORIES.find(c => c.id === 'barra-sextavada')!,
+            CATEGORIES.find(c => c.id === 'barras-chatas')!,
+            CATEGORIES.find(c => c.id === 'cantoneiras')!,
+            CATEGORIES.find(c => c.id === 'chapas')!,
+        ]
+    },
+    {
+        title: 'OUTROS METAIS',
+        items: [
+            CATEGORIES.find(c => c.id === 'tarugo-bronze')!,
+            CATEGORIES.find(c => c.id === 'verg-aluminio')!,
+            CATEGORIES.find(c => c.id === 'verg-latao')!,
+        ]
+    },
+    {
+        title: 'INFORMATIVOS',
+        items: [
+            CATEGORIES.find(c => c.id === 'normas-astm')!,
+            CATEGORIES.find(c => c.id === 'processos-fabricacao')!,
+        ]
+    }
+]
+
+export const ALL_CATEGORIES = CATEGORY_GROUPS.flatMap(group => group.items);
     
     
 
@@ -781,7 +830,6 @@ export const CATEGORIES: Category[] = [
 
     
 
-    
 
 
 

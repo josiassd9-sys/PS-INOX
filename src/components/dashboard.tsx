@@ -215,6 +215,7 @@ function DashboardComponent() {
   }
   
   const showPriceControls = !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory;
+  const showGlobalSearch = !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory;
 
   return (
     <>
@@ -276,7 +277,7 @@ function DashboardComponent() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-              ) : !isScrapCategory && !isPackageCheckerCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && (
+              ) : showGlobalSearch ? (
                 <div className="relative flex-1">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -287,7 +288,7 @@ function DashboardComponent() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
-              )}
+              ) : null}
               
               <div className="flex items-center gap-1">
                 {showPriceControls && (
@@ -300,7 +301,7 @@ function DashboardComponent() {
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Ajustar Preços - {selectedCategory.name}</DialogTitle>
+                        <DialogTitle>Ajustar Preços - {selectedCategory.hasOwnPriceControls ? selectedCategory.name : 'Global'}</DialogTitle>
                       </DialogHeader>
                       <PriceControls
                         costPrice={currentPriceParams.costPrice}
@@ -357,5 +358,7 @@ export function Dashboard() {
     </SidebarProvider>
   )
 }
+
+    
 
     

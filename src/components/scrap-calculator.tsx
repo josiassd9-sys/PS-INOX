@@ -233,18 +233,19 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
       const getNum = (val: string) => parseFloat(val.replace(',', '.')) || 0;
       let piecePrice = 0;
       
-      // Use the rounded weight from the input field for price calculation
-      const roundedWeight = getNum(fields.weight);
-
       if (prefilledItem) {
           const scrapLength_mm = getNum(fields.scrapLength);
           if (scrapLength_mm > 0 && prefilledItem.weight > 0) {
               const pricePerMeter = Math.ceil(sellingPrice * prefilledItem.weight);
               piecePrice = pricePerMeter * (scrapLength_mm / 1000);
           }
-      } else if (roundedWeight > 0) {
-          const pricePerKg = getNum(scrapPrice);
-          piecePrice = roundedWeight * pricePerKg;
+      } else { // Manual scrap
+        // Use the rounded weight from the input field for price calculation
+        const roundedWeight = getNum(fields.weight);
+        if (roundedWeight > 0) {
+            const pricePerKg = getNum(scrapPrice);
+            piecePrice = roundedWeight * pricePerKg;
+        }
       }
       
       const finalPriceWithCut = piecePrice * (1 + currentCutPercentage / 100);
@@ -522,3 +523,5 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     </div>
   );
 }
+
+    

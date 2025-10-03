@@ -5,12 +5,13 @@
 
 
 
+
 export const STAINLESS_STEEL_DENSITY_KG_M3 = 7980;
 const INCH_TO_MM = 25.4;
 
 // New Densities
 const BRONZE_TM23_DENSITY_KG_M3 = 8800;
-const ALUMINUM_6351_T6_DENSITY_KG_M3 = 2710;
+const ALUMINUM_DENSITY_KG_M3 = 2710;
 const BRASS_DENSITY_KG_M3 = 8500;
 
 
@@ -19,6 +20,7 @@ const TUBE_WEIGHT_CONSTANT = Math.PI * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000)
 
 // For sheets: Weight(kg/m²) = Thickness_mm * (DENSITY / 1000)
 const SHEET_WEIGHT_CONSTANT = STAINLESS_STEEL_DENSITY_KG_M3 / 1000;
+const ALUMINUM_SHEET_WEIGHT_CONSTANT = ALUMINUM_DENSITY_KG_M3 / 1000;
 
 // For round bars: Weight(kg/m) = D_mm^2 * (PI/4) * (DENSITY / 1000000)
 export const ROUND_BAR_WEIGHT_CONSTANT =
@@ -26,7 +28,7 @@ export const ROUND_BAR_WEIGHT_CONSTANT =
 
 // New constants for new materials
 const BRONZE_BAR_WEIGHT_CONSTANT = (Math.PI / 4) * (BRONZE_TM23_DENSITY_KG_M3 / 1000000);
-const ALUMINUM_BAR_WEIGHT_CONSTANT = (Math.PI / 4) * (ALUMINUM_6351_T6_DENSITY_KG_M3 / 1000000);
+const ALUMINUM_BAR_WEIGHT_CONSTANT = (Math.PI / 4) * (ALUMINUM_DENSITY_KG_M3 / 1000000);
 const BRASS_BAR_WEIGHT_CONSTANT = (Math.PI / 4) * (BRASS_DENSITY_KG_M3 / 1000000);
 
 
@@ -156,6 +158,30 @@ const generateChapas = (): SteelItem[] => {
             });
         });
     });
+    return items;
+};
+
+const generateChapasAluminio = (): SteelItem[] => {
+    const items: SteelItem[] = [];
+    const categoryName = 'Chapa Alumínio';
+    const thicknesses = [0.8, 1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0];
+    const dimensions = [
+        { w: 1.25, h: 2.0, desc: '1250x2000' },
+        { w: 1.25, h: 3.0, desc: '1250x3000' },
+    ];
+    
+    thicknesses.forEach(thickness => {
+        const thicknessDesc = thickness.toFixed(1).replace('.', ',');
+        dimensions.forEach(dim => {
+            items.push({
+                id: `chapa-al-${thickness}-${dim.w}x${dim.h}`,
+                description: `Chapa Alumínio ${thicknessDesc}x${dim.desc} mm`,
+                weight: thickness * dim.w * dim.h * ALUMINUM_SHEET_WEIGHT_CONSTANT,
+                categoryName,
+            });
+        });
+    });
+    
     return items;
 };
 
@@ -439,6 +465,17 @@ const CATEGORIES: Category[] = [
     items: generateAluminumRods(),
     hasOwnPriceControls: true,
     defaultCostPrice: 20,
+    defaultMarkup: 50,
+  },
+  {
+    id: 'chapas-aluminio',
+    name: 'Chapas Alumínio',
+    description: 'Chapas de alumínio em diversas espessuras e dimensões.',
+    icon: 'Square',
+    unit: 'un',
+    items: generateChapasAluminio(),
+    hasOwnPriceControls: true,
+    defaultCostPrice: 25,
     defaultMarkup: 50,
   },
   {
@@ -819,6 +856,7 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
         items: [
             CATEGORIES.find(c => c.id === 'tarugo-bronze')!,
             CATEGORIES.find(c => c.id === 'verg-aluminio')!,
+            CATEGORIES.find(c => c.id === 'chapas-aluminio')!,
             CATEGORIES.find(c => c.id === 'verg-latao')!,
         ]
     },
@@ -839,6 +877,7 @@ export const ALL_CATEGORIES = CATEGORY_GROUPS.flatMap(group => group.items);
     
 
     
+
 
 
 

@@ -59,20 +59,22 @@ interface PriceParams {
 const PRICE_PARAMS_LOCAL_STORAGE_KEY = "priceParamsState";
 
 const initializePriceParams = (): Record<string, PriceParams> => {
+  let params: Record<string, PriceParams> = {
+    global: { costPrice: 30, markup: 50, sellingPrice: 45 },
+  };
+
   try {
     const savedParams = localStorage.getItem(PRICE_PARAMS_LOCAL_STORAGE_KEY);
     if (savedParams) {
-      return JSON.parse(savedParams);
+      params = JSON.parse(savedParams);
     }
   } catch (error) {
     console.error("Failed to load price params from localStorage", error);
   }
 
-  const params: Record<string, PriceParams> = {
-    global: { costPrice: 30, markup: 50, sellingPrice: 45 },
-  };
+  // Ensure all categories with own controls are initialized
   ALL_CATEGORIES.forEach(cat => {
-    if (cat.hasOwnPriceControls) {
+    if (cat.hasOwnPriceControls && !params[cat.id]) {
       const costPrice = cat.defaultCostPrice || 0;
       const markup = cat.defaultMarkup || 0;
       params[cat.id] = {
@@ -82,19 +84,27 @@ const initializePriceParams = (): Record<string, PriceParams> => {
       };
     }
   });
+
   return params;
 };
 
 function DashboardComponent() {
   const { toast } = useToast();
-  const [priceParams, setPriceParams] = React.useState<Record<string, PriceParams>>(initializePriceParams());
-  const [selectedCategoryId, setSelectedCategoryId] = React.useState(ALL_CATEGORIES[0]?.id || "");
+  const [priceParams, setPriceParams] = React.useState<Record<string, PriceParams>>({});
+  const [isPriceParamsInitialized, setIsPriceParamsInitialized] = React.useState(false);
+  
+  const [selectedCategoryId, setSelectedCategoryId] = React.useState(CATEGORY_GROUPS[0]?.items[0]?.id || "");
   const [searchTerm, setSearchTerm] = React.useState("");
   const { setOpenMobile, isMobile } = useSidebar();
   const [isScrapItemDialogOpen, setIsScrapItemDialogOpen] = React.useState(false);
   const [prefillScrapItem, setPrefillScrapItem] = React.useState<SteelItem | null>(null);
   const [prefillSellingPrice, setPrefillSellingPrice] = React.useState<number>(0);
   const [customerName, setCustomerName] = React.useState("");
+
+  React.useEffect(() => {
+    setPriceParams(initializePriceParams());
+    setIsPriceParamsInitialized(true);
+  }, []);
   
   const savePriceParams = () => {
     try {
@@ -169,6 +179,14 @@ function DashboardComponent() {
       return { ...category, items: filteredItems };
     }).filter(category => category.items.length > 0);
   }, [searchTerm]);
+
+  if (!isPriceParamsInitialized || !currentPriceParams) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Carregando...</p>
+      </div>
+    );
+  }
   
   const isScrapCategory = selectedCategoryId === 'retalhos';
   const isPackageCheckerCategory = selectedCategoryId === 'package-checker';
@@ -318,7 +336,7 @@ function DashboardComponent() {
                     placeholder="Buscar em sucatas..."
                     className="w-full rounded-lg bg-background pl-8"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => setSearchTerm(e.target.value.replace(',', '.'))}
                     />
                 </div>
               ) : showGlobalSearch ? (
@@ -329,7 +347,7 @@ function DashboardComponent() {
                     placeholder="Buscar em todas as categorias..."
                     className="w-full rounded-lg bg-background pl-8"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => setSearchTerm(e.target.value.replace(',', '.'))}
                     />
                 </div>
               ) : null}

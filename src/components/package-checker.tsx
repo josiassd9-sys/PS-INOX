@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CATEGORIES, SteelItem } from "@/lib/data";
+import { ALL_CATEGORIES, SteelItem } from "@/lib/data";
 import { Search } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
 import { cn } from "@/lib/utils";
@@ -37,9 +37,9 @@ export function PackageChecker() {
   };
 
   const allItems = React.useMemo(() => {
-    return CATEGORIES.flatMap((cat) =>
+    return ALL_CATEGORIES.flatMap((cat) =>
       cat.unit === "m" ? cat.items : []
-    );
+    ) as SteelItem[];
   }, []);
 
   const filteredItems = React.useMemo(() => {

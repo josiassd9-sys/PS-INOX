@@ -39,19 +39,27 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
   const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
 
   const [newDescription, setNewDescription] = React.useState("");
-  const [newWeight, setNewWeight] = React.useState<number | "">("");
+  const [newWeight, setNewWeight] = React.useState<string>("");
 
   React.useEffect(() => {
     setItems(category.items);
     setSelectedItemId(null); 
   }, [category]);
+  
+  const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
+    const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
+    if (/^\d*\,?\d*$/.test(sanitizedValue)) {
+      setter(sanitizedValue);
+    }
+  };
+
 
   const handleAddItem = () => {
     if (newDescription && newWeight) {
       const newItem: SteelItem = {
         id: `custom-${Date.now()}`,
         description: newDescription,
-        weight: Number(newWeight),
+        weight: parseFloat(newWeight.replace(',', '.')),
       };
       setItems([...items, newItem]);
       setNewDescription("");
@@ -124,13 +132,10 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
                 </Label>
                 <Input
                   id="weight"
-                  type="number"
+                  type="text"
+                  inputMode="decimal"
                   value={newWeight}
-                  onChange={(e) =>
-                    setNewWeight(
-                      e.target.value === "" ? "" : e.target.valueAsNumber
-                    )
-                  }
+                  onChange={(e) => handleInputChange(setNewWeight, e.target.value)}
                   className="col-span-3"
                 />
               </div>

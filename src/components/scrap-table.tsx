@@ -39,7 +39,7 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
   
   const [newMaterial, setNewMaterial] = React.useState("");
   const [newComposition, setNewComposition] = React.useState("");
-  const [newPrice, setNewPrice] = React.useState<number | "">("");
+  const [newPrice, setNewPrice] = React.useState<string>("");
 
   // Load hidden items from localStorage on initial render
   React.useEffect(() => {
@@ -80,6 +80,14 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
   React.useEffect(() => {
     setAllItems(category.items as ScrapItem[]);
   }, [category]);
+  
+  const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
+    const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
+    if (/^\d*\,?\d*$/.test(sanitizedValue)) {
+      setter(sanitizedValue);
+    }
+  };
+
 
   const handleAddItem = () => {
     if (newMaterial && newPrice !== "") {
@@ -87,7 +95,7 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
         id: `custom-scrap-${Date.now()}`,
         material: newMaterial,
         composition: newComposition,
-        price: Number(newPrice),
+        price: parseFloat(newPrice.replace(",", ".")),
       };
       setAllItems([...allItems, newItem]);
       setNewMaterial("");
@@ -98,7 +106,7 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
   };
 
   const handlePriceChange = (id: string, newPriceValue: string) => {
-    const sanitizedValue = newPriceValue.replace(/[^0-9,.]/g, '').replace(',', '.');
+    const sanitizedValue = newPriceValue.replace(",", ".");
     const priceAsNumber = parseFloat(sanitizedValue);
     
     setAllItems(prevItems => prevItems.map(item => {
@@ -114,9 +122,10 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
     if (!searchTerm) {
       return visibleItems;
     }
+    const safeSearchTerm = searchTerm.toLowerCase().replace(",", ".");
     return visibleItems.filter(item => 
-      item.material.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (item.composition && item.composition.toLowerCase().includes(searchTerm.toLowerCase()))
+      item.material.toLowerCase().replace(",", ".").includes(safeSearchTerm) ||
+      (item.composition && item.composition.toLowerCase().replace(",", ".").includes(safeSearchTerm))
     );
   }, [allItems, hiddenItemIds, searchTerm]);
 
@@ -172,15 +181,12 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
                     </Label>
                     <Input
                     id="price"
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
                     value={newPrice}
-                    onChange={(e) =>
-                        setNewPrice(
-                        e.target.value === "" ? "" : e.target.valueAsNumber
-                        )
-                    }
+                    onChange={(e) => handleInputChange(setNewPrice, e.target.value) }
                     className="col-span-3"
-                    placeholder="Ex: 8.50"
+                    placeholder="Ex: 8,50"
                     />
                 </div>
                 </div>

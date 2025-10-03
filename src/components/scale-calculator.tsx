@@ -203,13 +203,12 @@ export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCal
     setId: string,
     field: keyof Omit<WeighingSet, "boxes" | "totalNet" | "id" | "driverName" | "plate">,
   ) => {
-    const sanitizedValue = value.replace(/[^0-9,]/g, "").replace(",", ".");
-    if (/^\d*\.?\d*$/.test(sanitizedValue)) {
-      const newValue = sanitizedValue.replace(".", ",");
+    const sanitizedValue = value.replace(/[^0-9,.]/g, "").replace(".", ",");
+    if (/^\d*\,?\d*$/.test(sanitizedValue)) {
       setWeighingSets((prevSets) =>
         prevSets.map((set) => {
           if (set.id !== setId) return set;
-          return { ...set, [field]: newValue };
+          return { ...set, [field]: sanitizedValue };
         })
       );
     }
@@ -227,13 +226,12 @@ export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCal
       return;
     }
     
-    const sanitizedValue = value.replace(/[^0-9,]/g, "").replace(",", ".");
-    if (/^\d*\.?\d*$/.test(sanitizedValue)) {
-      const newValue = sanitizedValue.replace(".", ",");
+    const sanitizedValue = value.replace(/[^0-9,.]/g, "").replace(".", ",");
+    if (/^\d*\,?\d*$/.test(sanitizedValue)) {
       setWeighingSets(prevSets => prevSets.map(set => {
         if (set.id !== setId) return set;
         const updatedBoxes = set.boxes.map(box => 
-          box.id === boxId ? { ...box, [field]: newValue } : box
+          box.id === boxId ? { ...box, [field]: sanitizedValue } : box
         );
         return { ...set, boxes: updatedBoxes };
       }));

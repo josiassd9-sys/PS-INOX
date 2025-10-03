@@ -44,8 +44,9 @@ export function PackageChecker() {
 
   const filteredItems = React.useMemo(() => {
     if (!searchTerm) return [];
+    const safeSearchTerm = searchTerm.replace(",", ".").toLowerCase();
     return allItems.filter((item) =>
-      item.description.toLowerCase().includes(searchTerm.toLowerCase())
+      item.description.toLowerCase().replace(",", ".").includes(safeSearchTerm)
     );
   }, [searchTerm, allItems]);
   
@@ -124,9 +125,9 @@ export function PackageChecker() {
     value: string,
     field?: LastEdited | 'total' | 'perKg'
   ) => {
-    const sanitizedValue = value.replace(/[^0-9,]/g, '').replace(',', '.');
-    if (/^\d*\.?\d*$/.test(sanitizedValue)) {
-      setter(sanitizedValue.replace('.', ','));
+    const sanitizedValue = value.replace(/[^0-9,]/g, '').replace('.', ',');
+    if (/^\d*\,?\d*$/.test(sanitizedValue)) {
+      setter(sanitizedValue);
       if(field === 'weight' || field === 'length') setLastEdited(field);
       if(field === 'total' || field === 'perKg') setLastPriceFieldEdited(field);
     }

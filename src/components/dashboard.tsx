@@ -160,9 +160,11 @@ function DashboardComponent() {
   const filteredCategories = React.useMemo(() => {
     if (!searchTerm) return [];
     
+    const safeSearchTerm = searchTerm.replace(",", ".").toLowerCase();
+
     return ALL_CATEGORIES.filter(cat => cat.unit === 'm' || cat.unit === 'un').map(category => {
       const filteredItems = (category.items as any[]).filter(item => 
-        item.description.toLowerCase().includes(searchTerm.toLowerCase())
+        item.description.toLowerCase().replace(",", ".").includes(safeSearchTerm)
       );
       return { ...category, items: filteredItems };
     }).filter(category => category.items.length > 0);
@@ -182,17 +184,17 @@ function DashboardComponent() {
   const priceUnitLabel = `Preço (R$/${unitLabel})`;
 
   const renderContent = () => {
-    const showSearchResults = searchTerm && (filteredCategories.length > 0 || isScrapCategory);
+    const showSearchResults = searchTerm && filteredCategories.length > 0;
   
     if (isScrapCategory) {
-      if (showSearchResults && searchTerm) {
+      if (showSearchResults) {
         return (
           <GlobalSearchResults
             categories={filteredCategories as any}
             priceParams={priceParams}
             searchTerm={searchTerm}
             onPrefillScrap={handlePrefillScrapItem}
-            isScrapCalculatorActive={isScrapCategory}
+            isScrapCalculatorActive={true}
           />
         );
       }
@@ -206,7 +208,7 @@ function DashboardComponent() {
           priceParams={priceParams}
           searchTerm={searchTerm}
           onPrefillScrap={handlePrefillScrapItem}
-          isScrapCalculatorActive={isScrapCategory}
+          isScrapCalculatorActive={false}
         />
       );
     }

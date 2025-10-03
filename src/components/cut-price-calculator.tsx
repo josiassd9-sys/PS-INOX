@@ -25,7 +25,7 @@ export function CutPriceCalculator({
   sellingPrice,
   onClose,
 }: CutPriceCalculatorProps) {
-  const [cutLength, setCutLength] = React.useState<number | "">("");
+  const [cutLength, setCutLength] = React.useState<string>("");
   const [pieceWeight, setPieceWeight] = React.useState(0);
   const [finalPrice, setFinalPrice] = React.useState(0);
   const [currentCutPercentage, setCurrentCutPercentage] = React.useState(0);
@@ -52,12 +52,13 @@ export function CutPriceCalculator({
   };
 
   React.useEffect(() => {
-    if (cutLength !== "" && cutLength > 0) {
-      const lengthInMeters = Number(cutLength) / 1000;
+    const lengthValue = parseFloat(cutLength.replace(",", "."));
+    if (cutLength !== "" && lengthValue > 0) {
+      const lengthInMeters = lengthValue / 1000;
       const weight = selectedItem.weight * lengthInMeters;
       setPieceWeight(weight);
       
-      const dynamicPercentage = calculateDynamicPercentage(Number(cutLength));
+      const dynamicPercentage = calculateDynamicPercentage(lengthValue);
       setCurrentCutPercentage(dynamicPercentage);
       
       const pricePerMeter = selectedItem.weight * sellingPrice;
@@ -79,6 +80,14 @@ export function CutPriceCalculator({
     setPieceWeight(0);
     setCurrentCutPercentage(0);
   }, [selectedItem, sellingPrice]);
+  
+  const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
+    const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
+    if (/^\d*\,?\d*$/.test(sanitizedValue)) {
+      setter(sanitizedValue);
+    }
+  };
+
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -117,13 +126,10 @@ export function CutPriceCalculator({
               <Label htmlFor="cut-length">Comprimento do Corte (mm)</Label>
               <Input
                 id="cut-length"
-                type="number"
+                type="text"
+                inputMode="decimal"
                 value={cutLength}
-                onChange={(e) =>
-                  setCutLength(
-                    e.target.value === "" ? "" : e.target.valueAsNumber
-                  )
-                }
+                onChange={(e) => handleInputChange(setCutLength, e.target.value)}
                 placeholder="Ex: 500"
               />
             </div>

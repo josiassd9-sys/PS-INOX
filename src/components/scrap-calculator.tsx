@@ -159,13 +159,11 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
         if (scrapLength_mm > 0 && prefilledItem.weight > 0) {
             const calculated = (scrapLength_mm / 1000) * prefilledItem.weight;
             weight = calculated;
-            // Don't use Math.ceil for prefilled items to keep precision
-            setFields(prev => ({...prev, weight: calculated.toFixed(3).replace('.', ',')}));
+            newFields.weight = calculated.toFixed(3).replace('.', ',');
             setCalculatedWeight(calculated);
-
             setCurrentCutPercentage(calculateDynamicPercentage(scrapLength_mm));
         } else {
-            setFields(prev => ({...prev, weight: ''}));
+            newFields.weight = '';
             setCalculatedWeight(null);
             setCurrentCutPercentage(0);
         }
@@ -225,9 +223,9 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
         }
       }
       
-      setFields(newFields);
       setCalculatedWeight(weight);
     }
+    setFields(newFields);
   }, [fields.width, fields.length, fields.thickness, fields.weight, fields.diameter, shape, prefilledItem, fields.scrapLength]);
   
   React.useEffect(() => {
@@ -280,7 +278,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
         newPiece = {
             id: uuidv4(),
             description,
-            weight: weight, // Use the precise weight from the state
+            weight: weight,
             price: finalPrice,
             pricePerKg: pricePerMeter, // This is price per meter here
             length: scrapLength_mm,
@@ -311,7 +309,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
         newPiece = {
             id: uuidv4(),
             description,
-            weight: weight, // Use the rounded weight from the input for manual scraps
+            weight: weight,
             price: finalPrice,
             pricePerKg: pricePerUnit,
             unit: 'kg',
@@ -504,9 +502,9 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                            </tbody>
                            <tfoot className="font-semibold border-t sticky bottom-0 bg-background/95">
                                 <tr>
-                                    <td className="p-1">TOTAL</td>
-                                    <td className="p-1 text-right">{formatNumber(totalListWeight, {minimumFractionDigits: 3, maximumFractionDigits: 3})} kg</td>
-                                    <td className="p-1 text-right text-primary">{formatNumber(totalListPrice, {style: 'currency', currency: 'BRL'})}</td>
+                                    <td className="p-1 pt-2">TOTAL</td>
+                                    <td className="p-1 pt-2 text-right">{formatNumber(totalListWeight, {minimumFractionDigits: 3, maximumFractionDigits: 3})} kg</td>
+                                    <td className="p-1 pt-2 text-right text-primary">{formatNumber(totalListPrice, {style: 'currency', currency: 'BRL'})}</td>
                                 </tr>
                            </tfoot>
                         </table>

@@ -2,8 +2,15 @@
 
 
 
+
 export const STAINLESS_STEEL_DENSITY_KG_M3 = 7980;
 const INCH_TO_MM = 25.4;
+
+// New Densities
+const BRONZE_TM23_DENSITY_KG_M3 = 8800;
+const ALUMINUM_6351_T6_DENSITY_KG_M3 = 2710;
+const BRASS_DENSITY_KG_M3 = 8500;
+
 
 // For tubes: Weight(kg/m) = (OD_mm - WT_mm) * WT_mm * (PI * DENSITY / 1000000)
 const TUBE_WEIGHT_CONSTANT = Math.PI * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
@@ -14,6 +21,12 @@ const SHEET_WEIGHT_CONSTANT = STAINLESS_STEEL_DENSITY_KG_M3 / 1000;
 // For round bars: Weight(kg/m) = D_mm^2 * (PI/4) * (DENSITY / 1000000)
 export const ROUND_BAR_WEIGHT_CONSTANT =
   (Math.PI / 4) * (STAINLESS_STEEL_DENSITY_KG_M3 / 1000000);
+
+// New constants for new materials
+const BRONZE_BAR_WEIGHT_CONSTANT = (Math.PI / 4) * (BRONZE_TM23_DENSITY_KG_M3 / 1000000);
+const ALUMINUM_BAR_WEIGHT_CONSTANT = (Math.PI / 4) * (ALUMINUM_6351_T6_DENSITY_KG_M3 / 1000000);
+const BRASS_BAR_WEIGHT_CONSTANT = (Math.PI / 4) * (BRASS_DENSITY_KG_M3 / 1000000);
+
 
 // For square bars: Weight(kg/m) = Side_mm^2 * (DENSITY / 1000000)
 const SQUARE_BAR_WEIGHT_CONSTANT = STAINLESS_STEEL_DENSITY_KG_M3 / 1000000;
@@ -57,6 +70,9 @@ export type Category = {
   items: SteelItem[] | ScrapItem[];
   icon: string;
   unit: 'm' | 'm²' | 'un' | 'calc' | 'kg';
+  hasOwnPriceControls?: boolean;
+  defaultCostPrice?: number;
+  defaultMarkup?: number;
 };
 
 export type ScrapItem = {
@@ -235,6 +251,52 @@ const tubosAliancaItems: SteelItem[] = [
   { id: 'ta-114.3-3.00', description: 'Tubo DIN 114.30x3.00 Øin 108.30mm', weight: (114.30 - 3.00) * 3.00 * TUBE_WEIGHT_CONSTANT, categoryName: 'Tubo Aliança' },
 ];
 
+const newMaterialDiameters = [
+    { inch: '1/2"', mm: 12.70 },
+    { inch: '5/8"', mm: 15.88 },
+    { inch: '3/4"', mm: 19.05 },
+    { inch: '7/8"', mm: 22.22 },
+    { inch: '1"', mm: 25.40 },
+    { inch: '1.1/4"', mm: 31.75 },
+    { inch: '1.1/2"', mm: 38.10 },
+    { inch: '1.3/4"', mm: 44.45 },
+    { inch: '2"', mm: 50.80 },
+    { inch: '2.1/4"', mm: 57.15 },
+    { inch: '2.1/2"', mm: 63.50 },
+    { inch: '2.3/4"', mm: 69.85 },
+    { inch: '3"', mm: 76.20 },
+    { inch: '3.1/2"', mm: 88.90 },
+    { inch: '4"', mm: 101.60 },
+];
+
+const generateBronzeRods = (): SteelItem[] => {
+    return newMaterialDiameters.map(d => ({
+        id: `bronze-${d.inch.replace(/ /g, '')}`,
+        description: `Tarugo Bronze TM23 ${d.inch} (${d.mm.toFixed(2)}mm)`,
+        weight: Math.pow(d.mm, 2) * BRONZE_BAR_WEIGHT_CONSTANT,
+        categoryName: 'Tarugo Bronze'
+    }));
+};
+
+const generateAluminumRods = (): SteelItem[] => {
+    return newMaterialDiameters.map(d => ({
+        id: `aluminum-${d.inch.replace(/ /g, '')}`,
+        description: `Verg. Alum. Liga 6351 T6 Red. ${d.inch} (${d.mm.toFixed(2)}mm)`,
+        weight: Math.pow(d.mm, 2) * ALUMINUM_BAR_WEIGHT_CONSTANT,
+        categoryName: 'Verg. Alumínio'
+    }));
+};
+
+const generateBrassRods = (): SteelItem[] => {
+    return newMaterialDiameters.map(d => ({
+        id: `brass-${d.inch.replace(/ /g, '')}`,
+        description: `Verg. Latão Red. ${d.inch} (${d.mm.toFixed(2)}mm)`,
+        weight: Math.pow(d.mm, 2) * BRASS_BAR_WEIGHT_CONSTANT,
+        categoryName: 'Verg. Latão'
+    }));
+};
+
+
 export const CATEGORIES: Category[] = [
   {
     id: 'retalhos',
@@ -350,6 +412,39 @@ export const CATEGORIES: Category[] = [
     icon: 'Square',
     unit: 'un',
     items: generateChapas(),
+  },
+  {
+    id: 'tarugo-bronze',
+    name: 'Tarugo Bronze',
+    description: 'Tarugos de Bronze TM23 em diversas bitolas.',
+    icon: 'Circle',
+    unit: 'm',
+    items: generateBronzeRods(),
+    hasOwnPriceControls: true,
+    defaultCostPrice: 45,
+    defaultMarkup: 50,
+  },
+  {
+    id: 'verg-aluminio',
+    name: 'Verg. Alumínio',
+    description: 'Vergalhões de Alumínio 6351 T6 em diversas bitolas.',
+    icon: 'Circle',
+    unit: 'm',
+    items: generateAluminumRods(),
+    hasOwnPriceControls: true,
+    defaultCostPrice: 20,
+    defaultMarkup: 50,
+  },
+  {
+    id: 'verg-latao',
+    name: 'Verg. Latão',
+    description: 'Vergalhões de Latão em diversas bitolas.',
+    icon: 'Circle',
+    unit: 'm',
+    items: generateBrassRods(),
+    hasOwnPriceControls: true,
+    defaultCostPrice: 35,
+    defaultMarkup: 50,
   },
   {
     id: 'barras-redondas',
@@ -687,6 +782,7 @@ export const CATEGORIES: Category[] = [
     
 
     
+
 
 
 

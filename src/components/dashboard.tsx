@@ -36,59 +36,81 @@ import { cn } from "@/lib/utils";
 import { AstmStandards } from "./astm-standards";
 import { ManufacturingProcesses } from "./manufacturing-processes";
 
+interface PriceParams {
+  costPrice: number;
+  markup: number;
+  sellingPrice: number;
+}
+
+const initializePriceParams = (): Record<string, PriceParams> => {
+  const params: Record<string, PriceParams> = {
+    global: { costPrice: 30, markup: 50, sellingPrice: 45 },
+  };
+  CATEGORIES.forEach(cat => {
+    if (cat.hasOwnPriceControls) {
+      const costPrice = cat.defaultCostPrice || 0;
+      const markup = cat.defaultMarkup || 0;
+      params[cat.id] = {
+        costPrice,
+        markup,
+        sellingPrice: costPrice * (1 + markup / 100),
+      };
+    }
+  });
+  return params;
+};
+
 function DashboardComponent() {
-  const [costPrice, setCostPrice] = React.useState(30);
-  const [markup, setMarkup] = React.useState(50);
-  const [sellingPrice, setSellingPrice] = React.useState(
-    costPrice * (1 + markup / 100)
-  );
-  const [selectedCategoryId, setSelectedCategoryId] = React.useState(
-    CATEGORIES[0]?.id || ""
-  );
+  const [priceParams, setPriceParams] = React.useState<Record<string, PriceParams>>(initializePriceParams());
+  const [selectedCategoryId, setSelectedCategoryId] = React.useState(CATEGORIES[0]?.id || "");
   const [searchTerm, setSearchTerm] = React.useState("");
   const { setOpenMobile, isMobile } = useSidebar();
   const [isScrapItemDialogOpen, setIsScrapItemDialogOpen] = React.useState(false);
   const [prefillScrapItem, setPrefillScrapItem] = React.useState<SteelItem | null>(null);
   const [customerName, setCustomerName] = React.useState("");
 
+  const selectedCategory = CATEGORIES.find((c) => c.id === selectedCategoryId) || CATEGORIES[0];
+  const currentPriceParamsKey = selectedCategory.hasOwnPriceControls ? selectedCategoryId : 'global';
+  const currentPriceParams = priceParams[currentPriceParamsKey];
 
-  const handleCostChange = (newCost: number | null) => {
-    const cost = newCost ?? 0;
-    setCostPrice(cost);
-    setSellingPrice(cost * (1 + markup / 100));
-  };
+  const handlePriceChange = (key: keyof PriceParams, value: number | null) => {
+    const numericValue = value ?? 0;
+    const currentParams = priceParams[currentPriceParamsKey];
+    let newParams = { ...currentParams };
 
-  const handleMarkupChange = (newMarkup: number | null) => {
-    const mk = newMarkup ?? 0;
-    setMarkup(mk);
-    setSellingPrice(costPrice * (1 + mk / 100));
-  };
-
-  const handleSellingPriceChange = (newSelling: number | null) => {
-    const selling = newSelling ?? 0;
-    setSellingPrice(selling);
-    if (costPrice > 0) {
-      setMarkup(((selling / costPrice) - 1) * 100);
+    if (key === 'costPrice') {
+      newParams.costPrice = numericValue;
+      newParams.sellingPrice = numericValue * (1 + newParams.markup / 100);
+    } else if (key === 'markup') {
+      newParams.markup = numericValue;
+      newParams.sellingPrice = newParams.costPrice * (1 + numericValue / 100);
+    } else if (key === 'sellingPrice') {
+      newParams.sellingPrice = numericValue;
+      if (newParams.costPrice > 0) {
+        newParams.markup = ((numericValue / newParams.costPrice) - 1) * 100;
+      }
     }
+
+    setPriceParams(prev => ({
+      ...prev,
+      [currentPriceParamsKey]: newParams,
+    }));
   };
 
   const handleSelectCategory = (categoryId: string) => {
     setSelectedCategoryId(categoryId);
-    setSearchTerm(""); // Clear search when a category is selected
-    setPrefillScrapItem(null); // Clear prefill item
+    setSearchTerm("");
+    setPrefillScrapItem(null);
     if (isMobile) {
       setOpenMobile(false);
     }
-  }
+  };
 
   const handlePrefillScrapItem = (item: SteelItem) => {
     setPrefillScrapItem(item);
     setSelectedCategoryId('retalhos');
     setSearchTerm("");
   };
-
-  const selectedCategory =
-    CATEGORIES.find((c) => c.id === selectedCategoryId) || CATEGORIES[0];
   
   const filteredCategories = React.useMemo(() => {
     if (!searchTerm) return [];
@@ -114,11 +136,13 @@ function DashboardComponent() {
   const priceUnitLabel = `Preço (R$/${unitLabel})`;
 
   const renderContent = () => {
+    const sellingPrice = currentPriceParams.sellingPrice;
+
     if (searchTerm && !isScrapTableCategory) {
       return (
         <GlobalSearchResults 
           categories={filteredCategories as any}
-          sellingPrice={sellingPrice}
+          priceParams={priceParams}
           searchTerm={searchTerm}
           onPrefillScrap={handlePrefillScrapItem}
           isScrapCalculatorActive={isScrapCategory}
@@ -156,6 +180,8 @@ function DashboardComponent() {
       />
     );
   }
+  
+  const showPriceControls = !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory;
 
   return (
     <>
@@ -220,7 +246,7 @@ function DashboardComponent() {
               )}
               
               <div className="flex items-center gap-1">
-                {!isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && (
+                {showPriceControls && (
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm" className="gap-1">
@@ -230,15 +256,15 @@ function DashboardComponent() {
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Ajustar Parâmetros de Preço</DialogTitle>
+                        <DialogTitle>Ajustar Preços - {selectedCategory.name}</DialogTitle>
                       </DialogHeader>
                       <PriceControls
-                        costPrice={costPrice}
-                        markup={markup}
-                        sellingPrice={sellingPrice}
-                        onCostChange={handleCostChange}
-                        onMarkupChange={handleMarkupChange}
-                        onSellingPriceChange={handleSellingPriceChange}
+                        costPrice={currentPriceParams.costPrice}
+                        markup={currentPriceParams.markup}
+                        sellingPrice={currentPriceParams.sellingPrice}
+                        onCostChange={(v) => handlePriceChange('costPrice', v)}
+                        onMarkupChange={(v) => handlePriceChange('markup', v)}
+                        onSellingPriceChange={(v) => handlePriceChange('sellingPrice', v)}
                       />
                     </DialogContent>
                   </Dialog>

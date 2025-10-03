@@ -1,6 +1,6 @@
 "use client";
 
-import { LucideProps, icons, RectangleHorizontal, Hexagon, Scissors, PackageCheck, Weight, Printer, Save, Download, Trash2, Eye, EyeOff, GalleryVertical, Book, Factory, Sparkles } from 'lucide-react';
+import { LucideProps, icons, RectangleHorizontal, Hexagon, Scissors, PackageCheck, Weight, Printer, Save, Download, Trash2, Eye, EyeOff, GalleryVertical, Book, Factory, Sparkles, DraftingCompass } from 'lucide-react';
 
 const customIcons = {
     RectangleHorizontal,
@@ -17,7 +17,8 @@ const customIcons = {
     GalleryVertical,
     Book,
     Factory,
-    Sparkles
+    Sparkles,
+    DraftingCompass
 }
 
 interface IconProps extends LucideProps {

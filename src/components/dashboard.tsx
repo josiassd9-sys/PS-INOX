@@ -48,6 +48,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "./ui/accordion";
+import { TechnicalDrawingGuide } from "./technical-drawing-guide";
 
 interface PriceParams {
   costPrice: number;
@@ -173,8 +174,9 @@ function DashboardComponent() {
   const isScrapTableCategory = selectedCategoryId === 'tabela-sucata';
   const isAstmStandardsCategory = selectedCategoryId === 'normas-astm';
   const isManufacturingProcessesCategory = selectedCategoryId === 'processos-fabricacao';
+  const isTechnicalDrawingCategory = selectedCategoryId === 'desenho-tecnico';
   
-  const showCustomHeader = !searchTerm && !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory;
+  const showCustomHeader = !searchTerm && !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory;
   const unitLabel = selectedCategory.unit === "m" ? "m" : selectedCategory.unit === 'm²' ? "m²" : "un";
   const weightUnitLabel = `Peso (kg/${unitLabel})`;
   const priceUnitLabel = `Preço (R$/${unitLabel})`;
@@ -183,7 +185,7 @@ function DashboardComponent() {
     const showSearchResults = searchTerm && (filteredCategories.length > 0 || isScrapCategory);
   
     if (isScrapCategory) {
-      if (showSearchResults) {
+      if (showSearchResults && searchTerm) {
         return (
           <GlobalSearchResults
             categories={filteredCategories as any}
@@ -229,6 +231,9 @@ function DashboardComponent() {
     if (isManufacturingProcessesCategory) {
         return <ManufacturingProcesses />;
     }
+    if (isTechnicalDrawingCategory) {
+        return <TechnicalDrawingGuide />;
+    }
     return (
       <ItemTable 
         category={selectedCategory as any} 
@@ -238,7 +243,7 @@ function DashboardComponent() {
     );
   }
   
-  const showPriceControls = !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory;
+  const showPriceControls = !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory;
   const showGlobalSearch = !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory;
 
 

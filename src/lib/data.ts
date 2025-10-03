@@ -4,6 +4,7 @@
 
 
 
+
 export const STAINLESS_STEEL_DENSITY_KG_M3 = 7980;
 const INCH_TO_MM = 25.4;
 
@@ -776,6 +777,14 @@ const CATEGORIES: Category[] = [
     icon: 'Factory',
     unit: 'calc',
     items: [],
+  },
+  {
+    id: 'desenho-tecnico',
+    name: 'Desenho Técnico',
+    description: 'Guia de leitura e interpretação de desenhos.',
+    icon: 'DraftingCompass',
+    unit: 'calc',
+    items: [],
   }
 ];
 
@@ -818,6 +827,7 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
         items: [
             CATEGORIES.find(c => c.id === 'normas-astm')!,
             CATEGORIES.find(c => c.id === 'processos-fabricacao')!,
+            CATEGORIES.find(c => c.id === 'desenho-tecnico')!,
         ]
     }
 ]
@@ -829,6 +839,7 @@ export const ALL_CATEGORIES = CATEGORY_GROUPS.flatMap(group => group.items);
     
 
     
+
 
 
 

@@ -42,6 +42,12 @@ import { cn } from "@/lib/utils";
 import { AstmStandards } from "./astm-standards";
 import { ManufacturingProcesses } from "./manufacturing-processes";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "./ui/accordion";
 
 interface PriceParams {
   costPrice: number;
@@ -174,7 +180,7 @@ function DashboardComponent() {
   const priceUnitLabel = `Preço (R$/${unitLabel})`;
 
   const renderContent = () => {
-    const showSearchResults = searchTerm && filteredCategories.length > 0;
+    const showSearchResults = searchTerm && (filteredCategories.length > 0 || isScrapCategory);
 
     if (showSearchResults) {
       return (
@@ -221,7 +227,7 @@ function DashboardComponent() {
   }
   
   const showPriceControls = !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory;
-  const showGlobalSearch = !isPackageCheckerCategory && !isScaleCategory && (!isScrapCategory || !!searchTerm);
+  const showGlobalSearch = !isPackageCheckerCategory && !isScaleCategory && (!isScrapTableCategory);
 
 
   return (
@@ -234,24 +240,31 @@ function DashboardComponent() {
           </div>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarMenu>
+          <Accordion type="multiple" className="w-full" defaultValue={CATEGORY_GROUPS.map(g => g.title)}>
             {CATEGORY_GROUPS.map((group, index) => (
-              <SidebarGroup key={index}>
-                <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
-                {group.items.map((category) => (
-                  <SidebarMenuItem key={category.id}>
-                    <SidebarMenuButton
-                      onClick={() => handleSelectCategory(category.id)}
-                      isActive={selectedCategoryId === category.id && !searchTerm}
-                    >
-                      <Icon name={category.icon as any} />
-                      <span>{category.name}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarGroup>
+               <AccordionItem value={group.title} key={group.title} className="border-none">
+                 <AccordionTrigger className="px-2 py-1.5 text-sm font-medium text-sidebar-primary hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md [&[data-state=open]]:bg-sidebar-accent">
+                   {group.title}
+                 </AccordionTrigger>
+                 <AccordionContent className="pt-1">
+                    <SidebarMenu>
+                      {group.items.map((category) => (
+                        <SidebarMenuItem key={category.id}>
+                          <SidebarMenuButton
+                            onClick={() => handleSelectCategory(category.id)}
+                            isActive={selectedCategoryId === category.id && !searchTerm}
+                            className="w-full justify-start h-8"
+                          >
+                            <Icon name={category.icon as any} />
+                            <span>{category.name}</span>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      ))}
+                    </SidebarMenu>
+                 </AccordionContent>
+               </AccordionItem>
             ))}
-          </SidebarMenu>
+          </Accordion>
         </SidebarContent>
       </Sidebar>
       <SidebarInset>
@@ -370,3 +383,5 @@ export function Dashboard() {
     </SidebarProvider>
   )
 }
+
+    

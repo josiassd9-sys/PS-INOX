@@ -181,6 +181,21 @@ function DashboardComponent() {
 
   const renderContent = () => {
     const showSearchResults = searchTerm && (filteredCategories.length > 0 || isScrapCategory);
+  
+    if (isScrapCategory) {
+      if (showSearchResults) {
+        return (
+          <GlobalSearchResults
+            categories={filteredCategories as any}
+            priceParams={priceParams}
+            searchTerm={searchTerm}
+            onPrefillScrap={handlePrefillScrapItem}
+            isScrapCalculatorActive={isScrapCategory}
+          />
+        );
+      }
+      return <ScrapCalculator prefilledItem={prefillScrapItem} onClearPrefill={() => setPrefillScrapItem(null)} sellingPrice={prefillSellingPrice} />;
+    }
 
     if (showSearchResults) {
       return (
@@ -194,9 +209,6 @@ function DashboardComponent() {
       );
     }
 
-    if (isScrapCategory) {
-      return <ScrapCalculator prefilledItem={prefillScrapItem} onClearPrefill={() => setPrefillScrapItem(null)} sellingPrice={prefillSellingPrice} />;
-    }
     if (isPackageCheckerCategory) {
       return <PackageChecker />;
     }
@@ -227,7 +239,7 @@ function DashboardComponent() {
   }
   
   const showPriceControls = !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory;
-  const showGlobalSearch = !isPackageCheckerCategory && !isScaleCategory && (!isScrapTableCategory);
+  const showGlobalSearch = !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory;
 
 
   return (
@@ -240,7 +252,7 @@ function DashboardComponent() {
           </div>
         </SidebarHeader>
         <SidebarContent>
-          <Accordion type="multiple" className="w-full" defaultValue={CATEGORY_GROUPS.map(g => g.title)}>
+          <Accordion type="single" collapsible className="w-full" defaultValue={CATEGORY_GROUPS[0].title}>
             {CATEGORY_GROUPS.map((group, index) => (
                <AccordionItem value={group.title} key={group.title} className="border-none">
                  <AccordionTrigger className="px-2 py-1.5 text-sm font-medium text-sidebar-primary hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md [&[data-state=open]]:bg-sidebar-accent">
@@ -383,5 +395,3 @@ export function Dashboard() {
     </SidebarProvider>
   )
 }
-
-    

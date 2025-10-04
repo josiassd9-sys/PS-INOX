@@ -170,15 +170,59 @@ function DashboardComponent() {
   
   const filteredCategories = React.useMemo(() => {
     if (!searchTerm) return [];
-    
+  
     const safeSearchTerm = searchTerm.replace(",", ".").toLowerCase();
-
-    return ALL_CATEGORIES.filter(cat => cat.unit === 'm' || cat.unit === 'un').map(category => {
-      const filteredItems = (category.items as any[]).filter(item => 
-        item.description.toLowerCase().replace(",", ".").includes(safeSearchTerm)
-      );
-      return { ...category, items: filteredItems };
-    }).filter(category => category.items.length > 0);
+  
+    return ALL_CATEGORIES.filter(
+      (cat) => cat.unit === "m" || cat.unit === "un"
+    )
+      .map((category) => {
+        let filteredItems: any[] = [];
+  
+        if (category.id === "conexoes") {
+          // Handle nested groups in connections
+          const connectionGroups = category.items as any[];
+          const filteredGroups = connectionGroups
+            .map((group) => {
+              const items = group.items.filter(
+                (item: any) =>
+                  item.description &&
+                  item.description
+                    .toLowerCase()
+                    .replace(",", ".")
+                    .includes(safeSearchTerm)
+              );
+              return { ...group, items };
+            })
+            .filter((group) => group.items.length > 0);
+          
+          if (filteredGroups.length > 0) {
+            // If we have filtered groups, we reconstruct the category with them
+            // This structure is handled by GlobalSearchResults
+             return { ...category, items: filteredGroups };
+          }
+           return null; // No items found in any group
+  
+        } else {
+          // Handle flat item lists
+          filteredItems = (category.items as any[]).filter(
+            (item) =>
+              item.description &&
+              item.description
+                .toLowerCase()
+                .replace(",", ".")
+                .includes(safeSearchTerm)
+          );
+        }
+        
+        if (filteredItems.length > 0) {
+            return { ...category, items: filteredItems };
+        }
+        
+        return null;
+        
+      })
+      .filter((category): category is Category => category !== null && category.items.length > 0);
   }, [searchTerm]);
 
   if (!isPriceParamsInitialized || !currentPriceParams) {
@@ -343,7 +387,7 @@ function DashboardComponent() {
                     <Input
                         id="customer-name"
                         value={customerName}
-                        onChange={(e) => onCustomerNameChange(e.target.value.replace(',', '.'))}
+                        onChange={(e) => onCustomerNameChange(e.target.value)}
                         placeholder="Digite o nome do cliente"
                         className="w-full rounded-lg bg-background"
                     />
@@ -356,7 +400,7 @@ function DashboardComponent() {
                     placeholder="Buscar em sucatas..."
                     className="w-full rounded-lg bg-background pl-8"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value.replace(',', '.'))}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
               ) : showGlobalSearch ? (
@@ -367,7 +411,7 @@ function DashboardComponent() {
                     placeholder="Buscar em todas as categorias..."
                     className="w-full rounded-lg bg-background pl-8"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value.replace(',', '.'))}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
               ) : null}
@@ -441,3 +485,5 @@ export function Dashboard() {
     </SidebarProvider>
   )
 }
+
+    

@@ -1,12 +1,5 @@
 
 
-
-
-
-
-
-
-
 export const STAINLESS_STEEL_DENSITY_KG_M3 = 7980;
 const INCH_TO_MM = 25.4;
 
@@ -73,12 +66,18 @@ export type Category = {
   id: string;
   name: string;
   description: string;
-  items: SteelItem[] | ScrapItem[];
+  items: SteelItem[] | ScrapItem[] | ConnectionGroup[];
   icon: string;
   unit: 'm' | 'm²' | 'un' | 'calc' | 'kg';
   hasOwnPriceControls?: boolean;
   defaultCostPrice?: number;
   defaultMarkup?: number;
+};
+
+export type ConnectionGroup = {
+  id: string;
+  name: string;
+  items: SteelItem[];
 };
 
 export type ScrapItem = {
@@ -92,6 +91,131 @@ export type CategoryGroup = {
     title: string;
     items: Category[];
 };
+
+const connectionSizes = [
+  { inch: '3/8"', mm: 9.52, weightMultiplier: 0.2 },
+  { inch: '1/2"', mm: 12.70, weightMultiplier: 0.4 },
+  { inch: '5/8"', mm: 15.88, weightMultiplier: 0.6 },
+  { inch: '3/4"', mm: 19.05, weightMultiplier: 0.8 },
+  { inch: '1"', mm: 25.40, weightMultiplier: 1.0 },
+  { inch: '1.1/4"', mm: 31.75, weightMultiplier: 1.5 },
+  { inch: '1.1/2"', mm: 38.10, weightMultiplier: 2.0 },
+  { inch: '2"', mm: 50.80, weightMultiplier: 3.0 },
+  { inch: '2.1/2"', mm: 63.50, weightMultiplier: 4.5 },
+  { inch: '3"', mm: 76.20, weightMultiplier: 6.5 },
+  { inch: '4"', mm: 101.60, weightMultiplier: 10.0 },
+  { inch: '5"', mm: 127.00, weightMultiplier: 15.0 },
+  { inch: '6"', mm: 152.40, weightMultiplier: 22.0 },
+  { inch: '8"', mm: 203.20, weightMultiplier: 35.0 },
+];
+
+const generateConnectionItems = (
+  prefix: string,
+  descriptionTemplate: (inch: string) => string,
+  baseWeight: number,
+  baseCost: number
+): SteelItem[] => {
+  return connectionSizes.map(size => ({
+    id: `${prefix}-${size.inch.replace(/ /g, '')}`,
+    description: descriptionTemplate(size.inch),
+    weight: baseWeight * size.weightMultiplier,
+    costPrice: baseCost * size.weightMultiplier,
+  }));
+};
+
+const connectionsGroups: ConnectionGroup[] = [
+  {
+    id: 'sanitario-tc',
+    name: 'Sanitário Tri-Clamp (TC)',
+    items: [
+      ...generateConnectionItems('conn-uniao-tc', (inch) => `União TC ${inch}`, 0.3, 25),
+      ...generateConnectionItems('conn-niple-tc', (inch) => `Niple TC ${inch}`, 0.15, 12),
+      ...generateConnectionItems('conn-tampao-tc', (inch) => `Tampão (CAP) TC ${inch}`, 0.1, 10),
+      ...generateConnectionItems('conn-abracadeira-tc', (inch) => `Abraçadeira TC ${inch}`, 0.2, 15),
+      ...generateConnectionItems('conn-vedacao-tc', (inch) => `Vedação TC (Silicone) ${inch}`, 0.01, 2),
+      ...generateConnectionItems('conn-niple-espigao-tc', (inch) => `Niple TC c/ Espigão ${inch}`, 0.2, 18),
+    ],
+  },
+  {
+    id: 'sanitario-sms',
+    name: 'Sanitário SMS',
+    items: [
+      ...generateConnectionItems('conn-uniao-sms', (inch) => `União SMS ${inch}`, 0.4, 30),
+      ...generateConnectionItems('conn-niple-sms', (inch) => `Niple SMS ${inch}`, 0.2, 15),
+      ...generateConnectionItems('conn-luva-sms', (inch) => `Luva SMS ${inch}`, 0.15, 12),
+      ...generateConnectionItems('conn-macho-sms', (inch) => `Macho SMS ${inch}`, 0.2, 14),
+      ...generateConnectionItems('conn-porca-tampao-sms', (inch) => `Porca Tampão SMS ${inch}`, 0.25, 20),
+      ...generateConnectionItems('conn-vedacao-sms', (inch) => `Vedação SMS (Nitrílica) ${inch}`, 0.02, 3),
+    ],
+  },
+  {
+    id: 'sanitario-rjt',
+    name: 'Sanitário RJT',
+    items: [
+      ...generateConnectionItems('conn-uniao-rjt', (inch) => `União RJT ${inch}`, 0.45, 35),
+      ...generateConnectionItems('conn-niple-rjt', (inch) => `Niple RJT ${inch}`, 0.22, 18),
+      ...generateConnectionItems('conn-luva-rjt', (inch) => `Luva RJT ${inch}`, 0.18, 15),
+      ...generateConnectionItems('conn-macho-rjt', (inch) => `Macho RJT ${inch}`, 0.25, 16),
+      ...generateConnectionItems('conn-porca-tampao-rjt', (inch) => `Porca Tampão RJT ${inch}`, 0.3, 22),
+      ...generateConnectionItems('conn-vedacao-rjt', (inch) => `Vedação RJT (Nitrílica) ${inch}`, 0.03, 4),
+    ],
+  },
+  {
+    id: 'curvas',
+    name: 'Curvas OD e Schedule',
+    items: [
+      ...generateConnectionItems('conn-curva-od-45', (inch) => `Curva 45° OD ${inch}`, 0.12, 8),
+      ...generateConnectionItems('conn-curva-od-90', (inch) => `Curva 90° OD ${inch}`, 0.15, 10),
+      ...generateConnectionItems('conn-curva-od-180', (inch) => `Curva 180° OD ${inch}`, 0.3, 20),
+      ...generateConnectionItems('conn-curva-sch-90', (inch) => `Curva 90° Schedule ${inch}`, 0.25, 18),
+    ],
+  },
+  {
+    id: 'tees-derivacoes',
+    name: 'Tees e Derivações',
+    items: [
+      ...generateConnectionItems('conn-tee-od', (inch) => `Tee OD ${inch}`, 0.2, 15),
+      ...generateConnectionItems('conn-tee-45-od', (inch) => `Tee 45° (Y) OD ${inch}`, 0.25, 20),
+      ...generateConnectionItems('conn-tee-sch', (inch) => `Tee Schedule ${inch}`, 0.4, 25),
+      ...generateConnectionItems('conn-cruzata-od', (inch) => `Cruzata OD ${inch}`, 0.3, 22),
+    ],
+  },
+  {
+    id: 'reducoes',
+    name: 'Reduções OD',
+    items: [
+      ...generateConnectionItems('conn-reducao-conc', (inch) => `Redução Concêntrica OD ${inch} x ...`, 0.18, 14),
+      ...generateConnectionItems('conn-reducao-exc', (inch) => `Redução Excêntrica OD ${inch} x ...`, 0.18, 14),
+    ],
+  },
+  {
+    id: 'roscados',
+    name: 'Roscados BSP',
+    items: [
+      ...generateConnectionItems('conn-luva-bsp', (inch) => `Luva BSP ${inch}`, 0.1, 8),
+      ...generateConnectionItems('conn-ponta-rosca-bsp', (inch) => `Ponta Roscada BSP ${inch}`, 0.15, 10),
+      ...generateConnectionItems('conn-espigao-bsp', (inch) => `Espigão BSP ${inch}`, 0.12, 9),
+    ],
+  },
+  {
+    id: 'valvulas',
+    name: 'Válvulas',
+    items: [
+      ...generateConnectionItems('conn-valvula-borboleta', (inch) => `Válvula Borboleta TC ${inch}`, 1.5, 150),
+      ...generateConnectionItems('conn-valvula-esfera', (inch) => `Válvula Esfera Tripartida BSP ${inch}`, 1.8, 180),
+      ...generateConnectionItems('conn-valvula-retencao', (inch) => `Válvula Retenção TC ${inch}`, 1.2, 120),
+      ...generateConnectionItems('conn-valvula-globo', (inch) => `Válvula Globo BSP ${inch}`, 2.5, 250),
+    ],
+  },
+  {
+    id: 'diversos',
+    name: 'Diversos',
+    items: [
+      ...generateConnectionItems('conn-abracadeira-suporte', (inch) => `Abraçadeira Suporte com Haste ${inch}`, 0.1, 5),
+      ...generateConnectionItems('conn-sprayball', (inch) => `Spray Ball Fixo ${inch}`, 0.5, 80),
+    ],
+  }
+];
 
 
 const chapasGroup1: {thickness: number, desc: string}[] = [
@@ -331,27 +455,6 @@ const generateBrassRods = (): SteelItem[] => {
     }));
 };
 
-const connectionsOdItems: SteelItem[] = [
-    { id: 'conn-curve-90-od-0.5', description: 'Curva 90° OD 1/2"', weight: 0.05, costPrice: 5.00, categoryName: 'Conexões' },
-    { id: 'conn-curve-90-od-0.75', description: 'Curva 90° OD 3/4"', weight: 0.10, costPrice: 7.00, categoryName: 'Conexões' },
-    { id: 'conn-curve-90-od-1', description: 'Curva 90° OD 1"', weight: 0.15, costPrice: 10.00, categoryName: 'Conexões' },
-    { id: 'conn-curve-90-od-1.5', description: 'Curva 90° OD 1.1/2"', weight: 0.30, costPrice: 15.00, categoryName: 'Conexões' },
-    { id: 'conn-curve-90-od-2', description: 'Curva 90° OD 2"', weight: 0.50, costPrice: 20.00, categoryName: 'Conexões' },
-    { id: 'conn-curve-90-od-2.5', description: 'Curva 90° OD 2.1/2"', weight: 0.80, costPrice: 30.00, categoryName: 'Conexões' },
-    { id: 'conn-curve-90-od-3', description: 'Curva 90° OD 3"', weight: 1.20, costPrice: 40.00, categoryName: 'Conexões' },
-    { id: 'conn-curve-90-od-4', description: 'Curva 90° OD 4"', weight: 2.00, costPrice: 60.00, categoryName: 'Conexões' },
-
-    { id: 'conn-tee-od-0.5', description: 'Tee OD 1/2"', weight: 0.07, costPrice: 8.00, categoryName: 'Conexões' },
-    { id: 'conn-tee-od-0.75', description: 'Tee OD 3/4"', weight: 0.12, costPrice: 11.00, categoryName: 'Conexões' },
-    { id: 'conn-tee-od-1', description: 'Tee OD 1"', weight: 0.20, costPrice: 15.00, categoryName: 'Conexões' },
-    { id: 'conn-tee-od-1.5', description: 'Tee OD 1.1/2"', weight: 0.40, costPrice: 22.00, categoryName: 'Conexões' },
-    { id: 'conn-tee-od-2', description: 'Tee OD 2"', weight: 0.65, costPrice: 30.00, categoryName: 'Conexões' },
-    { id: 'conn-tee-od-2.5', description: 'Tee OD 2.1/2"', weight: 1.00, costPrice: 45.00, categoryName: 'Conexões' },
-    { id: 'conn-tee-od-3', description: 'Tee OD 3"', weight: 1.50, costPrice: 60.00, categoryName: 'Conexões' },
-    { id: 'conn-tee-od-4', description: 'Tee OD 4"', weight: 2.50, costPrice: 90.00, categoryName: 'Conexões' },
-];
-
-
 const CATEGORIES: Category[] = [
   {
     id: 'retalhos',
@@ -463,10 +566,10 @@ const CATEGORIES: Category[] = [
   {
     id: 'conexoes',
     name: 'Conexões',
-    description: 'Conexões para tubulação padrão OD.',
+    description: 'Catálogo de conexões sanitárias, roscadas e de solda.',
     icon: 'Link',
     unit: 'un',
-    items: connectionsOdItems,
+    items: connectionsGroups,
     hasOwnPriceControls: true,
     defaultCostPrice: 1, // Multiplier
     defaultMarkup: 50,
@@ -911,7 +1014,6 @@ export const ALL_CATEGORIES = CATEGORY_GROUPS.flatMap(group => group.items);
 
     
 
-    
 
 
 

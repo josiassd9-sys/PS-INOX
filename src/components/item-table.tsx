@@ -167,7 +167,7 @@ export function ItemTable({ category, sellingPrice, costPrice, showTableHeader =
         <Table>
           {showTableHeader && (
             <TableHeader>
-              <TableRow className="bg-primary/5 hover:bg-primary/10">
+              <TableRow className="bg-primary/5 hover:bg-primary/10 flex">
                 <TableHead className="flex-1">Descrição</TableHead>
                 <TableHead className="w-1/3 text-center">
                   Peso ({weightUnitLabel})

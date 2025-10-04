@@ -49,6 +49,7 @@ import {
   AccordionTrigger,
 } from "./ui/accordion";
 import { TechnicalDrawingGuide } from "./technical-drawing-guide";
+import { ConnectionsTable } from "./connections-table";
 
 interface PriceParams {
   costPrice: number;
@@ -197,7 +198,7 @@ function DashboardComponent() {
   const isTechnicalDrawingCategory = selectedCategoryId === 'desenho-tecnico';
   const isConnectionsCategory = selectedCategoryId === 'conexoes';
   
-  const showCustomHeader = !searchTerm && !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory;
+  const showCustomHeader = !searchTerm && !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isConnectionsCategory;
   const unitLabel = selectedCategory.unit === "m" ? "m" : selectedCategory.unit === 'm²' ? "m²" : "un";
   const weightUnitLabel = `Peso (kg/${unitLabel})`;
   const priceUnitLabel = `Preço (R$/${unitLabel})`;
@@ -254,6 +255,13 @@ function DashboardComponent() {
     }
     if (isTechnicalDrawingCategory) {
         return <TechnicalDrawingGuide />;
+    }
+    if (isConnectionsCategory) {
+        return <ConnectionsTable
+            category={selectedCategory as any}
+            costMultiplier={currentPriceParams.costPrice}
+            markupPercentage={currentPriceParams.markup}
+        />;
     }
     return (
       <ItemTable 
@@ -335,7 +343,7 @@ function DashboardComponent() {
                     <Input
                         id="customer-name"
                         value={customerName}
-                        onChange={(e) => setCustomerName(e.target.value.replace(',', '.'))}
+                        onChange={(e) => onCustomerNameChange(e.target.value.replace(',', '.'))}
                         placeholder="Digite o nome do cliente"
                         className="w-full rounded-lg bg-background"
                     />
@@ -414,7 +422,7 @@ function DashboardComponent() {
                 </div>
               )}
               <div className="flex-1 overflow-y-auto">
-                <div className={cn("p-1", (isScrapTableCategory || (isScrapCategory && !searchTerm)) && "p-0 md:p-0")}>
+                <div className={cn("p-1", (isScrapTableCategory || (isScrapCategory && !searchTerm) || isConnectionsCategory) && "p-0 md:p-0")}>
                  {renderContent()}
                 </div>
               </div>

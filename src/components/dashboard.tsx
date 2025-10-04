@@ -18,7 +18,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
-import { Search, Warehouse, SlidersHorizontal, PlusCircle } from "lucide-react";
+import { Search, Warehouse, SlidersHorizontal, PlusCircle, Link } from "lucide-react";
 import { PriceControls } from "./price-controls";
 import { ItemTable } from "./item-table";
 import { Icon } from "./icons";
@@ -195,6 +195,7 @@ function DashboardComponent() {
   const isAstmStandardsCategory = selectedCategoryId === 'normas-astm';
   const isManufacturingProcessesCategory = selectedCategoryId === 'processos-fabricacao';
   const isTechnicalDrawingCategory = selectedCategoryId === 'desenho-tecnico';
+  const isConnectionsCategory = selectedCategoryId === 'conexoes';
   
   const showCustomHeader = !searchTerm && !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory;
   const unitLabel = selectedCategory.unit === "m" ? "m" : selectedCategory.unit === 'm²' ? "m²" : "un";
@@ -258,6 +259,7 @@ function DashboardComponent() {
       <ItemTable 
         category={selectedCategory as any} 
         sellingPrice={currentPriceParams.sellingPrice}
+        costPrice={currentPriceParams.costPrice}
         showTableHeader={!showCustomHeader}
       />
     );
@@ -265,6 +267,16 @@ function DashboardComponent() {
   
   const showPriceControls = !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory;
   const showGlobalSearch = !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory;
+
+  const priceControlTitle = () => {
+    if (selectedCategory.hasOwnPriceControls) {
+      if (isConnectionsCategory) {
+        return 'Ajustar Preços - Conexões';
+      }
+      return `Ajustar Preços - ${selectedCategory.name}`;
+    }
+    return 'Ajustar Preços - Global';
+  }
 
 
   return (
@@ -277,7 +289,7 @@ function DashboardComponent() {
           </div>
         </SidebarHeader>
         <SidebarContent>
-          <Accordion type="single" collapsible className="w-full" defaultValue={CATEGORY_GROUPS[0].title}>
+           <Accordion type="single" collapsible className="w-full" defaultValue={CATEGORY_GROUPS[0].title}>
             {CATEGORY_GROUPS.map((group, index) => (
                <AccordionItem value={group.title} key={group.title} className="border-none">
                  <AccordionTrigger className="px-2 py-1.5 text-sm font-medium text-sidebar-primary hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md [&[data-state=open]]:bg-sidebar-accent">
@@ -323,7 +335,7 @@ function DashboardComponent() {
                     <Input
                         id="customer-name"
                         value={customerName}
-                        onChange={(e) => setCustomerName(e.target.value)}
+                        onChange={(e) => setCustomerName(e.target.value.replace(',', '.'))}
                         placeholder="Digite o nome do cliente"
                         className="w-full rounded-lg bg-background"
                     />
@@ -363,7 +375,7 @@ function DashboardComponent() {
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Ajustar Preços - {selectedCategory.hasOwnPriceControls ? selectedCategory.name : 'Global'}</DialogTitle>
+                        <DialogTitle>{priceControlTitle()}</DialogTitle>
                       </DialogHeader>
                       <PriceControls
                         costPrice={currentPriceParams.costPrice}
@@ -372,6 +384,7 @@ function DashboardComponent() {
                         onCostChange={(v) => handlePriceChange('costPrice', v)}
                         onMarkupChange={(v) => handlePriceChange('markup', v)}
                         onSellingPriceChange={(v) => handlePriceChange('sellingPrice', v)}
+                        isConnections={isConnectionsCategory}
                       />
                       <DialogFooter>
                         <DialogClose asChild>

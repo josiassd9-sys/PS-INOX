@@ -6,6 +6,7 @@
 
 
 
+
 export const STAINLESS_STEEL_DENSITY_KG_M3 = 7980;
 const INCH_TO_MM = 25.4;
 
@@ -64,6 +65,7 @@ export type SteelItem = {
   id: string;
   description: string;
   weight: number;
+  costPrice?: number; // Cost per piece for connections
   categoryName?: string;
 };
 
@@ -329,6 +331,27 @@ const generateBrassRods = (): SteelItem[] => {
     }));
 };
 
+const connectionsOdItems: SteelItem[] = [
+    { id: 'conn-curve-90-od-0.5', description: 'Curva 90° OD 1/2"', weight: 0.05, costPrice: 5.00, categoryName: 'Conexões' },
+    { id: 'conn-curve-90-od-0.75', description: 'Curva 90° OD 3/4"', weight: 0.10, costPrice: 7.00, categoryName: 'Conexões' },
+    { id: 'conn-curve-90-od-1', description: 'Curva 90° OD 1"', weight: 0.15, costPrice: 10.00, categoryName: 'Conexões' },
+    { id: 'conn-curve-90-od-1.5', description: 'Curva 90° OD 1.1/2"', weight: 0.30, costPrice: 15.00, categoryName: 'Conexões' },
+    { id: 'conn-curve-90-od-2', description: 'Curva 90° OD 2"', weight: 0.50, costPrice: 20.00, categoryName: 'Conexões' },
+    { id: 'conn-curve-90-od-2.5', description: 'Curva 90° OD 2.1/2"', weight: 0.80, costPrice: 30.00, categoryName: 'Conexões' },
+    { id: 'conn-curve-90-od-3', description: 'Curva 90° OD 3"', weight: 1.20, costPrice: 40.00, categoryName: 'Conexões' },
+    { id: 'conn-curve-90-od-4', description: 'Curva 90° OD 4"', weight: 2.00, costPrice: 60.00, categoryName: 'Conexões' },
+
+    { id: 'conn-tee-od-0.5', description: 'Tee OD 1/2"', weight: 0.07, costPrice: 8.00, categoryName: 'Conexões' },
+    { id: 'conn-tee-od-0.75', description: 'Tee OD 3/4"', weight: 0.12, costPrice: 11.00, categoryName: 'Conexões' },
+    { id: 'conn-tee-od-1', description: 'Tee OD 1"', weight: 0.20, costPrice: 15.00, categoryName: 'Conexões' },
+    { id: 'conn-tee-od-1.5', description: 'Tee OD 1.1/2"', weight: 0.40, costPrice: 22.00, categoryName: 'Conexões' },
+    { id: 'conn-tee-od-2', description: 'Tee OD 2"', weight: 0.65, costPrice: 30.00, categoryName: 'Conexões' },
+    { id: 'conn-tee-od-2.5', description: 'Tee OD 2.1/2"', weight: 1.00, costPrice: 45.00, categoryName: 'Conexões' },
+    { id: 'conn-tee-od-3', description: 'Tee OD 3"', weight: 1.50, costPrice: 60.00, categoryName: 'Conexões' },
+    { id: 'conn-tee-od-4', description: 'Tee OD 4"', weight: 2.50, costPrice: 90.00, categoryName: 'Conexões' },
+];
+
+
 const CATEGORIES: Category[] = [
   {
     id: 'retalhos',
@@ -436,6 +459,17 @@ const CATEGORIES: Category[] = [
     icon: 'GalleryVertical',
     unit: 'm',
     items: tubosAliancaItems,
+  },
+  {
+    id: 'conexoes',
+    name: 'Conexões',
+    description: 'Conexões para tubulação padrão OD.',
+    icon: 'Link',
+    unit: 'un',
+    items: connectionsOdItems,
+    hasOwnPriceControls: true,
+    defaultCostPrice: 1, // Multiplier
+    defaultMarkup: 50,
   },
   {
     id: 'chapas',
@@ -838,6 +872,7 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
     {
         title: 'MATERIAIS (AÇO INOX)',
         items: [
+            CATEGORIES.find(c => c.id === 'conexoes')!,
             CATEGORIES.find(c => c.id === 'tubos-od')!,
             CATEGORIES.find(c => c.id === 'tubos-schedule')!,
             CATEGORIES.find(c => c.id === 'tubos-alianca')!,
@@ -877,6 +912,7 @@ export const ALL_CATEGORIES = CATEGORY_GROUPS.flatMap(group => group.items);
     
 
     
+
 
 
 

@@ -15,7 +15,6 @@ interface PriceControlsProps {
   onCostChange: (value: number | null) => void;
   onMarkupChange: (value: number | null) => void;
   onSellingPriceChange: (value: number | null) => void;
-  isConnections?: boolean;
 }
 
 export function PriceControls({
@@ -25,7 +24,6 @@ export function PriceControls({
   onCostChange,
   onMarkupChange,
   onSellingPriceChange,
-  isConnections = false,
 }: PriceControlsProps) {
 
   const handleInputChange = (callback: (value: number | null) => void, value: string) => {
@@ -45,9 +43,9 @@ export function PriceControls({
       return value.toFixed(2).replace(".", ",");
   }
   
-  const costLabel = isConnections ? "Multiplicador de Custo" : "Custo (R$/kg)";
-  const sellingPriceLabel = isConnections ? "Margem de Lucro (%)" : "Venda (R$/kg)";
-  const markupLabel = isConnections ? "Preço Final (Calculado)" : "Margem (%)";
+  const costLabel = "Custo (R$/kg)";
+  const markupLabel = "Margem (%)";
+  const sellingPriceLabel = "Venda (R$/kg)";
 
 
   return (
@@ -62,11 +60,11 @@ export function PriceControls({
               inputMode="decimal"
               value={formatValue(costPrice)}
               onChange={(e) => handleInputChange(onCostChange, e.target.value)}
-              placeholder={isConnections ? "Ex: 1,00" : "Ex: 25,50"}
+              placeholder={"Ex: 25,50"}
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="markup" className="text-xs">{isConnections ? 'Margem (%)' : 'Margem (%)'}</Label>
+            <Label htmlFor="markup" className="text-xs">{markupLabel}</Label>
             <Input
               id="markup"
               type="text"
@@ -77,16 +75,15 @@ export function PriceControls({
             />
           </div>
           <div className="space-y-1">
-             <Label htmlFor="selling-price" className="text-primary font-semibold text-xs">{isConnections ? 'Preço Final (Calculado)' : 'Venda (R$/kg)'}</Label>
+             <Label htmlFor="selling-price" className="text-primary font-semibold text-xs">{sellingPriceLabel}</Label>
             <Input
               id="selling-price"
               type="text"
               inputMode="decimal"
               value={formatValue(sellingPrice)}
               onChange={(e) => handleInputChange(onSellingPriceChange, e.target.value)}
-              placeholder={isConnections ? "" : "Ex: 35,70"}
+              placeholder={"Ex: 35,70"}
               className="border-primary/50 text-primary font-bold text-sm"
-              disabled={isConnections}
             />
           </div>
         </div>

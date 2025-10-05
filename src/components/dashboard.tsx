@@ -3,7 +3,7 @@
 "use client";
 
 import * as React from "react";
-import { ALL_CATEGORIES, CATEGORY_GROUPS, type Category, type ScrapItem, SteelItem } from "@/lib/data";
+import { ALL_CATEGORIES, CATEGORY_GROUPS, type Category, type ScrapItem, SteelItem, ConnectionGroup, ConnectionItem } from "@/lib/data";
 import {
   SidebarProvider,
   Sidebar,
@@ -58,6 +58,7 @@ interface PriceParams {
 }
 
 const PRICE_PARAMS_LOCAL_STORAGE_KEY = "priceParamsState";
+export const EDITED_CONNECTIONS_WEIGHTS_KEY = "editedConnectionsWeights";
 
 const initializePriceParams = (): Record<string, PriceParams> => {
   let params: Record<string, PriceParams> = {
@@ -101,9 +102,20 @@ function DashboardComponent() {
   const [prefillScrapItem, setPrefillScrapItem] = React.useState<SteelItem | null>(null);
   const [prefillSellingPrice, setPrefillSellingPrice] = React.useState<number>(0);
   const [customerName, setCustomerName] = React.useState("");
+  const [editedWeights, setEditedWeights] = React.useState<Record<string, number>>({});
+
 
   React.useEffect(() => {
     setPriceParams(initializePriceParams());
+    try {
+      const savedWeights = localStorage.getItem(EDITED_CONNECTIONS_WEIGHTS_KEY);
+      if (savedWeights) {
+        setEditedWeights(JSON.parse(savedWeights));
+      }
+    } catch (error) {
+      console.error("Failed to load edited weights from localStorage", error);
+    }
+
     setIsPriceParamsInitialized(true);
   }, []);
   
@@ -121,6 +133,25 @@ function DashboardComponent() {
         title: "Erro ao Salvar",
         description: "Não foi possível salvar os parâmetros de preço.",
       });
+    }
+  };
+
+  const handleWeightChange = (itemId: string, newWeight: number) => {
+    const updatedWeights = { ...editedWeights, [itemId]: newWeight };
+    setEditedWeights(updatedWeights);
+    try {
+        localStorage.setItem(EDITED_CONNECTIONS_WEIGHTS_KEY, JSON.stringify(updatedWeights));
+        toast({
+            title: "Peso Atualizado",
+            description: "O novo peso da conexão foi salvo.",
+        });
+    } catch (error) {
+        console.error("Failed to save edited weights", error);
+        toast({
+            variant: "destructive",
+            title: "Erro ao Salvar Peso",
+            description: "Não foi possível salvar a alteração do peso.",
+        });
     }
   };
 
@@ -180,12 +211,11 @@ function DashboardComponent() {
         let filteredItems: any[] = [];
   
         if (category.id === "conexoes") {
-          // Handle nested groups in connections
-          const connectionGroups = category.items as any[];
+          const connectionGroups = category.items as ConnectionGroup[];
           const filteredGroups = connectionGroups
             .map((group) => {
               const items = group.items.filter(
-                (item: any) =>
+                (item: ConnectionItem) =>
                   item.description &&
                   item.description
                     .toLowerCase()
@@ -197,15 +227,12 @@ function DashboardComponent() {
             .filter((group) => group.items.length > 0);
           
           if (filteredGroups.length > 0) {
-            // If we have filtered groups, we reconstruct the category with them
-            // This structure is handled by GlobalSearchResults
              return { ...category, items: filteredGroups };
           }
-           return null; // No items found in any group
+           return null;
   
         } else {
-          // Handle flat item lists
-          filteredItems = (category.items as any[]).filter(
+          filteredItems = (category.items as SteelItem[]).filter(
             (item) =>
               item.description &&
               item.description
@@ -303,28 +330,24 @@ function DashboardComponent() {
     if (isConnectionsCategory) {
         return <ConnectionsTable
             category={selectedCategory as any}
-            costMultiplier={currentPriceParams.costPrice}
-            markupPercentage={currentPriceParams.markup}
+            sellingPrice={currentPriceParams.sellingPrice}
+            editedWeights={editedWeights}
+            onWeightChange={handleWeightChange}
         />;
     }
     return (
       <ItemTable 
         category={selectedCategory as any} 
         sellingPrice={currentPriceParams.sellingPrice}
-        costPrice={currentPriceParams.costPrice}
         showTableHeader={!showCustomHeader}
       />
     );
   }
   
   const showPriceControls = !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory;
-  const showGlobalSearch = !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory;
-
+  
   const priceControlTitle = () => {
     if (selectedCategory.hasOwnPriceControls) {
-      if (isConnectionsCategory) {
-        return 'Ajustar Preços - Conexões';
-      }
       return `Ajustar Preços - ${selectedCategory.name}`;
     }
     return 'Ajustar Preços - Global';
@@ -436,7 +459,6 @@ function DashboardComponent() {
                         onCostChange={(v) => handlePriceChange('costPrice', v)}
                         onMarkupChange={(v) => handlePriceChange('markup', v)}
                         onSellingPriceChange={(v) => handlePriceChange('sellingPrice', v)}
-                        isConnections={isConnectionsCategory}
                       />
                       <DialogFooter>
                         <DialogClose asChild>
@@ -485,5 +507,3 @@ export function Dashboard() {
     </SidebarProvider>
   )
 }
-
-    

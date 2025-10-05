@@ -58,9 +58,16 @@ export type SteelItem = {
   id: string;
   description: string;
   weight: number;
-  costPrice?: number; // Cost per piece for connections
   categoryName?: string;
 };
+
+export type ConnectionItem = {
+  id: string;
+  description: string;
+  weight: number;
+  categoryName?: string;
+};
+
 
 export type Category = {
   id: string;
@@ -77,7 +84,7 @@ export type Category = {
 export type ConnectionGroup = {
   id: string;
   name: string;
-  items: SteelItem[];
+  items: ConnectionItem[];
 };
 
 export type ScrapItem = {
@@ -113,13 +120,11 @@ const generateConnectionItems = (
   prefix: string,
   descriptionTemplate: (inch: string) => string,
   baseWeight: number,
-  baseCost: number
-): SteelItem[] => {
+): ConnectionItem[] => {
   return connectionSizes.map(size => ({
     id: `${prefix}-${size.inch.replace(/ /g, '')}`,
     description: descriptionTemplate(size.inch),
     weight: baseWeight * size.weightMultiplier,
-    costPrice: baseCost * size.weightMultiplier,
   }));
 };
 
@@ -128,91 +133,91 @@ const connectionsGroups: ConnectionGroup[] = [
     id: 'sanitario-tc',
     name: 'Sanitário Tri-Clamp (TC)',
     items: [
-      ...generateConnectionItems('conn-uniao-tc', (inch) => `União TC ${inch}`, 0.3, 25),
-      ...generateConnectionItems('conn-niple-tc', (inch) => `Niple TC ${inch}`, 0.15, 12),
-      ...generateConnectionItems('conn-tampao-tc', (inch) => `Tampão (CAP) TC ${inch}`, 0.1, 10),
-      ...generateConnectionItems('conn-abracadeira-tc', (inch) => `Abraçadeira TC ${inch}`, 0.2, 15),
-      ...generateConnectionItems('conn-vedacao-tc', (inch) => `Vedação TC (Silicone) ${inch}`, 0.01, 2),
-      ...generateConnectionItems('conn-niple-espigao-tc', (inch) => `Niple TC c/ Espigão ${inch}`, 0.2, 18),
+      ...generateConnectionItems('conn-uniao-tc', (inch) => `União TC ${inch}`, 0.3),
+      ...generateConnectionItems('conn-niple-tc', (inch) => `Niple TC ${inch}`, 0.15),
+      ...generateConnectionItems('conn-tampao-tc', (inch) => `Tampão (CAP) TC ${inch}`, 0.1),
+      ...generateConnectionItems('conn-abracadeira-tc', (inch) => `Abraçadeira TC ${inch}`, 0.2),
+      ...generateConnectionItems('conn-vedacao-tc', (inch) => `Vedação TC (Silicone) ${inch}`, 0.01),
+      ...generateConnectionItems('conn-niple-espigao-tc', (inch) => `Niple TC c/ Espigão ${inch}`, 0.2),
     ],
   },
   {
     id: 'sanitario-sms',
     name: 'Sanitário SMS',
     items: [
-      ...generateConnectionItems('conn-uniao-sms', (inch) => `União SMS ${inch}`, 0.4, 30),
-      ...generateConnectionItems('conn-niple-sms', (inch) => `Niple SMS ${inch}`, 0.2, 15),
-      ...generateConnectionItems('conn-luva-sms', (inch) => `Luva SMS ${inch}`, 0.15, 12),
-      ...generateConnectionItems('conn-macho-sms', (inch) => `Macho SMS ${inch}`, 0.2, 14),
-      ...generateConnectionItems('conn-porca-tampao-sms', (inch) => `Porca Tampão SMS ${inch}`, 0.25, 20),
-      ...generateConnectionItems('conn-vedacao-sms', (inch) => `Vedação SMS (Nitrílica) ${inch}`, 0.02, 3),
+      ...generateConnectionItems('conn-uniao-sms', (inch) => `União SMS ${inch}`, 0.4),
+      ...generateConnectionItems('conn-niple-sms', (inch) => `Niple SMS ${inch}`, 0.2),
+      ...generateConnectionItems('conn-luva-sms', (inch) => `Luva SMS ${inch}`, 0.15),
+      ...generateConnectionItems('conn-macho-sms', (inch) => `Macho SMS ${inch}`, 0.2),
+      ...generateConnectionItems('conn-porca-tampao-sms', (inch) => `Porca Tampão SMS ${inch}`, 0.25),
+      ...generateConnectionItems('conn-vedacao-sms', (inch) => `Vedação SMS (Nitrílica) ${inch}`, 0.02),
     ],
   },
   {
     id: 'sanitario-rjt',
     name: 'Sanitário RJT',
     items: [
-      ...generateConnectionItems('conn-uniao-rjt', (inch) => `União RJT ${inch}`, 0.45, 35),
-      ...generateConnectionItems('conn-niple-rjt', (inch) => `Niple RJT ${inch}`, 0.22, 18),
-      ...generateConnectionItems('conn-luva-rjt', (inch) => `Luva RJT ${inch}`, 0.18, 15),
-      ...generateConnectionItems('conn-macho-rjt', (inch) => `Macho RJT ${inch}`, 0.25, 16),
-      ...generateConnectionItems('conn-porca-tampao-rjt', (inch) => `Porca Tampão RJT ${inch}`, 0.3, 22),
-      ...generateConnectionItems('conn-vedacao-rjt', (inch) => `Vedação RJT (Nitrílica) ${inch}`, 0.03, 4),
+      ...generateConnectionItems('conn-uniao-rjt', (inch) => `União RJT ${inch}`, 0.45),
+      ...generateConnectionItems('conn-niple-rjt', (inch) => `Niple RJT ${inch}`, 0.22),
+      ...generateConnectionItems('conn-luva-rjt', (inch) => `Luva RJT ${inch}`, 0.18),
+      ...generateConnectionItems('conn-macho-rjt', (inch) => `Macho RJT ${inch}`, 0.25),
+      ...generateConnectionItems('conn-porca-tampao-rjt', (inch) => `Porca Tampão RJT ${inch}`, 0.3),
+      ...generateConnectionItems('conn-vedacao-rjt', (inch) => `Vedação RJT (Nitrílica) ${inch}`, 0.03),
     ],
   },
   {
     id: 'curvas',
     name: 'Curvas OD e Schedule',
     items: [
-      ...generateConnectionItems('conn-curva-od-45', (inch) => `Curva 45° OD ${inch}`, 0.12, 8),
-      ...generateConnectionItems('conn-curva-od-90', (inch) => `Curva 90° OD ${inch}`, 0.15, 10),
-      ...generateConnectionItems('conn-curva-od-180', (inch) => `Curva 180° OD ${inch}`, 0.3, 20),
-      ...generateConnectionItems('conn-curva-sch-90', (inch) => `Curva 90° Schedule ${inch}`, 0.25, 18),
+      ...generateConnectionItems('conn-curva-od-45', (inch) => `Curva 45° OD ${inch}`, 0.12),
+      ...generateConnectionItems('conn-curva-od-90', (inch) => `Curva 90° OD ${inch}`, 0.15),
+      ...generateConnectionItems('conn-curva-od-180', (inch) => `Curva 180° OD ${inch}`, 0.3),
+      ...generateConnectionItems('conn-curva-sch-90', (inch) => `Curva 90° Schedule ${inch}`, 0.25),
     ],
   },
   {
     id: 'tees-derivacoes',
     name: 'Tees e Derivações',
     items: [
-      ...generateConnectionItems('conn-tee-od', (inch) => `Tee OD ${inch}`, 0.2, 15),
-      ...generateConnectionItems('conn-tee-45-od', (inch) => `Tee 45° (Y) OD ${inch}`, 0.25, 20),
-      ...generateConnectionItems('conn-tee-sch', (inch) => `Tee Schedule ${inch}`, 0.4, 25),
-      ...generateConnectionItems('conn-cruzata-od', (inch) => `Cruzata OD ${inch}`, 0.3, 22),
+      ...generateConnectionItems('conn-tee-od', (inch) => `Tee OD ${inch}`, 0.2),
+      ...generateConnectionItems('conn-tee-45-od', (inch) => `Tee 45° (Y) OD ${inch}`, 0.25),
+      ...generateConnectionItems('conn-tee-sch', (inch) => `Tee Schedule ${inch}`, 0.4),
+      ...generateConnectionItems('conn-cruzata-od', (inch) => `Cruzata OD ${inch}`, 0.3),
     ],
   },
   {
     id: 'reducoes',
     name: 'Reduções OD',
     items: [
-      ...generateConnectionItems('conn-reducao-conc', (inch) => `Redução Concêntrica OD ${inch} x ...`, 0.18, 14),
-      ...generateConnectionItems('conn-reducao-exc', (inch) => `Redução Excêntrica OD ${inch} x ...`, 0.18, 14),
+      ...generateConnectionItems('conn-reducao-conc', (inch) => `Redução Concêntrica OD ${inch} x ...`, 0.18),
+      ...generateConnectionItems('conn-reducao-exc', (inch) => `Redução Excêntrica OD ${inch} x ...`, 0.18),
     ],
   },
   {
     id: 'roscados',
     name: 'Roscados BSP',
     items: [
-      ...generateConnectionItems('conn-luva-bsp', (inch) => `Luva BSP ${inch}`, 0.1, 8),
-      ...generateConnectionItems('conn-ponta-rosca-bsp', (inch) => `Ponta Roscada BSP ${inch}`, 0.15, 10),
-      ...generateConnectionItems('conn-espigao-bsp', (inch) => `Espigão BSP ${inch}`, 0.12, 9),
+      ...generateConnectionItems('conn-luva-bsp', (inch) => `Luva BSP ${inch}`, 0.1),
+      ...generateConnectionItems('conn-ponta-rosca-bsp', (inch) => `Ponta Roscada BSP ${inch}`, 0.15),
+      ...generateConnectionItems('conn-espigao-bsp', (inch) => `Espigão BSP ${inch}`, 0.12),
     ],
   },
   {
     id: 'valvulas',
     name: 'Válvulas',
     items: [
-      ...generateConnectionItems('conn-valvula-borboleta', (inch) => `Válvula Borboleta TC ${inch}`, 1.5, 150),
-      ...generateConnectionItems('conn-valvula-esfera', (inch) => `Válvula Esfera Tripartida BSP ${inch}`, 1.8, 180),
-      ...generateConnectionItems('conn-valvula-retencao', (inch) => `Válvula Retenção TC ${inch}`, 1.2, 120),
-      ...generateConnectionItems('conn-valvula-globo', (inch) => `Válvula Globo BSP ${inch}`, 2.5, 250),
+      ...generateConnectionItems('conn-valvula-borboleta', (inch) => `Válvula Borboleta TC ${inch}`, 1.5),
+      ...generateConnectionItems('conn-valvula-esfera', (inch) => `Válvula Esfera Tripartida BSP ${inch}`, 1.8),
+      ...generateConnectionItems('conn-valvula-retencao', (inch) => `Válvula Retenção TC ${inch}`, 1.2),
+      ...generateConnectionItems('conn-valvula-globo', (inch) => `Válvula Globo BSP ${inch}`, 2.5),
     ],
   },
   {
     id: 'diversos',
     name: 'Diversos',
     items: [
-      ...generateConnectionItems('conn-abracadeira-suporte', (inch) => `Abraçadeira Suporte com Haste ${inch}`, 0.1, 5),
-      ...generateConnectionItems('conn-sprayball', (inch) => `Spray Ball Fixo ${inch}`, 0.5, 80),
+      ...generateConnectionItems('conn-abracadeira-suporte', (inch) => `Abraçadeira Suporte com Haste ${inch}`, 0.1),
+      ...generateConnectionItems('conn-sprayball', (inch) => `Spray Ball Fixo ${inch}`, 0.5),
     ],
   }
 ];
@@ -571,7 +576,7 @@ const CATEGORIES: Category[] = [
     unit: 'un',
     items: connectionsGroups,
     hasOwnPriceControls: true,
-    defaultCostPrice: 1, // Multiplier
+    defaultCostPrice: 40,
     defaultMarkup: 50,
   },
   {
@@ -1013,6 +1018,7 @@ export const ALL_CATEGORIES = CATEGORY_GROUPS.flatMap(group => group.items);
     
 
     
+
 
 
 

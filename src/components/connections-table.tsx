@@ -15,18 +15,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { Category, ConnectionGroup, SteelItem } from "@/lib/data";
+import type { Category, ConnectionGroup, ConnectionItem } from "@/lib/data";
+import { Input } from "./ui/input";
 
 interface ConnectionsTableProps {
   category: Category;
-  costMultiplier: number;
-  markupPercentage: number;
+  sellingPrice: number;
+  editedWeights: Record<string, number>;
+  onWeightChange: (itemId: string, newWeight: number) => void;
 }
 
 export function ConnectionsTable({
   category,
-  costMultiplier,
-  markupPercentage,
+  sellingPrice,
+  editedWeights,
+  onWeightChange,
 }: ConnectionsTableProps) {
   const connectionGroups = category.items as ConnectionGroup[];
 
@@ -36,19 +39,22 @@ export function ConnectionsTable({
       currency: "BRL",
     }).format(value);
   };
-
-  const formatNumber = (value: number, digits: number = 3) => {
-    return new Intl.NumberFormat("pt-BR", {
-      minimumFractionDigits: digits,
-      maximumFractionDigits: digits,
-    }).format(value);
+  
+  const handleWeightBlur = (itemId: string, event: React.FocusEvent<HTMLInputElement>) => {
+    const value = event.target.value.replace(",", ".");
+    const newWeight = parseFloat(value);
+    if (!isNaN(newWeight)) {
+        onWeightChange(itemId, newWeight);
+    }
   };
 
-  const calculateItemPrice = (item: SteelItem) => {
-    const itemCost = item.costPrice || 0;
-    const finalCost = itemCost * costMultiplier;
-    return Math.ceil(finalCost * (1 + markupPercentage / 100));
-  };
+  const handleWeightChangeLocal = (itemId: string, value: string, setter: (val: string) => void) => {
+     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
+      if (/^\d*\,?\d*$/.test(sanitizedValue)) {
+        setter(sanitizedValue);
+    }
+  }
+
 
   return (
     <Accordion
@@ -81,7 +87,15 @@ export function ConnectionsTable({
                 </TableHeader>
                 <TableBody>
                   {group.items.map((item) => {
-                    const itemPrice = calculateItemPrice(item);
+                    const currentWeight = editedWeights[item.id] ?? item.weight;
+                    const itemPrice = Math.ceil(currentWeight * sellingPrice);
+                    
+                    const [localWeight, setLocalWeight] = React.useState(currentWeight.toFixed(3).replace('.', ','));
+
+                    React.useEffect(() => {
+                        setLocalWeight((editedWeights[item.id] ?? item.weight).toFixed(3).replace('.', ','));
+                    }, [editedWeights, item.id, item.weight]);
+
                     return (
                       <TableRow
                         key={item.id}
@@ -89,7 +103,14 @@ export function ConnectionsTable({
                       >
                         <TableCell className="flex-1 px-1">{item.description}</TableCell>
                         <TableCell className="w-1/3 text-center px-1">
-                          {formatNumber(item.weight)}
+                           <Input
+                                type="text"
+                                inputMode="decimal"
+                                value={localWeight}
+                                onBlur={(e) => handleWeightBlur(item.id, e)}
+                                onChange={(e) => handleWeightChangeLocal(item.id, e.target.value, setLocalWeight)}
+                                className="h-8 text-center border-primary/20 bg-transparent"
+                            />
                         </TableCell>
                         <TableCell className="w-1/3 text-right font-medium text-primary px-1">
                           {formatCurrency(itemPrice)}

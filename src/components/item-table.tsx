@@ -30,11 +30,10 @@ import { CutPriceCalculator } from "./cut-price-calculator";
 interface ItemTableProps {
   category: Category;
   sellingPrice: number;
-  costPrice: number;
   showTableHeader?: boolean;
 }
 
-export function ItemTable({ category, sellingPrice, costPrice, showTableHeader = true }: ItemTableProps) {
+export function ItemTable({ category, sellingPrice, showTableHeader = true }: ItemTableProps) {
   const [items, setItems] = React.useState<SteelItem[]>(category.items as SteelItem[]);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
@@ -100,11 +99,6 @@ export function ItemTable({ category, sellingPrice, costPrice, showTableHeader =
   const priceUnitLabel = `R$/${unitLabel}`;
 
   const calculateItemPrice = (item: SteelItem) => {
-    if (category.id === 'conexoes') {
-      const itemCost = item.costPrice || 0;
-      const finalCost = itemCost * costPrice; // costPrice here is a multiplier
-      return Math.ceil(finalCost * (1 + (sellingPrice / 100))); // sellingPrice is markup for connections
-    }
     if (category.unit === 'm') {
       return Math.ceil(item.weight * sellingPrice);
     }

@@ -68,7 +68,11 @@ const initializePriceParams = (): Record<string, PriceParams> => {
   try {
     const savedParams = localStorage.getItem(PRICE_PARAMS_LOCAL_STORAGE_KEY);
     if (savedParams) {
-      params = JSON.parse(savedParams);
+      const parsed = JSON.parse(savedParams);
+      // Basic validation
+      if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+          params = parsed;
+      }
     }
   } catch (error) {
     console.error("Failed to load price params from localStorage", error);
@@ -344,7 +348,8 @@ function DashboardComponent() {
     );
   }
   
-  const showPriceControls = selectedCategory.hasOwnPriceControls;
+  const showPriceControls = selectedCategory.hasOwnPriceControls || selectedCategoryId === 'global' || !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory;
+
   const showGlobalSearch = !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory;
 
   

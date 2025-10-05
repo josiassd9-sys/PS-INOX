@@ -6,7 +6,6 @@ const Dashboard = dynamic(() => import('@/components/dashboard').then(mod => mod
       <p className="text-lg text-muted-foreground">Carregando aplicativo...</p>
     </div>
   ),
-  ssr: false
 })
 
 export default function Home() {

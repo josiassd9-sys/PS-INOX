@@ -77,8 +77,8 @@ const initializePriceParams = (): Record<string, PriceParams> => {
   // Ensure all categories with own controls are initialized
   ALL_CATEGORIES.forEach(cat => {
     if (cat.hasOwnPriceControls && !params[cat.id]) {
-      const costPrice = cat.defaultCostPrice || 0;
-      const markup = cat.defaultMarkup || 0;
+      const costPrice = cat.defaultCostPrice || 30;
+      const markup = cat.defaultMarkup || 50;
       params[cat.id] = {
         costPrice,
         markup,
@@ -344,7 +344,9 @@ function DashboardComponent() {
     );
   }
   
-  const showPriceControls = !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory;
+  const showPriceControls = selectedCategory.hasOwnPriceControls;
+  const showGlobalSearch = !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory;
+
   
   const priceControlTitle = () => {
     if (selectedCategory.hasOwnPriceControls) {
@@ -410,7 +412,7 @@ function DashboardComponent() {
                     <Input
                         id="customer-name"
                         value={customerName}
-                        onChange={(e) => onCustomerNameChange(e.target.value)}
+                        onChange={(e) => setCustomerName(e.target.value)}
                         placeholder="Digite o nome do cliente"
                         className="w-full rounded-lg bg-background"
                     />

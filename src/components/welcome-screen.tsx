@@ -62,7 +62,7 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
                                     {group.title}
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="flex flex-col gap-1 flex-1 p-2">
+                            <CardContent className="flex flex-col gap-1 p-2">
                                 {group.items.map((category: Category) => (
                                     <Button
                                         key={category.id}
@@ -70,8 +70,8 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
                                         className="justify-start h-9 text-sm"
                                         onClick={() => onSelectCategory(category.id)}
                                     >
-                                        <Icon name={category.icon as any} className="mr-2 h-5 w-5 text-primary/70" />
-                                        <span>{category.name}</span>
+                                        <Icon name={category.icon as any} className="mr-2 h-5 w-5 text-primary/70 shrink-0" />
+                                        <span className="truncate">{category.name}</span>
                                     </Button>
                                 ))}
                             </CardContent>
@@ -88,7 +88,7 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
                                     {mainGroup.title}
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="grid grid-cols-2 gap-1 p-2">
+                            <CardContent className="flex flex-col gap-1 p-2">
                                 {mainGroup.items.map((category: Category) => (
                                     <Button
                                         key={category.id}
@@ -96,8 +96,8 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
                                         className="justify-start h-9 text-sm"
                                         onClick={() => onSelectCategory(category.id)}
                                     >
-                                        <Icon name={category.icon as any} className="mr-2 h-5 w-5 text-primary/70" />
-                                        <span>{category.name}</span>
+                                        <Icon name={category.icon as any} className="mr-2 h-5 w-5 text-primary/70 shrink-0" />
+                                        <span className="truncate">{category.name}</span>
                                     </Button>
                                 ))}
                             </CardContent>

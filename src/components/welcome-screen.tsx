@@ -42,9 +42,18 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
         <div className="flex h-full w-full flex-col items-center justify-center p-1">
             <div className="flex flex-col items-center gap-2 text-center mb-5">
                 <PsInoxLogo />
-                <p className="text-muted-foreground max-w-md">
+                <motion.p
+                    className="text-muted-foreground max-w-md"
+                    animate={{ opacity: [1, 0.5, 1] }}
+                    transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        repeatType: "loop",
+                        ease: "easeInOut",
+                    }}
+                >
                     Comércio de Aço - Calcule Tudo Aqui:
-                </p>
+                </motion.p>
             </div>
 
             <motion.div

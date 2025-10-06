@@ -39,7 +39,7 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
 
     return (
         <div className="flex h-full w-full flex-col items-center justify-center p-1">
-            <div className="flex flex-col items-center gap-1 text-center mb-4">
+            <div className="flex flex-col items-center gap-1 text-center mb-2">
                 <Warehouse className="h-12 w-12 text-primary/50" />
                 <h1 className="text-3xl font-bold tracking-tight">PS INOX</h1>
                 <p className="text-muted-foreground max-w-md">
@@ -88,7 +88,7 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
                                     {mainGroup.title}
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="grid grid-cols-2 gap-1 flex-1 p-2">
+                            <CardContent className="grid grid-cols-2 gap-1 p-2">
                                 {mainGroup.items.map((category: Category) => (
                                     <Button
                                         key={category.id}

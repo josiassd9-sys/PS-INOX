@@ -50,6 +50,7 @@ import {
 } from "./ui/accordion";
 import { TechnicalDrawingGuide } from "./technical-drawing-guide";
 import { ConnectionsTable } from "./connections-table";
+import { WelcomeScreen } from "./welcome-screen";
 
 interface PriceParams {
   costPrice: number;
@@ -99,7 +100,7 @@ function DashboardComponent() {
   const [priceParams, setPriceParams] = React.useState<Record<string, PriceParams>>({});
   const [isPriceParamsInitialized, setIsPriceParamsInitialized] = React.useState(false);
   
-  const [selectedCategoryId, setSelectedCategoryId] = React.useState(CATEGORY_GROUPS[0]?.items[0]?.id || "");
+  const [selectedCategoryId, setSelectedCategoryId] = React.useState<string | null>(null);
   const [searchTerm, setSearchTerm] = React.useState("");
   const { setOpenMobile, isMobile } = useSidebar();
   const [isScrapItemDialogOpen, setIsScrapItemDialogOpen] = React.useState(false);
@@ -159,13 +160,13 @@ function DashboardComponent() {
     }
   };
 
-  const selectedCategory = ALL_CATEGORIES.find((c) => c.id === selectedCategoryId) || ALL_CATEGORIES[0];
-  const currentPriceParamsKey = selectedCategory.hasOwnPriceControls ? selectedCategoryId : 'global';
-  const currentPriceParams = priceParams[currentPriceParamsKey];
+  const selectedCategory = ALL_CATEGORIES.find((c) => c.id === selectedCategoryId);
+  const currentPriceParamsKey = selectedCategory?.hasOwnPriceControls ? selectedCategoryId : 'global';
+  const currentPriceParams = priceParams[currentPriceParamsKey!];
 
   const handlePriceChange = (key: keyof PriceParams, value: number | null) => {
     const numericValue = value ?? 0;
-    const currentParams = priceParams[currentPriceParamsKey];
+    const currentParams = priceParams[currentPriceParamsKey!];
     let newParams = { ...currentParams };
 
     if (key === 'costPrice') {
@@ -183,7 +184,7 @@ function DashboardComponent() {
 
     setPriceParams(prev => ({
       ...prev,
-      [currentPriceParamsKey]: newParams,
+      [currentPriceParamsKey!]: newParams,
     }));
   };
 
@@ -274,11 +275,12 @@ function DashboardComponent() {
   const isConnectionsCategory = selectedCategoryId === 'conexoes';
   
   const showCustomHeader = !searchTerm && !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isConnectionsCategory;
-  const unitLabel = selectedCategory.unit === "m" ? "m" : selectedCategory.unit === 'm²' ? "m²" : "un";
-  const weightUnitLabel = `Peso (kg/${unitLabel})`;
-  const priceUnitLabel = `Preço (R$/${unitLabel})`;
-
+  
   const renderContent = () => {
+    if (!selectedCategory) {
+      return <WelcomeScreen />;
+    }
+
     const showSearchResults = searchTerm && filteredCategories.length > 0;
   
     if (isScrapCategory) {
@@ -348,17 +350,22 @@ function DashboardComponent() {
     );
   }
   
-  const showPriceControls = selectedCategory.hasOwnPriceControls || selectedCategoryId === 'global' || !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory;
+  const showPriceControls = selectedCategory && (selectedCategory.hasOwnPriceControls || !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory);
 
   const showGlobalSearch = !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory;
 
   
   const priceControlTitle = () => {
+    if (!selectedCategory) return 'Ajustar Preços - Global';
     if (selectedCategory.hasOwnPriceControls) {
       return `Ajustar Preços - ${selectedCategory.name}`;
     }
     return 'Ajustar Preços - Global';
   }
+
+  const unitLabel = selectedCategory ? (selectedCategory.unit === "m" ? "m" : selectedCategory.unit === 'm²' ? "m²" : "un") : "";
+  const weightUnitLabel = selectedCategory ? `Peso (kg/${unitLabel})` : "";
+  const priceUnitLabel = selectedCategory ? `Preço (R$/${unitLabel})` : "";
 
 
   return (
@@ -370,11 +377,11 @@ function DashboardComponent() {
             <h1 className="text-lg font-semibold">PS INOX</h1>
           </div>
         </SidebarHeader>
-        <SidebarContent>
-           <Accordion type="single" collapsible className="w-full" defaultValue={CATEGORY_GROUPS[0].title}>
-            {CATEGORY_GROUPS.map((group, index) => (
-               <AccordionItem value={group.title} key={group.title} className="border-none">
-                 <AccordionTrigger className="px-2 py-1.5 text-sm font-medium text-sidebar-primary hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-md [&[data-state=open]]:bg-sidebar-accent">
+        <SidebarContent className="p-1">
+           <Accordion type="multiple" defaultValue={CATEGORY_GROUPS.map(g => g.title)} className="w-full flex flex-col gap-1">
+            {CATEGORY_GROUPS.map((group) => (
+               <AccordionItem value={group.title} key={group.title} className="border-none rounded-lg bg-sidebar-accent/10 p-1">
+                 <AccordionTrigger className="p-2 text-sm font-semibold text-sidebar-primary hover:no-underline [&[data-state=open]>svg]:-rotate-180">
                    {group.title}
                  </AccordionTrigger>
                  <AccordionContent className="pt-1">
@@ -407,8 +414,8 @@ function DashboardComponent() {
               <div className="flex items-center gap-1">
                 <SidebarTrigger className="md:hidden"/>
                 <div className="hidden md:block">
-                  <h2 className="text-lg font-semibold">{searchTerm ? 'Resultados da Busca' : selectedCategory.name}</h2>
-                  <p className="text-sm text-muted-foreground">{searchTerm ? `Buscando por "${searchTerm}"` : selectedCategory.description}</p>
+                  <h2 className="text-lg font-semibold">{searchTerm ? 'Resultados da Busca' : selectedCategory?.name ?? 'Bem-vindo!'}</h2>
+                  <p className="text-sm text-muted-foreground">{searchTerm ? `Buscando por "${searchTerm}"` : selectedCategory?.description ?? 'Selecione uma categoria no menu para começar.'}</p>
                 </div>
               </div>
               
@@ -485,7 +492,7 @@ function DashboardComponent() {
             </header>
             
             <div className="flex-1 flex flex-col overflow-hidden">
-              {showCustomHeader && (
+              {showCustomHeader && selectedCategory && (
                 <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm -mx-1 px-1">
                     <div className="flex h-12 items-center border-b px-1 text-sm font-medium text-muted-foreground">
                         <div className="flex-1 px-1">Descrição</div>

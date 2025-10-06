@@ -22,7 +22,7 @@ const containerVariants = {
 };
 
 const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 30, opacity: 0 },
     visible: {
         y: 0,
         opacity: 1,
@@ -38,35 +38,35 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
     const otherGroups = CATEGORY_GROUPS.filter(g => g.title !== 'MATERIAIS (AÇO INOX)');
 
     return (
-        <div className="flex h-full w-full flex-col items-center justify-center p-1">
-            <div className="flex flex-col items-center gap-2 text-center mb-4">
+        <div className="flex h-full w-full flex-col items-center justify-center p-5">
+            <div className="flex flex-col items-center gap-1 text-center mb-5">
                 <PsInoxLogo />
                 <p className="text-muted-foreground max-w-md">
-                    Selecione uma categoria no menu lateral ou use o hub de navegação abaixo para começar a calcular.
+                    Comércio - Calcule Tudo Aqui:
                 </p>
             </div>
 
             <motion.div
-                className="grid grid-cols-2 gap-2 w-full max-w-6xl"
+                className="grid grid-cols-2 gap-1 w-full max-w-6xl"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
             >
                 {/* Coluna Esquerda */}
-                <motion.div className="flex flex-col gap-2" variants={itemVariants}>
+                <motion.div className="flex flex-col gap-1" variants={itemVariants}>
                     {otherGroups.map((group) => (
                         <Card key={group.title} className="flex flex-col bg-card/50 hover:bg-card transition-colors duration-300">
-                            <CardHeader className="p-2">
+                            <CardHeader className="p-1">
                                 <CardTitle className="text-base font-semibold tracking-wider uppercase text-primary/80">
                                     {group.title}
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="flex flex-col gap-1 p-2">
+                            <CardContent className="flex flex-col gap-1 p-1">
                                 {group.items.map((category: Category) => (
                                     <Button
                                         key={category.id}
                                         variant="ghost"
-                                        className="justify-start h-9 text-sm"
+                                        className="justify-start h-7 text-sm"
                                         onClick={() => onSelectCategory(category.id)}
                                     >
                                         <Icon name={category.icon as any} className="mr-2 h-5 w-5 text-primary/70 shrink-0" />
@@ -82,17 +82,17 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
                 {mainGroup && (
                     <motion.div variants={itemVariants}>
                         <Card className="h-full flex flex-col bg-card/50 hover:bg-card transition-colors duration-300">
-                            <CardHeader className="p-2">
+                            <CardHeader className="p-1">
                                 <CardTitle className="text-base font-semibold tracking-wider uppercase text-primary/80">
                                     {mainGroup.title}
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="flex flex-col gap-1 p-2">
+                            <CardContent className="flex flex-col gap-1 p-1">
                                 {mainGroup.items.map((category: Category) => (
                                     <Button
                                         key={category.id}
                                         variant="ghost"
-                                        className="justify-start h-9 text-sm"
+                                        className="justify-start h-7 text-sm"
                                         onClick={() => onSelectCategory(category.id)}
                                     >
                                         <Icon name={category.icon as any} className="mr-2 h-5 w-5 text-primary/70 shrink-0" />

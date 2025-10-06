@@ -58,7 +58,7 @@ export function PsInoxLogo() {
           <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.6" />
         </linearGradient>
         <mask id="logoMask">
-            <g fill="white" fontFamily="var(--font-headline), sans-serif" fontSize="48" fontWeight="bold">
+            <g fill="white" fontFamily="var(--font-headline), sans-serif" fontSize="71" fontWeight="bold">
                 <motion.text x="0" y="50" variants={textVariants}>PS</motion.text>
                 <motion.text x="95" y="50" variants={textVariants}>INOX</motion.text>
             </g>
@@ -66,7 +66,7 @@ export function PsInoxLogo() {
       </defs>
 
       {/* Base Logo */}
-      <g fill="hsl(var(--primary))" fontFamily="var(--font-headline), sans-serif" fontSize="48" fontWeight="bold">
+      <g fill="hsl(var(--primary))" fontFamily="var(--font-headline), sans-serif" fontSize="71" fontWeight="bold">
           <motion.text x="0" y="50" variants={textVariants}>PS</motion.text>
           <motion.text x="95" y="50" variants={textVariants}>INOX</motion.text>
       </g>

@@ -79,9 +79,9 @@ export function ConnectionsTable({
   return (
     <>
     <Accordion
-      type="multiple"
+      type="single"
+      collapsible
       className="w-full space-y-1"
-      defaultValue={connectionGroups.map((g) => g.id)}
     >
       {connectionGroups.map((group) => (
         <AccordionItem

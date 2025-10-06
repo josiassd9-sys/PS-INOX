@@ -188,7 +188,7 @@ function DashboardComponent() {
     }));
   };
 
-  const handleSelectCategory = (categoryId: string) => {
+  const handleSelectCategory = (categoryId: string | null) => {
     setSelectedCategoryId(categoryId);
     setSearchTerm("");
     setPrefillScrapItem(null);
@@ -349,7 +349,7 @@ function DashboardComponent() {
     );
   }
   
-  const showPriceControls = selectedCategory && (selectedCategory.hasOwnPriceControls || !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory);
+  const showPriceControls = selectedCategory && (selectedCategory.hasOwnPriceControls || (!isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory));
 
   const showGlobalSearch = selectedCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory;
 
@@ -371,10 +371,14 @@ function DashboardComponent() {
     <>
       <Sidebar>
         <SidebarHeader>
-          <div className="flex items-center gap-1">
+          <button
+            onClick={() => handleSelectCategory(null)}
+            className="flex items-center gap-1 cursor-pointer w-full text-left"
+            aria-label="Voltar para a tela inicial"
+          >
             <Warehouse className="size-6 text-primary" />
             <h1 className="text-lg font-semibold">PS INOX</h1>
-          </div>
+          </button>
         </SidebarHeader>
         <SidebarContent className="p-1">
            <Accordion type="multiple" defaultValue={CATEGORY_GROUPS.map(g => g.title)} className="w-full flex flex-col gap-1">
@@ -520,3 +524,5 @@ export function Dashboard() {
     </SidebarProvider>
   )
 }
+
+    

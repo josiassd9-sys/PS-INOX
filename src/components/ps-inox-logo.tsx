@@ -11,7 +11,6 @@ export function PsInoxLogo() {
       xmlns="http://www.w3.org/2000/svg"
       initial="initial"
       animate="animate"
-      whileHover="hover"
     >
       <defs>
         {/* Gradients for Metallic Effect */}
@@ -43,7 +42,9 @@ export function PsInoxLogo() {
         {/* Shine Gradient for Animation */}
         <linearGradient id="shine-grad" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stopColor="white" stopOpacity="0" />
+          <stop offset="40%" stopColor="white" stopOpacity="0" />
           <stop offset="50%" stopColor="white" stopOpacity="0.5" />
+          <stop offset="60%" stopColor="white" stopOpacity="0" />
           <stop offset="100%" stopColor="white" stopOpacity="0" />
         </linearGradient>
 
@@ -52,14 +53,18 @@ export function PsInoxLogo() {
           <feDropShadow dx="3" dy="5" stdDeviation="3" floodColor="#000000" floodOpacity="0.4" />
         </filter>
 
-        {/* Mask for the shine effect */}
+        {/* Mask for the shine effect - This will contain white shapes of the logo */}
         <mask id="logo-mask">
           <g fill="white">
-            {/* Base Triangle */}
+            {/* Triangle Shape for Mask */}
             <polygon points="150,10 240,110 60,110" />
-            {/* Inner hole cut out */}
             <polygon points="150,45 205,102.5 95,102.5" fill="black" />
-            {/* Text */}
+            <path d="M 150 10 L 60 110 L 90 100 L 150 40 Z" />
+            <path d="M 150 10 L 240 110 L 210 100 L 150 40 Z" />
+            <path d="M 60 110 L 240 110 L 210 100 L 90 100 Z" />
+            
+            {/* Text Shape for Mask (slightly fattened to catch edges) */}
+            <text x="150" y="155" fontFamily="Teko, sans-serif" fontSize="50" fontWeight="700" textAnchor="middle" stroke="white" strokeWidth="2">PS INOX</text>
             <text x="150" y="155" fontFamily="Teko, sans-serif" fontSize="50" fontWeight="700" textAnchor="middle">PS INOX</text>
           </g>
         </mask>
@@ -99,7 +104,8 @@ export function PsInoxLogo() {
                 duration: 3,
                 repeat: Infinity,
                 ease: "linear",
-                delay: 1,
+                delay: 2,
+                repeatDelay: 2
               }
             }
           }}

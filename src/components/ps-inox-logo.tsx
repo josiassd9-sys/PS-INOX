@@ -65,17 +65,17 @@ export function PsInoxLogo() {
         </linearGradient>
 
         <mask id="logoMask">
-            <g fontFamily="var(--font-headline), sans-serif" fontSize="80" fontWeight="bold" fill="white">
-                <motion.text x="0" y="60" variants={textVariants}>PS</motion.text>
-                <motion.text x="85" y="60" variants={textVariants}>INOX</motion.text>
+            <g fontFamily="var(--font-headline), sans-serif" fontSize="58" fontWeight="bold" fill="white">
+                <motion.text x="8" y="60" variants={textVariants}>PS</motion.text>
+                <motion.text x="85" y="60" variants={textVariants}>-INOX</motion.text>
             </g>
         </mask>
       </defs>
 
       {/* 3D Extrusion Effect */}
-      <g fontFamily="var(--font-headline), sans-serif" fontSize="80" fontWeight="bold" fill="hsl(var(--primary) / 0.4)">
+      <g fontFamily="var(--font-headline), sans-serif" fontSize="61" fontWeight="bold" fill="hsl(var(--primary) / 0.4)">
           <motion.text x="2" y="62" variants={textVariants}>PS</motion.text>
-          <motion.text x="87" y="62" variants={textVariants}>INOX</motion.text>
+          <motion.text x="87" y="62" variants={textVariants}>-INOX</motion.text>
       </g>
 
       {/* Base Logo with Metallic Gradient */}

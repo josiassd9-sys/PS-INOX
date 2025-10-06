@@ -31,7 +31,7 @@ export function PsInoxLogo() {
     visible: {
       x: "50%",
       transition: {
-        duration: 3,
+        duration: 1.5,
         ease: "easeInOut",
         delay: 1.2,
         repeat: Infinity,

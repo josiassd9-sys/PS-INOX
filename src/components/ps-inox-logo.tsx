@@ -1,8 +1,11 @@
+
 "use client";
 
 import { motion } from "framer-motion";
 
 export function PsInoxLogo() {
+  const gradientId = "shine-grad";
+
   return (
     <motion.svg
       width="300"
@@ -13,103 +16,97 @@ export function PsInoxLogo() {
       animate="animate"
     >
       <defs>
-        {/* Gradients for Metallic Effect */}
-        <linearGradient id="triangle-grad-top" x1="50%" y1="0%" x2="50%" y2="100%">
-          <stop offset="0%" stopColor="#f0f0f0" />
-          <stop offset="50%" stopColor="#c0c0c0" />
-          <stop offset="100%" stopColor="#a8a8a8" />
-        </linearGradient>
-        <linearGradient id="triangle-grad-left" x1="0%" y1="50%" x2="100%" y2="50%">
-          <stop offset="0%" stopColor="#888888" />
-          <stop offset="50%" stopColor="#c0c0c0" />
-          <stop offset="100%" stopColor="#a8a8a8" />
-        </linearGradient>
-        <linearGradient id="triangle-grad-right" x1="100%" y1="50%" x2="0%" y2="50%">
-          <stop offset="0%" stopColor="#888888" />
-          <stop offset="50%" stopColor="#c0c0c0" />
-          <stop offset="100%" stopColor="#a8a8a8" />
-        </linearGradient>
-        <linearGradient id="text-grad-top" x1="50%" y1="0%" x2="50%" y2="100%">
-          <stop offset="0%" stopColor="#e0e0e0" />
-          <stop offset="50%" stopColor="#b0b0b0" />
-          <stop offset="100%" stopColor="#909090" />
-        </linearGradient>
-        <linearGradient id="text-grad-side" x1="50%" y1="0%" x2="50%" y2="100%">
-          <stop offset="0%" stopColor="#707070" />
-          <stop offset="100%" stopColor="#404040" />
-        </linearGradient>
-
-        {/* Shine Gradient for Animation */}
-        <linearGradient id="shine-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="white" stopOpacity="0" />
-          <stop offset="40%" stopColor="white" stopOpacity="0" />
-          <stop offset="50%" stopColor="white" stopOpacity="0.5" />
-          <stop offset="60%" stopColor="white" stopOpacity="0" />
-          <stop offset="100%" stopColor="white" stopOpacity="0" />
-        </linearGradient>
-
-        {/* Filters */}
-        <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="3" dy="5" stdDeviation="3" floodColor="#000000" floodOpacity="0.4" />
+        {/* Filtro para a sombra projetada */}
+        <filter id="soft-shadow" x="-50%" y="-50%" width="200%" height="200%">
+          <feDropShadow dx="4" dy="6" stdDeviation="4" floodColor="#000000" floodOpacity="0.3" />
         </filter>
 
-        {/* Mask for the shine effect - This will contain white shapes of the logo */}
-        <mask id="logo-mask">
-          <g fill="white">
-            {/* Triangle Shape for Mask */}
-            <polygon points="150,10 240,110 60,110" />
-            <polygon points="150,45 205,102.5 95,102.5" fill="black" />
-            <path d="M 150 10 L 60 110 L 90 100 L 150 40 Z" />
-            <path d="M 150 10 L 240 110 L 210 100 L 150 40 Z" />
-            <path d="M 60 110 L 240 110 L 210 100 L 90 100 Z" />
-            
-            {/* Text Shape for Mask (slightly fattened to catch edges) */}
-            <text x="150" y="155" fontFamily="Teko, sans-serif" fontSize="50" fontWeight="700" textAnchor="middle" stroke="white" strokeWidth="2">PS INOX</text>
-            <text x="150" y="155" fontFamily="Teko, sans-serif" fontSize="50" fontWeight="700" textAnchor="middle">PS INOX</text>
-          </g>
-        </mask>
-      </defs>
+        {/* Gradiente do Metal Base (Face Superior) */}
+        <linearGradient id="metal-face-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#d0d0d0" />
+          <stop offset="50%" stopColor="#c0c0c0" />
+          <stop offset="100%" stopColor="#b0b0b0" />
+        </linearGradient>
 
-      {/* -- LOGO GROUP -- */}
-      <g>
-        {/* -- Base 3D Logo -- */}
-        <g filter="url(#soft-shadow)">
-          {/* Triangle */}
-          <g>
-            <polygon points="150,10 240,110 60,110" fill="url(#triangle-grad-top)" />
-            <path d="M 150 10 L 60 110 L 90 100 L 150 40 Z" fill="url(#triangle-grad-left)" />
-            <path d="M 150 10 L 240 110 L 210 100 L 150 40 Z" fill="url(#triangle-grad-right)" />
-            <path d="M 60 110 L 240 110 L 210 100 L 90 100 Z" fill="url(#triangle-grad-top)" />
-            <polygon points="150,45 205,102.5 95,102.5" fill="var(--background)" className="dark:fill-[hsl(var(--sidebar-background))]" />
-          </g>
-          {/* Text "PS INOX" */}
-          <g fontFamily="Teko, sans-serif" fontSize="50" fontWeight="700" textAnchor="middle">
-            <text x="150" y="157" fill="url(#text-grad-side)">PS INOX</text>
-            <text x="148" y="155" fill="url(#text-grad-top)" stroke="#ffffff" strokeWidth="0.5">PS INOX</text>
-          </g>
-        </g>
+        {/* Cor da Extrusão 3D */}
+        <linearGradient id="metal-side-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#666666" />
+          <stop offset="100%" stopColor="#444444" />
+        </linearGradient>
         
-        {/* -- Animated Shine Effect -- */}
-        <motion.rect
-          x="-300"
-          y="0"
-          width="300"
-          height="180"
-          fill="url(#shine-grad)"
-          mask="url(#logo-mask)"
-          variants={{
-            animate: {
-              x: [null, 300],
-              transition: {
-                duration: 3,
-                repeat: Infinity,
-                ease: "linear",
-                delay: 2,
-                repeatDelay: 2
-              }
-            }
-          }}
-        />
+        {/* O gradiente que será animado para o efeito de brilho */}
+        <linearGradient id={gradientId} x1="-1" y1="0" x2="0" y2="0">
+            <stop offset="0%" stopColor="#888" />
+            <stop offset="45%" stopColor="#888" />
+            <stop offset="50%" stopColor="white" />
+            <stop offset="55%" stopColor="#888" />
+            <stop offset="100%" stopColor="#888" />
+        </linearGradient>
+
+      </defs>
+      
+      {/* Grupo principal do Logo com a sombra */}
+      <g filter="url(#soft-shadow)">
+
+        {/* --- Triângulo --- */}
+        <g>
+          {/* Lado Esquerdo 3D */}
+          <path d="M 105 10 L 110 10 L 40 100 L 35 100 Z" fill="url(#metal-side-grad)" />
+          {/* Lado Direito 3D */}
+          <path d="M 195 10 L 190 10 L 260 100 L 265 100 Z" fill="url(#metal-side-grad)" />
+          {/* Base 3D */}
+          <path d="M 40 100 L 260 100 L 255 105 L 45 105 Z" fill="url(#metal-side-grad)" />
+          {/* Face Superior do Triângulo */}
+          <motion.polygon 
+            points="110,10 190,10 260,100 40,100" 
+            fill={`url(#${gradientId})`}
+            stroke="#ffffff"
+            strokeWidth="0.5"
+          >
+            <animate 
+                attributeName="x1"
+                from="-1"
+                to="1"
+                dur="3s"
+                repeatCount="indefinite"
+            />
+             <animate 
+                attributeName="x2"
+                from="0"
+                to="2"
+                dur="3s"
+                repeatCount="indefinite"
+            />
+          </motion.polygon>
+          
+          {/* Buraco do Triângulo */}
+          <polygon points="120,25 180,25 235,90 65,90" fill="var(--background)" className="dark:fill-[hsl(var(--sidebar-background))]" />
+        </g>
+
+        {/* --- Texto PS INOX --- */}
+        <g fontFamily="Teko, sans-serif" fontSize="50" fontWeight="700" textAnchor="middle">
+          {/* Extrusão 3D do Texto */}
+          <text x="151" y="147" fill="url(#metal-side-grad)">PS INOX</text>
+          
+          {/* Face Superior do Texto com animação */}
+          <motion.text x="150" y="145" fill={`url(#${gradientId})`} stroke="#ffffff" strokeWidth="0.5">
+            PS INOX
+            <animate 
+                attributeName="x1"
+                from="-1"
+                to="1"
+                dur="3s"
+                repeatCount="indefinite"
+            />
+             <animate 
+                attributeName="x2"
+                from="0"
+                to="2"
+                dur="3s"
+                repeatCount="indefinite"
+            />
+          </motion.text>
+        </g>
       </g>
     </motion.svg>
   );

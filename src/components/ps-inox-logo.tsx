@@ -9,8 +9,8 @@ export function PsInoxLogo() {
   return (
     <motion.svg
       width="300"
-      height="180"
-      viewBox="0 0 300 180"
+      height="80"
+      viewBox="0 0 300 80"
       xmlns="http://www.w3.org/2000/svg"
       initial="initial"
       animate="animate"
@@ -48,48 +48,13 @@ export function PsInoxLogo() {
       {/* Grupo principal do Logo com a sombra */}
       <g filter="url(#soft-shadow)">
 
-        {/* --- Triângulo --- */}
-        <g>
-          {/* Lado Esquerdo 3D */}
-          <path d="M 105 10 L 110 10 L 40 100 L 35 100 Z" fill="url(#metal-side-grad)" />
-          {/* Lado Direito 3D */}
-          <path d="M 195 10 L 190 10 L 260 100 L 265 100 Z" fill="url(#metal-side-grad)" />
-          {/* Base 3D */}
-          <path d="M 40 100 L 260 100 L 255 105 L 45 105 Z" fill="url(#metal-side-grad)" />
-          {/* Face Superior do Triângulo */}
-          <motion.polygon 
-            points="110,10 190,10 260,100 40,100" 
-            fill={`url(#${gradientId})`}
-            stroke="#ffffff"
-            strokeWidth="0.5"
-          >
-            <animate 
-                attributeName="x1"
-                from="-1"
-                to="1"
-                dur="3s"
-                repeatCount="indefinite"
-            />
-             <animate 
-                attributeName="x2"
-                from="0"
-                to="2"
-                dur="3s"
-                repeatCount="indefinite"
-            />
-          </motion.polygon>
-          
-          {/* Buraco do Triângulo */}
-          <polygon points="120,25 180,25 235,90 65,90" fill="var(--background)" className="dark:fill-[hsl(var(--sidebar-background))]" />
-        </g>
-
         {/* --- Texto PS INOX --- */}
         <g fontFamily="Teko, sans-serif" fontSize="50" fontWeight="700" textAnchor="middle">
           {/* Extrusão 3D do Texto */}
-          <text x="151" y="147" fill="url(#metal-side-grad)">PS INOX</text>
+          <text x="151" y="52" fill="url(#metal-side-grad)">PS INOX</text>
           
           {/* Face Superior do Texto com animação */}
-          <motion.text x="150" y="145" fill={`url(#${gradientId})`} stroke="#ffffff" strokeWidth="0.5">
+          <motion.text x="150" y="50" fill={`url(#${gradientId})`} stroke="#ffffff" strokeWidth="0.5">
             PS INOX
             <animate 
                 attributeName="x1"

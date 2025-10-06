@@ -62,7 +62,7 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
                                     {group.title}
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="flex flex-col gap-1 flex-1">
+                            <CardContent className="flex flex-col gap-1 flex-1 p-1">
                                 {group.items.map((category: Category) => (
                                     <Button
                                         key={category.id}
@@ -88,7 +88,7 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
                                     {mainGroup.title}
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="grid grid-cols-2 gap-1 flex-1">
+                            <CardContent className="grid grid-cols-2 gap-1 flex-1 p-1">
                                 {mainGroup.items.map((category: Category) => (
                                     <Button
                                         key={category.id}

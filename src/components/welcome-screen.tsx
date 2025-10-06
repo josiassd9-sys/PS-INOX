@@ -38,7 +38,7 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
     const otherGroups = CATEGORY_GROUPS.filter(g => g.title !== 'MATERIAIS (AÇO INOX)');
 
     return (
-        <div className="flex h-full w-full flex-col items-center justify-center p-1 md:p-2">
+        <div className="flex h-full w-full flex-col items-center justify-center p-1">
             <div className="flex flex-col items-center gap-1 text-center mb-1">
                 <Warehouse className="h-12 w-12 text-primary/50" />
                 <h1 className="text-3xl font-bold tracking-tight">PS INOX</h1>

@@ -1,11 +1,11 @@
 "use client";
 
 import { CATEGORY_GROUPS, type Category } from "@/lib/data";
-import { Warehouse } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
 import { Icon } from "./icons";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { PsInoxLogo } from "./ps-inox-logo";
 
 interface WelcomeScreenProps {
     onSelectCategory: (categoryId: string) => void;
@@ -39,9 +39,8 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
 
     return (
         <div className="flex h-full w-full flex-col items-center justify-center p-1">
-            <div className="flex flex-col items-center gap-1 text-center mb-2">
-                <Warehouse className="h-12 w-12 text-primary/50" />
-                <h1 className="text-3xl font-bold tracking-tight">PS INOX</h1>
+            <div className="flex flex-col items-center gap-2 text-center mb-4">
+                <PsInoxLogo />
                 <p className="text-muted-foreground max-w-md">
                     Selecione uma categoria no menu lateral ou use o hub de navegação abaixo para começar a calcular.
                 </p>

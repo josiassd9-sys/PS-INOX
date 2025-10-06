@@ -40,7 +40,7 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
 
     return (
         <div className="flex h-full w-full flex-col items-center justify-center p-1">
-            <div className="flex flex-col items-center gap-1 text-center mb-5">
+            <div className="flex flex-col items-center gap-2 text-center mb-5">
                 <PsInoxLogo />
                 <p className="text-muted-foreground max-w-md">
                     Comércio de Aço - Calcule Tudo Aqui:

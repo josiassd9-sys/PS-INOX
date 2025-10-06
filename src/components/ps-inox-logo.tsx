@@ -80,11 +80,11 @@ export function PsInoxLogo() {
 
       {/* Base Logo with Metallic Gradient */}
       <g fill="url(#metallicGradient)" mask="url(#logoMask)">
-          <rect x="0" y="0" width="100%" height="100%" />
+          <motion.rect x="0" y="0" width="100%" height="100%" />
       </g>
       
       {/* Animated Shine Effect */}
-      <rect
+      <motion.rect
         x="0"
         y="0"
         width="100%"

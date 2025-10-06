@@ -43,8 +43,8 @@ export function PsInoxLogo() {
   return (
     <motion.svg
       width="280"
-      height="60"
-      viewBox="0 0 280 55"
+      height="70"
+      viewBox="0 0 280 70"
       xmlns="http://www.w3.org/2000/svg"
       variants={svgVariants}
       initial="hidden"
@@ -57,20 +57,32 @@ export function PsInoxLogo() {
           <stop offset="50%" stopColor="hsl(var(--primary-foreground))" stopOpacity="0.9" />
           <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.6" />
         </linearGradient>
+
+        <linearGradient id="metallicGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="hsl(var(--primary) / 0.9)" />
+            <stop offset="50%" stopColor="hsl(var(--primary))" />
+            <stop offset="100%" stopColor="hsl(var(--primary) / 0.8)" />
+        </linearGradient>
+
         <mask id="logoMask">
-            <g fill="white" fontFamily="var(--font-headline), sans-serif" fontSize="56" fontWeight="bold">
-                <motion.text x="0" y="45" variants={textVariants}>PS</motion.text>
-                <motion.text x="85" y="45" variants={textVariants}>INOX</motion.text>
+            <g fontFamily="var(--font-headline), sans-serif" fontSize="80" fontWeight="bold" fill="white">
+                <motion.text x="0" y="60" variants={textVariants}>PS</motion.text>
+                <motion.text x="85" y="60" variants={textVariants}>INOX</motion.text>
             </g>
         </mask>
       </defs>
 
-      {/* Base Logo */}
-      <g fill="hsl(var(--primary))" fontFamily="var(--font-headline), sans-serif" fontSize="56" fontWeight="bold">
-          <motion.text x="0" y="45" variants={textVariants}>PS</motion.text>
-          <motion.text x="85" y="45" variants={textVariants}>INOX</motion.text>
+      {/* 3D Extrusion Effect */}
+      <g fontFamily="var(--font-headline), sans-serif" fontSize="80" fontWeight="bold" fill="hsl(var(--primary) / 0.4)">
+          <motion.text x="2" y="62" variants={textVariants}>PS</motion.text>
+          <motion.text x="87" y="62" variants={textVariants}>INOX</motion.text>
       </g>
 
+      {/* Base Logo with Metallic Gradient */}
+      <g fill="url(#metallicGradient)" mask="url(#logoMask)">
+          <rect x="0" y="0" width="100%" height="100%" />
+      </g>
+      
       {/* Animated Shine Effect */}
       <rect
         x="0"

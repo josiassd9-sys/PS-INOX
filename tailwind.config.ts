@@ -11,7 +11,7 @@ export default {
     extend: {
       fontFamily: {
         body: ['Inter', 'sans-serif'],
-        headline: ['"Roboto Slab"', 'sans-serif'],
+        headline: ['"Teko"', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
@@ -85,7 +85,7 @@ export default {
           from: {
             height: 'var(--radix-accordion-content-height)',
           },
-          to: {
+to: {
             height: '0',
           },
         },

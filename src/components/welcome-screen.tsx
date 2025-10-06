@@ -65,7 +65,7 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
                 {/* Coluna Esquerda */}
                 <motion.div className="flex flex-col gap-1" variants={itemVariants}>
                     {otherGroups.map((group) => (
-                        <Card key={group.title} className="flex flex-col bg-card/50 hover:bg-card transition-colors duration-300">
+                        <Card key={group.title} className="flex-1 flex flex-col bg-card/50 hover:bg-card transition-colors duration-300">
                             <CardHeader className="p-1">
                                 <CardTitle className="text-base font-semibold tracking-wider uppercase text-primary/80">
                                     {group.title}

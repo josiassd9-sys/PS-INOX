@@ -57,7 +57,7 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
             </div>
 
             <motion.div
-                className="grid grid-cols-1 md:grid-cols-2 gap-1 w-full max-w-6xl"
+                className="grid grid-cols-2 md:grid-cols-2 gap-1 w-full max-w-6xl"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"

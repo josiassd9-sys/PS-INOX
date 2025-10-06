@@ -14,7 +14,7 @@ export function PsInoxLogo() {
   };
 
   const textVariants = {
-    hidden: { opacity: 0, y: 10 },
+    hidden: { opacity: 0, y: 100 },
     visible: {
       opacity: 1,
       y: 0,
@@ -31,7 +31,7 @@ export function PsInoxLogo() {
     visible: {
       x: "50%",
       transition: {
-        duration: 1.5,
+        duration: 3,
         ease: "easeInOut",
         delay: 1.2,
         repeat: Infinity,

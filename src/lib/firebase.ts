@@ -5,12 +5,12 @@ import { initializeApp, getApp, getApps } from "firebase/app";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  "projectId": "ps-inox-87453539-229a9",
-  "appId": "1:561284818527:web:5b1a0d605b15f6973addea",
-  "apiKey": "AIzaSyDeE3LbUdpVY6HB6bNgAi4R7G0ZlC84Fq8",
-  "authDomain": "ps-inox-87453539-229a9.firebaseapp.com",
-  "measurementId": "",
-  "messagingSenderId": "561284818527"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase

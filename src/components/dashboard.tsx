@@ -209,10 +209,7 @@ function DashboardComponent() {
   
     const safeSearchTerm = searchTerm.replace(",", ".").toLowerCase();
   
-    return ALL_CATEGORIES.filter(
-      (cat) => cat.unit === "m" || cat.unit === "un"
-    )
-      .map((category) => {
+    return ALL_CATEGORIES.map((category) => {
         let filteredItems: any[] = [];
   
         if (category.id === "conexoes") {
@@ -237,14 +234,16 @@ function DashboardComponent() {
            return null;
   
         } else {
-          filteredItems = (category.items as SteelItem[]).filter(
-            (item) =>
-              item.description &&
-              item.description
-                .toLowerCase()
-                .replace(",", ".")
-                .includes(safeSearchTerm)
-          );
+            if (Array.isArray(category.items)) {
+                filteredItems = (category.items as SteelItem[]).filter(
+                    (item) =>
+                    item.description &&
+                    item.description
+                        .toLowerCase()
+                        .replace(",", ".")
+                        .includes(safeSearchTerm)
+                );
+            }
         }
         
         if (filteredItems.length > 0) {
@@ -278,7 +277,7 @@ function DashboardComponent() {
   
   const renderContent = () => {
     if (!selectedCategory) {
-      return <WelcomeScreen />;
+      return <WelcomeScreen onSelectCategory={handleSelectCategory} />;
     }
 
     const showSearchResults = searchTerm && filteredCategories.length > 0;
@@ -352,7 +351,7 @@ function DashboardComponent() {
   
   const showPriceControls = selectedCategory && (selectedCategory.hasOwnPriceControls || !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory);
 
-  const showGlobalSearch = !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory;
+  const showGlobalSearch = selectedCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory;
 
   
   const priceControlTitle = () => {

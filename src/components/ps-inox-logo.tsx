@@ -9,34 +9,34 @@ export function PsInoxLogo() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3,
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 10 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.8,
+        duration: 0.5,
         ease: "easeOut",
       },
     },
   };
   
   const shineVariants = {
-    hidden: { x: "-200%" },
+    hidden: { x: "-150%" },
     visible: {
-      x: "200%",
+      x: "150%",
       transition: {
-        duration: 2.5,
+        duration: 1.5,
         ease: "easeInOut",
-        delay: 1.5,
+        delay: 1.2,
         repeat: Infinity,
-        repeatDelay: 3,
+        repeatDelay: 2.5,
       },
     },
   };
@@ -44,8 +44,8 @@ export function PsInoxLogo() {
   return (
     <motion.svg
       width="280"
-      height="70"
-      viewBox="0 0 280 70"
+      height="80"
+      viewBox="0 0 280 80"
       xmlns="http://www.w3.org/2000/svg"
       variants={svgVariants}
       initial="hidden"
@@ -53,39 +53,55 @@ export function PsInoxLogo() {
       className="max-w-[280px] md:max-w-[320px]"
     >
       <defs>
-        {/* Gradient for the shine effect */}
+        {/* Gradients for the static 3D/metallic effect */}
+        <linearGradient id="triangleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="hsl(var(--primary) / 0.7)" />
+          <stop offset="50%" stopColor="hsl(var(--primary))" />
+          <stop offset="100%" stopColor="hsl(var(--primary) / 0.5)" />
+        </linearGradient>
+
+        <linearGradient id="textGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="hsl(var(--primary-foreground))" />
+          <stop offset="50%" stopColor="hsl(var(--primary))" />
+          <stop offset="100%" stopColor="hsl(var(--primary) / 0.8)" />
+        </linearGradient>
+        
+        {/* Gradient for the animated shine effect */}
         <linearGradient id="shineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stopColor="hsl(var(--primary-foreground))" stopOpacity="0" />
-          <stop offset="50%" stopColor="hsl(var(--primary-foreground))" stopOpacity="0.8" />
+          <stop offset="50%" stopColor="hsl(var(--primary-foreground))" stopOpacity="0.6" />
           <stop offset="100%" stopColor="hsl(var(--primary-foreground))" stopOpacity="0" />
         </linearGradient>
         
         {/* Mask for the entire logo (triangle + text) */}
         <mask id="fullLogoMask">
             <g fill="white">
-                <path d="M 5 65 L 35 10 L 65 65 Z" />
-                <text x="80" y="58" fontFamily="var(--font-headline), sans-serif" fontSize="50" fontWeight="bold">PS INOX</text>
+                <polygon points="5,65 35,10 65,65" />
+                <text x="75" y="58" fontFamily="var(--font-headline), sans-serif" fontSize="50" fontWeight="bold">PS INOX</text>
             </g>
         </mask>
       </defs>
       
-      {/* Base layer for the logo (solid color) */}
-      <motion.g variants={itemVariants} fill="hsl(var(--primary))">
-          <path d="M 5 65 L 35 10 L 65 65 Z" />
-          <text
-            x="80"
-            y="58"
-            fontFamily="var(--font-headline), sans-serif"
-            fontSize="50"
-            fontWeight="bold"
-          >
-            PS INOX
-          </text>
-      </motion.g>
+      {/* Base layer for the static 3D/metallic logo */}
+      <g>
+        {/* Subtle shadow for 3D effect */}
+        <motion.g variants={itemVariants} style={{ filter: "drop-shadow(2px 2px 2px rgba(0,0,0,0.2))" }}>
+            <polygon points="5,65 35,10 65,65" fill="url(#triangleGradient)" />
+            <text 
+              x="75" y="58" 
+              fontFamily="var(--font-headline), sans-serif" 
+              fontSize="50" 
+              fontWeight="bold" 
+              fill="url(#textGradient)"
+            >
+              PS INOX
+            </text>
+        </motion.g>
+      </g>
       
-       {/* Animated Shine Effect applied to the whole logo */}
-       <motion.rect
-          x="0"
+      {/* Animated Shine Effect applied to the whole logo */}
+      <motion.rect
+          x="-50%"
           y="0"
           width="100%"
           height="100%"
@@ -96,4 +112,3 @@ export function PsInoxLogo() {
     </motion.svg>
   );
 }
-

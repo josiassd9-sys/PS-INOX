@@ -34,6 +34,9 @@ const itemVariants = {
 };
 
 export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
+    const mainGroup = CATEGORY_GROUPS.find(g => g.title === 'MATERIAIS (AÇO INOX)');
+    const otherGroups = CATEGORY_GROUPS.filter(g => g.title !== 'MATERIAIS (AÇO INOX)');
+
     return (
         <div className="flex h-full w-full flex-col items-center justify-center p-1 md:p-2">
             <div className="flex flex-col items-center gap-1 text-center mb-1">
@@ -45,14 +48,15 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
             </div>
 
             <motion.div
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-1 w-full max-w-6xl"
+                className="grid grid-cols-1 lg:grid-cols-2 gap-1 w-full max-w-6xl"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
             >
-                {CATEGORY_GROUPS.map((group) => (
-                    <motion.div key={group.title} variants={itemVariants}>
-                        <Card className="h-full flex flex-col bg-card/50 hover:bg-card transition-colors duration-300">
+                {/* Coluna Esquerda */}
+                <motion.div className="flex flex-col gap-1" variants={itemVariants}>
+                    {otherGroups.map((group) => (
+                        <Card key={group.title} className="flex flex-col bg-card/50 hover:bg-card transition-colors duration-300">
                             <CardHeader>
                                 <CardTitle className="text-base font-semibold tracking-wider uppercase text-primary/80">
                                     {group.title}
@@ -72,8 +76,34 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
                                 ))}
                             </CardContent>
                         </Card>
+                    ))}
+                </motion.div>
+
+                {/* Coluna Direita */}
+                {mainGroup && (
+                    <motion.div variants={itemVariants}>
+                        <Card className="h-full flex flex-col bg-card/50 hover:bg-card transition-colors duration-300">
+                            <CardHeader>
+                                <CardTitle className="text-base font-semibold tracking-wider uppercase text-primary/80">
+                                    {mainGroup.title}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-1 flex-1">
+                                {mainGroup.items.map((category: Category) => (
+                                    <Button
+                                        key={category.id}
+                                        variant="ghost"
+                                        className="justify-start h-10 text-base"
+                                        onClick={() => onSelectCategory(category.id)}
+                                    >
+                                        <Icon name={category.icon as any} className="mr-2 h-5 w-5 text-primary/70" />
+                                        <span>{category.name}</span>
+                                    </Button>
+                                ))}
+                            </CardContent>
+                        </Card>
                     </motion.div>
-                ))}
+                )}
             </motion.div>
         </div>
     )

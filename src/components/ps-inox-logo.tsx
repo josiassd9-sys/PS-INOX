@@ -27,11 +27,11 @@ export function PsInoxLogo() {
   };
 
   const shineVariants = {
-    hidden: { x: "-150%" },
+    hidden: { x: "-50%" },
     visible: {
-      x: "150%",
+      x: "50%",
       transition: {
-        duration: 1.5,
+        duration: 3,
         ease: "easeInOut",
         delay: 1.2,
         repeat: Infinity,
@@ -42,9 +42,9 @@ export function PsInoxLogo() {
 
   return (
     <motion.svg
-      width="280"
+      width="20"
       height="70"
-      viewBox="0 0 280 70"
+      viewBox="0 0 20 70"
       xmlns="http://www.w3.org/2000/svg"
       variants={svgVariants}
       initial="hidden"

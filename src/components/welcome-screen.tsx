@@ -38,8 +38,8 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
     const otherGroups = CATEGORY_GROUPS.filter(g => g.title !== 'MATERIAIS (AÇO INOX)');
 
     return (
-        <div className="flex h-full w-full flex-col items-center justify-center p-1">
-            <div className="flex flex-col items-center gap-1 text-center mb-1">
+        <div className="flex h-full w-full flex-col items-center justify-center p-4">
+            <div className="flex flex-col items-center gap-2 text-center mb-6">
                 <Warehouse className="h-12 w-12 text-primary/50" />
                 <h1 className="text-3xl font-bold tracking-tight">PS INOX</h1>
                 <p className="text-muted-foreground max-w-md">
@@ -48,13 +48,13 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
             </div>
 
             <motion.div
-                className="grid grid-cols-2 gap-1 w-full max-w-6xl"
+                className="grid grid-cols-2 gap-4 w-full max-w-6xl"
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
             >
                 {/* Coluna Esquerda */}
-                <motion.div className="flex flex-col gap-1" variants={itemVariants}>
+                <motion.div className="flex flex-col gap-4" variants={itemVariants}>
                     {otherGroups.map((group) => (
                         <Card key={group.title} className="flex flex-col bg-card/50 hover:bg-card transition-colors duration-300">
                             <CardHeader>
@@ -62,7 +62,7 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
                                     {group.title}
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="flex flex-col gap-1 flex-1 p-1">
+                            <CardContent className="flex flex-col gap-2 flex-1 p-4">
                                 {group.items.map((category: Category) => (
                                     <Button
                                         key={category.id}
@@ -88,7 +88,7 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
                                     {mainGroup.title}
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent className="grid grid-cols-2 gap-1 flex-1 p-1">
+                            <CardContent className="grid grid-cols-2 gap-2 flex-1 p-4">
                                 {mainGroup.items.map((category: Category) => (
                                     <Button
                                         key={category.id}

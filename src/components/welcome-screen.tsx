@@ -46,7 +46,7 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
                     className="text-muted-foreground max-w-md"
                     animate={{ opacity: [1, 0.5, 1] }}
                     transition={{
-                        duration: 2,
+                        duration: 5,
                         repeat: Infinity,
                         repeatType: "loop",
                         ease: "easeInOut",

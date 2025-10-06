@@ -11,7 +11,7 @@ export default {
     extend: {
       fontFamily: {
         body: ['Inter', 'sans-serif'],
-        headline: ['"Yanone Kaffeesatz"', 'sans-serif'],
+        headline: ['"Roboto Slab"', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {

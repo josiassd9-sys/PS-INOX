@@ -44,7 +44,7 @@ export function PsInoxLogo() {
     <motion.svg
       width="280"
       height="60"
-      viewBox="0 0 280 60"
+      viewBox="0 0 280 55"
       xmlns="http://www.w3.org/2000/svg"
       variants={svgVariants}
       initial="hidden"
@@ -58,17 +58,17 @@ export function PsInoxLogo() {
           <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.6" />
         </linearGradient>
         <mask id="logoMask">
-            <g fill="white" fontFamily="var(--font-headline), sans-serif" fontSize="71" fontWeight="bold">
-                <motion.text x="0" y="50" variants={textVariants}>PS</motion.text>
-                <motion.text x="95" y="50" variants={textVariants}>INOX</motion.text>
+            <g fill="white" fontFamily="var(--font-headline), sans-serif" fontSize="56" fontWeight="bold">
+                <motion.text x="0" y="45" variants={textVariants}>PS</motion.text>
+                <motion.text x="85" y="45" variants={textVariants}>INOX</motion.text>
             </g>
         </mask>
       </defs>
 
       {/* Base Logo */}
-      <g fill="hsl(var(--primary))" fontFamily="var(--font-headline), sans-serif" fontSize="71" fontWeight="bold">
-          <motion.text x="0" y="50" variants={textVariants}>PS</motion.text>
-          <motion.text x="95" y="50" variants={textVariants}>INOX</motion.text>
+      <g fill="hsl(var(--primary))" fontFamily="var(--font-headline), sans-serif" fontSize="56" fontWeight="bold">
+          <motion.text x="0" y="45" variants={textVariants}>PS</motion.text>
+          <motion.text x="85" y="45" variants={textVariants}>INOX</motion.text>
       </g>
 
       {/* Animated Shine Effect */}

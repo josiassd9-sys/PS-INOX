@@ -13,21 +13,6 @@ export function PsInoxLogo() {
     },
   };
 
-  const pathVariants = {
-    hidden: {
-      pathLength: 0,
-      opacity: 0,
-    },
-    visible: {
-      pathLength: 1,
-      opacity: 1,
-      transition: {
-        duration: 1.2,
-        ease: "easeInOut",
-      },
-    },
-  };
-
   const textVariants = {
     hidden: { opacity: 0, y: 10 },
     visible: {
@@ -35,16 +20,16 @@ export function PsInoxLogo() {
       y: 0,
       transition: {
         duration: 0.8,
-        delay: 0.5,
+        delay: 0.2,
         ease: "easeOut",
       },
     },
-  }
+  };
 
   const shineVariants = {
-    hidden: { x: "-100%" },
+    hidden: { x: "-150%" },
     visible: {
-      x: "100%",
+      x: "150%",
       transition: {
         duration: 1.5,
         ease: "easeInOut",
@@ -74,8 +59,7 @@ export function PsInoxLogo() {
         </linearGradient>
         <mask id="logoMask">
             <g fill="white" fontFamily="var(--font-headline), sans-serif" fontSize="38" fontWeight="bold">
-                <motion.path d="M10 10 V 50 H 25 C 35 50, 35 30, 25 30 H 10" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" variants={pathVariants} />
-                <motion.path d="M55 10 C 40 10, 40 30, 55 30 C 70 30, 70 50, 55 50" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" variants={pathVariants} />
+                <motion.text x="10" y="45" variants={textVariants}>PS</motion.text>
                 <motion.text x="85" y="45" variants={textVariants}>INOX</motion.text>
             </g>
         </mask>
@@ -83,8 +67,7 @@ export function PsInoxLogo() {
 
       {/* Base Logo */}
       <g fill="hsl(var(--primary))" fontFamily="var(--font-headline), sans-serif" fontSize="38" fontWeight="bold">
-          <motion.path d="M10 10 V 50 H 25 C 35 50, 35 30, 25 30 H 10" stroke="hsl(var(--primary))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" variants={pathVariants} />
-          <motion.path d="M55 10 C 40 10, 40 30, 55 30 C 70 30, 70 50, 55 50" stroke="hsl(var(--primary))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" variants={pathVariants} />
+          <motion.text x="10" y="45" variants={textVariants}>PS</motion.text>
           <motion.text x="85" y="45" variants={textVariants}>INOX</motion.text>
       </g>
 

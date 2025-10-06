@@ -67,7 +67,7 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
                                     <Button
                                         key={category.id}
                                         variant="ghost"
-                                        className="justify-start h-10 text-base"
+                                        className="justify-start h-10 text-sm"
                                         onClick={() => onSelectCategory(category.id)}
                                     >
                                         <Icon name={category.icon as any} className="mr-2 h-5 w-5 text-primary/70" />
@@ -93,7 +93,7 @@ export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
                                     <Button
                                         key={category.id}
                                         variant="ghost"
-                                        className="justify-start h-10 text-base"
+                                        className="justify-start h-10 text-sm"
                                         onClick={() => onSelectCategory(category.id)}
                                     >
                                         <Icon name={category.icon as any} className="mr-2 h-5 w-5 text-primary/70" />

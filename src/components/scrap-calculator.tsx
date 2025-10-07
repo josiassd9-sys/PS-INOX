@@ -38,24 +38,44 @@ interface ScrapCalculatorProps {
 const DENSITY = STAINLESS_STEEL_DENSITY_KG_M3;
 const LOCAL_STORAGE_KEY = "scrapCalculatorList";
 
-const calculateDynamicPercentage = (lengthInMm: number) => {
-    const minLength = 10;
-    const midLength = 1000;
-    const maxLength = 3000;
-    const highPercentage = 100;
-    const midPercentage = 30;
-    const lowPercentage = 10;
-
-    if (lengthInMm <= minLength) return highPercentage;
-    if (lengthInMm >= maxLength) return lowPercentage;
-
-    if (lengthInMm <= midLength) {
-      // Interpolate between 10mm (100%) and 1000mm (30%)
-      return highPercentage + (lengthInMm - minLength) * (midPercentage - highPercentage) / (midLength - minLength);
-    } else {
-      // Interpolate between 1000mm (30%) and 3000mm (10%)
-      return midPercentage + (lengthInMm - midLength) * (lowPercentage - midPercentage) / (maxLength - midLength);
+const calculateDynamicPercentage = (lengthInMm: number, weightInKg: number): number => {
+    // Rule: For any cut of 6m (6000mm) or more, the markup is 0%.
+    if (lengthInMm >= 6000) {
+      return 0;
     }
+    // Rule: For any cut above 3m (3000mm) up to 6m, the markup is 5%.
+    if (lengthInMm > 3000) {
+      return 5;
+    }
+
+    const minLength = 10;
+    const maxLength = 3000;
+
+    if (lengthInMm <= minLength) lengthInMm = minLength;
+    if (lengthInMm > maxLength) lengthInMm = maxLength; // Cap at 3000 for interpolation
+
+    let highPercentage: number;
+    let lowPercentage: number;
+
+    // Determine percentage range based on weight tier
+    if (weightInKg <= 0.5) {
+      // Tier 1: up to 0.5 kg -> 100% to 10%
+      highPercentage = 100;
+      lowPercentage = 10;
+    } else if (weightInKg <= 2) {
+      // Tier 2: 0.5 kg to 2 kg -> 50% to 10%
+      highPercentage = 50;
+      lowPercentage = 10;
+    } else {
+      // Tier 3: above 2 kg -> 30% to 10%
+      highPercentage = 30;
+      lowPercentage = 10;
+    }
+
+    // Linear interpolation between minLength and maxLength
+    const percentage = highPercentage + (lengthInMm - minLength) * (lowPercentage - highPercentage) / (maxLength - minLength);
+
+    return percentage;
   };
 
 
@@ -156,12 +176,13 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     const scrapLength_mm = getNum(fields.scrapLength);
 
     if (prefilledItem) {
+        let calculated;
         if (scrapLength_mm > 0 && prefilledItem.weight > 0) {
-            const calculated = (scrapLength_mm / 1000) * prefilledItem.weight;
+            calculated = (scrapLength_mm / 1000) * prefilledItem.weight;
             weight = calculated;
             newFields.weight = calculated.toFixed(3).replace('.', ',');
             setCalculatedWeight(calculated);
-            setCurrentCutPercentage(calculateDynamicPercentage(scrapLength_mm));
+            setCurrentCutPercentage(calculateDynamicPercentage(scrapLength_mm, calculated));
         } else {
             newFields.weight = '';
             setCalculatedWeight(null);
@@ -521,5 +542,3 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     </div>
   );
 }
-
-    

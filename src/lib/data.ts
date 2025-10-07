@@ -59,7 +59,7 @@ export type SteelItem = {
   description: string;
   weight: number;
   categoryName?: string;
-  unit: 'm' | 'un' | 'kg';
+  unit?: 'm' | 'un' | 'kg';
 };
 
 export type ConnectionItem = {
@@ -275,7 +275,7 @@ const generateChapas = (): SteelItem[] => {
             items.push({
                 id: `chapa-${chapa.thickness}-${dim.w}x${dim.h}`,
                 description: `Chapa Inox ${chapa.desc}x${dim.desc} mm`,
-                weight: chapa.thickness * dim.w * dim.h * SHEET_WEIGHT_CONSTANT,
+                weight: Math.ceil(chapa.thickness * dim.w * dim.h * SHEET_WEIGHT_CONSTANT),
                 categoryName,
                 unit: 'un',
             });
@@ -286,7 +286,7 @@ const generateChapas = (): SteelItem[] => {
             items.push({
                 id: `chapa-${chapa.thickness}-${dim.w}x${dim.h}`,
                 description: `Chapa Inox ${chapa.desc}x${dim.desc} mm`,
-                weight: chapa.thickness * dim.w * dim.h * SHEET_WEIGHT_CONSTANT,
+                weight: Math.ceil(chapa.thickness * dim.w * dim.h * SHEET_WEIGHT_CONSTANT),
                 categoryName,
                 unit: 'un',
             });
@@ -1044,6 +1044,7 @@ export const ALL_CATEGORIES = CATEGORY_GROUPS.flatMap(group => group.items);
     
 
     
+
 
 
 

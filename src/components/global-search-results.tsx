@@ -86,9 +86,9 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
                                                     </TableHeader>
                                                     <TableBody>
                                                         {group.items.map(item => {
-                                                             const itemCost = item.costPrice || 0;
-                                                             const finalCost = itemCost * costMultiplier;
-                                                             const itemPrice = Math.ceil(finalCost * (1 + markupPercentage / 100));
+                                                             const itemCost = item.weight; // Using weight as base for connections now
+                                                             const finalCost = itemCost * priceParams['global'].sellingPrice;
+                                                             const itemPrice = Math.ceil(finalCost);
                                                             return (
                                                                 <TableRow key={item.id} className="even:bg-primary/5 odd:bg-transparent flex items-center">
                                                                     <TableCell className="flex-1">{item.description}</TableCell>
@@ -122,8 +122,8 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
                                     <TableHeader>
                                     <TableRow className="bg-primary/5 hover:bg-primary/10 flex items-center">
                                         <TableHead className="flex-1">Descrição</TableHead>
-                                        <TableHead className="w-1/3 text-center">Peso (kg/{(category as Category).unit === 'm' ? 'm' : (category as Category).unit})</TableHead>
-                                        <TableHead className="w-1/3 text-right font-semibold text-primary">Preço (R$/{(category as Category).unit === 'm' ? 'm' : (category as Category).unit})</TableHead>
+                                        <TableHead className="w-1/3 text-center">Peso (kg/{(category as Category).unit})</TableHead>
+                                        <TableHead className="w-1/3 text-right font-semibold text-primary">Preço (R$/{(category as Category).unit})</TableHead>
                                     </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -137,7 +137,7 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
                                                         className={cn(
                                                             'even:bg-primary/5 odd:bg-transparent',
                                                             'flex items-center',
-                                                            ((category as Category).unit === 'm' || isScrapCalculatorActive) && 'cursor-pointer',
+                                                            ((category as Category).unit === 'm' || (category as Category).unit === 'un' || isScrapCalculatorActive) && 'cursor-pointer',
                                                             isSelected && 'bg-primary/20 hover:bg-primary/20',
                                                             !isSelected && 'hover:bg-primary/10',
                                                         )}

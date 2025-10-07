@@ -17,7 +17,7 @@ import { SwipeToDelete } from "./ui/swipe-to-delete";
 import { AnimatePresence, motion } from "framer-motion";
 
 type Shape = "rectangle" | "disc";
-type FieldName = "width" | "length" | "thickness" | "weight" | "diameter" | "material" | "scrapLength";
+type FieldName = "width" | "length" | "thickness" | "weight" | "diameter" | "material" | "scrapLength" | "quantity";
 
 interface ScrapPiece {
     id: string;
@@ -26,7 +26,8 @@ interface ScrapPiece {
     price: number;
     pricePerKg?: number;
     length?: number;
-    unit?: 'm' | 'kg';
+    quantity?: number;
+    unit?: 'm' | 'kg' | 'un';
 }
 
 interface ScrapCalculatorProps {
@@ -39,42 +40,28 @@ const DENSITY = STAINLESS_STEEL_DENSITY_KG_M3;
 const LOCAL_STORAGE_KEY = "scrapCalculatorList";
 
 const calculateDynamicPercentage = (lengthInMm: number, weightInKg: number): number => {
-    // Rule: For any cut of 6m (6000mm) or more, the markup is 0%.
-    if (lengthInMm >= 6000) {
-      return 0;
-    }
-    // Rule: For any cut above 3m (3000mm) up to 6m, the markup is 5%.
-    if (lengthInMm > 3000) {
-      return 5;
-    }
+    if (lengthInMm >= 6000) return 0;
+    if (lengthInMm > 3000) return 5;
 
     const minLength = 10;
     const maxLength = 3000;
 
     if (lengthInMm <= minLength) lengthInMm = minLength;
-    if (lengthInMm > maxLength) lengthInMm = maxLength; // Cap at 3000 for interpolation
+    if (lengthInMm > maxLength) lengthInMm = maxLength;
 
-    let highPercentage: number;
-    let lowPercentage: number;
-
-    // Determine percentage range based on weight tier
+    let highPercentage: number, lowPercentage: number;
     if (weightInKg <= 0.5) {
-      // Tier 1: up to 0.5 kg -> 100% to 10%
       highPercentage = 100;
       lowPercentage = 10;
     } else if (weightInKg <= 2) {
-      // Tier 2: 0.5 kg to 2 kg -> 50% to 10%
       highPercentage = 50;
       lowPercentage = 10;
     } else {
-      // Tier 3: above 2 kg -> 30% to 10%
       highPercentage = 30;
       lowPercentage = 10;
     }
 
-    // Linear interpolation between minLength and maxLength
     const percentage = highPercentage + (lengthInMm - minLength) * (lowPercentage - highPercentage) / (maxLength - minLength);
-
     return percentage;
   };
 
@@ -92,12 +79,15 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     diameter: "",
     material: "304",
     scrapLength: "",
+    quantity: "1",
   });
 
   const [scrapList, setScrapList] = React.useState<ScrapPiece[]>([]);
   const [calculatedWeight, setCalculatedWeight] = React.useState<number | null>(null);
   const [currentCutPercentage, setCurrentCutPercentage] = React.useState(0);
   const [finalPrice, setFinalPrice] = React.useState(0);
+
+  const isPrefilledItemUnit = prefilledItem?.unit === 'un';
 
   React.useEffect(() => {
     try {
@@ -145,7 +135,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
 
   const resetFields = (keepMaterial = true) => {
     const material = keepMaterial ? fields.material : "304";
-    setFields({ width: "", length: "", thickness: "", weight: "", diameter: "", material, scrapLength: "" });
+    setFields({ width: "", length: "", thickness: "", weight: "", diameter: "", material, scrapLength: "", quantity: "1" });
     setCalculatedWeight(null);
     setCurrentCutPercentage(0);
     setFinalPrice(0);
@@ -173,22 +163,36 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     let weight: number | null = null;
     let newFields = { ...fields };
 
-    const scrapLength_mm = getNum(fields.scrapLength);
-
     if (prefilledItem) {
-        let calculated;
-        if (scrapLength_mm > 0 && prefilledItem.weight > 0) {
-            calculated = (scrapLength_mm / 1000) * prefilledItem.weight;
-            weight = calculated;
-            newFields.weight = calculated.toFixed(3).replace('.', ',');
-            setCalculatedWeight(calculated);
-            setCurrentCutPercentage(calculateDynamicPercentage(scrapLength_mm, calculated));
+        if (isPrefilledItemUnit) {
+            const quantity = getNum(fields.quantity);
+            if (quantity > 0 && prefilledItem.weight > 0) {
+                const calculated = prefilledItem.weight * quantity;
+                weight = calculated;
+                newFields.weight = calculated.toFixed(3).replace('.', ',');
+                setCalculatedWeight(calculated);
+                setCurrentCutPercentage(0);
+            } else {
+                 newFields.weight = '';
+                 setCalculatedWeight(null);
+                 setCurrentCutPercentage(0);
+            }
         } else {
-            newFields.weight = '';
-            setCalculatedWeight(null);
-            setCurrentCutPercentage(0);
+            const scrapLength_mm = getNum(fields.scrapLength);
+            let calculated;
+            if (scrapLength_mm > 0 && prefilledItem.weight > 0) {
+                calculated = (scrapLength_mm / 1000) * prefilledItem.weight;
+                weight = calculated;
+                newFields.weight = calculated.toFixed(3).replace('.', ',');
+                setCalculatedWeight(calculated);
+                setCurrentCutPercentage(calculateDynamicPercentage(scrapLength_mm, calculated));
+            } else {
+                newFields.weight = '';
+                setCalculatedWeight(null);
+                setCurrentCutPercentage(0);
+            }
         }
-    } else {
+    } else { // Manual calculation
       const w_mm = getNum(fields.width);
       const l_mm = getNum(fields.length);
       const t_mm = getNum(fields.thickness);
@@ -243,11 +247,10 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
             }
         }
       }
-      
       setCalculatedWeight(weight);
     }
     setFields(newFields);
-  }, [fields.width, fields.length, fields.thickness, fields.weight, fields.diameter, shape, prefilledItem, fields.scrapLength]);
+  }, [fields.width, fields.length, fields.thickness, fields.weight, fields.diameter, shape, prefilledItem, fields.scrapLength, fields.quantity, isPrefilledItemUnit]);
   
   React.useEffect(() => {
       const getNum = (val: string) => parseFloat(val.replace(',', '.')) || 0;
@@ -255,10 +258,16 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
       const weightForPrice = getNum(fields.weight);
       
       if (prefilledItem) {
-          const scrapLength_mm = getNum(fields.scrapLength);
-          if (scrapLength_mm > 0 && prefilledItem.weight > 0) {
-              const pricePerMeter = Math.ceil(sellingPrice * prefilledItem.weight);
-              piecePrice = pricePerMeter * (scrapLength_mm / 1000);
+          if (isPrefilledItemUnit) {
+              const quantity = getNum(fields.quantity);
+              const pricePerUnit = prefilledItem.weight * sellingPrice;
+              piecePrice = pricePerUnit * quantity;
+          } else {
+              const scrapLength_mm = getNum(fields.scrapLength);
+              if (scrapLength_mm > 0 && prefilledItem.weight > 0) {
+                  const pricePerMeter = Math.ceil(sellingPrice * prefilledItem.weight);
+                  piecePrice = pricePerMeter * (scrapLength_mm / 1000);
+              }
           }
       } else { // Manual scrap
         if (weightForPrice > 0) {
@@ -270,7 +279,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
       const finalPriceWithCut = piecePrice * (1 + currentCutPercentage / 100);
       setFinalPrice(Math.ceil(finalPriceWithCut));
 
-  }, [fields.weight, scrapPrice, sellingPrice, prefilledItem, fields.scrapLength, currentCutPercentage]);
+  }, [fields.weight, scrapPrice, sellingPrice, prefilledItem, fields.scrapLength, fields.quantity, currentCutPercentage, isPrefilledItemUnit]);
 
 
   const addToList = () => {
@@ -278,7 +287,6 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     let weight = 0;
     let newPiece: ScrapPiece;
     const getNumPrice = (val: string) => parseFloat(val.replace(',', '.')) || 0;
-    const pricePerUnit = getNumPrice(scrapPrice);
     
     weight = getNumPrice(fields.weight);
     if (weight <= 0) {
@@ -288,25 +296,42 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
 
 
     if (prefilledItem) {
-        const scrapLength_mm = getNumPrice(fields.scrapLength);
-        if (scrapLength_mm <= 0) {
-            toast({ variant: "destructive", title: "Comprimento inválido", description: "O comprimento do retalho deve ser maior que zero." });
-            return;
+        if (isPrefilledItemUnit) {
+            const quantity = getNumPrice(fields.quantity);
+             if (quantity <= 0) {
+                toast({ variant: "destructive", title: "Quantidade inválida", description: "A quantidade deve ser maior que zero." });
+                return;
+            }
+            description = `${prefilledItem.description} ${formatNumber(quantity, {minimumFractionDigits: 0})}pç`;
+            newPiece = {
+                id: uuidv4(),
+                description,
+                weight: weight,
+                price: finalPrice,
+                pricePerKg: prefilledItem.weight * sellingPrice, // Price per piece
+                quantity: quantity,
+                unit: 'un',
+            };
+        } else {
+            const scrapLength_mm = getNumPrice(fields.scrapLength);
+            if (scrapLength_mm <= 0) {
+                toast({ variant: "destructive", title: "Comprimento inválido", description: "O comprimento do retalho deve ser maior que zero." });
+                return;
+            }
+            description = `${prefilledItem.description} x ${formatNumber(scrapLength_mm, {minimumFractionDigits: 0})} mm`;
+            const pricePerMeter = Math.ceil(sellingPrice * prefilledItem.weight);
+            newPiece = {
+                id: uuidv4(),
+                description,
+                weight: weight,
+                price: finalPrice,
+                pricePerKg: pricePerMeter, // This is price per meter here
+                length: scrapLength_mm,
+                unit: 'm',
+            };
         }
-        description = `${prefilledItem.description} x ${formatNumber(scrapLength_mm, {minimumFractionDigits: 0})} mm`;
-        const pricePerMeter = Math.ceil(sellingPrice * prefilledItem.weight);
-
-        newPiece = {
-            id: uuidv4(),
-            description,
-            weight: weight,
-            price: finalPrice,
-            pricePerKg: pricePerMeter, // This is price per meter here
-            length: scrapLength_mm,
-            unit: 'm',
-        };
-
     } else { // Manual scrap
+        const pricePerUnit = getNumPrice(scrapPrice);
         if (shape === 'rectangle') {
             const t = getNumPrice(fields.thickness);
             const w = getNumPrice(fields.width);
@@ -386,8 +411,17 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                     </Button>
                 </div>
                 <div className="space-y-1">
-                    <Label htmlFor="scrapLength">Comprimento do Retalho (mm)</Label>
-                    <Input id="scrapLength" type="text" inputMode="decimal" placeholder="Insira o comprimento" value={fields.scrapLength} onChange={(e) => handleInputChange('scrapLength', e.target.value)} />
+                    {isPrefilledItemUnit ? (
+                        <>
+                         <Label htmlFor="quantity">Quantidade de Peças (un)</Label>
+                         <Input id="quantity" type="text" inputMode="decimal" placeholder="Insira a quantidade" value={fields.quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} />
+                        </>
+                    ) : (
+                        <>
+                         <Label htmlFor="scrapLength">Comprimento do Retalho (mm)</Label>
+                         <Input id="scrapLength" type="text" inputMode="decimal" placeholder="Insira o comprimento" value={fields.scrapLength} onChange={(e) => handleInputChange('scrapLength', e.target.value)} />
+                        </>
+                    )}
                 </div>
             </div>
         ) : (
@@ -429,7 +463,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
         )}
         
         <div className="pt-1 mt-1 border-t space-y-1">
-             {prefilledItem && (
+             {prefilledItem && !isPrefilledItemUnit && (
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label htmlFor="cut-percentage">Acréscimo de Corte (%)</Label>
                     <Input
@@ -473,7 +507,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                            <thead className="text-left sticky top-0 bg-background z-10">
                                 <tr className="border-b">
                                     <th className="p-1 font-medium w-auto break-words">Descrição</th>
-                                    <th className="p-1 font-medium text-right w-24">Peso/Compr.</th>
+                                    <th className="p-1 font-medium text-right w-24">Peso/Detalhe</th>
                                     <th className="p-1 font-medium text-right text-primary w-28">Preço (R$)</th>
                                 </tr>
                            </thead>
@@ -502,6 +536,13 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                                                    </div>
                                                  )}
                                                </>
+                                             ) : item.unit === 'un' && item.quantity ? (
+                                                <>
+                                                  <div>{formatNumber(item.weight, { minimumFractionDigits: 3, maximumFractionDigits: 3 })} kg</div>
+                                                  <div className="text-xs text-muted-foreground font-normal">
+                                                     {`${formatNumber(item.pricePerKg!, { style: 'currency', currency: 'BRL' })}/pç`}
+                                                   </div>
+                                                </>
                                              ) : (
                                                <>
                                                  <div>{formatNumber(item.weight, { minimumFractionDigits: 3, maximumFractionDigits: 3 })} kg</div>

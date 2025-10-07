@@ -40,11 +40,9 @@ const DENSITY = STAINLESS_STEEL_DENSITY_KG_M3;
 const LOCAL_STORAGE_KEY = "scrapCalculatorList";
 
 const calculateDynamicPercentage = (lengthInMm: number, weightInKg: number): number => {
-    // Rule: For any cut of 6m (6000mm) or more, the markup is 0%.
     if (lengthInMm >= 6000) {
       return 0;
     }
-    // Rule: For any cut above 3m (3000mm) up to 6m, the markup is 5%.
     if (lengthInMm > 3000) {
       return 5;
     }
@@ -53,27 +51,22 @@ const calculateDynamicPercentage = (lengthInMm: number, weightInKg: number): num
     const maxLength = 3000;
 
     if (lengthInMm <= minLength) lengthInMm = minLength;
-    if (lengthInMm > maxLength) lengthInMm = maxLength; // Cap at 3000 for interpolation
+    if (lengthInMm > maxLength) lengthInMm = maxLength; 
 
     let highPercentage: number;
     let lowPercentage: number;
 
-    // Determine percentage range based on weight tier
     if (weightInKg <= 0.5) {
-      // Tier 1: up to 0.5 kg -> 100% to 10%
       highPercentage = 100;
       lowPercentage = 10;
     } else if (weightInKg <= 2) {
-      // Tier 2: 0.5 kg to 2 kg -> 50% to 10%
       highPercentage = 50;
       lowPercentage = 10;
     } else {
-      // Tier 3: above 2 kg -> 30% to 10%
       highPercentage = 30;
       lowPercentage = 10;
     }
 
-    // Linear interpolation between minLength and maxLength
     const percentage = highPercentage + (lengthInMm - minLength) * (lowPercentage - highPercentage) / (maxLength - minLength);
 
     return percentage;
@@ -174,35 +167,21 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
 
   React.useEffect(() => {
     const getNum = (val: string) => parseFloat(val.replace(',', '.')) || 0;
-    let weight: number | null = null;
+    let singlePieceWeight: number | null = null;
     let newFields = { ...fields };
 
     if (prefilledItem) {
         if (isPrefilledItemUnit) {
-            const quantity = getNum(fields.quantity);
-            if (quantity > 0 && prefilledItem.weight > 0) {
-                const calculated = prefilledItem.weight * quantity;
-                weight = calculated;
-                newFields.weight = calculated.toFixed(3).replace('.', ',');
-                setCalculatedWeight(calculated);
-                setCurrentCutPercentage(0);
-            } else {
-                 newFields.weight = '';
-                 setCalculatedWeight(null);
-                 setCurrentCutPercentage(0);
+            if (prefilledItem.weight > 0) {
+                singlePieceWeight = prefilledItem.weight;
             }
         } else {
             const scrapLength_mm = getNum(fields.scrapLength);
-            let calculated;
             if (scrapLength_mm > 0 && prefilledItem.weight > 0) {
-                calculated = (scrapLength_mm / 1000) * prefilledItem.weight;
-                weight = calculated;
-                newFields.weight = calculated.toFixed(3).replace('.', ',');
-                setCalculatedWeight(calculated);
+                const calculated = (scrapLength_mm / 1000) * prefilledItem.weight;
+                singlePieceWeight = calculated;
                 setCurrentCutPercentage(calculateDynamicPercentage(scrapLength_mm, calculated));
             } else {
-                newFields.weight = '';
-                setCalculatedWeight(null);
                 setCurrentCutPercentage(0);
             }
         }
@@ -213,6 +192,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
       const kg = getNum(fields.weight);
       const d_mm = getNum(fields.diameter);
       
+      let calculatedWeight = null;
       if (shape === 'rectangle') {
         const inputs = [w_mm > 0, l_mm > 0, t_mm > 0, kg > 0];
         const filledCount = inputs.filter(Boolean).length;
@@ -221,18 +201,17 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
             if (kg > 0 && t_mm > 0 && l_mm > 0 && w_mm === 0) {
               const width = (kg / ((l_mm / 1000) * (t_mm / 1000) * DENSITY)) * 1000;
               newFields.width = width.toFixed(2).replace('.', ',');
-              weight = kg;
+              calculatedWeight = kg;
             } else if (kg > 0 && t_mm > 0 && w_mm > 0 && l_mm === 0) {
               const length = (kg / ((w_mm / 1000) * (t_mm / 1000) * DENSITY)) * 1000;
               newFields.length = length.toFixed(2).replace('.', ',');
-              weight = kg;
+              calculatedWeight = kg;
             } else if (kg > 0 && w_mm > 0 && l_mm > 0 && t_mm === 0) {
               const thickness = (kg / ((w_mm / 1000) * (l_mm / 1000) * DENSITY)) * 1000;
               newFields.thickness = thickness.toFixed(2).replace('.', ',');
-              weight = kg;
+              calculatedWeight = kg;
             } else if (w_mm > 0 && l_mm > 0 && t_mm > 0) {
-              weight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
-              newFields.weight = Math.ceil(weight).toString().replace('.', ',');
+              calculatedWeight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
             }
         }
       } else { // disc
@@ -246,54 +225,58 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
               const r_m = Math.sqrt(area_m2 / Math.PI);
               const diameter = r_m * 2 * 1000;
               newFields.diameter = diameter.toFixed(2).replace('.', ',');
-              weight = kg;
+              calculatedWeight = kg;
             } else if (kg > 0 && d_mm > 0 && t_mm === 0) {
               const r_m = d_mm / 2000;
               const area_m2 = Math.PI * r_m * r_m;
               const thickness = (kg / (area_m2 * DENSITY)) * 1000;
               newFields.thickness = thickness.toFixed(2).replace('.', ',');
-              weight = kg;
+              calculatedWeight = kg;
             } else if (d_mm > 0 && t_mm > 0) {
               const r_m = d_mm / 2000;
               const vol_m3 = Math.PI * r_m * r_m * (t_mm / 1000);
-              weight = vol_m3 * DENSITY;
-              newFields.weight = Math.ceil(weight).toString().replace('.', ',');
+              calculatedWeight = vol_m3 * DENSITY;
             }
         }
       }
-      setCalculatedWeight(weight);
+      singlePieceWeight = calculatedWeight;
     }
+
+    const quantity = getNum(fields.quantity) || 1;
+    const totalWeight = singlePieceWeight ? singlePieceWeight * quantity : null;
+
+    newFields.weight = totalWeight ? totalWeight.toFixed(3).replace('.', ',') : '';
+    
+    setCalculatedWeight(singlePieceWeight);
     setFields(newFields);
-  }, [fields.width, fields.length, fields.thickness, fields.weight, fields.diameter, shape, prefilledItem, fields.scrapLength, fields.quantity, isPrefilledItemUnit]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fields.width, fields.length, fields.thickness, fields.diameter, shape, prefilledItem, fields.scrapLength, fields.quantity]);
   
   React.useEffect(() => {
       const getNum = (val: string) => parseFloat(val.replace(',', '.')) || 0;
-      let piecePrice = 0;
-      const weightForPrice = getNum(fields.weight);
+      const quantity = getNum(fields.quantity) || 1;
+      let singlePiecePrice = 0;
       
-      if (prefilledItem) {
-          if (isPrefilledItemUnit) {
-              const quantity = getNum(fields.quantity);
-              const pricePerUnit = prefilledItem.weight * sellingPrice;
-              piecePrice = pricePerUnit * quantity;
-          } else {
-              const scrapLength_mm = getNum(fields.scrapLength);
-              if (scrapLength_mm > 0 && prefilledItem.weight > 0) {
+      if (calculatedWeight !== null && calculatedWeight > 0) {
+          if (prefilledItem) {
+              if (isPrefilledItemUnit) {
+                  singlePiecePrice = prefilledItem.weight * sellingPrice;
+              } else {
                   const pricePerMeter = Math.ceil(sellingPrice * prefilledItem.weight);
-                  piecePrice = pricePerMeter * (scrapLength_mm / 1000);
+                  const scrapLength_mm = getNum(fields.scrapLength);
+                  singlePiecePrice = pricePerMeter * (scrapLength_mm / 1000);
               }
+          } else {
+              const pricePerKg = getNum(scrapPrice);
+              singlePiecePrice = calculatedWeight * pricePerKg;
           }
-      } else { // Manual scrap
-        if (weightForPrice > 0) {
-            const pricePerKg = getNum(scrapPrice);
-            piecePrice = weightForPrice * pricePerKg;
-        }
       }
       
-      const finalPriceWithCut = piecePrice * (1 + currentCutPercentage / 100);
-      setFinalPrice(Math.ceil(finalPriceWithCut));
+      const priceWithCut = singlePiecePrice * (1 + currentCutPercentage / 100);
+      const totalFinalPrice = priceWithCut * quantity;
+      setFinalPrice(Math.ceil(totalFinalPrice));
 
-  }, [fields.weight, scrapPrice, sellingPrice, prefilledItem, fields.scrapLength, fields.quantity, currentCutPercentage, isPrefilledItemUnit]);
+  }, [calculatedWeight, scrapPrice, sellingPrice, prefilledItem, fields.scrapLength, fields.quantity, currentCutPercentage, isPrefilledItemUnit]);
 
 
   const addToList = () => {
@@ -302,8 +285,14 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     let newPiece: ScrapPiece;
     const getNumPrice = (val: string) => parseFloat(val.replace(',', '.')) || 0;
     
-    weight = getNumPrice(fields.weight);
-    if (weight <= 0) {
+    const quantity = getNumPrice(fields.quantity) || 1;
+    if (quantity <= 0) {
+        toast({ variant: "destructive", title: "Quantidade inválida", description: "A quantidade deve ser maior que zero." });
+        return;
+    }
+
+    const totalWeight = calculatedWeight ? calculatedWeight * quantity : 0;
+     if (totalWeight <= 0) {
         toast({ variant: "destructive", title: "Peso inválido", description: "O peso da peça deve ser maior que zero." });
         return;
     }
@@ -311,18 +300,13 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
 
     if (prefilledItem) {
         if (isPrefilledItemUnit) {
-            const quantity = getNumPrice(fields.quantity);
-             if (quantity <= 0) {
-                toast({ variant: "destructive", title: "Quantidade inválida", description: "A quantidade deve ser maior que zero." });
-                return;
-            }
-            description = `${prefilledItem.description} ${formatNumber(quantity, {minimumFractionDigits: 0})}pç`;
+            description = `${prefilledItem.description}`;
             newPiece = {
                 id: uuidv4(),
                 description,
-                weight: weight,
+                weight: totalWeight,
                 price: finalPrice,
-                pricePerKg: prefilledItem.weight * sellingPrice, // Price per piece
+                pricePerKg: prefilledItem.weight * sellingPrice,
                 quantity: quantity,
                 unit: 'un',
             };
@@ -337,10 +321,11 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
             newPiece = {
                 id: uuidv4(),
                 description,
-                weight: weight,
+                weight: totalWeight,
                 price: finalPrice,
                 pricePerKg: pricePerMeter, // This is price per meter here
                 length: scrapLength_mm,
+                quantity: quantity,
                 unit: 'm',
             };
         }
@@ -369,17 +354,22 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
         newPiece = {
             id: uuidv4(),
             description,
-            weight: weight,
+            weight: totalWeight,
             price: finalPrice,
             pricePerKg: pricePerUnit,
+            quantity: quantity,
             unit: 'kg',
         };
+    }
+    
+    if(quantity > 1) {
+        newPiece.description = `(${quantity}x) ${newPiece.description}`;
     }
 
     const newList = [...scrapList, newPiece];
     setScrapList(newList);
     saveListToLocalStorage(newList);
-    toast({ title: "Peça adicionada!", description: description });
+    toast({ title: "Peça adicionada!", description: newPiece.description });
 
     resetFields();
   }
@@ -424,19 +414,12 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                         <X/>
                     </Button>
                 </div>
-                <div className="space-y-1">
-                    {isPrefilledItemUnit ? (
-                        <>
-                         <Label htmlFor="quantity">Quantidade de Peças (un)</Label>
-                         <Input id="quantity" type="text" inputMode="decimal" placeholder="Insira a quantidade" value={fields.quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} />
-                        </>
-                    ) : (
-                        <>
+                {!isPrefilledItemUnit && (
+                    <div className="space-y-1">
                          <Label htmlFor="scrapLength">Comprimento do Retalho (mm)</Label>
                          <Input id="scrapLength" type="text" inputMode="decimal" placeholder="Insira o comprimento" value={fields.scrapLength} onChange={(e) => handleInputChange('scrapLength', e.target.value)} />
-                        </>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
         ) : (
             <>
@@ -490,14 +473,17 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                     />
                 </div>
              )}
-            <div className="flex gap-1">
-                <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="weight">Peso (kg)</Label><Input id="weight" type="text" inputMode="decimal" placeholder="Peso" value={fields.weight} onChange={(e) => handleInputChange('weight', e.target.value)} /></div>
+            <div className="flex gap-1 items-end">
                 <div className="space-y-1 flex-1 min-w-0">
-                    <Label>P. Real (kg)</Label>
-                    <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm h-10 flex items-center text-muted-foreground">{calculatedWeight !== null ? formatNumber(calculatedWeight, {minimumFractionDigits: 3, maximumFractionDigits: 3}) : "..."}</div>
+                    <Label htmlFor="quantity">Quantidade</Label>
+                    <Input id="quantity" type="text" inputMode="decimal" placeholder="Qtd" value={fields.quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} />
                 </div>
                 <div className="space-y-1 flex-1 min-w-0">
-                    <Label className="text-accent-price font-semibold">R$ Peça</Label>
+                    <Label>P. Total (kg)</Label>
+                    <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm h-10 flex items-center text-muted-foreground">{fields.weight || "..."}</div>
+                </div>
+                <div className="space-y-1 flex-1 min-w-0">
+                    <Label className="text-accent-price font-semibold">R$ Total</Label>
                     <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">{formatNumber(finalPrice, {style: 'currency', currency: 'BRL'})}</div>
                 </div>
             </div>

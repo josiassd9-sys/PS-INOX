@@ -168,6 +168,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     setFields({ width: "", length: "", thickness: "", weight: "", diameter: "", material, scrapLength: "", quantity: "1" });
     setCalculatedWeight(null);
     setCurrentCutPercentage(0);
+    setFinalPrice(0);
     if(prefilledItem) onClearPrefill();
   };
 
@@ -338,7 +339,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                 return;
             }
             const dims = [w, l].sort((a,b) => a-b);
-            description = `${quantityText}Retalho Chapa ${fields.material} ${formatNumber(t, {minimumFractionDigits: 2})}x${formatNumber(dims[0], {minimumFractionDigits: 0})}x${formatNumber(dims[1], {minimumFractionDigits: 0})} mm`;
+            description = `${quantityText}Ret. Chapa ${fields.material} ${formatNumber(t, {minimumFractionDigits: 2})}x${formatNumber(dims[0], {minimumFractionDigits: 0})}x${formatNumber(dims[1], {minimumFractionDigits: 0})} mm`;
         } else { // disc
             const t = getNumPrice(fields.thickness);
             const d = getNumPrice(fields.diameter);
@@ -346,7 +347,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                 toast({ variant: "destructive", title: "Dimensões inválidas", description: "Espessura e diâmetro devem ser preenchidos." });
                 return;
             }
-            description = `${quantityText}Retalho Disco ${fields.material} ${formatNumber(t, {minimumFractionDigits: 2})} Ø${formatNumber(d, {minimumFractionDigits: 0})} mm`;
+            description = `${quantityText}Ret. Disco ${fields.material} ${formatNumber(t, {minimumFractionDigits: 2})} Ø${formatNumber(d, {minimumFractionDigits: 0})} mm`;
         }
         
         newPiece = {
@@ -404,7 +405,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                         <h3 className="font-semibold text-primary">Calculando retalho de item selecionado:</h3>
                         <p className="text-sm text-muted-foreground">{prefilledItem.description}</p>
                     </div>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 -mr-2 -mt-2" onClick={resetFields}>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 -mr-2 -mt-2" onClick={() => resetFields()}>
                         <X/>
                     </Button>
                 </div>
@@ -439,12 +440,12 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                   {shape === "rectangle" ? (
                     <div className="space-y-1">
                         <div className="flex gap-1">
-                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="width">Largura(mm)</Label><Input id="width" type="text" inputMode="decimal" placeholder="Largura" value={fields.width} onChange={(e) => handleInputChange('width', e.target.value)} /></div>
+                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="width">Larg.(mm)</Label><Input id="width" type="text" inputMode="decimal" placeholder="Largura" value={fields.width} onChange={(e) => handleInputChange('width', e.target.value)} /></div>
                             <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="length">Compr.(mm)</Label><Input id="length" type="text" inputMode="decimal" placeholder="Compr." value={fields.length} onChange={(e) => handleInputChange('length', e.target.value)} /></div>
-                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="quantity">Quantidade</Label><Input id="quantity" type="text" inputMode="decimal" placeholder="Qtd." value={fields.quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} /></div>
+                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="quantity">Qtde</Label><Input id="quantity" type="text" inputMode="decimal" placeholder="Qtd." value={fields.quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} /></div>
                         </div>
                         <div className="flex gap-1">
-                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Espessura(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
+                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Esp.(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
                              <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
                              <div className="space-y-1 flex-1 min-w-0">
                                 <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
@@ -507,7 +508,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
         <div className="mt-1">
             <Button onClick={addToList} className="w-full gap-1">
                 <PlusCircle/>
-                Adicionar à Lista
+                Adicione à Lista
             </Button>
         </div>
       </div>

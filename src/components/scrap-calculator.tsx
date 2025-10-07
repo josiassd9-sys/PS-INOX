@@ -493,7 +493,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                     <Input id="weight" type="text" inputMode="decimal" placeholder="Peso Final" value={fields.weight} onChange={(e) => handleInputChange('weight', e.target.value)} />
                 </div>
                 <div className="space-y-1 flex-1 min-w-0">
-                    <Label>Peso Total (kg)</Label>
+                    <Label>P. Real (kg)</Label>
                     <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm h-10 flex items-center text-muted-foreground">
                         {calculatedWeight ? formatNumber(calculatedWeight, {minimumFractionDigits:3}) : '...'}
                     </div>

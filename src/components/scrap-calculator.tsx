@@ -502,9 +502,9 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                            </tbody>
                            <tfoot className="font-semibold border-t sticky bottom-0 bg-background/95">
                                 <tr>
-                                    <td className="p-1 pt-2">TOTAL</td>
-                                    <td className="p-1 pt-2 text-right">{formatNumber(totalListWeight, {minimumFractionDigits: 3, maximumFractionDigits: 3})} kg</td>
-                                    <td className="p-1 pt-2 text-right text-primary">{formatNumber(totalListPrice, {style: 'currency', currency: 'BRL'})}</td>
+                                    <td className="p-1 pt-4">TOTAL</td>
+                                    <td className="p-1 pt-4 text-right">{formatNumber(totalListWeight, {minimumFractionDigits: 3, maximumFractionDigits: 3})} kg</td>
+                                    <td className="p-1 pt-4 text-right text-primary">{formatNumber(totalListPrice, {style: 'currency', currency: 'BRL'})}</td>
                                 </tr>
                            </tfoot>
                         </table>

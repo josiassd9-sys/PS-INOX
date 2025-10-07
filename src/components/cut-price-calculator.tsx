@@ -30,44 +30,68 @@ export function CutPriceCalculator({
   const [finalPrice, setFinalPrice] = React.useState(0);
   const [currentCutPercentage, setCurrentCutPercentage] = React.useState(0);
 
-  // Function to calculate dynamic percentage
-  const calculateDynamicPercentage = (lengthInMm: number) => {
-    const minLength = 10;
-    const midLength = 1000;
-    const maxLength = 3000;
-    const highPercentage = 100;
-    const midPercentage = 30;
-    const lowPercentage = 10;
-
-    if (lengthInMm <= minLength) return highPercentage;
-    if (lengthInMm >= maxLength) return lowPercentage;
-
-    if (lengthInMm <= midLength) {
-      // Interpolate between 10mm (100%) and 1000mm (30%)
-      return highPercentage + (lengthInMm - minLength) * (midPercentage - highPercentage) / (midLength - minLength);
-    } else {
-      // Interpolate between 1000mm (30%) and 3000mm (10%)
-      return midPercentage + (lengthInMm - midLength) * (lowPercentage - midPercentage) / (maxLength - midLength);
+  // Function to calculate dynamic percentage based on length and weight
+  const calculateDynamicPercentage = (lengthInMm: number, weightInKg: number): number => {
+    // Rule: For any cut of 6m (6000mm) or more, the markup is 0%.
+    if (lengthInMm >= 6000) {
+      return 0;
     }
+    // Rule: For any cut above 3m (3000mm) up to 6m, the markup is 5%.
+    if (lengthInMm > 3000) {
+      return 5;
+    }
+
+    const minLength = 10;
+    const maxLength = 3000;
+
+    if (lengthInMm <= minLength) lengthInMm = minLength;
+    if (lengthInMm > maxLength) lengthInMm = maxLength; // Cap at 3000 for interpolation
+
+    let highPercentage: number;
+    let lowPercentage: number;
+
+    // Determine percentage range based on weight tier
+    if (weightInKg <= 0.5) {
+      // Tier 1: up to 0.5 kg -> 100% to 10%
+      highPercentage = 100;
+      lowPercentage = 10;
+    } else if (weightInKg <= 2) {
+      // Tier 2: 0.5 kg to 2 kg -> 50% to 10%
+      highPercentage = 50;
+      lowPercentage = 10;
+    } else {
+      // Tier 3: above 2 kg -> 30% to 10%
+      highPercentage = 30;
+      lowPercentage = 10;
+    }
+
+    // Linear interpolation between minLength and maxLength
+    const percentage = highPercentage + (lengthInMm - minLength) * (lowPercentage - highPercentage) / (maxLength - minLength);
+
+    return percentage;
   };
+
 
   React.useEffect(() => {
     const lengthValue = parseFloat(cutLength.replace(",", "."));
+    let calculatedWeight = 0;
     if (cutLength !== "" && lengthValue > 0) {
       const lengthInMeters = lengthValue / 1000;
-      const weight = selectedItem.weight * lengthInMeters;
-      setPieceWeight(weight);
-      
-      const dynamicPercentage = calculateDynamicPercentage(lengthValue);
+      calculatedWeight = selectedItem.weight * lengthInMeters;
+    }
+    setPieceWeight(calculatedWeight);
+
+    if (calculatedWeight > 0) {
+      const dynamicPercentage = calculateDynamicPercentage(lengthValue, calculatedWeight);
       setCurrentCutPercentage(dynamicPercentage);
-      
+
       const pricePerMeter = selectedItem.weight * sellingPrice;
-      const piecePrice = pricePerMeter * lengthInMeters;
+      const piecePrice = pricePerMeter * (lengthValue / 1000);
+
       const finalPriceWithCut = piecePrice * (1 + dynamicPercentage / 100);
       setFinalPrice(Math.ceil(finalPriceWithCut));
     } else {
       setCurrentCutPercentage(0);
-      setPieceWeight(0);
       setFinalPrice(0);
     }
   }, [cutLength, sellingPrice, selectedItem]);
@@ -144,7 +168,7 @@ export function CutPriceCalculator({
             <div className="space-y-1 flex-1">
                 <Label>Acréscimo de Corte (%)</Label>
                 <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm font-semibold h-10 flex items-center">
-                {currentCutPercentage.toFixed(2)}%
+                {currentCutPercentage.toFixed(2).replace('.',',')}%
                 </div>
             </div>
             <div className="space-y-1 flex-1">

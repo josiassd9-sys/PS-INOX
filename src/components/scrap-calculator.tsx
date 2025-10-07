@@ -93,7 +93,6 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
   const [scrapList, setScrapList] = React.useState<ScrapPiece[]>([]);
   const [calculatedWeight, setCalculatedWeight] = React.useState<number | null>(null);
   const [currentCutPercentage, setCurrentCutPercentage] = React.useState(0);
-  const [finalPrice, setFinalPrice] = React.useState(0);
   const [isPrefilledItemUnit, setIsPrefilledItemUnit] = React.useState(false);
 
 
@@ -625,5 +624,3 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     </div>
   );
 }
-
-    

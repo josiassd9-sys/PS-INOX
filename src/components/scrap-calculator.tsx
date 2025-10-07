@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -100,15 +101,26 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     if (prefilledItem) {
         const itemIsUnit = prefilledItem.unit === 'un';
         setIsPrefilledItemUnit(itemIsUnit);
+
+        const quantity = parseFloat(fields.quantity.replace(',', '.')) || 1;
+
         if (itemIsUnit) {
-          setFields(prev => ({...prev, quantity: "1", scrapLength: ""}))
+          // If it's a unit item (like a sheet), set the weight field directly
+          const totalWeight = (prefilledItem.weight || 0) * quantity;
+          setFields(prev => ({
+            ...prev,
+            weight: totalWeight > 0 ? totalWeight.toFixed(3).replace('.', ',') : '',
+            scrapLength: ""
+          }));
         } else {
-           setFields(prev => ({...prev, quantity: "1"}))
+           // For linear items, clear weight to allow calculation from length
+           setFields(prev => ({...prev, weight: ''}));
         }
     } else {
         setIsPrefilledItemUnit(false);
     }
-  }, [prefilledItem]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefilledItem, fields.quantity]);
 
 
   React.useEffect(() => {
@@ -183,12 +195,13 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
   React.useEffect(() => {
     const getNum = (val: string) => parseFloat(val.replace(',', '.')) || 0;
     let singlePieceWeight: number | null = null;
+    const quantity = getNum(fields.quantity) || 1;
 
     if (prefilledItem) {
         if (isPrefilledItemUnit) {
-            if (prefilledItem.weight > 0) {
-                singlePieceWeight = prefilledItem.weight;
-            }
+            // For unit items, the weight is taken directly from the weight field,
+            // which is pre-filled when the item is selected.
+            singlePieceWeight = getNum(fields.weight) / quantity;
         } else {
             const scrapLength_mm = getNum(fields.scrapLength);
             if (scrapLength_mm > 0 && prefilledItem.weight > 0) {
@@ -230,14 +243,13 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
       singlePieceWeight = calculatedWeight;
     }
 
-    const quantity = getNum(fields.quantity) || 1;
     const totalWeight = singlePieceWeight ? singlePieceWeight * quantity : 0;
     
     setCalculatedWeight(totalWeight);
     
-    // Only update the weight field if it's not the one being typed into
+    // Only update the weight field if it's not the one being typed into and not a prefilled unit item
     const activeElement = document.activeElement;
-    if (activeElement?.id !== 'weight') {
+    if (activeElement?.id !== 'weight' && !isPrefilledItemUnit) {
       let finalWeightToShow = totalWeight;
       if (!prefilledItem && totalWeight > 0) {
         finalWeightToShow = Math.ceil(totalWeight);
@@ -245,7 +257,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
       setFields(prev => ({...prev, weight: finalWeightToShow ? finalWeightToShow.toFixed(3).replace('.', ',') : ''}));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fields.width, fields.length, fields.thickness, fields.diameter, shape, prefilledItem, fields.scrapLength, fields.quantity]);
+  }, [fields.width, fields.length, fields.thickness, fields.diameter, shape, prefilledItem, fields.scrapLength, fields.quantity, isPrefilledItemUnit]);
   
   React.useEffect(() => {
       const getNum = (val: string) => parseFloat(val.replace(',', '.')) || 0;
@@ -254,18 +266,19 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
       let totalFinalPrice = 0;
 
       if (weightForPrice > 0) {
+          const quantity = getNum(fields.quantity) || 1;
           if (prefilledItem) {
-              const quantity = getNum(fields.quantity) || 1;
               let singlePiecePrice = 0;
               if (isPrefilledItemUnit) {
                   singlePiecePrice = prefilledItem.weight * sellingPrice;
+                  totalFinalPrice = singlePiecePrice * quantity; // Direct multiplication for unit items
               } else {
                   const pricePerMeter = Math.ceil(sellingPrice * prefilledItem.weight);
                   const scrapLength_mm = getNum(fields.scrapLength);
                   singlePiecePrice = pricePerMeter * (scrapLength_mm / 1000);
+                  const priceWithCut = singlePiecePrice * (1 + currentCutPercentage / 100);
+                  totalFinalPrice = priceWithCut * quantity;
               }
-              const priceWithCut = singlePiecePrice * (1 + currentCutPercentage / 100);
-              totalFinalPrice = priceWithCut * quantity;
           } else {
               const pricePerKg = getNum(scrapPrice);
               totalFinalPrice = weightForPrice * pricePerKg;
@@ -464,7 +477,6 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                         <div className="flex gap-1">
                             <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Espessura(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Insira a espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
                             <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
-                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="scrap-price">Preço (R$/kg)</Label><Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} disabled={!!prefilledItem}/></div>
                         </div>
                     </div>
                   ) : (
@@ -476,7 +488,6 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                         </div>
                         <div className="flex gap-1">
                             <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
-                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="scrap-price">Preço (R$/kg)</Label><Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} disabled={!!prefilledItem}/></div>
                         </div>
                     </div>
                   )}
@@ -500,6 +511,10 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
              )}
             <div className="flex gap-1 items-end">
                 <div className="space-y-1 flex-1 min-w-0">
+                    <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
+                    <Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} disabled={!!prefilledItem}/>
+                </div>
+                 <div className="space-y-1 flex-1 min-w-0">
                     <Label htmlFor="weight">Peso (kg)</Label>
                     <Input id="weight" type="text" inputMode="decimal" placeholder="Peso Final" value={fields.weight} onChange={(e) => handleInputChange('weight', e.target.value)} />
                 </div>
@@ -610,3 +625,5 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     </div>
   );
 }
+
+    

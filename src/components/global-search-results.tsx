@@ -133,7 +133,7 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
                                             return (
                                                 <React.Fragment key={item.id}>
                                                     <TableRow
-                                                        onClick={() => handleRowClick(item, category as Category, sellingPrice)}
+                                                        onClick={() => handleRowClick(item as SteelItem, category as Category, sellingPrice)}
                                                         className={cn(
                                                             'even:bg-primary/5 odd:bg-transparent',
                                                             'flex items-center',
@@ -163,7 +163,7 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
                                                             <TableCell colSpan={3} className="p-0">
                                                                 <div className="p-1 bg-primary/5">
                                                                     <CutPriceCalculator
-                                                                        selectedItem={item}
+                                                                        selectedItem={item as SteelItem}
                                                                         sellingPrice={sellingPrice}
                                                                         onClose={() => setSelectedItemId(null)}
                                                                     />

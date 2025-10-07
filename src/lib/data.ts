@@ -59,7 +59,7 @@ export type SteelItem = {
   description: string;
   weight: number;
   categoryName?: string;
-  unit: 'm' | 'un';
+  unit: 'm' | 'un' | 'kg';
 };
 
 export type ConnectionItem = {
@@ -1025,6 +1025,7 @@ export const ALL_CATEGORIES = CATEGORY_GROUPS.flatMap(group => group.items);
     
 
     
+
 
 
 

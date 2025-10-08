@@ -82,7 +82,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
   });
   
   const [manualWeight, setManualWeight] = React.useState<string>("");
-  const [isWeightManuallyEdited, setIsWeightManuallyEdited] = React.useState(false);
+  const [isWeightEdited, setIsWeightEdited] = React.useState(false);
   const [scrapList, setScrapList] = React.useState<ScrapPiece[]>([]);
 
   React.useEffect(() => {
@@ -116,7 +116,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     const material = keepMaterial ? dimensions.material : "304";
     setDimensions({ width: "", length: "", thickness: "", diameter: "", material, scrapLength: "", quantity: "1" });
     setManualWeight("");
-    setIsWeightManuallyEdited(false);
+    setIsWeightEdited(false);
     if(prefilledItem) onClearPrefill();
   };
   
@@ -124,14 +124,14 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     const sanitizedValue = field === 'material' ? value : value.replace(/[^0-9,.]/g, '');
     if (field !== 'material' && !/^\d*[,.]?\d*$/.test(sanitizedValue)) return;
     setDimensions(prev => ({...prev, [field]: sanitizedValue}));
-    setIsWeightManuallyEdited(false);
+    setIsWeightEdited(false); // Reset manual edit flag on dimension change
   };
   
   const handleWeightChange = (value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '');
     if (!/^\d*[,.]?\d*$/.test(sanitizedValue)) return;
     setManualWeight(sanitizedValue);
-    setIsWeightManuallyEdited(true);
+    setIsWeightEdited(true); // User is editing manually
   }
 
   const handleScrapPriceChange = (value: string) => {
@@ -146,55 +146,51 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
       resetFields();
     }
   };
+  
+  // Reset fields when prefilledItem changes
+  React.useEffect(() => {
+      resetFields();
+      if (prefilledItem) {
+        if (sellingPrice > 0) setScrapPrice(sellingPrice.toFixed(2).replace('.', ','));
+        if (prefilledItem.unit === 'un') { // Sheets
+            setIsWeightEdited(true); // For sheets, weight is always "manual"
+            setManualWeight(prefilledItem.weight > 0 ? prefilledItem.weight.toFixed(3).replace('.', ',') : '');
+        }
+      } else {
+        setScrapPrice("23");
+      }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefilledItem, sellingPrice]);
 
   // --- DERIVED VALUES ---
   const { calculatedWeight, currentCutPercentage } = React.useMemo(() => {
-    if (prefilledItem && prefilledItem.unit !== 'un') {
-      const scrapLength_mm = getNum(dimensions.scrapLength);
-      if (scrapLength_mm > 0 && prefilledItem.weight > 0) {
+    const w_mm = getNum(dimensions.width);
+    const l_mm = getNum(dimensions.length);
+    const t_mm = getNum(dimensions.thickness);
+    const d_mm = getNum(dimensions.diameter);
+    const scrapLength_mm = getNum(dimensions.scrapLength);
+
+    if (prefilledItem && prefilledItem.unit !== 'un' && scrapLength_mm > 0 && prefilledItem.weight > 0) {
         const weight = (scrapLength_mm / 1000) * prefilledItem.weight;
         const cutPercentage = calculateDynamicPercentage(scrapLength_mm, weight);
         return { calculatedWeight: weight, currentCutPercentage: cutPercentage };
-      }
     } else if (!prefilledItem) {
-      const w_mm = getNum(dimensions.width);
-      const l_mm = getNum(dimensions.length);
-      const t_mm = getNum(dimensions.thickness);
-      const d_mm = getNum(dimensions.diameter);
-
-      if (shape === 'rectangle' && w_mm > 0 && l_mm > 0 && t_mm > 0) {
-        const weight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
-        return { calculatedWeight: weight, currentCutPercentage: 0 };
-      } else if (shape === 'disc' && d_mm > 0 && t_mm > 0) {
-        const r_m = d_mm / 2000;
-        const vol_m3 = Math.PI * r_m * r_m * (t_mm / 1000);
-        return { calculatedWeight: vol_m3 * DENSITY, currentCutPercentage: 0 };
-      }
+        if (shape === 'rectangle' && w_mm > 0 && l_mm > 0 && t_mm > 0) {
+            const weight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
+            return { calculatedWeight: weight, currentCutPercentage: 0 };
+        } else if (shape === 'disc' && d_mm > 0 && t_mm > 0) {
+            const r_m = d_mm / 2000;
+            const vol_m3 = Math.PI * r_m * r_m * (t_mm / 1000);
+            const weight = vol_m3 * DENSITY;
+            return { calculatedWeight: weight, currentCutPercentage: 0 };
+        }
     }
     return { calculatedWeight: 0, currentCutPercentage: 0 };
   }, [dimensions, shape, prefilledItem]);
 
 
-  React.useEffect(() => {
-    if (prefilledItem) {
-        if (sellingPrice > 0) setScrapPrice(sellingPrice.toFixed(2).replace('.', ','));
-        
-        if (prefilledItem.unit === 'un') { // Sheets
-            setManualWeight(prefilledItem.weight > 0 ? prefilledItem.weight.toFixed(3).replace('.', ',') : '');
-            setIsWeightManuallyEdited(true);
-        } else { // Tubes, Bars
-             setIsWeightManuallyEdited(false);
-        }
-    } else {
-        setScrapPrice("23");
-        setIsWeightManuallyEdited(false);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prefilledItem, sellingPrice]);
-
-
-  const finalWeight = isWeightManuallyEdited ? getNum(manualWeight) : Math.ceil(calculatedWeight);
-  const displayWeightInput = isWeightManuallyEdited ? manualWeight : (calculatedWeight > 0 ? String(Math.ceil(calculatedWeight)) : "");
+  const finalWeight = isWeightEdited ? getNum(manualWeight) : Math.ceil(calculatedWeight);
+  const displayWeightInput = isWeightEdited ? manualWeight : (calculatedWeight > 0 ? String(Math.ceil(calculatedWeight)) : "");
 
   const finalPrice = React.useMemo(() => {
     if (finalWeight <= 0) return 0;
@@ -492,4 +488,3 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     </div>
   );
 }
-

@@ -9,7 +9,7 @@ import { ALL_CATEGORIES, Category, ConnectionGroup, ConnectionItem, SteelItem } 
 import { GlobalSearchResults } from "./global-search-results";
 import { useToast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from "uuid";
-import { Table, TableBody, TableCell, TableHeader, TableRow } from "./ui/table";
+import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "./ui/table";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { ScrapCalculator } from "./scrap-calculator";
@@ -296,7 +296,7 @@ export function MaterialListBuilder() {
                                             transition={{ duration: 0.2, type: "spring" }}
                                             className="block"
                                         >
-                                            <SwipeToDelete onDelete={() => handleRemoveFromList(item.listItemId)} asChild>
+                                            <SwipeToDelete onDelete={() => handleRemoveFromList(item.listItemId)}>
                                                 <TableRow
                                                     className="border-b-border/50 bg-background flex"
                                                 >
@@ -332,8 +332,6 @@ export function MaterialListBuilder() {
         </div>
 
         {materialList.length > 0 && (
-             // GUIA DE AJUSTE DE ESPAÇAMENTO: RODAPÉ DO TOTAL
-             // 'p-2': Padding geral do rodapé. Altere para 'p-3', 'p-4'.
             <div className="shrink-0 border-t border-border bg-background/95 backdrop-blur-sm p-2">
                 <div className="flex items-center justify-between">
                     <span className="text-lg font-semibold">Total</span>

@@ -50,7 +50,6 @@ import {
 } from "./ui/accordion";
 import { TechnicalDrawingGuide } from "./technical-drawing-guide";
 import { ConnectionsTable } from "./connections-table";
-import { WelcomeScreen } from "./welcome-screen";
 import { CostAdjustmentCalculator } from "./cost-adjustment-calculator";
 
 interface PriceParams {
@@ -320,7 +319,11 @@ function DashboardComponent() {
   
   const renderContent = () => {
     if (!selectedCategory) {
-      return <WelcomeScreen onSelectCategory={handleSelectCategory} />;
+      return (
+        <div className="flex items-center justify-center h-full text-center text-muted-foreground p-4">
+          <p>Selecione uma categoria no menu para começar a usar a calculadora.</p>
+        </div>
+      );
     }
 
     const showSearchResults = searchTerm && filteredCategories.length > 0;
@@ -591,4 +594,3 @@ export function Dashboard() {
     </SidebarProvider>
   )
 }
-

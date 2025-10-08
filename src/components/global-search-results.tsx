@@ -15,6 +15,8 @@ import { PlusCircle, Tag } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
+import { ScrapCalculator } from "./scrap-calculator";
+import { Card, CardContent } from "./ui/card";
 
 interface GlobalSearchResultsProps {
     categories: (Category | { id: 'conexoes'; name: string; items: ConnectionGroup[] })[];
@@ -115,6 +117,23 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
         <h2 className="text-xl font-semibold">Resultados da Busca para "{searchTerm}"</h2>
         <Accordion type="multiple" className="w-full space-y-1" defaultValue={categories.map(c => c.id)}>
             {categories.map((category) => {
+                 if (category.id === 'retalhos') {
+                    return (
+                        <AccordionItem value={category.id} key={category.id} className="border rounded-lg overflow-hidden bg-card">
+                             <AccordionTrigger className="px-1 py-1 hover:bg-primary/10 text-lg font-semibold">
+                                {category.name}
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <Card>
+                                    <CardContent className="p-1">
+                                        <ScrapCalculator onAddItem={onAddItem} />
+                                    </CardContent>
+                                </Card>
+                            </AccordionContent>
+                        </AccordionItem>
+                    )
+                 }
+
                  if (category.id === 'conexoes') {
                     const connectionGroups = category.items as ConnectionGroup[];
                     const sellingPrice = priceParams['conexoes']?.sellingPrice || priceParams['global'].sellingPrice;

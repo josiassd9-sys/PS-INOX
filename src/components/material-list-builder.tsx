@@ -9,7 +9,6 @@ import { v4 as uuidv4 } from "uuid";
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "./ui/table";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
-import { ScrapCalculator } from "./scrap-calculator";
 import Link from "next/link";
 import { SteelItem, ALL_CATEGORIES, ConnectionGroup, ConnectionItem, Category } from "../lib/data";
 import { GlobalSearchResults } from "./global-search-results";
@@ -56,7 +55,6 @@ const initializePriceParams = (): Record<string, PriceParams> => {
 export function MaterialListBuilder() {
   const [materialList, setMaterialList] = React.useState<ListItem[]>([]);
   const [searchTerm, setSearchTerm] = React.useState("");
-  const [isScrapCalculatorOpen, setIsScrapCalculatorOpen] = React.useState(false);
 
   const [priceParams, setPriceParams] = React.useState<Record<string, PriceParams>>({});
   const [costAdjustments, setCostAdjustments] = React.useState<Record<string, number>>({});
@@ -96,7 +94,6 @@ export function MaterialListBuilder() {
     const newList = [...materialList, newItem];
     setMaterialList(newList);
     saveList(newList);
-    setIsScrapCalculatorOpen(false);
   }
   
   const handleRemoveFromList = (listItemId: string) => {
@@ -128,6 +125,10 @@ export function MaterialListBuilder() {
   
     return ALL_CATEGORIES.map((category) => {
         let filteredItems: any[] = [];
+        
+        if (category.id === "retalhos" && "retalho".includes(safeSearchTerm)) {
+          return category;
+        }
   
         if (category.id === "conexoes") {
           const connectionGroups = category.items as ConnectionGroup[];
@@ -170,7 +171,7 @@ export function MaterialListBuilder() {
         return null;
         
       })
-      .filter((category): category is Category => category !== null && category.items.length > 0);
+      .filter((category): category is Category => category !== null);
   }, [searchTerm]);
 
 
@@ -194,10 +195,6 @@ export function MaterialListBuilder() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </div>
-
-            <Button onClick={() => setIsScrapCalculatorOpen(true)} className="w-full mt-px">
-                Adicionar Retalho Personalizado
-            </Button>
         </div>
 
         <div className="flex-1 mt-px overflow-y-auto relative z-0 p-1 min-h-0">
@@ -206,32 +203,15 @@ export function MaterialListBuilder() {
                     categories={filteredCategories as any}
                     priceParams={priceParams}
                     searchTerm={searchTerm}
-                    onPrefillScrap={() => {}} // Not used here
+                    onPrefillScrap={() => {}}
                     isScrapCalculatorActive={false}
                     costAdjustments={costAdjustments}
-                    onItemClick={() => {}} // Not used here
+                    onItemClick={() => {}} 
                     onAddItem={handleAddItemToList}
                 />
              ) : (
                 <>
-                {isScrapCalculatorOpen && (
-                    <div className="mb-2">
-                         <Card>
-                            <CardContent className="p-1">
-                                 <div className="flex justify-between items-center pb-1">
-                                    <h3 className="font-semibold px-1">Calcular Retalho Personalizado</h3>
-                                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setIsScrapCalculatorOpen(false)}><X/></Button>
-                                </div>
-                                <ScrapCalculator 
-                                    onAddItem={handleAddItemToList}
-                                />
-                            </CardContent>
-                        </Card>
-                    </div>
-                 )}
-
-                
-                {materialList.length > 0 && (
+                {materialList.length > 0 ? (
                     <div id="material-list-section" className="flex-1 flex flex-col min-h-0 pt-2">
                         <h2 className="text-lg font-semibold text-center mb-1 text-foreground">Lista de Materiais</h2>
                          <Card className="flex-1 overflow-hidden flex flex-col bg-card border-border">
@@ -240,8 +220,8 @@ export function MaterialListBuilder() {
                                    <TableHeader>
                                        <TableRow className="border-b-border hover:bg-muted/50 flex">
                                            <TableHead className="flex-1 p-2">Descrição</TableHead>
-                                           <TableHead className="text-center p-2 w-[80px]">Preço</TableHead>
                                            <TableHead className="text-center p-2 w-[70px] bg-muted/50">Detalhe</TableHead>
+                                           <TableHead className="text-center p-2 w-[80px]">Preço</TableHead>
                                            <TableHead className="px-1 w-[40px]"></TableHead>
                                        </TableRow>
                                    </TableHeader>
@@ -249,13 +229,13 @@ export function MaterialListBuilder() {
                                        {materialList.map(item => (
                                             <TableRow key={item.listItemId} className="flex items-center">
                                               <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
-                                              <TableCell className="text-right font-semibold text-accent-price p-2 w-[80px]">{formatCurrency(item.price)}</TableCell>
-                                              <TableCell className="text-center text-muted-foreground p-2 w-[70px] bg-muted/50">
+                                               <TableCell className="text-center text-muted-foreground p-2 w-[70px] bg-muted/50">
                                                   <div className="flex flex-col items-center">
                                                     <span>{(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}</span>
                                                     <span className="text-xs">{formatNumber(item.weight, 3)} kg</span>
                                                   </div>
                                               </TableCell>
+                                              <TableCell className="text-right font-semibold text-accent-price p-2 w-[80px]">{formatCurrency(item.price)}</TableCell>
                                                <TableCell className="px-1 w-[40px]">
                                                   <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleRemoveFromList(item.listItemId)}>
                                                       <Trash2 className="h-4 w-4 text-destructive" />
@@ -268,12 +248,10 @@ export function MaterialListBuilder() {
                             </CardContent>
                          </Card>
                     </div>
-                )}
-                
-                {!isScrapCalculatorOpen && materialList.length === 0 && (
+                ) : (
                      <div className="text-center text-muted-foreground py-10">
                         <p>Sua lista de materiais está vazia.</p>
-                        <p>Use a busca ou o botão acima para adicionar itens.</p>
+                        <p>Use a busca acima para adicionar itens.</p>
                     </div>
                 )}
                 </>

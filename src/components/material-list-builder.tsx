@@ -175,7 +175,7 @@ export function MaterialListBuilder() {
 
     if (filteredCategories.length === 0 && !isScrapCalculatorOpen) {
         return (
-             <div className="absolute inset-x-0 top-full mt-1 bg-background z-4 border rounded-lg shadow-lg p-2 max-h-[60vh] overflow-y-auto">
+             <div className="absolute inset-x-0 top-full mt-1 bg-background z-40 border rounded-lg shadow-lg p-2 max-h-[60vh] overflow-y-auto">
                 <div className="text-center text-muted-foreground py-1">
                     <p>Nenhum material encontrado para "{searchTerm}".</p>
                 </div>
@@ -184,7 +184,7 @@ export function MaterialListBuilder() {
     }
 
     return (
-        <div className="absolute inset-x-0 top-full mt-1 bg-background z-4 border rounded-lg shadow-lg p-1 max-h-[60vh] overflow-y-auto">
+        <div className="absolute inset-x-0 top-full mt-1 bg-background z-40 border rounded-lg shadow-lg p-1 max-h-[60vh] overflow-y-auto">
             <GlobalSearchResults
                 categories={filteredCategories}
                 priceParams={mockPriceParams}
@@ -207,7 +207,7 @@ export function MaterialListBuilder() {
           - 'p-1': Padding geral deste container. Aumente para 'p-2', 'p-4', etc.
           - 'gap-1': Espaço vertical entre o logo e a barra de busca. Aumente para 'gap-2', 'gap-3', etc.
         */}
-        <div className="relative z-4 w-full p-1 flex flex-col gap-1 shrink-0">
+        <div className="relative z-40 w-full p-1 flex flex-col gap-1 shrink-0">
             {/*
               GUIA DE AJUSTE DE ESPAÇAMENTO: LOGO
               - 'pt-1': Padding no topo do logo. Aumente para 'pt-2' para mais espaço acima.
@@ -271,13 +271,13 @@ export function MaterialListBuilder() {
                                        <TableHead className="flex-1 p-2">Descrição</TableHead>
                                        
                                        {/* GUIA DE AJUSTE DE COLUNA: Detalhe
-                                           - 'w-[70px]': Largura fixa. Altere para 'w-[90px]', 'w-1/3' (um terço), etc.
+                                           - 'w-[80px]': Largura fixa. Altere para 'w-[90px]', 'w-1/3' (um terço), etc.
                                            - 'p-2': Padding interno.
                                        */}
                                        <TableHead className="text-center w-[80px] p-2 bg-muted/50">Detalhe</TableHead>
                                        
                                        {/* GUIA DE AJUSTE DE COLUNA: Preço
-                                           - 'w-[80px]': Largura fixa.
+                                           - 'w-[90px]': Largura fixa.
                                            - 'p-2': Padding interno.
                                        */}
                                        <TableHead className="text-right w-[90px] p-2">Preço</TableHead>

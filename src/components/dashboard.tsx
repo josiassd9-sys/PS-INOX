@@ -51,6 +51,7 @@ import {
 import { TechnicalDrawingGuide } from "./technical-drawing-guide";
 import { ConnectionsTable } from "./connections-table";
 import { CostAdjustmentCalculator } from "./cost-adjustment-calculator";
+import { WelcomeScreen } from "./welcome-screen";
 
 interface PriceParams {
   costPrice: number;
@@ -318,11 +319,9 @@ function DashboardComponent() {
   }
   
   const renderContent = () => {
-    if (!selectedCategory) {
+    if (!selectedCategoryId) {
       return (
-        <div className="flex items-center justify-center h-full text-center text-muted-foreground p-4">
-          <p>Selecione uma categoria no menu para começar a usar a calculadora.</p>
-        </div>
+        <WelcomeScreen />
       );
     }
 

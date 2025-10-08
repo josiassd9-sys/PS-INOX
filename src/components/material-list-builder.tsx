@@ -13,7 +13,7 @@ import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { ScrapCalculator } from "./scrap-calculator";
 import { SwipeToDelete } from "./ui/swipe-to-delete";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const MATERIAL_LIST_KEY = "materialBuilderList";
 
@@ -175,8 +175,8 @@ export function MaterialListBuilder() {
 
     if (filteredCategories.length === 0 && !isScrapCalculatorOpen) {
         return (
-             <div className="absolute inset-x-0 top-full mt-1 bg-background z-20 border rounded-lg shadow-lg p-4 max-h-[60vh] overflow-y-auto">
-                <div className="text-center text-muted-foreground py-10">
+             <div className="absolute inset-x-0 top-full mt-1 bg-background z-4 border rounded-lg shadow-lg p-2 max-h-[60vh] overflow-y-auto">
+                <div className="text-center text-muted-foreground py-1">
                     <p>Nenhum material encontrado para "{searchTerm}".</p>
                 </div>
             </div>
@@ -184,7 +184,7 @@ export function MaterialListBuilder() {
     }
 
     return (
-        <div className="absolute inset-x-0 top-full mt-1 bg-background z-20 border rounded-lg shadow-lg p-1 max-h-[60vh] overflow-y-auto">
+        <div className="absolute inset-x-0 top-full mt-1 bg-background z-4 border rounded-lg shadow-lg p-1 max-h-[60vh] overflow-y-auto">
             <GlobalSearchResults
                 categories={filteredCategories}
                 priceParams={mockPriceParams}
@@ -205,14 +205,14 @@ export function MaterialListBuilder() {
         {/*
           GUIA DE AJUSTE DE ESPAÇAMENTO: CONTAINER SUPERIOR (LOGO E BUSCA)
           - 'p-1': Padding geral deste container. Aumente para 'p-2', 'p-4', etc.
-          - 'gap-2': Espaço vertical entre o logo e a barra de busca. Aumente para 'gap-3', 'gap-4', etc.
+          - 'gap-1': Espaço vertical entre o logo e a barra de busca. Aumente para 'gap-2', 'gap-3', etc.
         */}
-        <div className="relative z-10 w-full p-1 flex flex-col gap-2 shrink-0">
+        <div className="relative z-4 w-full p-1 flex flex-col gap-1 shrink-0">
             {/*
               GUIA DE AJUSTE DE ESPAÇAMENTO: LOGO
-              - 'pt-2': Padding no topo do logo. Aumente para 'pt-4' para mais espaço acima.
+              - 'pt-1': Padding no topo do logo. Aumente para 'pt-2' para mais espaço acima.
             */}
-            <div className="flex justify-center pt-2">
+            <div className="flex justify-center pt-1">
                 <PsInoxLogo />
             </div>
 
@@ -271,43 +271,46 @@ export function MaterialListBuilder() {
                                        <TableHead className="flex-1 p-2">Descrição</TableHead>
                                        
                                        {/* GUIA DE AJUSTE DE COLUNA: Detalhe
-                                           - 'w-[80px]': Largura fixa. Altere para 'w-[90px]', 'w-1/3' (um terço), etc.
+                                           - 'w-[70px]': Largura fixa. Altere para 'w-[90px]', 'w-1/3' (um terço), etc.
                                            - 'p-2': Padding interno.
                                        */}
-                                       <TableHead className="text-center w-[80px] p-2">Detalhe</TableHead>
+                                       <TableHead className="text-center w-[80px] p-2 bg-muted/50">Detalhe</TableHead>
                                        
                                        {/* GUIA DE AJUSTE DE COLUNA: Preço
-                                           - 'w-[90px]': Largura fixa.
+                                           - 'w-[80px]': Largura fixa.
                                            - 'p-2': Padding interno.
                                        */}
                                        <TableHead className="text-right w-[90px] p-2">Preço</TableHead>
                                    </TableRow>
                                </TableHeader>
                                <TableBody>
+                                  <AnimatePresence>
                                    {materialList.map(item => (
-                                       <SwipeToDelete
-                                          key={item.listItemId}
-                                          onDelete={() => handleRemoveFromList(item.listItemId)}
-                                          className="flex"
-                                          layout
-                                          initial={{ opacity: 0, height: 0 }}
-                                          animate={{ opacity: 1, height: 'auto' }}
-                                          exit={{ opacity: 0, height: 0, x: -100 }}
-                                          transition={{ duration: 0.3, type: "spring" }}
-                                       >
-                                            {/* Célula da Descrição */}
-                                            <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
-                                            
-                                            {/* Célula do Detalhe (Peso/Qtd) */}
-                                            <TableCell className="text-center text-muted-foreground w-[80px] p-2">
-                                                {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
-                                                <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
-                                            </TableCell>
-                                            
-                                            {/* Célula do Preço */}
-                                            <TableCell className="text-right font-semibold text-accent-price w-[90px] p-2">{formatCurrency(item.price)}</TableCell>
-                                       </SwipeToDelete>
+                                        <motion.tr
+                                            key={item.listItemId}
+                                            layout
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0, x: -100 }}
+                                            transition={{ duration: 0.3, type: "spring" }}
+                                            className="flex"
+                                        >
+                                            <SwipeToDelete onDelete={() => handleRemoveFromList(item.listItemId)}>
+                                                {/* Célula da Descrição */}
+                                                <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
+                                                
+                                                {/* Célula do Detalhe (Peso/Qtd) */}
+                                                <TableCell className="text-center text-muted-foreground w-[80px] p-2 bg-muted/50">
+                                                    {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
+                                                    <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
+                                                </TableCell>
+                                                
+                                                {/* Célula do Preço */}
+                                                <TableCell className="text-right font-semibold text-accent-price w-[90px] p-2">{formatCurrency(item.price)}</TableCell>
+                                            </SwipeToDelete>
+                                        </motion.tr>
                                    ))}
+                                   </AnimatePresence>
                                </TableBody>
                            </Table>
                         </CardContent>

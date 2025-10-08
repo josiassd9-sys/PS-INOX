@@ -22,9 +22,12 @@ const toolsIcons = CATEGORY_GROUPS.flatMap(g => g.items)
     .filter(c => ['retalhos', 'package-checker', 'balanca', 'tabela-sucata'].includes(c.id))
     .map(c => ({ name: c.name, icon: c.icon as any}));
 
-const infoIcons = CATEGORY_GROUPS.flatMap(g => g.items)
-    .filter(c => ['normas-astm', 'processos-fabricacao', 'desenho-tecnico'].includes(c.id))
-    .map(c => ({ name: c.name, icon: c.icon as any}));
+const infoIcons = [
+    ...CATEGORY_GROUPS.flatMap(g => g.items)
+        .filter(c => ['normas-astm', 'processos-fabricacao', 'desenho-tecnico'].includes(c.id))
+        .map(c => ({ name: c.name, icon: c.icon as any})),
+    { name: 'Lista de Materiais', icon: 'ClipboardList' }
+];
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -60,17 +63,6 @@ export function BlueprintMinimalist() {
                 <motion.div variants={itemVariants} className="mb-2">
                      <h2 className="text-lg font-bold text-slate-100">PS INOX</h2>
                     <p className="text-sm text-slate-400">Calculadora de Preços</p>
-                </motion.div>
-
-                <motion.div 
-                    variants={itemVariants} 
-                    className="mb-2"
-                    whileHover={{ scale: 1.05, backgroundColor: 'hsla(220, 14%, 96%, 0.1)' }}
-                >
-                    <div className="flex flex-col items-center justify-center gap-1 p-1 rounded-lg cursor-pointer">
-                        <Icon name="ClipboardList" className="w-6 h-6 text-slate-300" />
-                        <span className="text-xs text-slate-300 font-semibold">Lista de Materiais</span>
-                    </div>
                 </motion.div>
 
                 <motion.div variants={itemVariants} className="mb-1">
@@ -133,7 +125,7 @@ export function BlueprintMinimalist() {
                  <motion.div variants={itemVariants} className="mb-1">
                     <p className="text-xs font-semibold uppercase tracking-widest text-slate-400">Informativos</p>
                 </motion.div>
-                 <motion.div variants={containerVariants} className="grid grid-cols-3 gap-1">
+                 <motion.div variants={containerVariants} className="grid grid-cols-4 gap-1">
                      {infoIcons.map((item) => (
                          <motion.div
                             key={item.name}

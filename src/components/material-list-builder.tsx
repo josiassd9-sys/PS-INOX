@@ -234,10 +234,10 @@ export function MaterialListBuilder() {
 
         {/*
           GUIA DE AJUSTE DE ESPAÇAMENTO: CONTAINER DA LISTA
-          - 'mt-2': Margem no topo, separando da busca. Aumente para 'mt-4'.
+          - 'mt-1': Margem no topo, separando da busca. Aumente para 'mt-4'.
           - 'p-1': Padding interno.
         */}
-        <div className="flex-1 mt-2 overflow-y-auto relative z-0 p-1 min-h-0">
+        <div className="flex-1 mt-1 overflow-y-auto relative z-0 p-1 min-h-0">
              {isScrapCalculatorOpen && (
                 <div className="mb-2">
                      <Card>
@@ -276,41 +276,42 @@ export function MaterialListBuilder() {
                                            - 'w-[80px]': Largura fixa. Altere para 'w-[90px]', 'w-1/3' (um terço), etc.
                                            - 'p-2': Padding interno.
                                        */}
-                                       <TableHead className="text-center w-[80px] p-2 bg-muted/50">Detalhe</TableHead>
+                                       <TableHead className="text-right p-2 w-[80px]">Preço</TableHead>
                                        
                                        {/* GUIA DE AJUSTE DE COLUNA: Preço
                                            - 'w-[90px]': Largura fixa.
                                            - 'p-2': Padding interno.
                                        */}
-                                       <TableHead className="text-right w-[90px] p-2">Preço</TableHead>
+                                       <TableHead className="text-center p-2 w-[70px] bg-muted/50">Detalhe</TableHead>
                                    </TableRow>
                                </TableHeader>
                                <TableBody>
                                   <AnimatePresence>
                                    {materialList.map(item => (
-                                        <motion.tr
-                                            key={item.listItemId}
-                                            layout
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0, x: -100 }}
-                                            transition={{ duration: 0.3, type: "spring" }}
-                                            className="flex"
+                                        <SwipeToDelete 
+                                          asChild 
+                                          key={item.listItemId} 
+                                          onDelete={() => handleRemoveFromList(item.listItemId)}
+                                          initial={{ opacity: 0, height: 0 }}
+                                          animate={{ opacity: 1, height: 'auto' }}
+                                          exit={{ opacity: 0, height: 0 }}
+                                          transition={{ duration: 0.3, type: "spring" }}
+                                          layout
                                         >
-                                            <SwipeToDelete onDelete={() => handleRemoveFromList(item.listItemId)}>
+                                            <TableRow>
                                                 {/* Célula da Descrição */}
                                                 <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
                                                 
+                                                {/* Célula do Preço */}
+                                                <TableCell className="text-right font-semibold text-accent-price p-2 w-[80px]">{formatCurrency(item.price)}</TableCell>
+
                                                 {/* Célula do Detalhe (Peso/Qtd) */}
-                                                <TableCell className="text-center text-muted-foreground w-[80px] p-2 bg-muted/50">
+                                                <TableCell className="text-center text-muted-foreground p-2 w-[70px] bg-muted/50">
                                                     {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
                                                     <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
                                                 </TableCell>
-                                                
-                                                {/* Célula do Preço */}
-                                                <TableCell className="text-right font-semibold text-accent-price w-[90px] p-2">{formatCurrency(item.price)}</TableCell>
-                                            </SwipeToDelete>
-                                        </motion.tr>
+                                            </TableRow>
+                                        </SwipeToDelete>
                                    ))}
                                    </AnimatePresence>
                                </TableBody>

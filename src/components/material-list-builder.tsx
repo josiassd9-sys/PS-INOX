@@ -1,8 +1,7 @@
-
 "use client";
 
 import * as React from "react";
-import { Search, Trash2, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { PsInoxLogo } from "./ps-inox-logo";
 import { Input } from "./ui/input";
 import { ALL_CATEGORIES, Category, ConnectionGroup, ConnectionItem, SteelItem } from "@/lib/data";
@@ -14,7 +13,7 @@ import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { ScrapCalculator } from "./scrap-calculator";
 import { SwipeToDelete } from "./ui/swipe-to-delete";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 const MATERIAL_LIST_KEY = "materialBuilderList";
 
@@ -201,7 +200,7 @@ export function MaterialListBuilder() {
   }
 
   return (
-    <div className="relative w-full h-full flex flex-col overflow-hidden bg-background text-foreground p-1">
+    <div className="relative w-full h-full flex flex-col overflow-hidden bg-background text-foreground">
         
         {/*
           GUIA DE AJUSTE DE ESPAÇAMENTO: CONTAINER SUPERIOR (LOGO E BUSCA)
@@ -285,36 +284,30 @@ export function MaterialListBuilder() {
                                    </TableRow>
                                </TableHeader>
                                <TableBody>
-                                   <AnimatePresence>
                                    {materialList.map(item => (
-                                        <SwipeToDelete
+                                       <SwipeToDelete
                                           key={item.listItemId}
-                                          asChild
                                           onDelete={() => handleRemoveFromList(item.listItemId)}
-                                        >
-                                            <TableRow
-                                                className="border-b-border/50 bg-background"
-                                                layout
-                                                initial={{ opacity: 0, height: 0 }}
-                                                animate={{ opacity: 1, height: 'auto' }}
-                                                exit={{ opacity: 0, height: 0, x: -100 }}
-                                                transition={{ duration: 0.3, type: "spring" }}
-                                            >
-                                                {/* Célula da Descrição */}
-                                                <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
-                                                
-                                                {/* Célula do Detalhe (Peso/Qtd) */}
-                                                <TableCell className="text-center text-muted-foreground w-[80px] p-2">
-                                                    {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
-                                                    <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
-                                                </TableCell>
-                                                
-                                                {/* Célula do Preço */}
-                                                <TableCell className="text-right font-semibold text-primary w-[90px] p-2">{formatCurrency(item.price)}</TableCell>
-                                            </TableRow>
-                                        </SwipeToDelete>
+                                          className="flex"
+                                          layout
+                                          initial={{ opacity: 0, height: 0 }}
+                                          animate={{ opacity: 1, height: 'auto' }}
+                                          exit={{ opacity: 0, height: 0, x: -100 }}
+                                          transition={{ duration: 0.3, type: "spring" }}
+                                       >
+                                            {/* Célula da Descrição */}
+                                            <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
+                                            
+                                            {/* Célula do Detalhe (Peso/Qtd) */}
+                                            <TableCell className="text-center text-muted-foreground w-[80px] p-2">
+                                                {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
+                                                <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
+                                            </TableCell>
+                                            
+                                            {/* Célula do Preço */}
+                                            <TableCell className="text-right font-semibold text-accent-price w-[90px] p-2">{formatCurrency(item.price)}</TableCell>
+                                       </SwipeToDelete>
                                    ))}
-                                   </AnimatePresence>
                                </TableBody>
                            </Table>
                         </CardContent>
@@ -331,6 +324,8 @@ export function MaterialListBuilder() {
         </div>
 
         {materialList.length > 0 && (
+            // GUIA DE AJUSTE DE ESPAÇAMENTO: Rodapé do Total
+            // 'p-2': Padding interno.
             <div className="shrink-0 border-t border-border bg-background/95 backdrop-blur-sm p-2">
                 <div className="flex items-center justify-between">
                     <span className="text-lg font-semibold">Total</span>

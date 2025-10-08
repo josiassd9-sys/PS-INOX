@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -36,35 +35,7 @@ interface ScrapCalculatorProps {
     sellingPrice: number;
 }
 
-const DENSITY = STAINLESS_STEEL_DENSITY_KG_M3;
 const LOCAL_STORAGE_KEY = "scrapCalculatorList";
-
-const calculateDynamicPercentage = (lengthInMm: number, weightInKg: number): number => {
-    if (lengthInMm >= 6000) return 0;
-    if (lengthInMm > 3000) return 5;
-
-    const minLength = 10;
-    const maxLength = 3000;
-
-    lengthInMm = Math.max(minLength, Math.min(lengthInMm, maxLength));
-
-    let highPercentage: number;
-    let lowPercentage: number;
-
-    if (weightInKg <= 0.5) {
-      highPercentage = 100;
-      lowPercentage = 10;
-    } else if (weightInKg <= 2) {
-      highPercentage = 50;
-      lowPercentage = 10;
-    } else {
-      highPercentage = 30;
-      lowPercentage = 10;
-    }
-
-    return highPercentage + (lengthInMm - minLength) * (lowPercentage - highPercentage) / (maxLength - minLength);
-};
-
 
 export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }: ScrapCalculatorProps) {
   const { toast } = useToast();
@@ -82,9 +53,9 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
   });
   
   const [manualWeight, setManualWeight] = React.useState<string>("");
-  const [isWeightEdited, setIsWeightEdited] = React.useState(false);
   const [scrapList, setScrapList] = React.useState<ScrapPiece[]>([]);
 
+  // Load list from local storage on initial mount
   React.useEffect(() => {
     try {
       const savedList = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -102,172 +73,27 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
       toast({ variant: "destructive", title: "Erro ao Salvar", description: "Não foi possível salvar a lista." });
     }
   };
-  
-  const getNum = (val: string | number | undefined): number => {
-    if (typeof val === 'number') return val;
-    if (typeof val === 'string' && val.trim() !== '') {
-        const num = parseFloat(val.replace(',', '.'));
-        return isNaN(num) ? 0 : num;
-    }
-    return 0;
-  };
 
-  const resetFields = (keepMaterial = true) => {
-    const material = keepMaterial ? dimensions.material : "304";
-    setDimensions({ width: "", length: "", thickness: "", diameter: "", material, scrapLength: "", quantity: "1" });
-    setManualWeight("");
-    setIsWeightEdited(false);
-    if(prefilledItem) onClearPrefill();
-  };
-  
   const handleDimChange = (field: keyof typeof dimensions, value: string) => {
-    const sanitizedValue = field === 'material' ? value : value.replace(/[^0-9,.]/g, '');
-    if (field !== 'material' && !/^\d*[,.]?\d*$/.test(sanitizedValue)) return;
-    setDimensions(prev => ({...prev, [field]: sanitizedValue}));
-    setIsWeightEdited(false); // Reset manual edit flag on dimension change
+    // Logic was cleared
   };
   
   const handleWeightChange = (value: string) => {
-    const sanitizedValue = value.replace(/[^0-9,.]/g, '');
-    if (!/^\d*[,.]?\d*$/.test(sanitizedValue)) return;
-    setManualWeight(sanitizedValue);
-    setIsWeightEdited(true); // User is editing manually
+    // Logic was cleared
   }
 
   const handleScrapPriceChange = (value: string) => {
-    const sanitizedValue = value.replace(/[^0-9,.]/g, '');
-    if (!/^\d*[,.]?\d*$/.test(sanitizedValue)) return;
-    setScrapPrice(sanitizedValue);
+    // Logic was cleared
   }
 
   const handleShapeChange = (value: Shape | "") => {
     if (value) {
       setShape(value);
-      resetFields();
     }
   };
-  
-  // Reset fields when prefilledItem changes
-  React.useEffect(() => {
-      resetFields();
-      if (prefilledItem) {
-        if (sellingPrice > 0) setScrapPrice(sellingPrice.toFixed(2).replace('.', ','));
-        if (prefilledItem.unit === 'un') { // Sheets
-            setIsWeightEdited(true); // For sheets, weight is always "manual"
-            setManualWeight(prefilledItem.weight > 0 ? prefilledItem.weight.toFixed(3).replace('.', ',') : '');
-        }
-      } else {
-        setScrapPrice("23");
-      }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prefilledItem, sellingPrice]);
-
-  // --- DERIVED VALUES ---
-  const { calculatedWeight, currentCutPercentage } = React.useMemo(() => {
-    const w_mm = getNum(dimensions.width);
-    const l_mm = getNum(dimensions.length);
-    const t_mm = getNum(dimensions.thickness);
-    const d_mm = getNum(dimensions.diameter);
-    const scrapLength_mm = getNum(dimensions.scrapLength);
-
-    if (prefilledItem && prefilledItem.unit !== 'un' && scrapLength_mm > 0 && prefilledItem.weight > 0) {
-        const weight = (scrapLength_mm / 1000) * prefilledItem.weight;
-        const cutPercentage = calculateDynamicPercentage(scrapLength_mm, weight);
-        return { calculatedWeight: weight, currentCutPercentage: cutPercentage };
-    } else if (!prefilledItem) {
-        if (shape === 'rectangle' && w_mm > 0 && l_mm > 0 && t_mm > 0) {
-            const weight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
-            return { calculatedWeight: weight, currentCutPercentage: 0 };
-        } else if (shape === 'disc' && d_mm > 0 && t_mm > 0) {
-            const r_m = d_mm / 2000;
-            const vol_m3 = Math.PI * r_m * r_m * (t_mm / 1000);
-            const weight = vol_m3 * DENSITY;
-            return { calculatedWeight: weight, currentCutPercentage: 0 };
-        }
-    }
-    return { calculatedWeight: 0, currentCutPercentage: 0 };
-  }, [dimensions, shape, prefilledItem]);
-
-
-  const finalWeight = isWeightEdited ? getNum(manualWeight) : Math.ceil(calculatedWeight);
-  const displayWeightInput = isWeightEdited ? manualWeight : (calculatedWeight > 0 ? String(Math.ceil(calculatedWeight)) : "");
-
-  const finalPrice = React.useMemo(() => {
-    if (finalWeight <= 0) return 0;
-    
-    const quantity = getNum(dimensions.quantity) || 1;
-    let singlePiecePrice = 0;
-
-    if (prefilledItem) {
-      if (prefilledItem.unit === 'un') { // Sheet
-        singlePiecePrice = finalWeight * sellingPrice;
-      } else { // Tube/Bar
-        const pricePerMeter = Math.ceil(sellingPrice * prefilledItem.weight);
-        const scrapLength_mm = getNum(dimensions.scrapLength);
-        const basePrice = pricePerMeter * (scrapLength_mm / 1000);
-        singlePiecePrice = basePrice * (1 + currentCutPercentage / 100);
-      }
-    } else { // Manual scrap
-      const pricePerKg = getNum(scrapPrice);
-      singlePiecePrice = finalWeight * pricePerKg;
-    }
-
-    return Math.ceil(singlePiecePrice) * quantity;
-  }, [finalWeight, dimensions.quantity, prefilledItem, sellingPrice, scrapPrice, currentCutPercentage, dimensions.scrapLength]);
 
   const addToList = () => {
-    let description = "";
-    const quantity = getNum(dimensions.quantity) || 1;
-
-    if (finalWeight <= 0) {
-        toast({ variant: "destructive", title: "Peso inválido", description: "O peso da peça deve ser maior que zero." });
-        return;
-    }
-
-    let newPiece: ScrapPiece;
-
-    if (prefilledItem) {
-        const quantityText = quantity > 1 ? `(${quantity}x) ` : '';
-        if (prefilledItem.unit === 'un') {
-            description = `${quantityText}${prefilledItem.description}`;
-            newPiece = { id: uuidv4(), description, weight: finalWeight * quantity, price: finalPrice, pricePerKg: sellingPrice, unit: 'un', quantity };
-        } else {
-            const scrapLength_mm = getNum(dimensions.scrapLength);
-            if (scrapLength_mm <= 0) {
-                toast({ variant: "destructive", title: "Comprimento inválido", description: "O comprimento do retalho deve ser maior que zero." });
-                return;
-            }
-            description = `${quantityText}${prefilledItem.description} x ${formatNumber(scrapLength_mm, {minimumFractionDigits: 0})} mm`;
-            const pricePerMeter = Math.ceil(sellingPrice * prefilledItem.weight);
-            newPiece = { id: uuidv4(), description, weight: calculatedWeight * quantity, price: finalPrice, pricePerKg: pricePerMeter, length: scrapLength_mm, unit: 'm', quantity };
-        }
-    } else { // Manual scrap
-        const pricePerUnit = getNum(scrapPrice);
-        const quantityText = quantity > 1 ? `(${quantity}x) ` : '';
-        if (shape === 'rectangle') {
-            const t = getNum(dimensions.thickness); const w = getNum(dimensions.width); const l = getNum(dimensions.length);
-            if (t <= 0 || w <= 0 || l <= 0) {
-                toast({ variant: "destructive", title: "Dimensões inválidas", description: "Espessura, largura e comprimento devem ser preenchidos." });
-                return;
-            }
-            const dims = [w, l].sort((a,b) => a-b);
-            description = `${quantityText}Ret. Chapa ${dimensions.material} ${formatNumber(t, {minimumFractionDigits: 2})}x${formatNumber(dims[0], {minimumFractionDigits: 0})}x${formatNumber(dims[1], {minimumFractionDigits: 0})} mm`;
-        } else { // disc
-            const t = getNum(dimensions.thickness); const d = getNum(dimensions.diameter);
-            if (t <= 0 || d <= 0) {
-                toast({ variant: "destructive", title: "Dimensões inválidas", description: "Espessura e diâmetro devem ser preenchidos." });
-                return;
-            }
-            description = `${quantityText}Ret. Disco ${dimensions.material} ${formatNumber(t, {minimumFractionDigits: 2})} Ø${formatNumber(d, {minimumFractionDigits: 0})} mm`;
-        }
-        newPiece = { id: uuidv4(), description, weight: finalWeight * quantity, price: finalPrice, pricePerKg: pricePerUnit, unit: 'kg', quantity };
-    }
-    
-    const newList = [...scrapList, newPiece];
-    setScrapList(newList);
-    saveListToLocalStorage(newList);
-    toast({ title: "Peça adicionada!", description: newPiece.description });
-    resetFields();
+    toast({ title: "Lógica em manutenção", description: "A função de adicionar à lista será reimplementada." });
   }
 
   const removeFromList = (id: string) => {
@@ -296,7 +122,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                         <h3 className="font-semibold text-primary">Calculando retalho de item selecionado:</h3>
                         <p className="text-sm text-muted-foreground">{prefilledItem.description}</p>
                     </div>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 -mr-2 -mt-2" onClick={() => resetFields()}>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 -mr-2 -mt-2" onClick={onClearPrefill}>
                         <X/>
                     </Button>
                 </div>
@@ -368,30 +194,25 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
              {prefilledItem && prefilledItem.unit !== 'un' && (
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label htmlFor="cut-percentage">Acréscimo de Corte (%)</Label>
-                    <Input
-                        id="cut-percentage"
-                        type="text"
-                        value={currentCutPercentage > 0 ? formatNumber(currentCutPercentage, {minimumFractionDigits: 2}) : ""}
-                        readOnly
-                        placeholder="0,00"
-                        className="bg-muted/30"
-                    />
+                    <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm h-10 flex items-center text-muted-foreground">
+                        0,00
+                    </div>
                 </div>
              )}
             <div className="flex gap-1 items-end">
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label htmlFor="weight">Peso (kg)</Label>
-                    <Input id="weight" type="text" inputMode="decimal" placeholder="Peso Final" value={displayWeightInput} onChange={(e) => handleWeightChange(e.target.value)} />
+                    <Input id="weight" type="text" inputMode="decimal" placeholder="Peso Final" value={manualWeight} onChange={(e) => handleWeightChange(e.target.value)} />
                 </div>
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label>P. Real (kg)</Label>
                     <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm h-10 flex items-center text-muted-foreground">
-                        {calculatedWeight > 0 ? formatNumber(calculatedWeight, {minimumFractionDigits:3}) : '...'}
+                        ...
                     </div>
                 </div>
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label className="text-accent-price font-semibold">R$ Total</Label>
-                    <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">{formatNumber(finalPrice, {style: 'currency', currency: 'BRL'})}</div>
+                    <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">R$ 0,00</div>
                 </div>
             </div>
         </div>

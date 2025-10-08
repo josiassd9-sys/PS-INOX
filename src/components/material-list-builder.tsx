@@ -242,7 +242,7 @@ export function MaterialListBuilder() {
 
             
             {materialList.length > 0 && (
-                <div id="material-list-section" className="flex-1 flex flex-col min-h-0 mt-px pt-2">
+                <div id="material-list-section" className="flex-1 flex flex-col min-h-0 pt-2">
                     <h2 className="text-lg font-semibold text-center mb-1 text-foreground">Lista de Materiais</h2>
                      <Card className="flex-1 overflow-hidden flex flex-col bg-card border-border">
                         <CardContent className="p-0 flex-1 overflow-y-auto">
@@ -250,21 +250,21 @@ export function MaterialListBuilder() {
                                <TableHeader>
                                    <TableRow className="border-b-border hover:bg-muted/50 flex">
                                        <TableHead className="flex-1 p-2">Descrição</TableHead>
+                                       <TableHead className="text-center p-2 w-[70px] bg-muted/50">Detalhe</TableHead>
                                        <TableHead className="text-right p-2 w-[80px]">Preço</TableHead>
-                                       <TableHead className="text-center p-2 w-[70px]">Detalhe</TableHead>
                                        <TableHead className="w-[44px] p-0"></TableHead>
                                    </TableRow>
                                </TableHeader>
                                <TableBody>
                                    {materialList.map(item => (
                                         <TableRow key={item.listItemId} className="flex">
-                                          <TableCell className="font-medium flex-1 p-2 bg-background">{item.description}</TableCell>
-                                          <TableCell className="text-right font-semibold text-accent-price p-2 w-[80px] bg-background">{formatCurrency(item.price)}</TableCell>
+                                          <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
                                           <TableCell className="text-center text-muted-foreground p-2 w-[70px] bg-muted/50">
                                               {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
                                               <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
                                           </TableCell>
-                                           <TableCell className="w-[44px] p-0 flex items-center justify-center bg-muted/50">
+                                          <TableCell className="text-right font-semibold text-accent-price p-2 w-[80px]">{formatCurrency(item.price)}</TableCell>
+                                           <TableCell className="w-[44px] p-0 flex items-center justify-center">
                                               <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleRemoveFromList(item.listItemId)}>
                                                   <Trash2 size={16} />
                                               </Button>

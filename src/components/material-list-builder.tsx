@@ -229,6 +229,20 @@ export function MaterialListBuilder() {
       maximumFractionDigits: digits,
     }).format(value);
   };
+
+  const formatWeight = (value: number) => {
+    const formatted = formatNumber(value, 3);
+    const parts = formatted.split(',');
+    const integerPart = parts[0];
+    const decimalPart = parts[1];
+    
+    return (
+        <div className="flex items-baseline justify-center tabular-nums">
+            <span className="text-[10px]">{integerPart}</span>
+            <span className="text-[6px] self-start mt-px">,{decimalPart} kg</span>
+        </div>
+    )
+  }
   
   const totalListPrice = materialList.reduce((acc, item) => acc + item.price, 0);
 
@@ -332,8 +346,8 @@ export function MaterialListBuilder() {
                                <Table>
                                    <TableHeader>
                                        <TableRow className="border-b-border hover:bg-muted/50 flex">
-                                           <TableHead className="flex-1 pl-2 py-2 pr-1">Descrição</TableHead>
-                                           <TableHead className="text-center p-1 w-[70px]">Detalhe</TableHead>
+                                           <TableHead className="flex-1 pl-2 pr-1 py-2">Descrição</TableHead>
+                                           <TableHead className="text-center p-1 w-[80px]">Detalhe</TableHead>
                                            <TableHead className="text-center p-1 w-[80px] bg-muted/50">Preço</TableHead>
                                        </TableRow>
                                    </TableHeader>
@@ -344,11 +358,11 @@ export function MaterialListBuilder() {
                                                 onClick={() => handleRowClick(item.listItemId)}
                                                 className={cn("flex items-center cursor-pointer", editingItemId === item.listItemId && "bg-primary/20")}
                                             >
-                                              <TableCell className="font-medium text-[11px] flex-1 pl-2 py-1 pr-1">{item.description}</TableCell>
-                                               <TableCell className="text-center text-muted-foreground p-1 w-[70px]">
+                                              <TableCell className="font-medium text-[11px] flex-1 pl-2 pr-1 py-1">{item.description}</TableCell>
+                                               <TableCell className="text-center text-muted-foreground p-1 w-[80px]">
                                                   <div className="flex flex-col items-center">
                                                     <span className="text-xs">{(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}</span>
-                                                    <span className="text-xs">{formatNumber(item.weight, 3)} kg</span>
+                                                    {formatWeight(item.weight)}
                                                   </div>
                                               </TableCell>
                                               <TableCell className="text-right font-semibold text-accent-price p-1 w-[80px] bg-muted/50">

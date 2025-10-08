@@ -13,7 +13,7 @@ export function PhoneMockup({ children, className }: PhoneMockupProps) {
         <div className={cn("w-full max-w-sm mx-auto bg-slate-800 rounded-[2.5rem] p-2 shadow-2xl", className)}>
             <div className="w-full h-full bg-slate-900 rounded-[2rem] p-1">
                 <div 
-                    className="relative w-full aspect-[9/19.5] bg-background rounded-[1.8rem] overflow-hidden"
+                    className="relative w-full aspect-[9/15.5] bg-background rounded-[1.8rem] overflow-hidden"
                 >
                     {children}
                 </div>

@@ -9,7 +9,7 @@ import { ALL_CATEGORIES, Category, ConnectionGroup, ConnectionItem, SteelItem } 
 import { GlobalSearchResults } from "./global-search-results";
 import { useToast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from "uuid";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { Table, TableBody, TableCell, TableHeader, TableRow } from "./ui/table";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { ScrapCalculator } from "./scrap-calculator";
@@ -203,7 +203,16 @@ export function MaterialListBuilder() {
   return (
     <div className="relative w-full h-full flex flex-col overflow-hidden bg-background text-foreground p-1">
         
+        {/*
+          GUIA DE AJUSTE DE ESPAÇAMENTO: CONTAINER SUPERIOR (LOGO E BUSCA)
+          - 'p-1': Padding geral deste container. Aumente para 'p-2', 'p-4', etc.
+          - 'gap-2': Espaço vertical entre o logo e a barra de busca. Aumente para 'gap-3', 'gap-4', etc.
+        */}
         <div className="relative z-10 w-full p-1 flex flex-col gap-2 shrink-0">
+            {/*
+              GUIA DE AJUSTE DE ESPAÇAMENTO: LOGO
+              - 'pt-2': Padding no topo do logo. Aumente para 'pt-4' para mais espaço acima.
+            */}
             <div className="flex justify-center pt-2">
                 <PsInoxLogo />
             </div>
@@ -222,6 +231,11 @@ export function MaterialListBuilder() {
             </div>
         </div>
 
+        {/*
+          GUIA DE AJUSTE DE ESPAÇAMENTO: CONTAINER DA LISTA
+          - 'mt-2': Margem no topo, separando da busca. Aumente para 'mt-4'.
+          - 'p-1': Padding interno.
+        */}
         <div className="flex-1 mt-2 overflow-y-auto relative z-0 p-1 min-h-0">
              {isScrapCalculatorOpen && (
                 <div className="mb-2">
@@ -251,15 +265,29 @@ export function MaterialListBuilder() {
                            <Table>
                                <TableHeader>
                                    <TableRow className="border-b-border hover:bg-muted/50 flex">
+                                       {/* GUIA DE AJUSTE DE COLUNA: Descrição
+                                           - 'flex-1': Faz a coluna ocupar o espaço restante.
+                                           - 'p-2': Padding interno. Altere para 'p-1', 'p-3', etc.
+                                       */}
                                        <TableHead className="flex-1 p-2">Descrição</TableHead>
+                                       
+                                       {/* GUIA DE AJUSTE DE COLUNA: Detalhe
+                                           - 'w-[80px]': Largura fixa. Altere para 'w-[90px]', 'w-1/3' (um terço), etc.
+                                           - 'p-2': Padding interno.
+                                       */}
                                        <TableHead className="text-center w-[80px] p-2">Detalhe</TableHead>
+                                       
+                                       {/* GUIA DE AJUSTE DE COLUNA: Preço
+                                           - 'w-[90px]': Largura fixa.
+                                           - 'p-2': Padding interno.
+                                       */}
                                        <TableHead className="text-right w-[90px] p-2">Preço</TableHead>
                                    </TableRow>
                                </TableHeader>
                                <TableBody>
                                    <AnimatePresence>
                                    {materialList.map(item => (
-                                        <motion.tr 
+                                        <motion.div 
                                             key={item.listItemId}
                                             layout
                                             initial={{ opacity: 0 }}
@@ -268,19 +296,24 @@ export function MaterialListBuilder() {
                                             transition={{ duration: 0.2, type: "spring" }}
                                             className="block"
                                         >
-                                            <SwipeToDelete onDelete={() => handleRemoveFromList(item.listItemId)}>
+                                            <SwipeToDelete onDelete={() => handleRemoveFromList(item.listItemId)} asChild>
                                                 <TableRow
                                                     className="border-b-border/50 bg-background flex"
                                                 >
+                                                    {/* Célula da Descrição */}
                                                     <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
+                                                    
+                                                    {/* Célula do Detalhe (Peso/Qtd) */}
                                                     <TableCell className="text-center text-muted-foreground w-[80px] p-2">
                                                         {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
                                                         <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
                                                     </TableCell>
+                                                    
+                                                    {/* Célula do Preço */}
                                                     <TableCell className="text-right font-semibold text-primary w-[90px] p-2">{formatCurrency(item.price)}</TableCell>
                                                 </TableRow>
                                             </SwipeToDelete>
-                                        </motion.tr>
+                                        </motion.div>
                                    ))}
                                    </AnimatePresence>
                                </TableBody>
@@ -299,6 +332,8 @@ export function MaterialListBuilder() {
         </div>
 
         {materialList.length > 0 && (
+             // GUIA DE AJUSTE DE ESPAÇAMENTO: RODAPÉ DO TOTAL
+             // 'p-2': Padding geral do rodapé. Altere para 'p-3', 'p-4'.
             <div className="shrink-0 border-t border-border bg-background/95 backdrop-blur-sm p-2">
                 <div className="flex items-center justify-between">
                     <span className="text-lg font-semibold">Total</span>

@@ -11,7 +11,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { cn } from "@/lib/utils";
 import { CutPriceCalculator } from "./cut-price-calculator";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Tag } from "lucide-react";
 
 interface GlobalSearchResultsProps {
     categories: (Category | { id: 'conexoes'; name: string; items: ConnectionGroup[] })[];
@@ -19,20 +19,30 @@ interface GlobalSearchResultsProps {
     searchTerm: string;
     onPrefillScrap: (item: SteelItem, sellingPrice: number) => void;
     isScrapCalculatorActive: boolean;
+    costAdjustments: Record<string, number>;
+    onItemClick: (item: SteelItem) => void;
 }
 
-export function GlobalSearchResults({ categories, priceParams, searchTerm, onPrefillScrap, isScrapCalculatorActive }: GlobalSearchResultsProps) {
+export function GlobalSearchResults({ categories, priceParams, searchTerm, onPrefillScrap, isScrapCalculatorActive, costAdjustments, onItemClick }: GlobalSearchResultsProps) {
     const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
 
-    const handleRowClick = (item: SteelItem, category: Category, sellingPrice: number) => {
+    const handleRowClick = (item: SteelItem, category: Category) => {
+        const priceKey = category.hasOwnPriceControls ? category.id : 'global';
+        const { costPrice, markup } = priceParams[priceKey] || priceParams['global'];
+        const adjustment = costAdjustments[item.id] || 0;
+        const adjustedCost = costPrice * (1 + adjustment / 100);
+        const sellingPrice = adjustedCost * (1 + markup / 100);
+
         if (isScrapCalculatorActive) {
             onPrefillScrap(item, sellingPrice);
         } else if (category.unit === 'm') {
           if (selectedItemId === item.id) {
-            setSelectedItemId(null); // Deselect if clicking the same item
+            setSelectedItemId(null);
           } else {
             setSelectedItemId(item.id);
           }
+        } else {
+          onItemClick(item);
         }
     };
     
@@ -60,8 +70,8 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
         <Accordion type="multiple" className="w-full space-y-1" defaultValue={categories.map(c => c.id)}>
             {categories.map((category) => {
                  if (category.id === 'conexoes') {
-                    const { costPrice: costMultiplier, markup: markupPercentage } = priceParams['conexoes'] || priceParams['global'];
                     const connectionGroups = category.items as ConnectionGroup[];
+                    const sellingPrice = priceParams['conexoes']?.sellingPrice || priceParams['global'].sellingPrice;
 
                     return (
                         <AccordionItem value={category.id} key={category.id} className="border rounded-lg overflow-hidden bg-card">
@@ -86,9 +96,7 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
                                                     </TableHeader>
                                                     <TableBody>
                                                         {group.items.map(item => {
-                                                             const itemCost = item.weight; // Using weight as base for connections now
-                                                             const finalCost = itemCost * priceParams['global'].sellingPrice;
-                                                             const itemPrice = Math.ceil(finalCost);
+                                                             const itemPrice = Math.ceil(item.weight * sellingPrice);
                                                             return (
                                                                 <TableRow key={item.id} className="even:bg-primary/5 odd:bg-transparent flex items-center">
                                                                     <TableCell className="flex-1">{item.description}</TableCell>
@@ -109,7 +117,7 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
                 }
 
                 const priceKey = (category as Category).hasOwnPriceControls ? category.id : 'global';
-                const { sellingPrice } = priceParams[priceKey] || priceParams['global'];
+                const { costPrice, markup } = priceParams[priceKey] || priceParams['global'];
 
                 return (
                     <AccordionItem value={category.id} key={category.id} className="border rounded-lg overflow-hidden bg-card">
@@ -128,22 +136,31 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
                                     </TableHeader>
                                     <TableBody>
                                         {(category.items as SteelItem[]).map(item => {
+                                            const adjustment = costAdjustments[item.id] || 0;
+                                            const adjustedCost = costPrice * (1 + adjustment / 100);
+                                            const sellingPrice = adjustedCost * (1 + markup / 100);
+
                                             const itemPrice = (category as Category).unit === 'm' ? Math.ceil(item.weight * sellingPrice) : item.weight * sellingPrice;
                                             const isSelected = selectedItemId === item.id;
+                                            const hasAdjustment = adjustment !== 0;
+
                                             return (
                                                 <React.Fragment key={item.id}>
                                                     <TableRow
-                                                        onClick={() => handleRowClick(item as SteelItem, category as Category, sellingPrice)}
+                                                        onClick={() => handleRowClick(item as SteelItem, category as Category)}
                                                         className={cn(
                                                             'even:bg-primary/5 odd:bg-transparent',
                                                             'flex items-center',
-                                                            ((category as Category).unit === 'm' || (category as Category).unit === 'un' || isScrapCalculatorActive) && 'cursor-pointer',
+                                                            'cursor-pointer',
                                                             isSelected && 'bg-primary/20 hover:bg-primary/20',
                                                             !isSelected && 'hover:bg-primary/10',
                                                         )}
                                                     >
                                                         <TableCell className="flex-1 flex justify-between items-center">
-                                                            {item.description}
+                                                           <div className="flex items-center gap-1">
+                                                                {hasAdjustment && <Tag className="h-3 w-3 text-accent-price" />}
+                                                                {item.description}
+                                                            </div>
                                                             {isScrapCalculatorActive && (
                                                                 <PlusCircle className="h-5 w-5 text-primary/50 ml-1" />
                                                             )}

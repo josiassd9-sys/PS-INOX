@@ -51,6 +51,7 @@ import {
 import { TechnicalDrawingGuide } from "./technical-drawing-guide";
 import { ConnectionsTable } from "./connections-table";
 import { WelcomeScreen } from "./welcome-screen";
+import { CostAdjustmentCalculator } from "./cost-adjustment-calculator";
 
 interface PriceParams {
   costPrice: number;
@@ -60,6 +61,7 @@ interface PriceParams {
 
 const PRICE_PARAMS_LOCAL_STORAGE_KEY = "priceParamsState";
 export const EDITED_CONNECTIONS_WEIGHTS_KEY = "editedConnectionsWeights";
+export const COST_ADJUSTMENTS_LOCAL_STORAGE_KEY = "costAdjustments";
 
 const initializePriceParams = (): Record<string, PriceParams> => {
   let params: Record<string, PriceParams> = {
@@ -108,6 +110,8 @@ function DashboardComponent() {
   const [prefillSellingPrice, setPrefillSellingPrice] = React.useState<number>(0);
   const [customerName, setCustomerName] = React.useState("");
   const [editedWeights, setEditedWeights] = React.useState<Record<string, number>>({});
+  const [costAdjustments, setCostAdjustments] = React.useState<Record<string, number>>({});
+  const [selectedItemForAdjustment, setSelectedItemForAdjustment] = React.useState<SteelItem | null>(null);
 
 
   React.useEffect(() => {
@@ -117,8 +121,12 @@ function DashboardComponent() {
       if (savedWeights) {
         setEditedWeights(JSON.parse(savedWeights));
       }
+      const savedAdjustments = localStorage.getItem(COST_ADJUSTMENTS_LOCAL_STORAGE_KEY);
+      if (savedAdjustments) {
+        setCostAdjustments(JSON.parse(savedAdjustments));
+      }
     } catch (error) {
-      console.error("Failed to load edited weights from localStorage", error);
+      console.error("Failed to load data from localStorage", error);
     }
 
     setIsPriceParamsInitialized(true);
@@ -159,6 +167,27 @@ function DashboardComponent() {
         });
     }
   };
+
+  const handleCostAdjustmentChange = (itemId: string, adjustment: number) => {
+    const updatedAdjustments = { ...costAdjustments, [itemId]: adjustment };
+    setCostAdjustments(updatedAdjustments);
+    try {
+      localStorage.setItem(COST_ADJUSTMENTS_LOCAL_STORAGE_KEY, JSON.stringify(updatedAdjustments));
+      toast({
+        title: "Ajuste de Custo Salvo",
+        description: "O novo fator de ajuste para o item foi salvo.",
+      });
+    } catch (error) {
+      console.error("Failed to save cost adjustments", error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao Salvar Ajuste",
+        description: "Não foi possível salvar o ajuste de custo.",
+      });
+    }
+    setSelectedItemForAdjustment(null);
+  };
+
 
   const selectedCategory = ALL_CATEGORIES.find((c) => c.id === selectedCategoryId);
   const currentPriceParamsKey = selectedCategory?.hasOwnPriceControls ? selectedCategoryId : 'global';
@@ -203,6 +232,11 @@ function DashboardComponent() {
     setSelectedCategoryId('retalhos');
     setSearchTerm("");
   };
+
+  const handleItemClickForAdjustment = (item: SteelItem) => {
+    if (selectedCategory?.id === 'conexoes') return;
+    setSelectedItemForAdjustment(item);
+  }
   
   const filteredCategories = React.useMemo(() => {
     if (!searchTerm) return [];
@@ -291,6 +325,8 @@ function DashboardComponent() {
             searchTerm={searchTerm}
             onPrefillScrap={handlePrefillScrapItem}
             isScrapCalculatorActive={true}
+            costAdjustments={costAdjustments}
+            onItemClick={handleItemClickForAdjustment}
           />
         );
       }
@@ -305,6 +341,8 @@ function DashboardComponent() {
           searchTerm={searchTerm}
           onPrefillScrap={handlePrefillScrapItem}
           isScrapCalculatorActive={false}
+          costAdjustments={costAdjustments}
+          onItemClick={handleItemClickForAdjustment}
         />
       );
     }
@@ -343,7 +381,9 @@ function DashboardComponent() {
     return (
       <ItemTable 
         category={selectedCategory as any} 
-        sellingPrice={currentPriceParams.sellingPrice}
+        priceParams={currentPriceParams}
+        costAdjustments={costAdjustments}
+        onItemClick={handleItemClickForAdjustment}
         showTableHeader={!showCustomHeader}
       />
     );
@@ -512,6 +552,24 @@ function DashboardComponent() {
             </div>
           </div>
         </div>
+        <Dialog open={!!selectedItemForAdjustment} onOpenChange={(open) => !open && setSelectedItemForAdjustment(null)}>
+          <DialogContent>
+            {selectedItemForAdjustment && currentPriceParams && (
+              <>
+                <DialogHeader>
+                  <DialogTitle>Ajuste Fino de Custo</DialogTitle>
+                </DialogHeader>
+                <CostAdjustmentCalculator
+                  item={selectedItemForAdjustment}
+                  baseCostPrice={currentPriceParams.costPrice}
+                  markup={currentPriceParams.markup}
+                  currentAdjustment={costAdjustments[selectedItemForAdjustment.id] || 0}
+                  onSave={handleCostAdjustmentChange}
+                />
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
       </SidebarInset>
     </>
   );

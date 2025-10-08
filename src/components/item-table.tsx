@@ -13,7 +13,7 @@ import { Card, CardContent, CardTitle } from "./ui/card";
 import type { Category, SteelItem } from "@/lib/data";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Tag } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -29,11 +29,13 @@ import { CutPriceCalculator } from "./cut-price-calculator";
 
 interface ItemTableProps {
   category: Category;
-  sellingPrice: number;
+  priceParams: { costPrice: number; markup: number; sellingPrice: number };
+  costAdjustments: Record<string, number>;
+  onItemClick: (item: SteelItem) => void;
   showTableHeader?: boolean;
 }
 
-export function ItemTable({ category, sellingPrice, showTableHeader = true }: ItemTableProps) {
+export function ItemTable({ category, priceParams, costAdjustments, onItemClick, showTableHeader = true }: ItemTableProps) {
   const [items, setItems] = React.useState<SteelItem[]>(category.items as SteelItem[]);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
@@ -60,6 +62,7 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
         id: `custom-${Date.now()}`,
         description: newDescription,
         weight: parseFloat(newWeight.replace(',', '.')),
+        unit: category.unit,
       };
       setItems([...items, newItem]);
       setNewDescription("");
@@ -68,13 +71,15 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
     }
   };
   
-  const handleRowClick = (itemId: string) => {
+  const handleRowClick = (item: SteelItem) => {
     if (category.unit === 'm') {
-      if (selectedItemId === itemId) {
+      if (selectedItemId === item.id) {
         setSelectedItemId(null); // Deselect if clicking the same item
       } else {
-        setSelectedItemId(itemId);
+        setSelectedItemId(item.id);
       }
+    } else {
+      onItemClick(item);
     }
   };
 
@@ -99,6 +104,10 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
   const priceUnitLabel = `R$/${unitLabel}`;
 
   const calculateItemPrice = (item: SteelItem) => {
+    const adjustment = costAdjustments[item.id] || 0;
+    const adjustedCost = priceParams.costPrice * (1 + adjustment / 100);
+    const sellingPrice = adjustedCost * (1 + priceParams.markup / 100);
+
     if (category.unit === 'm') {
       return Math.ceil(item.weight * sellingPrice);
     }
@@ -176,19 +185,24 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
             {filteredItems.map((item) => {
                 const itemPrice = calculateItemPrice(item);
                 const isSelected = selectedItemId === item.id;
+                const hasAdjustment = (costAdjustments[item.id] || 0) !== 0;
+
               return (
                   <React.Fragment key={item.id}>
                       <TableRow 
-                          onClick={() => handleRowClick(item.id)}
+                          onClick={() => handleRowClick(item)}
                           className={cn(
                               'even:bg-primary/5 odd:bg-transparent',
                               'flex items-center',
-                              category.unit === 'm' && 'cursor-pointer',
+                              'cursor-pointer',
                               isSelected && 'bg-primary/20 hover:bg-primary/20',
-                              category.unit !== 'm' && 'hover:bg-primary/10',
+                              !isSelected && 'hover:bg-primary/10'
                           )}
                           >
-                          <TableCell className="flex-1 px-1">{item.description}</TableCell>
+                          <TableCell className="flex-1 px-1 flex items-center gap-1">
+                            {hasAdjustment && <Tag className="h-3 w-3 text-accent-price" />}
+                            {item.description}
+                          </TableCell>
                           <TableCell className="w-1/3 text-center px-1">
                               {formatNumber(item.weight, 3)}
                           </TableCell>
@@ -207,11 +221,11 @@ export function ItemTable({ category, sellingPrice, showTableHeader = true }: It
                             <TableRow>
                               <TableCell colSpan={3} className="p-0">
                                   <div className="p-1 bg-primary/5">
-                                  <CutPriceCalculator
-                                      selectedItem={item}
-                                      sellingPrice={sellingPrice}
-                                      onClose={() => setSelectedItemId(null)}
-                                  />
+                                    <CutPriceCalculator
+                                        selectedItem={item}
+                                        sellingPrice={itemPrice / item.weight}
+                                        onClose={() => setSelectedItemId(null)}
+                                    />
                                   </div>
                               </TableCell>
                           </TableRow>

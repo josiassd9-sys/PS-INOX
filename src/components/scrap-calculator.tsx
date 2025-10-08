@@ -200,9 +200,11 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
             if (scrapLength_mm > 0 && prefilledItem.weight > 0) {
                 const calculated = (scrapLength_mm / 1000) * prefilledItem.weight;
                 weight = calculated;
+                setCalculatedWeight(calculated);
                 setCurrentCutPercentage(calculateDynamicPercentage(scrapLength_mm, calculated));
             } else {
                 setCurrentCutPercentage(0);
+                setCalculatedWeight(null);
             }
         }
     } else { // Manual calculation
@@ -224,21 +226,19 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
         }
       }
       
+      setCalculatedWeight(calculatedWeightValue);
+
       if (calculatedWeightValue) {
           const roundedUpWeight = Math.ceil(calculatedWeightValue);
-          setCalculatedWeight(calculatedWeightValue);
-          // Auto-fill the editable weight field with the rounded up value
-          setFields(prev => ({...prev, weight: roundedUpWeight.toFixed(3).replace('.',',')}));
+          setFields(prev => ({...prev, weight: roundedUpWeight.toString().replace('.',',')}));
       } else {
-          setCalculatedWeight(null);
+          setFields(prev => ({...prev, weight: ''}));
       }
-      weight = calculatedWeightValue || 0;
+      return; // Stop here, the weight field update will trigger the next useEffect
     }
     
     const activeElement = document.activeElement;
-    if (activeElement?.id !== 'weight' && !isPrefilledItemSheet && !prefilledItem) {
-      // Don't auto-set weight for prefilled sheets or when manually calculating, as it's rounded up
-    } else if (activeElement?.id !== 'weight' && !isPrefilledItemSheet) {
+    if (activeElement?.id !== 'weight') {
         setFields(prev => ({...prev, weight: weight ? weight.toFixed(3).replace('.', ',') : ''}));
     }
 
@@ -442,30 +442,30 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                         <div className="flex gap-1">
                             <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="width">Larg.(mm)</Label><Input id="width" type="text" inputMode="decimal" placeholder="Largura" value={fields.width} onChange={(e) => handleInputChange('width', e.target.value)} /></div>
                             <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="length">Compr.(mm)</Label><Input id="length" type="text" inputMode="decimal" placeholder="Compr." value={fields.length} onChange={(e) => handleInputChange('length', e.target.value)} /></div>
-                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="quantity">Qtde</Label><Input id="quantity" type="text" inputMode="decimal" placeholder="Qtd." value={fields.quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} /></div>
+                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Esp.(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
                         </div>
                         <div className="flex gap-1">
-                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Esp.(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
-                             <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
+                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
                              <div className="space-y-1 flex-1 min-w-0">
                                 <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
                                 <Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} disabled={!!prefilledItem}/>
                             </div>
+                             <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="quantity">Qtde</Label><Input id="quantity" type="text" inputMode="decimal" placeholder="Qtd." value={fields.quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} /></div>
                         </div>
                     </div>
                   ) : (
                     <div className="space-y-1">
                         <div className="flex gap-1">
                             <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="diameter">Diâmetro(mm)</Label><Input id="diameter" type="text" inputMode="decimal" placeholder="Diâmetro" value={fields.diameter} onChange={(e) => handleInputChange('diameter', e.target.value)} /></div>
-                             <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="quantity">Quantidade</Label><Input id="quantity" type="text" inputMode="decimal" placeholder="Qtd." value={fields.quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} /></div>
+                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Espessura(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
                         </div>
                         <div className="flex gap-1">
-                           <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Espessura(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
-                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
+                           <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
                             <div className="space-y-1 flex-1 min-w-0">
                                 <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
                                 <Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} disabled={!!prefilledItem}/>
                             </div>
+                             <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="quantity">Quantidade</Label><Input id="quantity" type="text" inputMode="decimal" placeholder="Qtd." value={fields.quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} /></div>
                         </div>
                     </div>
                   )}

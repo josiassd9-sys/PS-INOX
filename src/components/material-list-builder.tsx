@@ -13,7 +13,6 @@ import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { ScrapCalculator } from "./scrap-calculator";
 import Link from "next/link";
-import { SwipeToDelete } from "./ui/swipe-to-delete";
 
 
 const MATERIAL_LIST_KEY = "materialBuilderList";
@@ -260,14 +259,21 @@ export function MaterialListBuilder() {
                                </TableHeader>
                                <TableBody>
                                    {materialList.map(item => (
-                                        <SwipeToDelete key={item.listItemId} onDelete={() => handleRemoveFromList(item.listItemId)}>
+                                        <TableRow key={item.listItemId} className="flex items-center">
                                           <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
                                           <TableCell className="text-right font-semibold text-accent-price p-2 w-[80px]">{formatCurrency(item.price)}</TableCell>
                                           <TableCell className="text-center text-muted-foreground p-2 w-[70px] bg-muted/50">
-                                              {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
-                                              <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
+                                              <div className="flex flex-col items-center">
+                                                <span>{(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}</span>
+                                                <span className="text-xs">{formatNumber(item.weight, 3)} kg</span>
+                                              </div>
                                           </TableCell>
-                                        </SwipeToDelete>
+                                           <TableCell className="px-1">
+                                              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleRemoveFromList(item.listItemId)}>
+                                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                              </Button>
+                                          </TableCell>
+                                        </TableRow>
                                    ))}
                                </TableBody>
                            </Table>

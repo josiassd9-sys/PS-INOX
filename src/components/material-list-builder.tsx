@@ -167,7 +167,6 @@ export function MaterialListBuilder() {
   };
   
   const totalListPrice = materialList.reduce((acc, item) => acc + item.price, 0);
-  const totalListWeight = materialList.reduce((acc, item) => acc + item.weight, 0);
 
 
   const renderResults = () => {
@@ -223,7 +222,7 @@ export function MaterialListBuilder() {
             </div>
         </div>
 
-        <div className="flex-1 mt-2 overflow-y-auto relative z-0 p-1">
+        <div className="flex-1 mt-2 overflow-y-auto relative z-0 p-1 min-h-0">
              {isScrapCalculatorOpen && (
                 <div className="mb-2">
                      <Card>
@@ -259,31 +258,25 @@ export function MaterialListBuilder() {
                                </TableHeader>
                                <TableBody>
                                    {materialList.map(item => (
-                                      <SwipeToDelete asChild key={item.listItemId} onDelete={() => handleRemoveFromList(item.listItemId)}>
-                                        <motion.tr
-                                            className="border-b-border/50 bg-background flex"
-                                            layout
-                                            initial={{ opacity: 0, y: -20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, x: -100 }}
-                                            transition={{ duration: 0.2 }}
-                                        >
-                                              <TableCell className="font-medium flex-1">{item.description}</TableCell>
-                                              <TableCell className="text-center text-muted-foreground w-[80px]">
-                                                  {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
-                                                  <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
-                                              </TableCell>
-                                              <TableCell className="text-right font-semibold text-primary w-[90px]">{formatCurrency(item.price)}</TableCell>
-                                        </motion.tr>
-                                      </SwipeToDelete>
+                                        <SwipeToDelete asChild key={item.listItemId} onDelete={() => handleRemoveFromList(item.listItemId)}>
+                                            <TableRow
+                                                className="border-b-border/50 bg-background flex"
+                                                layout
+                                                initial={{ opacity: 0, y: -20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, x: -100 }}
+                                                transition={{ duration: 0.2 }}
+                                            >
+                                                <TableCell className="font-medium flex-1">{item.description}</TableCell>
+                                                <TableCell className="text-center text-muted-foreground w-[80px]">
+                                                    {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
+                                                    <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
+                                                </TableCell>
+                                                <TableCell className="text-right font-semibold text-primary w-[90px]">{formatCurrency(item.price)}</TableCell>
+                                            </TableRow>
+                                        </SwipeToDelete>
                                    ))}
                                </TableBody>
-                               <TableFooter>
-                                   <TableRow className="border-t-border hover:bg-muted/50 flex">
-                                       <TableHead className="flex-1 text-lg">Total</TableHead>
-                                       <TableHead className="text-right text-lg font-bold text-primary w-[170px]">{formatCurrency(totalListPrice)}</TableHead>
-                                   </TableRow>
-                               </TableFooter>
                            </Table>
                         </CardContent>
                      </Card>
@@ -297,6 +290,15 @@ export function MaterialListBuilder() {
                 </div>
             )}
         </div>
+
+        {materialList.length > 0 && (
+            <div className="shrink-0 border-t border-border bg-background/95 backdrop-blur-sm p-1">
+                <div className="flex items-center justify-between">
+                    <span className="text-lg font-semibold">Total</span>
+                    <span className="text-right text-lg font-bold text-primary">{formatCurrency(totalListPrice)}</span>
+                </div>
+            </div>
+        )}
       </div>
   );
 }

@@ -65,7 +65,7 @@ export function PsInoxLogo() {
         </linearGradient>
 
         <mask id="logoMask">
-            <g fontFamily="var(--font-headline), sans-serif" fontSize="45" fontWeight="bold" fill="white">
+            <g fontFamily="var(--font-headline), sans-serif" fontSize="38" fontWeight="bold" fill="white">
                 <motion.text x="8" y="60" variants={textVariants}>PS</motion.text>
                 <motion.text x="85" y="60" variants={textVariants}>-INOX</motion.text>
             </g>

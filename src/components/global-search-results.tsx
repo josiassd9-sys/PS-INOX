@@ -24,27 +24,29 @@ interface GlobalSearchResultsProps {
 }
 
 export function GlobalSearchResults({ categories, priceParams, searchTerm, onPrefillScrap, isScrapCalculatorActive, costAdjustments, onItemClick }: GlobalSearchResultsProps) {
-    const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
+    const [selectedItemIdForCut, setSelectedItemIdForCut] = React.useState<string | null>(null);
 
-    const handleRowClick = (item: SteelItem, category: Category) => {
-        const priceKey = category.hasOwnPriceControls ? category.id : 'global';
-        const { costPrice, markup } = priceParams[priceKey] || priceParams['global'];
-        const adjustment = costAdjustments[item.id] || 0;
-        const adjustedCost = costPrice * (1 + adjustment / 100);
-        const sellingPrice = adjustedCost * (1 + markup / 100);
-
+    const handleCutCalculatorToggle = (item: SteelItem, category: Category) => {
         if (isScrapCalculatorActive) {
+            const priceKey = category.hasOwnPriceControls ? category.id : 'global';
+            const { costPrice, markup } = priceParams[priceKey] || priceParams['global'];
+            const adjustment = costAdjustments[item.id] || 0;
+            const adjustedCost = costPrice * (1 + adjustment / 100);
+            const sellingPrice = adjustedCost * (1 + markup / 100);
             onPrefillScrap(item, sellingPrice);
         } else if (category.unit === 'm') {
-          if (selectedItemId === item.id) {
-            setSelectedItemId(null);
+          if (selectedItemIdForCut === item.id) {
+            setSelectedItemIdForCut(null);
           } else {
-            setSelectedItemId(item.id);
+            setSelectedItemIdForCut(item.id);
           }
-        } else {
-          onItemClick(item);
         }
     };
+
+    const handleCostAdjustmentClick = (item: SteelItem, category: Category) => {
+        if (category.id === 'conexoes') return;
+        onItemClick(item);
+    }
     
     const formatCurrency = (value: number) => {
         return new Intl.NumberFormat("pt-BR", {
@@ -141,22 +143,22 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
                                             const sellingPrice = adjustedCost * (1 + markup / 100);
 
                                             const itemPrice = (category as Category).unit === 'm' ? Math.ceil(item.weight * sellingPrice) : item.weight * sellingPrice;
-                                            const isSelected = selectedItemId === item.id;
+                                            const isSelectedForCut = selectedItemIdForCut === item.id;
                                             const hasAdjustment = adjustment !== 0;
 
                                             return (
                                                 <React.Fragment key={item.id}>
                                                     <TableRow
-                                                        onClick={() => handleRowClick(item as SteelItem, category as Category)}
                                                         className={cn(
                                                             'even:bg-primary/5 odd:bg-transparent',
                                                             'flex items-center',
-                                                            'cursor-pointer',
-                                                            isSelected && 'bg-primary/20 hover:bg-primary/20',
-                                                            !isSelected && 'hover:bg-primary/10',
+                                                            isSelectedForCut && 'bg-primary/20 hover:bg-primary/20',
                                                         )}
                                                     >
-                                                        <TableCell className="flex-1 flex justify-between items-center">
+                                                        <TableCell 
+                                                          onClick={() => handleCostAdjustmentClick(item as SteelItem, category as Category)}
+                                                          className={cn('flex-1 flex justify-between items-center cursor-pointer', !isSelectedForCut && 'hover:bg-primary/10')}
+                                                        >
                                                            <div className="flex items-center gap-1">
                                                                 {hasAdjustment && <Tag className="h-3 w-3 text-accent-price" />}
                                                                 {item.description}
@@ -165,8 +167,16 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
                                                                 <PlusCircle className="h-5 w-5 text-primary/50 ml-1" />
                                                             )}
                                                         </TableCell>
-                                                        <TableCell className="w-1/3 text-center">{formatNumber(item.weight)}</TableCell>
-                                                        <TableCell className="w-1/3 text-right font-medium text-primary">
+                                                        <TableCell
+                                                            onClick={() => handleCutCalculatorToggle(item as SteelItem, category as Category)} 
+                                                            className={cn("w-1/3 text-center", (category as Category).unit === 'm' && 'cursor-pointer', !isSelectedForCut && 'hover:bg-primary/10')}
+                                                        >
+                                                          {formatNumber(item.weight)}
+                                                        </TableCell>
+                                                        <TableCell 
+                                                            onClick={() => handleCutCalculatorToggle(item as SteelItem, category as Category)} 
+                                                            className={cn("w-1/3 text-right font-medium text-primary", (category as Category).unit === 'm' && 'cursor-pointer', !isSelectedForCut && 'hover:bg-primary/10')}
+                                                        >
                                                             {formatCurrency(itemPrice)}
                                                             {(category as Category).unit === 'm' && (
                                                                 <div className="text-xs text-muted-foreground font-normal">
@@ -175,14 +185,14 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
                                                             )}
                                                         </TableCell>
                                                     </TableRow>
-                                                    {isSelected && (category as Category).unit === 'm' && !isScrapCalculatorActive && (
+                                                    {isSelectedForCut && (category as Category).unit === 'm' && !isScrapCalculatorActive && (
                                                         <TableRow>
                                                             <TableCell colSpan={3} className="p-0">
                                                                 <div className="p-1 bg-primary/5">
                                                                     <CutPriceCalculator
                                                                         selectedItem={item as SteelItem}
                                                                         sellingPrice={sellingPrice}
-                                                                        onClose={() => setSelectedItemId(null)}
+                                                                        onClose={() => setSelectedItemIdForCut(null)}
                                                                     />
                                                                 </div>
                                                             </TableCell>

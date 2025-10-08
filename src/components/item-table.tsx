@@ -38,14 +38,14 @@ interface ItemTableProps {
 export function ItemTable({ category, priceParams, costAdjustments, onItemClick, showTableHeader = true }: ItemTableProps) {
   const [items, setItems] = React.useState<SteelItem[]>(category.items as SteelItem[]);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
+  const [selectedItemIdForCut, setSelectedItemIdForCut] = React.useState<string | null>(null);
 
   const [newDescription, setNewDescription] = React.useState("");
   const [newWeight, setNewWeight] = React.useState<string>("");
 
   React.useEffect(() => {
     setItems(category.items as SteelItem[]);
-    setSelectedItemId(null); 
+    setSelectedItemIdForCut(null); 
   }, [category]);
   
   const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
@@ -71,17 +71,19 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
     }
   };
   
-  const handleRowClick = (item: SteelItem) => {
+  const handleCutCalculatorToggle = (item: SteelItem) => {
     if (category.unit === 'm') {
-      if (selectedItemId === item.id) {
-        setSelectedItemId(null); // Deselect if clicking the same item
+      if (selectedItemIdForCut === item.id) {
+        setSelectedItemIdForCut(null); // Deselect if clicking the same item
       } else {
-        setSelectedItemId(item.id);
+        setSelectedItemIdForCut(item.id);
       }
-    } else {
-      onItemClick(item);
     }
   };
+
+  const handleCostAdjustmentClick = (item: SteelItem) => {
+    onItemClick(item);
+  }
 
   const filteredItems = items;
 
@@ -184,29 +186,35 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
           <TableBody>
             {filteredItems.map((item) => {
                 const itemPrice = calculateItemPrice(item);
-                const isSelected = selectedItemId === item.id;
+                const isSelectedForCut = selectedItemIdForCut === item.id;
                 const hasAdjustment = (costAdjustments[item.id] || 0) !== 0;
 
               return (
                   <React.Fragment key={item.id}>
                       <TableRow 
-                          onClick={() => handleRowClick(item)}
                           className={cn(
                               'even:bg-primary/5 odd:bg-transparent',
                               'flex items-center',
-                              'cursor-pointer',
-                              isSelected && 'bg-primary/20 hover:bg-primary/20',
-                              !isSelected && 'hover:bg-primary/10'
+                              isSelectedForCut && 'bg-primary/20 hover:bg-primary/20',
                           )}
                           >
-                          <TableCell className="flex-1 px-1 flex items-center gap-1">
+                          <TableCell 
+                            onClick={() => handleCostAdjustmentClick(item)}
+                            className={cn('flex-1 px-1 flex items-center gap-1 cursor-pointer', !isSelectedForCut && 'hover:bg-primary/10')}
+                          >
                             {hasAdjustment && <Tag className="h-3 w-3 text-accent-price" />}
                             {item.description}
                           </TableCell>
-                          <TableCell className="w-1/3 text-center px-1">
+                          <TableCell 
+                             onClick={() => handleCutCalculatorToggle(item)}
+                             className={cn("w-1/3 text-center px-1", category.unit === 'm' && 'cursor-pointer', !isSelectedForCut && 'hover:bg-primary/10')}
+                          >
                               {formatNumber(item.weight, 3)}
                           </TableCell>
-                          <TableCell className="w-1/3 text-right font-medium text-primary px-1">
+                          <TableCell 
+                            onClick={() => handleCutCalculatorToggle(item)}
+                            className={cn("w-1/3 text-right font-medium text-primary px-1", category.unit === 'm' && 'cursor-pointer', !isSelectedForCut && 'hover:bg-primary/10')}
+                          >
                               <div className="flex items-center justify-end gap-1">
                                 <span>{formatCurrency(itemPrice)}</span>
                               </div>
@@ -217,14 +225,14 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
                               )}
                           </TableCell>
                       </TableRow>
-                      {isSelected && category.unit === 'm' && (
+                      {isSelectedForCut && category.unit === 'm' && (
                             <TableRow>
                               <TableCell colSpan={3} className="p-0">
                                   <div className="p-1 bg-primary/5">
                                     <CutPriceCalculator
                                         selectedItem={item}
                                         sellingPrice={itemPrice / item.weight}
-                                        onClose={() => setSelectedItemId(null)}
+                                        onClose={() => setSelectedItemIdForCut(null)}
                                     />
                                   </div>
                               </TableCell>

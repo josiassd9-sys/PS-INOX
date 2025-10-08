@@ -189,6 +189,17 @@ export function MaterialListBuilder() {
       currency: "BRL",
     }).format(value);
   };
+
+  const formatPrice = (value: number) => {
+    const parts = formatCurrency(value).split(',');
+    return (
+      <div className="flex items-baseline justify-end">
+        <span className="text-base">{parts[0]}</span>
+        <span className="text-xs self-start mt-px">,{parts[1]}</span>
+      </div>
+    );
+  };
+
   
   const formatNumber = (value: number, digits: number = 3) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -319,7 +330,9 @@ export function MaterialListBuilder() {
                                                     <span className="text-xs">{formatNumber(item.weight, 3)} kg</span>
                                                   </div>
                                               </TableCell>
-                                              <TableCell className="text-right font-semibold text-accent-price p-2 w-[80px]">{formatCurrency(item.price)}</TableCell>
+                                              <TableCell className="text-right font-semibold text-accent-price p-2 w-[80px]">
+                                                {formatPrice(item.price)}
+                                              </TableCell>
                                             </TableRow>
                                             {editingItemId === item.listItemId && (
                                                 <EditForm 

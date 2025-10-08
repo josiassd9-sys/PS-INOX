@@ -9,7 +9,7 @@ import { ALL_CATEGORIES, Category, ConnectionGroup, ConnectionItem, SteelItem } 
 import { GlobalSearchResults } from "./global-search-results";
 import { useToast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from "uuid";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "./ui/table";
+import { Table, TableBody, TableCell, TableHeader, TableRow, TableFooter } from "./ui/table";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { ScrapCalculator } from "./scrap-calculator";
@@ -267,12 +267,12 @@ export function MaterialListBuilder() {
                                                 exit={{ opacity: 0, x: -100 }}
                                                 transition={{ duration: 0.2 }}
                                             >
-                                                <TableCell className="font-medium flex-1">{item.description}</TableCell>
-                                                <TableCell className="text-center text-muted-foreground w-[80px]">
+                                                <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
+                                                <TableCell className="text-center text-muted-foreground w-[80px] p-2">
                                                     {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
                                                     <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
                                                 </TableCell>
-                                                <TableCell className="text-right font-semibold text-primary w-[90px]">{formatCurrency(item.price)}</TableCell>
+                                                <TableCell className="text-right font-semibold text-primary w-[90px] p-2">{formatCurrency(item.price)}</TableCell>
                                             </TableRow>
                                         </SwipeToDelete>
                                    ))}
@@ -295,7 +295,7 @@ export function MaterialListBuilder() {
             <div className="shrink-0 border-t border-border bg-background/95 backdrop-blur-sm p-1">
                 <div className="flex items-center justify-between">
                     <span className="text-lg font-semibold">Total</span>
-                    <span className="text-right text-lg font-bold text-primary">{formatCurrency(totalListPrice)}</span>
+                    <span className="text-right text-lg font-bold text-accent-price">{formatCurrency(totalListPrice)}</span>
                 </div>
             </div>
         )}

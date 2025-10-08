@@ -13,6 +13,7 @@ import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { ScrapCalculator } from "./scrap-calculator";
 import Link from "next/link";
+import { SwipeToDelete } from "./ui/swipe-to-delete";
 
 
 const MATERIAL_LIST_KEY = "materialBuilderList";
@@ -253,26 +254,20 @@ export function MaterialListBuilder() {
                                <TableHeader>
                                    <TableRow className="border-b-border hover:bg-muted/50 flex">
                                        <TableHead className="flex-1 p-2">Descrição</TableHead>
-                                       <TableHead className="text-center p-2 w-[70px] bg-muted/50">Detalhe</TableHead>
                                        <TableHead className="text-right p-2 w-[80px]">Preço</TableHead>
-                                       <TableHead className="w-[44px] p-0"></TableHead>
+                                       <TableHead className="text-center p-2 w-[70px] bg-muted/50">Detalhe</TableHead>
                                    </TableRow>
                                </TableHeader>
                                <TableBody>
                                    {materialList.map(item => (
-                                        <TableRow key={item.listItemId} className="flex">
+                                        <SwipeToDelete key={item.listItemId} onDelete={() => handleRemoveFromList(item.listItemId)}>
                                           <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
+                                          <TableCell className="text-right font-semibold text-accent-price p-2 w-[80px]">{formatCurrency(item.price)}</TableCell>
                                           <TableCell className="text-center text-muted-foreground p-2 w-[70px] bg-muted/50">
                                               {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
                                               <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
                                           </TableCell>
-                                          <TableCell className="text-right font-semibold text-accent-price p-2 w-[80px]">{formatCurrency(item.price)}</TableCell>
-                                           <TableCell className="w-[44px] p-0 flex items-center justify-center">
-                                              <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleRemoveFromList(item.listItemId)}>
-                                                  <Trash2 size={16} />
-                                              </Button>
-                                          </TableCell>
-                                        </TableRow>
+                                        </SwipeToDelete>
                                    ))}
                                </TableBody>
                            </Table>

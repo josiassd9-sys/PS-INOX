@@ -162,9 +162,13 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice, o
 
     const finalWeight = parseFloat(manualWeight.replace(',', '.')) || weight;
     if (manualWeight && finalWeight > 0) {
-        price = finalWeight * p_pricePerKg * (1 + p_cutPercentage / 100);
+        const basePrice = finalWeight * p_pricePerKg;
+        price = basePrice * (1 + p_cutPercentage / 100);
     }
-    if (prefilledItem?.unit === 'm') price = Math.ceil(price);
+    
+    if (prefilledItem?.unit === 'm' || (!prefilledItem && shape === 'rectangle')) {
+        price = Math.ceil(price);
+    }
 
 
     return { 

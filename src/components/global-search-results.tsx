@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import * as React from "react";
@@ -68,6 +66,11 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
     const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
 
     const handleItemSelection = (item: SteelItem, category: Category) => {
+        if (category.id === 'retalhos') {
+            onItemClick(item);
+            return;
+        }
+
         if (isScrapCalculatorActive) {
             const priceKey = category.hasOwnPriceControls ? category.id : 'global';
             const { costPrice, markup } = priceParams[priceKey] || priceParams['global'];
@@ -208,33 +211,32 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
                                             return (
                                                 <React.Fragment key={item.id}>
                                                     <TableRow
+                                                        onClick={() => handleItemSelection(item as SteelItem, category as Category)}
                                                         className={cn(
                                                             'even:bg-primary/5 odd:bg-transparent',
-                                                            'flex items-center',
+                                                            'flex items-center cursor-pointer',
                                                             isSelected && 'bg-primary/20 hover:bg-primary/20',
                                                         )}
                                                     >
                                                         <TableCell 
-                                                          onClick={() => handleCostAdjustmentClick(item as SteelItem, category as Category)}
-                                                          className={cn('flex-1 flex justify-between items-center cursor-pointer', !isSelected && 'hover:bg-primary/10')}
+                                                          onDoubleClick={() => handleCostAdjustmentClick(item as SteelItem, category as Category)}
+                                                          className={cn('flex-1 flex justify-between items-center', !isSelected && 'hover:bg-primary/10')}
                                                         >
                                                            <div className="flex items-center gap-1">
                                                                 {hasAdjustment && <Tag className="h-3 w-3 text-accent-price" />}
                                                                 {item.description}
                                                             </div>
-                                                            {isScrapCalculatorActive && (
+                                                            {(isScrapCalculatorActive || category.id === 'retalhos') && (
                                                                 <PlusCircle className="h-5 w-5 text-primary/50 ml-1" />
                                                             )}
                                                         </TableCell>
                                                         <TableCell
-                                                            onClick={() => handleItemSelection(item as SteelItem, category as Category)} 
-                                                            className={cn("w-1/3 text-center cursor-pointer", !isSelected && 'hover:bg-primary/10')}
+                                                            className={cn("w-1/3 text-center", !isSelected && 'hover:bg-primary/10')}
                                                         >
                                                           {formatNumber(item.weight)}
                                                         </TableCell>
                                                         <TableCell 
-                                                            onClick={() => handleItemSelection(item as SteelItem, category as Category)} 
-                                                            className={cn("w-1/3 text-right font-medium text-primary cursor-pointer", !isSelected && 'hover:bg-primary/10')}
+                                                            className={cn("w-1/3 text-right font-medium text-primary", !isSelected && 'hover:bg-primary/10')}
                                                         >
                                                             {formatCurrency(itemPrice)}
                                                             {(category as Category).unit === 'm' && (

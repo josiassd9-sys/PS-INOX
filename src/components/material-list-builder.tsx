@@ -1,7 +1,8 @@
+
 "use client";
 
 import * as React from "react";
-import { Search, X, Trash2 } from "lucide-react";
+import { Search, Trash2, X } from "lucide-react";
 import { PsInoxLogo } from "./ps-inox-logo";
 import { Input } from "./ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -13,6 +14,8 @@ import Link from "next/link";
 import { SteelItem, ALL_CATEGORIES, ConnectionGroup, ConnectionItem, Category } from "../lib/data";
 import { GlobalSearchResults } from "./global-search-results";
 import { COST_ADJUSTMENTS_LOCAL_STORAGE_KEY, EDITED_CONNECTIONS_WEIGHTS_KEY } from "./dashboard";
+import { Label } from "./ui/label";
+import { cn } from "@/lib/utils";
 
 
 const MATERIAL_LIST_KEY = "materialBuilderList";
@@ -24,6 +27,8 @@ interface ListItem extends SteelItem {
     price: number;
     quantity: number;
     length?: number;
+    basePrice: number; // Price for quantity 1
+    baseWeight: number; // Weight for quantity 1
 }
 
 interface PriceParams {
@@ -51,10 +56,56 @@ const initializePriceParams = (): Record<string, PriceParams> => {
   return params;
 };
 
+interface EditFormProps {
+    item: ListItem;
+    onUpdate: (listItemId: string, newQuantity: number) => void;
+    onDelete: (listItemId: string) => void;
+    onCancel: () => void;
+}
+
+function EditForm({ item, onUpdate, onDelete, onCancel }: EditFormProps) {
+    const [quantity, setQuantity] = React.useState(item.quantity.toString());
+
+    const handleUpdate = () => {
+        const newQuantity = parseInt(quantity, 10);
+        if (!isNaN(newQuantity) && newQuantity > 0) {
+            onUpdate(item.listItemId, newQuantity);
+        }
+    };
+    
+    const handleDelete = () => {
+        onDelete(item.listItemId);
+    }
+
+    return (
+        <TableRow className="bg-primary/10">
+            <TableCell colSpan={4} className="p-2">
+                <div className="flex items-end gap-2">
+                    <div className="space-y-1">
+                        <Label htmlFor="edit-quantity" className="text-xs">Quantidade</Label>
+                        <Input
+                            id="edit-quantity"
+                            type="number"
+                            value={quantity}
+                            onChange={(e) => setQuantity(e.target.value)}
+                            className="h-9 w-20"
+                            min="1"
+                        />
+                    </div>
+                    <Button onClick={handleUpdate} size="sm">Salvar</Button>
+                    <Button onClick={handleDelete} variant="destructive" size="sm">Deletar</Button>
+                    <Button onClick={onCancel} variant="ghost" size="sm">Cancelar</Button>
+                </div>
+            </TableCell>
+        </TableRow>
+    );
+}
+
 
 export function MaterialListBuilder() {
   const [materialList, setMaterialList] = React.useState<ListItem[]>([]);
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [editingItemId, setEditingItemId] = React.useState<string | null>(null);
 
   const [priceParams, setPriceParams] = React.useState<Record<string, PriceParams>>({});
   const [costAdjustments, setCostAdjustments] = React.useState<Record<string, number>>({});
@@ -90,16 +141,46 @@ export function MaterialListBuilder() {
     const newItem: ListItem = {
         ...item,
         listItemId: uuidv4(),
+        basePrice: item.price / (item.quantity || 1),
+        baseWeight: item.weight / (item.quantity || 1),
     };
     const newList = [...materialList, newItem];
     setMaterialList(newList);
     saveList(newList);
+    setSearchTerm("");
+    setEditingItemId(null);
   }
   
   const handleRemoveFromList = (listItemId: string) => {
     const newList = materialList.filter(item => item.listItemId !== listItemId);
     setMaterialList(newList);
     saveList(newList);
+    setEditingItemId(null);
+  }
+
+  const handleUpdateQuantity = (listItemId: string, newQuantity: number) => {
+    const newList = materialList.map(item => {
+        if (item.listItemId === listItemId) {
+            return {
+                ...item,
+                quantity: newQuantity,
+                price: item.basePrice * newQuantity,
+                weight: item.baseWeight * newQuantity,
+            };
+        }
+        return item;
+    });
+    setMaterialList(newList);
+    saveList(newList);
+    setEditingItemId(null);
+  };
+
+  const handleRowClick = (listItemId: string) => {
+      if (editingItemId === listItemId) {
+          setEditingItemId(null); // Close if clicking the same item
+      } else {
+          setEditingItemId(listItemId);
+      }
   }
   
  const formatCurrency = (value: number) => {
@@ -226,7 +307,11 @@ export function MaterialListBuilder() {
                                    </TableHeader>
                                    <TableBody>
                                        {materialList.map(item => (
-                                            <TableRow key={item.listItemId} className="flex items-center">
+                                           <React.Fragment key={item.listItemId}>
+                                            <TableRow 
+                                                onClick={() => handleRowClick(item.listItemId)}
+                                                className={cn("flex items-center cursor-pointer", editingItemId === item.listItemId && "bg-primary/20")}
+                                            >
                                               <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
                                                <TableCell className="text-center text-muted-foreground p-2 w-[70px] bg-muted/50">
                                                   <div className="flex flex-col items-center">
@@ -236,6 +321,15 @@ export function MaterialListBuilder() {
                                               </TableCell>
                                               <TableCell className="text-right font-semibold text-accent-price p-2 w-[80px]">{formatCurrency(item.price)}</TableCell>
                                             </TableRow>
+                                            {editingItemId === item.listItemId && (
+                                                <EditForm 
+                                                    item={item}
+                                                    onUpdate={handleUpdateQuantity}
+                                                    onDelete={handleRemoveFromList}
+                                                    onCancel={() => setEditingItemId(null)}
+                                                />
+                                            )}
+                                           </React.Fragment>
                                        ))}
                                    </TableBody>
                                </Table>
@@ -252,7 +346,7 @@ export function MaterialListBuilder() {
              )}
         </div>
 
-        {materialList.length > 0 && (
+        {materialList.length > 0 && !searchTerm && (
             <div className="shrink-0 border-t border-border bg-background/95 backdrop-blur-sm p-2">
                 <div className="flex items-center justify-between">
                     <span className="text-lg font-semibold">Total</span>

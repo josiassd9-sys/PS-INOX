@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { Search, Trash2, X } from "lucide-react";
+import { Search, Trash2 } from "lucide-react";
 import { PsInoxLogo } from "./ps-inox-logo";
 import { Input } from "./ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +16,7 @@ import { GlobalSearchResults } from "./global-search-results";
 import { COST_ADJUSTMENTS_LOCAL_STORAGE_KEY, EDITED_CONNECTIONS_WEIGHTS_KEY } from "./dashboard";
 import { Label } from "./ui/label";
 import { cn } from "@/lib/utils";
+import { ScrapCalculator } from "./scrap-calculator";
 
 
 const MATERIAL_LIST_KEY = "materialBuilderList";
@@ -391,5 +392,3 @@ export function MaterialListBuilder() {
       </div>
   );
 }
-
-    

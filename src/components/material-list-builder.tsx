@@ -332,7 +332,7 @@ export function MaterialListBuilder() {
                                <Table>
                                    <TableHeader>
                                        <TableRow className="border-b-border hover:bg-muted/50 flex">
-                                           <TableHead className="flex-1 p-2">Descrição</TableHead>
+                                           <TableHead className="flex-1 pl-2 py-2 pr-1">Descrição</TableHead>
                                            <TableHead className="text-center p-2 w-[70px] bg-muted/50">Detalhe</TableHead>
                                            <TableHead className="text-center p-1 w-[80px]">Preço</TableHead>
                                        </TableRow>
@@ -344,7 +344,7 @@ export function MaterialListBuilder() {
                                                 onClick={() => handleRowClick(item.listItemId)}
                                                 className={cn("flex items-center cursor-pointer", editingItemId === item.listItemId && "bg-primary/20")}
                                             >
-                                              <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
+                                              <TableCell className="font-medium flex-1 pl-2 py-2 pr-1">{item.description}</TableCell>
                                                <TableCell className="text-center text-muted-foreground p-2 w-[70px] bg-muted/50">
                                                   <div className="flex flex-col items-center">
                                                     <span>{(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}</span>
@@ -391,4 +391,3 @@ export function MaterialListBuilder() {
       </div>
   );
 }
-

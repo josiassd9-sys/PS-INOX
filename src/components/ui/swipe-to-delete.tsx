@@ -2,24 +2,22 @@
 "use client";
 
 import * as React from "react";
-import { motion, useMotionValue, useTransform } from "framer-motion";
+import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import { Trash2 } from "lucide-react";
 import { TableRow } from "./table";
+import { cn } from "@/lib/utils";
 
 interface SwipeToDeleteProps {
   children: React.ReactNode;
   onDelete: () => void;
-  className?: string;
-  [key: string]: any; 
 }
 
 const SWIPE_THRESHOLD = -100;
 
-export const SwipeToDelete = React.forwardRef<HTMLTableRowElement, SwipeToDeleteProps>(
-  ({ children, onDelete, className, ...props }, ref) => {
+export const SwipeToDelete = ({ children, onDelete }: SwipeToDeleteProps) => {
     const x = useMotionValue(0);
 
-    const handleDragEnd = (event: any, info: any) => {
+    const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
       if (info.offset.x < SWIPE_THRESHOLD) {
         onDelete();
       }
@@ -32,15 +30,15 @@ export const SwipeToDelete = React.forwardRef<HTMLTableRowElement, SwipeToDelete
     );
 
     const iconOpacity = useTransform(x, [-60, -20], [1, 0]);
+    
+    // Ensure children are valid React elements before cloning
+    const validChildren = React.Children.toArray(children).filter(React.isValidElement);
 
     return (
-        <TableRow
-            ref={ref}
-            className="relative" // A row is the container now
-            {...props}
-        >
+        <TableRow className="relative group">
+            {/* Background layer for the delete indicator */}
             <motion.td
-                colSpan={React.Children.count(children)}
+                colSpan={validChildren.length}
                 style={{ background }}
                 className="absolute inset-0 flex items-center justify-end pr-8 z-0"
             >
@@ -48,17 +46,19 @@ export const SwipeToDelete = React.forwardRef<HTMLTableRowElement, SwipeToDelete
                     <Trash2 className="text-destructive-foreground" />
                 </motion.div>
             </motion.td>
+            
+            {/* Foreground layer that is draggable */}
             <motion.div
                 drag="x"
                 dragConstraints={{ left: 0, right: 0 }}
                 style={{ x }}
                 onDragEnd={handleDragEnd}
-                className="contents z-10 cursor-grab" // 'contents' makes this div layout-less
+                className="contents z-10 cursor-grab"
             >
-                {children}
+              {/* Render children directly. They should be TableCell components */}
+              {children}
             </motion.div>
         </TableRow>
     );
-  }
-);
+};
 SwipeToDelete.displayName = "SwipeToDelete";

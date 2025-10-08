@@ -12,7 +12,6 @@ import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from ".
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { ScrapCalculator } from "./scrap-calculator";
-import { motion } from "framer-motion";
 import { SwipeToDelete } from "./ui/swipe-to-delete";
 
 
@@ -203,16 +202,7 @@ export function MaterialListBuilder() {
   return (
     <div className="relative w-full h-full flex flex-col overflow-hidden bg-background text-foreground">
         
-        {/*
-          GUIA DE AJUSTE DE ESPAÇAMENTO: CONTAINER SUPERIOR (LOGO E BUSCA)
-          - 'px-8 py-1': Padding geral deste container. Aumente para 'p-2', 'p-4', etc.
-          - 'gap-1': Espaço vertical entre o logo e a barra de busca. Aumente para 'gap-2', 'gap-3', etc.
-        */}
         <div className="relative z-40 w-full px-8 py-1 flex flex-col gap-1 shrink-0">
-            {/*
-              GUIA DE AJUSTE DE ESPAÇAMENTO: LOGO
-              - 'pt-1': Padding no topo do logo. Aumente para 'pt-2' para mais espaço acima.
-            */}
             <div className="flex justify-center pt-1">
                 <PsInoxLogo />
             </div>
@@ -231,11 +221,6 @@ export function MaterialListBuilder() {
             </div>
         </div>
 
-        {/*
-          GUIA DE AJUSTE DE ESPAÇAMENTO: CONTAINER DA LISTA
-          - 'mt-px': Margem no topo, separando da busca.
-          - 'p-1': Padding interno.
-        */}
         <div className="flex-1 mt-px overflow-y-auto relative z-0 p-1 min-h-0">
              {isScrapCalculatorOpen && (
                 <div className="mb-2">
@@ -266,8 +251,8 @@ export function MaterialListBuilder() {
                                <TableHeader>
                                    <TableRow className="border-b-border hover:bg-muted/50 flex">
                                        <TableHead className="flex-1 p-2">Descrição</TableHead>
-                                       <TableHead className="text-right p-2 w-[90px]">Preço</TableHead>
-                                       <TableHead className="text-center p-2 w-[80px] bg-muted/50">Detalhe</TableHead>
+                                       <TableHead className="text-right p-2 w-[80px]">Preço</TableHead>
+                                       <TableHead className="text-center p-2 w-[70px] bg-muted/50">Detalhe</TableHead>
                                    </TableRow>
                                </TableHeader>
                                <TableBody>
@@ -275,18 +260,13 @@ export function MaterialListBuilder() {
                                         <SwipeToDelete 
                                           key={item.listItemId} 
                                           onDelete={() => handleRemoveFromList(item.listItemId)}
-                                          layout
-                                          initial={{ opacity: 0, height: 0 }}
-                                          animate={{ opacity: 1, height: 'auto' }}
-                                          exit={{ opacity: 0, height: 0 }}
-                                          transition={{ duration: 0.3, type: "spring" }}
                                         >
-                                            <TableCell className="font-medium flex-1 p-2 bg-background">{item.description}</TableCell>
-                                            <TableCell className="text-right font-semibold text-accent-price p-2 w-[90px] bg-background">{formatCurrency(item.price)}</TableCell>
-                                            <TableCell className="text-center text-muted-foreground p-2 w-[80px] bg-muted/50">
-                                                {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
-                                                <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
-                                            </TableCell>
+                                          <TableCell className="font-medium flex-1 p-2 bg-background">{item.description}</TableCell>
+                                          <TableCell className="text-right font-semibold text-accent-price p-2 w-[80px] bg-background">{formatCurrency(item.price)}</TableCell>
+                                          <TableCell className="text-center text-muted-foreground p-2 w-[70px] bg-muted/50">
+                                              {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
+                                              <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
+                                          </TableCell>
                                         </SwipeToDelete>
                                    ))}
                                </TableBody>
@@ -305,8 +285,6 @@ export function MaterialListBuilder() {
         </div>
 
         {materialList.length > 0 && (
-            // GUIA DE AJUSTE DE ESPAÇAMENTO: Rodapé do Total
-            // 'p-2': Padding interno.
             <div className="shrink-0 border-t border-border bg-background/95 backdrop-blur-sm p-2">
                 <div className="flex items-center justify-between">
                     <span className="text-lg font-semibold">Total</span>

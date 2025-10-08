@@ -1,5 +1,6 @@
 import { BlueprintMinimalist } from "@/components/showcase/blueprint-minimalist";
 import { PhoneMockup } from "@/components/showcase/phone-mockup";
+import Link from "next/link";
 
 export default function Home() {
   return (

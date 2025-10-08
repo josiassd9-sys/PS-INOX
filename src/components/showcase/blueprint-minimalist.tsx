@@ -3,6 +3,7 @@
 import { motion } from "framer-motion"
 import { Icon } from "@/components/icons"
 import { CATEGORY_GROUPS } from "@/lib/data"
+import Link from "next/link";
 
 const mainIcons = CATEGORY_GROUPS.flatMap(g => g.items)
   .filter(c => ['tubos-od', 'metalon-quadrado', 'barras-chatas', 'chapas', 'conexoes', 'cantoneiras', 'tubos-schedule', 'metalon-retangular', 'barras-redondas', 'barra-quadrada', 'barra-sextavada', 'tubos-alianca'].includes(c.id))
@@ -11,22 +12,21 @@ const mainIcons = CATEGORY_GROUPS.flatMap(g => g.items)
       if (c.id === 'tubos-alianca') {
           icon = 'AllianceRing';
       }
-      return { name: c.name, icon };
+      return { name: c.name, icon, id: c.id };
   });
   
 const otherMetalsIcons = CATEGORY_GROUPS.flatMap(g => g.items)
   .filter(c => ['tarugo-bronze', 'verg-aluminio', 'chapas-aluminio', 'verg-latao'].includes(c.id))
-  .map(c => ({ name: c.name, icon: c.icon as any}));
+  .map(c => ({ name: c.name, icon: c.icon as any, id: c.id }));
 
 const toolsIcons = CATEGORY_GROUPS.flatMap(g => g.items)
     .filter(c => ['retalhos', 'package-checker', 'balanca', 'tabela-sucata'].includes(c.id))
-    .map(c => ({ name: c.name, icon: c.icon as any}));
+    .map(c => ({ name: c.name, icon: c.icon as any, id: c.id }));
 
 const infoIcons = [
     ...CATEGORY_GROUPS.flatMap(g => g.items)
         .filter(c => ['normas-astm', 'processos-fabricacao', 'desenho-tecnico'].includes(c.id))
-        .map(c => ({ name: c.name, icon: c.icon as any})),
-    { name: 'Lista de Materiais', icon: 'ClipboardList' }
+        .map(c => ({ name: c.name, icon: c.icon as any, id: c.id })),
 ];
 
 const containerVariants = {
@@ -137,6 +137,16 @@ export function BlueprintMinimalist() {
                             <span className="text-[10px] text-slate-400 text-center leading-tight">{item.name}</span>
                          </motion.div>
                     ))}
+                    <Link href="/lista-materiais" passHref>
+                      <motion.div
+                        variants={itemVariants}
+                        whileHover={{ scale: 1.1, backgroundColor: 'hsla(220, 14%, 96%, 0.1)', rotate: -5 }}
+                        className="flex flex-col items-center justify-center gap-1 p-1 rounded-lg cursor-pointer aspect-square"
+                      >
+                        <Icon name="ClipboardList" className="w-6 h-6 text-slate-300" />
+                        <span className="text-[10px] text-slate-400 text-center leading-tight">Lista de Materiais</span>
+                      </motion.div>
+                    </Link>
                 </motion.div>
             </motion.div>
         </div>

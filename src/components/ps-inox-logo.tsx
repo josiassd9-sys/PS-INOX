@@ -14,7 +14,7 @@ export function PsInoxLogo() {
   };
 
   const textVariants = {
-    hidden: { opacity: 0, y: 100 },
+    hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
@@ -31,7 +31,7 @@ export function PsInoxLogo() {
     visible: {
       x: "150%",
       transition: {
-        duration: 3,
+        duration: 2,
         ease: "easeInOut",
         delay: 1.2,
         repeat: Infinity,
@@ -42,48 +42,40 @@ export function PsInoxLogo() {
 
   return (
     <motion.svg
-      width="20"
+      width="200"
       height="70"
       viewBox="0 0 200 70"
       xmlns="http://www.w3.org/2000/svg"
       variants={svgVariants}
       initial="hidden"
       animate="visible"
-      className="max-w-[240px] md:max-w-[280px]"
+      className="max-w-[180px] h-auto"
     >
       <defs>
         <linearGradient id="shineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.6" />
-          <stop offset="50%" stopColor="hsl(var(--primary-foreground))" stopOpacity="0.9" />
-          <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.6" />
+          <stop offset="0%" stopColor="hsl(var(--primary-foreground) / 0.3)" />
+          <stop offset="50%" stopColor="hsl(var(--primary-foreground) / 0.8)" />
+          <stop offset="100%" stopColor="hsl(var(--primary-foreground) / 0.3)" />
         </linearGradient>
 
         <linearGradient id="metallicGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="hsl(var(--primary) / 0.9)" />
-            <stop offset="50%" stopColor="hsl(var(--primary))" />
-            <stop offset="100%" stopColor="hsl(var(--primary) / 0.8)" />
+            <stop offset="0%" stopColor="hsl(var(--primary-foreground) / 0.9)" />
+            <stop offset="50%" stopColor="hsl(var(--primary-foreground))" />
+            <stop offset="100%" stopColor="hsl(var(--primary-foreground) / 0.8)" />
         </linearGradient>
 
         <mask id="logoMask">
-            <g fontFamily="var(--font-headline), sans-serif" fontSize="58" fontWeight="bold" fill="white">
+            <g fontFamily="var(--font-headline), sans-serif" fontSize="61" fontWeight="bold" fill="white">
                 <motion.text x="8" y="60" variants={textVariants}>PS</motion.text>
                 <motion.text x="85" y="60" variants={textVariants}>-INOX</motion.text>
             </g>
         </mask>
       </defs>
-
-      {/* 3D Extrusion Effect */}
-      <g fontFamily="var(--font-headline), sans-serif" fontSize="61" fontWeight="bold" fill="hsl(var(--primary) / 0.4)">
-          <motion.text x="2" y="62" variants={textVariants}>PS</motion.text>
-          <motion.text x="87" y="62" variants={textVariants}>-INOX</motion.text>
-      </g>
-
-      {/* Base Logo with Metallic Gradient */}
+      
       <g fill="url(#metallicGradient)" mask="url(#logoMask)">
           <motion.rect x="0" y="0" width="100%" height="100%" />
       </g>
       
-      {/* Animated Shine Effect */}
       <motion.rect
         x="0"
         y="0"

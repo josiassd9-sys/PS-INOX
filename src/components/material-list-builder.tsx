@@ -215,9 +215,9 @@ export function MaterialListBuilder() {
     return (
       <div className="flex items-baseline justify-end tabular-nums">
         <span className="text-sm font-semibold">R$</span>
-        <span className="text-lg font-bold">{thousandsPart}</span>
-        <span className="text-base font-semibold">{hundredsPart}</span>
-        <span className="text-xs self-start mt-px">,{decimalPart}</span>
+        <span className="text-sm font-bold">{thousandsPart}</span>
+        <span className="text-[10px] font-semibold">{hundredsPart}</span>
+        <span className="text-[6px] self-start mt-px">,{decimalPart}</span>
       </div>
     );
   };
@@ -333,8 +333,8 @@ export function MaterialListBuilder() {
                                    <TableHeader>
                                        <TableRow className="border-b-border hover:bg-muted/50 flex">
                                            <TableHead className="flex-1 p-2">Descrição</TableHead>
-                                           <TableHead className="text-center p-2 w-[70px] bg-muted/50">Detalhe</TableHead>
                                            <TableHead className="text-center p-2 w-[80px]">Preço</TableHead>
+                                           <TableHead className="text-center p-2 w-[70px] bg-muted/50">Detalhe</TableHead>
                                        </TableRow>
                                    </TableHeader>
                                    <TableBody>
@@ -345,14 +345,14 @@ export function MaterialListBuilder() {
                                                 className={cn("flex items-center cursor-pointer", editingItemId === item.listItemId && "bg-primary/20")}
                                             >
                                               <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
+                                              <TableCell className="text-right font-semibold text-accent-price p-2 w-[80px]">
+                                                {formatPrice(item.price)}
+                                              </TableCell>
                                                <TableCell className="text-center text-muted-foreground p-2 w-[70px] bg-muted/50">
                                                   <div className="flex flex-col items-center">
                                                     <span>{(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}</span>
                                                     <span className="text-xs">{formatNumber(item.weight, 3)} kg</span>
                                                   </div>
-                                              </TableCell>
-                                              <TableCell className="text-right font-semibold text-accent-price p-2 w-[80px]">
-                                                {formatPrice(item.price)}
                                               </TableCell>
                                             </TableRow>
                                             {editingItemId === item.listItemId && (
@@ -391,3 +391,5 @@ export function MaterialListBuilder() {
       </div>
   );
 }
+
+    

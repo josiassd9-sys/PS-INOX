@@ -48,7 +48,7 @@ const itemVariants = {
 
 export function BlueprintMinimalist() {
     return (
-        <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden bg-slate-800 p-1">
+        <div className="relative w-full h-full flex flex-col items-center justify-center overflow-auto bg-slate-800 p-1">
             <div className="absolute inset-0 bg-grid-slate-700/[0.4] [mask-image:linear-gradient(to_bottom,white_10%,transparent_90%)]"></div>
 
             <motion.div
@@ -60,6 +60,17 @@ export function BlueprintMinimalist() {
                 <motion.div variants={itemVariants} className="mb-2">
                      <h2 className="text-lg font-bold text-slate-100">PS INOX</h2>
                     <p className="text-sm text-slate-400">Calculadora de Preços</p>
+                </motion.div>
+
+                <motion.div 
+                    variants={itemVariants} 
+                    className="mb-2"
+                    whileHover={{ scale: 1.05, backgroundColor: 'hsla(220, 14%, 96%, 0.1)' }}
+                >
+                    <div className="flex flex-col items-center justify-center gap-1 p-1 rounded-lg cursor-pointer">
+                        <Icon name="ClipboardList" className="w-6 h-6 text-slate-300" />
+                        <span className="text-xs text-slate-300 font-semibold">Lista de Materiais</span>
+                    </div>
                 </motion.div>
 
                 <motion.div variants={itemVariants} className="mb-1">

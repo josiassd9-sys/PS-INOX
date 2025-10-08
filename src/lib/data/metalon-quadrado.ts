@@ -1,0 +1,30 @@
+import type { SteelItem } from './types';
+import { calculateSquareTubeWeight } from './constants';
+
+export const metalonQuadradoItems: SteelItem[] = [
+        { id: 'm-10x10-1.0', unit: 'm', description: 'Metalon 10x10 x 1.00mm', weight: calculateSquareTubeWeight(10, 1.0) },
+        { id: 'm-10x10-1.2', unit: 'm', description: 'Metalon 10x10 x 1.20mm', weight: calculateSquareTubeWeight(10, 1.2) },
+        { id: 'm-15x15-1.0', unit: 'm', description: 'Metalon 15x15 x 1.00mm', weight: calculateSquareTubeWeight(15, 1.0) },
+        { id: 'm-15x15-1.2', unit: 'm', description: 'Metalon 15x15 x 1.20mm', weight: calculateSquareTubeWeight(15, 1.2) },
+        { id: 'm-15x15-1.5', unit: 'm', description: 'Metalon 15x15 x 1.50mm', weight: calculateSquareTubeWeight(15, 1.5) },
+        { id: 'm-20x20-1.0', unit: 'm', description: 'Metalon 20x20 x 1.00mm', weight: calculateSquareTubeWeight(20, 1.0) },
+        { id: 'm-20x20-1.2', unit: 'm', description: 'Metalon 20x20 x 1.20mm', weight: calculateSquareTubeWeight(20, 1.2) },
+        { id: 'm-20x20-1.5', unit: 'm', description: 'Metalon 20x20 x 1.50mm', weight: calculateSquareTubeWeight(20, 1.5) },
+        { id: 'm-25x25-1.0', unit: 'm', description: 'Metalon 25x25 x 1.00mm', weight: calculateSquareTubeWeight(25, 1.0) },
+        { id: 'm-25x25-1.2', unit: 'm', description: 'Metalon 25x25 x 1.20mm', weight: calculateSquareTubeWeight(25, 1.2) },
+        { id: 'm-25x25-1.5', unit: 'm', description: 'Metalon 25x25 x 1.50mm', weight: calculateSquareTubeWeight(25, 1.5) },
+        { id: 'm-30x30-1.2', unit: 'm', description: 'Metalon 30x30 x 1.20mm', weight: calculateSquareTubeWeight(30, 1.2) },
+        { id: 'm-30x30-1.5', unit: 'm', description: 'Metalon 30x30 x 1.50mm', weight: calculateSquareTubeWeight(30, 1.5) },
+        { id: 'm-40x40-1.2', unit: 'm', description: 'Metalon 40x40 x 1.20mm', weight: calculateSquareTubeWeight(40, 1.2) },
+        { id: 'm-40x40-1.5', unit: 'm', description: 'Metalon 40x40 x 1.50mm', weight: calculateSquareTubeWeight(40, 1.5) },
+        { id: 'm-50x50-1.2', unit: 'm', description: 'Metalon 50x50 x 1.20mm', weight: calculateSquareTubeWeight(50, 1.2) },
+        { id: 'm-50x50-1.5', unit: 'm', description: 'Metalon 50x50 x 1.50mm', weight: calculateSquareTubeWeight(50, 1.5) },
+        { id: 'm-50x50-2.0', unit: 'm', description: 'Metalon 50x50 x 2.00mm', weight: calculateSquareTubeWeight(50, 2.0) },
+        { id: 'm-60x60-1.5', unit: 'm', description: 'Metalon 60x60 x 1.50mm', weight: calculateSquareTubeWeight(60, 1.5) },
+        { id: 'm-60x60-2.0', unit: 'm', description: 'Metalon 60x60 x 2.00mm', weight: calculateSquareTubeWeight(60, 2.0) },
+        { id: 'm-80x80-1.5', unit: 'm', description: 'Metalon 80x80 x 1.50mm', weight: calculateSquareTubeWeight(80, 1.5) },
+        { id: 'm-80x80-2.0', unit: 'm', description: 'Metalon 80x80 x 2.00mm', weight: calculateSquareTubeWeight(80, 2.0) },
+        { id: 'm-100x100-1.5', unit: 'm', description: 'Metalon 100x100 x 1.50mm', weight: calculateSquareTubeWeight(100, 1.5) },
+        { id: 'm-100x100-2.0', unit: 'm', description: 'Metalon 100x100 x 2.00mm', weight: calculateSquareTubeWeight(100, 2.0) },
+        { id: 'm-100x100-3.0', unit: 'm', description: 'Metalon 100x100 x 3.00mm', weight: calculateSquareTubeWeight(100, 3.0) },
+    ].map(item => ({...item, categoryName: 'Metalon Quadrado'}));

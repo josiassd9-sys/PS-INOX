@@ -1,0 +1,268 @@
+import type { Category, CategoryGroup } from './types';
+import { scrapItems } from './sucata';
+import { tubosOdItems } from './tubos-od';
+import { tubosAliancaItems } from './tubos-alianca';
+import { connectionsGroups } from './conexoes';
+import { chapasItems } from './chapas';
+import { bronzeRodsItems } from './tarugo-bronze';
+import { aluminumRodsItems } from './verg-aluminio';
+import { chapasAluminioItems } from './chapas-aluminio';
+import { brassRodsItems } from './verg-latao';
+import { barrasRedondasItems } from './barras-redondas';
+import { barrasQuadradasItems } from './barras-quadradas';
+import { barrasSextavadasItems } from './barras-sextavadas';
+import { tubosScheduleItems } from './tubos-schedule';
+import { cantoneirasItems } from './cantoneiras';
+import { barrasChatasItems } from './barras-chatas';
+import { metalonQuadradoItems } from './metalon-quadrado';
+import { metalonRetangularItems } from './metalon-retangular';
+
+const CATEGORIES: Category[] = [
+  {
+    id: 'retalhos',
+    name: 'Retalhos',
+    description: 'Preencha os campos para calcular o valor.',
+    icon: 'Scissors',
+    unit: 'calc',
+    items: [],
+  },
+  {
+    id: 'package-checker',
+    name: 'Conferência',
+    description: 'Selecione item e insira os dados para calculo de metragem e custo.',
+    icon: 'PackageCheck',
+    unit: 'calc',
+    items: [],
+  },
+  {
+    id: 'balanca',
+    name: 'Balança',
+    description: 'Insira os dados de pesagem para calcular o peso líquido.',
+    icon: 'Weight',
+    unit: 'calc',
+    items: [],
+  },
+  {
+    id: 'tabela-sucata',
+    name: 'Tabela Sucata',
+    description: 'Tabela de preços e composição de sucatas.',
+    icon: 'Trash2',
+    unit: 'kg',
+    items: scrapItems,
+  },
+  {
+    id: 'tubos-od',
+    name: 'Tubos OD',
+    description: 'Tubos redondos com medidas em polegadas e parede em milímetros.',
+    icon: 'Minus',
+    unit: 'm',
+    items: tubosOdItems,
+  },
+  {
+    id: 'tubos-alianca',
+    name: 'Tubos Aliança (DIN)',
+    description: 'Tubos redondos padrão DIN 2458.',
+    icon: 'GalleryVertical',
+    unit: 'm',
+    items: tubosAliancaItems,
+  },
+  {
+    id: 'conexoes',
+    name: 'Conexões',
+    description: 'Catálogo de conexões sanitárias, roscadas e de solda.',
+    icon: 'Link',
+    unit: 'un',
+    items: connectionsGroups,
+    hasOwnPriceControls: true,
+    defaultCostPrice: 40,
+    defaultMarkup: 50,
+  },
+  {
+    id: 'chapas',
+    name: 'Chapas',
+    description: 'Chapas de aço inoxidável em diversas espessuras e dimensões.',
+    icon: 'Square',
+    unit: 'un',
+    items: chapasItems,
+  },
+  {
+    id: 'tarugo-bronze',
+    name: 'Tarugo Bronze',
+    description: 'Tarugos de Bronze TM23 em diversas bitolas.',
+    icon: 'Circle',
+    unit: 'm',
+    items: bronzeRodsItems,
+    hasOwnPriceControls: true,
+    defaultCostPrice: 45,
+    defaultMarkup: 50,
+  },
+  {
+    id: 'verg-aluminio',
+    name: 'Verg. Alumínio',
+    description: 'Vergalhões de Alumínio 6351 T6 em diversas bitolas.',
+    icon: 'Circle',
+    unit: 'm',
+    items: aluminumRodsItems,
+    hasOwnPriceControls: true,
+    defaultCostPrice: 20,
+    defaultMarkup: 50,
+  },
+  {
+    id: 'chapas-aluminio',
+    name: 'Chapas Alumínio',
+    description: 'Chapas de alumínio em diversas espessuras e dimensões.',
+    icon: 'Square',
+    unit: 'un',
+    items: chapasAluminioItems,
+    hasOwnPriceControls: true,
+    defaultCostPrice: 25,
+    defaultMarkup: 50,
+  },
+  {
+    id: 'verg-latao',
+    name: 'Verg. Latão',
+    description: 'Vergalhões de Latão em diversas bitolas.',
+    icon: 'Circle',
+    unit: 'm',
+    items: brassRodsItems,
+    hasOwnPriceControls: true,
+    defaultCostPrice: 35,
+    defaultMarkup: 50,
+  },
+  {
+    id: 'barras-redondas',
+    name: 'Barras Redondas',
+    description: 'Barras redondas maciças em diversas bitolas.',
+    icon: 'Circle',
+    unit: 'm',
+    items: barrasRedondasItems,
+  },
+  {
+    id: 'barra-quadrada',
+    name: 'Barra Quadrada',
+    description: 'Barras quadradas maciças em diversas bitolas.',
+    icon: 'Square',
+    unit: 'm',
+    items: barrasQuadradasItems,
+  },
+  {
+    id: 'barra-sextavada',
+    name: 'Barra Sextavada',
+    description: 'Barras sextavadas maciças em diversas bitolas.',
+    icon: 'Hexagon',
+    unit: 'm',
+    items: barrasSextavadasItems,
+  },
+  {
+    id: 'tubos-schedule',
+    name: 'Tubos Schedule',
+    description: 'Tubos redondos para condução de fluídos, norma Schedule.',
+    icon: 'Layers',
+    unit: 'm',
+    items: tubosScheduleItems,
+  },
+  {
+    id: 'cantoneiras',
+    name: 'Cantoneiras',
+    description: 'Cantoneiras em "L" com diversas medidas.',
+    icon: 'FlipHorizontal',
+    unit: 'm',
+    items: cantoneirasItems,
+  },
+  {
+    id: 'barras-chatas',
+    name: 'Barras Chatas',
+    description: 'Barras chatas (retangulares) em diversas medidas.',
+    icon: 'RectangleHorizontal',
+    unit: 'm',
+    items: barrasChatasItems,
+  },
+  {
+    id: 'metalon-quadrado',
+    name: 'Metalon Quadrado',
+    description: 'Tubos quadrados (metalon) em diversas medidas.',
+    icon: 'Square',
+    unit: 'm',
+    items: metalonQuadradoItems,
+  },
+  {
+    id: 'metalon-retangular',
+    name: 'Metalon Retangular',
+    description: 'Tubos retangulares (metalon) em diversas medidas.',
+    icon: 'RectangleHorizontal',
+    unit: 'm',
+    items: metalonRetangularItems,
+  },
+  {
+    id: 'normas-astm',
+    name: 'Normas ASTM',
+    description: 'Guia de normas técnicas para aço inoxidável.',
+    icon: 'Book',
+    unit: 'calc',
+    items: [],
+  },
+  {
+    id: 'processos-fabricacao',
+    name: 'Processos',
+    description: 'Processos de produção e trabalho com aço inoxidável.',
+    icon: 'Factory',
+    unit: 'calc',
+    items: [],
+  },
+  {
+    id: 'desenho-tecnico',
+    name: 'Desenho Técnico',
+    description: 'Guia de leitura e interpretação de desenhos.',
+    icon: 'DraftingCompass',
+    unit: 'calc',
+    items: [],
+  }
+];
+
+export const CATEGORY_GROUPS: CategoryGroup[] = [
+    {
+        title: 'FERRAMENTAS',
+        items: [
+            CATEGORIES.find(c => c.id === 'retalhos')!,
+            CATEGORIES.find(c => c.id === 'package-checker')!,
+            CATEGORIES.find(c => c.id === 'balanca')!,
+            CATEGORIES.find(c => c.id === 'tabela-sucata')!,
+        ]
+    },
+    {
+        title: 'MATERIAIS (AÇO INOX)',
+        items: [
+            CATEGORIES.find(c => c.id === 'conexoes')!,
+            CATEGORIES.find(c => c.id === 'tubos-od')!,
+            CATEGORIES.find(c => c.id === 'tubos-schedule')!,
+            CATEGORIES.find(c => c.id === 'tubos-alianca')!,
+            CATEGORIES.find(c => c.id === 'metalon-quadrado')!,
+            CATEGORIES.find(c => c.id === 'metalon-retangular')!,
+            CATEGORIES.find(c => c.id === 'barras-redondas')!,
+            CATEGORIES.find(c => c.id === 'barra-quadrada')!,
+            CATEGORIES.find(c => c.id === 'barra-sextavada')!,
+            CATEGORIES.find(c => c.id === 'barras-chatas')!,
+            CATEGORIES.find(c => c.id === 'cantoneiras')!,
+            CATEGORIES.find(c => c.id === 'chapas')!,
+        ]
+    },
+    {
+        title: 'OUTROS METAIS',
+        items: [
+            CATEGORIES.find(c => c.id === 'tarugo-bronze')!,
+            CATEGORIES.find(c => c.id === 'verg-aluminio')!,
+            CATEGORIES.find(c => c.id === 'chapas-aluminio')!,
+            CATEGORIES.find(c => c.id === 'verg-latao')!,
+        ]
+    },
+    {
+        title: 'INFORMATIVOS',
+        items: [
+            CATEGORIES.find(c => c.id === 'normas-astm')!,
+            CATEGORIES.find(c => c.id === 'processos-fabricacao')!,
+            CATEGORIES.find(c => c.id === 'desenho-tecnico')!,
+        ]
+    }
+]
+
+export const ALL_CATEGORIES = CATEGORY_GROUPS.flatMap(group => group.items);

@@ -2,12 +2,25 @@
 "use client";
 
 import * as React from "react";
-import { Search } from "lucide-react";
+import { Search, Trash2 } from "lucide-react";
 import { PsInoxLogo } from "./ps-inox-logo";
 import { Input } from "./ui/input";
 import { ALL_CATEGORIES, Category, ConnectionGroup, ConnectionItem, SteelItem } from "@/lib/data";
 import { GlobalSearchResults } from "./global-search-results";
 import { useToast } from "@/hooks/use-toast";
+import { v4 as uuidv4 } from "uuid";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { Card, CardContent } from "./ui/card";
+import { Button } from "./ui/button";
+
+const MATERIAL_LIST_KEY = "materialBuilderList";
+
+interface ListItem extends SteelItem {
+    listItemId: string;
+    price: number;
+    quantity: number;
+    length?: number;
+}
 
 
 // Mock data, to be replaced with state management
@@ -23,6 +36,44 @@ const mockCostAdjustments = {};
 export function MaterialListBuilder() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const { toast } = useToast();
+  const [materialList, setMaterialList] = React.useState<ListItem[]>([]);
+  
+  React.useEffect(() => {
+    try {
+        const savedList = localStorage.getItem(MATERIAL_LIST_KEY);
+        if (savedList) {
+            setMaterialList(JSON.parse(savedList));
+        }
+    } catch(error) {
+        console.error("Failed to load material list from localStorage", error);
+    }
+  }, []);
+
+  const saveList = (list: ListItem[]) => {
+      try {
+          localStorage.setItem(MATERIAL_LIST_KEY, JSON.stringify(list));
+      } catch (error) {
+           console.error("Failed to save material list to localStorage", error);
+      }
+  }
+  
+  const handleAddItemToList = (item: any) => {
+    const newItem: ListItem = {
+        ...item,
+        listItemId: uuidv4(),
+    };
+    const newList = [...materialList, newItem];
+    setMaterialList(newList);
+    saveList(newList);
+    toast({ title: "Item Adicionado!", description: `${item.description} foi adicionado à lista.` });
+  }
+  
+  const handleRemoveFromList = (listItemId: string) => {
+    const newList = materialList.filter(item => item.listItemId !== listItemId);
+    setMaterialList(newList);
+    saveList(newList);
+    toast({ title: "Item Removido" });
+  }
 
   const handlePrefillScrap = (item: SteelItem, sellingPrice: number) => {
     toast({ title: "Ação não disponível", description: "A adição à lista de retalhos não está ativa nesta tela." });
@@ -89,6 +140,23 @@ export function MaterialListBuilder() {
       .filter((category): category is Category => category !== null && category.items.length > 0);
   }, [searchTerm]);
 
+ const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(value);
+  };
+  
+  const formatNumber = (value: number, digits: number = 3) => {
+    return new Intl.NumberFormat("pt-BR", {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    }).format(value);
+  };
+  
+  const totalListPrice = materialList.reduce((acc, item) => acc + item.price, 0);
+  const totalListWeight = materialList.reduce((acc, item) => acc + item.weight, 0);
+
 
   const renderResults = () => {
     if (!searchTerm) {
@@ -116,6 +184,7 @@ export function MaterialListBuilder() {
             isScrapCalculatorActive={false}
             costAdjustments={mockCostAdjustments}
             onItemClick={handleItemClick}
+            onAddItem={handleAddItemToList}
         />
     );
   }
@@ -142,10 +211,60 @@ export function MaterialListBuilder() {
         </div>
 
         <div className="flex-1 mt-2 overflow-y-auto relative z-10 p-1">
-            {renderResults()}
+            {searchTerm ? renderResults() : null}
+            
+            {materialList.length > 0 && (
+                <div id="material-list-section" className="border-t border-slate-700 flex-1 flex flex-col min-h-0 pt-2 mt-2">
+                    <h2 className="text-lg font-semibold text-center mb-1 text-slate-300">Lista de Materiais</h2>
+                     <Card className="flex-1 overflow-hidden flex flex-col bg-slate-900/50 border-slate-700">
+                        <CardContent className="p-0 flex-1 overflow-y-auto">
+                           <Table>
+                               <TableHeader>
+                                   <TableRow className="border-b-slate-700 hover:bg-slate-800/50">
+                                       <TableHead className="text-slate-300">Descrição</TableHead>
+                                       <TableHead className="text-slate-300 text-center w-28">Detalhe</TableHead>
+                                       <TableHead className="text-slate-300 text-right w-28">Preço</TableHead>
+                                       <TableHead className="w-12"></TableHead>
+                                   </TableRow>
+                               </TableHeader>
+                               <TableBody>
+                                   {materialList.map(item => (
+                                       <TableRow key={item.listItemId} className="border-b-slate-800">
+                                            <TableCell className="font-medium text-slate-300">{item.description}</TableCell>
+                                            <TableCell className="text-center text-slate-400">
+                                                {item.unit === 'm' ? `${item.quantity} pç` : ''}
+                                                {item.unit === 'un' ? `${item.quantity} pç` : ''}
+                                                <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
+                                            </TableCell>
+                                            <TableCell className="text-right font-semibold text-slate-200">{formatCurrency(item.price)}</TableCell>
+                                            <TableCell>
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive/70 hover:text-destructive" onClick={() => handleRemoveFromList(item.listItemId)}>
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </TableCell>
+                                       </TableRow>
+                                   ))}
+                               </TableBody>
+                               <TableFooter>
+                                   <TableRow className="border-t-slate-700 hover:bg-slate-800/50">
+                                       <TableHead colSpan={2} className="text-lg text-slate-200">Total</TableHead>
+                                       <TableHead className="text-right text-lg font-bold text-slate-100">{formatCurrency(totalListPrice)}</TableHead>
+                                       <TableHead></TableHead>
+                                   </TableRow>
+                               </TableFooter>
+                           </Table>
+                        </CardContent>
+                     </Card>
+                </div>
+            )}
+            
+            {!searchTerm && materialList.length === 0 && (
+                 <div className="text-center text-slate-500 py-10">
+                    <p>Sua lista de materiais está vazia.</p>
+                    <p>Use a busca acima para adicionar itens.</p>
+                </div>
+            )}
         </div>
       </div>
   );
 }
-
-    

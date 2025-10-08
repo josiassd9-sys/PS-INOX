@@ -12,23 +12,27 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { SteelItem } from "@/lib/data";
 import { Button } from "./ui/button";
-import { X } from "lucide-react";
+import { PlusCircle, X } from "lucide-react";
 
 interface CutPriceCalculatorProps {
   selectedItem: SteelItem;
   sellingPrice: number;
   onClose: () => void;
+  onAddItem: (item: any) => void;
 }
 
 export function CutPriceCalculator({
   selectedItem,
   sellingPrice,
   onClose,
+  onAddItem,
 }: CutPriceCalculatorProps) {
   const [cutLength, setCutLength] = React.useState<string>("");
   const [pieceWeight, setPieceWeight] = React.useState(0);
   const [finalPrice, setFinalPrice] = React.useState(0);
   const [currentCutPercentage, setCurrentCutPercentage] = React.useState(0);
+  const [quantity, setQuantity] = React.useState<string>("1");
+
 
   // Function to calculate dynamic percentage based on length and weight
   const calculateDynamicPercentage = (lengthInMm: number, weightInKg: number): number => {
@@ -103,6 +107,7 @@ export function CutPriceCalculator({
     setFinalPrice(0);
     setPieceWeight(0);
     setCurrentCutPercentage(0);
+    setQuantity("1");
   }, [selectedItem, sellingPrice]);
   
   const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
@@ -126,6 +131,22 @@ export function CutPriceCalculator({
       maximumFractionDigits: digits,
     }).format(value);
   };
+  
+  const handleAdd = () => {
+    const qty = parseInt(quantity) || 1;
+    if (finalPrice > 0 && pieceWeight > 0) {
+        onAddItem({
+            ...selectedItem,
+            description: `${selectedItem.description} - ${cutLength}mm`,
+            price: finalPrice * qty,
+            weight: pieceWeight * qty,
+            length: parseFloat(cutLength.replace(",", ".")),
+            quantity: qty,
+            unit: 'm'
+        })
+        onClose();
+    }
+  }
 
   return (
     <Card className="border-primary/20">
@@ -157,26 +178,43 @@ export function CutPriceCalculator({
                 placeholder="Ex: 500"
               />
             </div>
-            <div className="space-y-1 flex-1">
+             <div className="space-y-1 w-1/3">
+              <Label htmlFor="quantity">Quantidade</Label>
+              <Input
+                id="quantity"
+                type="text"
+                inputMode="decimal"
+                value={quantity}
+                onChange={(e) => handleInputChange(setQuantity, e.target.value)}
+                placeholder="Qtd."
+              />
+            </div>
+          </div>
+          <div className="flex gap-1">
+             <div className="space-y-1 flex-1">
                 <Label>Peso da Peça (kg)</Label>
                 <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm font-semibold h-10 flex items-center">
                     {formatNumber(pieceWeight, 3)}
                 </div>
             </div>
-          </div>
-          <div className="flex gap-1">
             <div className="space-y-1 flex-1">
                 <Label>Acréscimo de Corte (%)</Label>
                 <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm font-semibold h-10 flex items-center">
                 {currentCutPercentage.toFixed(2).replace('.',',')}%
                 </div>
             </div>
-            <div className="space-y-1 flex-1">
+          </div>
+           <div className="flex gap-1 items-end">
+             <div className="space-y-1 flex-1">
                 <Label className="text-accent-price font-semibold">Preço Final da Peça</Label>
                 <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
                 {formatCurrency(finalPrice)}
                 </div>
             </div>
+            <Button onClick={handleAdd} className="h-10 gap-1">
+                <PlusCircle />
+                Adicionar
+            </Button>
           </div>
         </div>
       </CardContent>

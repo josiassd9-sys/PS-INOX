@@ -19,7 +19,6 @@ import { SwipeToDelete } from "./ui/swipe-to-delete";
 import { AnimatePresence, motion } from "framer-motion";
 
 type Shape = "rectangle" | "disc";
-type FieldName = "width" | "length" | "thickness" | "weight" | "diameter" | "material" | "scrapLength" | "quantity";
 
 interface ScrapPiece {
     id: string;
@@ -80,16 +79,19 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
   const [shape, setShape] = React.useState<Shape>("rectangle");
   const [scrapPrice, setScrapPrice] = React.useState<string>("23");
   
-  const [fields, setFields] = React.useState({
+  const [dimensions, setDimensions] = React.useState({
     width: "",
     length: "",
     thickness: "",
-    weight: "",
     diameter: "",
     material: "304",
     scrapLength: "",
     quantity: "1",
   });
+  
+  const [manualWeight, setManualWeight] = React.useState<string>("");
+  const [isWeightModified, setIsWeightModified] = React.useState(false);
+
 
   const [scrapList, setScrapList] = React.useState<ScrapPiece[]>([]);
 
@@ -125,19 +127,26 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     }
     return 0;
   };
-
-  const handleInputChange = (fieldName: FieldName, value: string) => {
-    const sanitizedValue = fieldName === 'material' ? value : value.replace(/[^0-9,.]/g, '');
-    
-    if (fieldName !== 'material' && !/^\d*[,.]?\d*$/.test(sanitizedValue)) {
+  
+  const handleDimChange = (field: keyof typeof dimensions, value: string) => {
+    const sanitizedValue = field === 'material' ? value : value.replace(/[^0-9,.]/g, '');
+    if (field !== 'material' && !/^\d*[,.]?\d*$/.test(sanitizedValue)) {
         return;
     }
-    
-    setFields(prev => ({
-        ...prev,
-        [fieldName]: sanitizedValue
-    }));
+    setDimensions(prev => ({...prev, [field]: sanitizedValue}));
+    // Reset manual weight when dimensions change
+    setIsWeightModified(false);
   };
+  
+  const handleWeightChange = (value: string) => {
+    const sanitizedValue = value.replace(/[^0-9,.]/g, '');
+     if (!/^\d*[,.]?\d*$/.test(sanitizedValue)) {
+        return;
+    }
+    setManualWeight(sanitizedValue);
+    setIsWeightModified(true);
+  }
+
 
   const handleScrapPriceChange = (value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '');
@@ -148,8 +157,10 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
   }
 
   const resetFields = (keepMaterial = true) => {
-    const material = keepMaterial ? fields.material : "304";
-    setFields({ width: "", length: "", thickness: "", weight: "", diameter: "", material, scrapLength: "", quantity: "1" });
+    const material = keepMaterial ? dimensions.material : "304";
+    setDimensions({ width: "", length: "", thickness: "", diameter: "", material, scrapLength: "", quantity: "1" });
+    setManualWeight("");
+    setIsWeightModified(false);
     if(prefilledItem) onClearPrefill();
   };
 
@@ -159,8 +170,9 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
       resetFields();
     }
   };
+  
+  const isPrefilledItemSheet = prefilledItem?.unit === 'un';
 
-  // EFFECT: Set default price
   React.useEffect(() => {
     if (prefilledItem && sellingPrice > 0) {
         setScrapPrice(sellingPrice.toFixed(2).replace('.', ','));
@@ -169,45 +181,36 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     }
   }, [prefilledItem, sellingPrice]);
   
-  // EFFECT: Handle prefilled item type
-  const isPrefilledItemSheet = prefilledItem?.unit === 'un';
-  
   React.useEffect(() => {
     if (prefilledItem && isPrefilledItemSheet) {
-      setFields(prev => ({
+      setDimensions(prev => ({
         ...prev,
-        weight: prefilledItem.weight > 0 ? prefilledItem.weight.toFixed(3).replace('.', ',') : '',
         scrapLength: "",
         quantity: "1",
       }));
-    } else if (prefilledItem && !isPrefilledItemSheet) {
-        // Handled by calculation effect
-    } else { // No prefilled item
-        // Handled by calculation effect
+      setManualWeight(prefilledItem.weight > 0 ? prefilledItem.weight.toFixed(3).replace('.', ',') : '')
+      setIsWeightModified(true); // Treat prefilled sheet as manual weight
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefilledItem, isPrefilledItemSheet]);
 
+
   // DERIVED VALUES - The core of the calculation logic
-  const { calculatedWeight, currentCutPercentage, finalPrice } = React.useMemo(() => {
+  const { calculatedWeight, currentCutPercentage, finalPrice, displayWeight } = React.useMemo(() => {
     let realWeight: number | null = null;
     let cutPercentage = 0;
 
-    if (prefilledItem) {
-      if (isPrefilledItemSheet) {
-        realWeight = getNum(prefilledItem.weight);
-      } else {
-        const scrapLength_mm = getNum(fields.scrapLength);
+    if (prefilledItem && !isPrefilledItemSheet) {
+        const scrapLength_mm = getNum(dimensions.scrapLength);
         if (scrapLength_mm > 0 && prefilledItem.weight > 0) {
           realWeight = (scrapLength_mm / 1000) * prefilledItem.weight;
           cutPercentage = calculateDynamicPercentage(scrapLength_mm, realWeight);
         }
-      }
-    } else { // Manual calculation
-      const w_mm = getNum(fields.width);
-      const l_mm = getNum(fields.length);
-      const t_mm = getNum(fields.thickness);
-      const d_mm = getNum(fields.diameter);
+    } else if (!prefilledItem) { // Manual calculation
+      const w_mm = getNum(dimensions.width);
+      const l_mm = getNum(dimensions.length);
+      const t_mm = getNum(dimensions.thickness);
+      const d_mm = getNum(dimensions.diameter);
       
       if (shape === 'rectangle' && w_mm > 0 && l_mm > 0 && t_mm > 0) {
         realWeight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
@@ -218,54 +221,52 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
       }
     }
     
-    const weightForPrice = getNum(fields.weight);
-    const quantity = getNum(fields.quantity) || 1;
+    let weightForPriceCalc: number;
+    let finalDisplayWeight: string;
+
+    if(isWeightModified) {
+        weightForPriceCalc = getNum(manualWeight);
+        finalDisplayWeight = manualWeight;
+    } else if (realWeight !== null) {
+        weightForPriceCalc = Math.ceil(realWeight);
+        finalDisplayWeight = weightForPriceCalc > 0 ? weightForPriceCalc.toString() : '';
+    } else {
+        weightForPriceCalc = 0;
+        finalDisplayWeight = '';
+    }
+
+    const quantity = getNum(dimensions.quantity) || 1;
     let totalFinalPrice = 0;
 
-    if (weightForPrice > 0) {
+    if (weightForPriceCalc > 0) {
       if (prefilledItem) {
         if (isPrefilledItemSheet) {
-          totalFinalPrice = prefilledItem.weight * sellingPrice;
+          const basePrice = getNum(manualWeight) * sellingPrice;
+          totalFinalPrice = basePrice;
         } else {
           const pricePerMeter = Math.ceil(sellingPrice * prefilledItem.weight);
-          const scrapLength_mm = getNum(fields.scrapLength);
+          const scrapLength_mm = getNum(dimensions.scrapLength);
           const singlePiecePrice = pricePerMeter * (scrapLength_mm / 1000);
           totalFinalPrice = singlePiecePrice * (1 + cutPercentage / 100);
         }
       } else {
         const pricePerKg = getNum(scrapPrice);
-        totalFinalPrice = weightForPrice * pricePerKg;
+        totalFinalPrice = weightForPriceCalc * pricePerKg;
       }
     }
     
     const finalPrice = Math.ceil(totalFinalPrice) * quantity;
 
-    return { calculatedWeight: realWeight, currentCutPercentage: cutPercentage, finalPrice };
+    return { calculatedWeight: realWeight, currentCutPercentage: cutPercentage, finalPrice, displayWeight: finalDisplayWeight };
 
-  }, [fields, shape, prefilledItem, scrapPrice, sellingPrice, isPrefilledItemSheet]);
-
-  // EFFECT: Update weight field based on calculations
-  React.useEffect(() => {
-    if (prefilledItem) {
-      if (!isPrefilledItemSheet && calculatedWeight !== null) {
-        setFields(prev => ({ ...prev, weight: calculatedWeight > 0 ? calculatedWeight.toFixed(3).replace('.',',') : '' }));
-      }
-    } else { // Manual calculation
-      if (calculatedWeight !== null) {
-        const roundedUpWeight = Math.ceil(calculatedWeight);
-        setFields(prev => ({ ...prev, weight: roundedUpWeight > 0 ? roundedUpWeight.toString() : '' }));
-      } else {
-        setFields(prev => ({ ...prev, weight: '' }));
-      }
-    }
-  }, [calculatedWeight, prefilledItem, isPrefilledItemSheet]);
+  }, [dimensions, shape, prefilledItem, scrapPrice, sellingPrice, isPrefilledItemSheet, manualWeight, isWeightModified]);
 
 
   const addToList = () => {
     let description = "";
     
-    const weight = getNum(fields.weight);
-    const quantity = getNum(fields.quantity) || 1;
+    const weight = getNum(displayWeight);
+    const quantity = getNum(dimensions.quantity) || 1;
 
      if (weight <= 0) {
         toast({ variant: "destructive", title: "Peso inválido", description: "O peso da peça deve ser maior que zero." });
@@ -279,14 +280,14 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
             newPiece = {
                 id: uuidv4(),
                 description,
-                weight: getNum(prefilledItem.weight) * quantity,
+                weight: getNum(displayWeight) * quantity,
                 price: finalPrice,
-                pricePerKg: prefilledItem.weight * sellingPrice,
+                pricePerKg: sellingPrice,
                 unit: 'un',
                 quantity: quantity
             };
         } else {
-            const scrapLength_mm = getNum(fields.scrapLength);
+            const scrapLength_mm = getNum(dimensions.scrapLength);
             if (scrapLength_mm <= 0) {
                 toast({ variant: "destructive", title: "Comprimento inválido", description: "O comprimento do retalho deve ser maior que zero." });
                 return;
@@ -297,7 +298,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
             newPiece = {
                 id: uuidv4(),
                 description,
-                weight: getNum(fields.weight) * quantity,
+                weight: getNum(displayWeight) * quantity, // use display weight which is calculated
                 price: finalPrice,
                 pricePerKg: pricePerMeter, // This is price per meter here
                 length: scrapLength_mm,
@@ -317,23 +318,23 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
         const pricePerUnit = getNum(scrapPrice);
         const quantityText = quantity > 1 ? `(${quantity}x) ` : '';
         if (shape === 'rectangle') {
-            const t = getNum(fields.thickness);
-            const w = getNum(fields.width);
-            const l = getNum(fields.length);
+            const t = getNum(dimensions.thickness);
+            const w = getNum(dimensions.width);
+            const l = getNum(dimensions.length);
             if (t <= 0 || w <= 0 || l <= 0) {
                 toast({ variant: "destructive", title: "Dimensões inválidas", description: "Espessura, largura e comprimento devem ser preenchidos." });
                 return;
             }
             const dims = [w, l].sort((a,b) => a-b);
-            description = `${quantityText}Ret. Chapa ${fields.material} ${formatNumber(t, {minimumFractionDigits: 2})}x${formatNumber(dims[0], {minimumFractionDigits: 0})}x${formatNumber(dims[1], {minimumFractionDigits: 0})} mm`;
+            description = `${quantityText}Ret. Chapa ${dimensions.material} ${formatNumber(t, {minimumFractionDigits: 2})}x${formatNumber(dims[0], {minimumFractionDigits: 0})}x${formatNumber(dims[1], {minimumFractionDigits: 0})} mm`;
         } else { // disc
-            const t = getNum(fields.thickness);
-            const d = getNum(fields.diameter);
+            const t = getNum(dimensions.thickness);
+            const d = getNum(dimensions.diameter);
             if (t <= 0 || d <= 0) {
                 toast({ variant: "destructive", title: "Dimensões inválidas", description: "Espessura e diâmetro devem ser preenchidos." });
                 return;
             }
-            description = `${quantityText}Ret. Disco ${fields.material} ${formatNumber(t, {minimumFractionDigits: 2})} Ø${formatNumber(d, {minimumFractionDigits: 0})} mm`;
+            description = `${quantityText}Ret. Disco ${dimensions.material} ${formatNumber(t, {minimumFractionDigits: 2})} Ø${formatNumber(d, {minimumFractionDigits: 0})} mm`;
         }
         
         newPiece = {
@@ -398,17 +399,17 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                 {isPrefilledItemSheet ? (
                     <div className="space-y-1">
                         <Label htmlFor="quantity">Quantidade de Peças</Label>
-                        <Input id="quantity" type="text" inputMode="decimal" placeholder="Insira a quantidade" value={fields.quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} />
+                        <Input id="quantity" type="text" inputMode="decimal" placeholder="Insira a quantidade" value={dimensions.quantity} onChange={(e) => handleDimChange('quantity', e.target.value)} />
                     </div>
                 ) : (
                     <div className="flex gap-1">
                         <div className="space-y-1 flex-1">
                             <Label htmlFor="scrapLength">Comprimento do Retalho (mm)</Label>
-                            <Input id="scrapLength" type="text" inputMode="decimal" placeholder="Insira o comprimento" value={fields.scrapLength} onChange={(e) => handleInputChange('scrapLength', e.target.value)} />
+                            <Input id="scrapLength" type="text" inputMode="decimal" placeholder="Insira o comprimento" value={dimensions.scrapLength} onChange={(e) => handleDimChange('scrapLength', e.target.value)} />
                         </div>
                         <div className="space-y-1 w-1/3">
                             <Label htmlFor="quantity">Quantidade</Label>
-                            <Input id="quantity" type="text" inputMode="decimal" placeholder="Qtd." value={fields.quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} />
+                            <Input id="quantity" type="text" inputMode="decimal" placeholder="Qtd." value={dimensions.quantity} onChange={(e) => handleDimChange('quantity', e.target.value)} />
                         </div>
                    </div>
                 )}
@@ -426,32 +427,32 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                   {shape === "rectangle" ? (
                     <div className="space-y-1">
                         <div className="flex gap-1">
-                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="width">Larg.(mm)</Label><Input id="width" type="text" inputMode="decimal" placeholder="Largura" value={fields.width} onChange={(e) => handleInputChange('width', e.target.value)} /></div>
-                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="length">Compr.(mm)</Label><Input id="length" type="text" inputMode="decimal" placeholder="Compr." value={fields.length} onChange={(e) => handleInputChange('length', e.target.value)} /></div>
-                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Esp.(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
+                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="width">Larg.(mm)</Label><Input id="width" type="text" inputMode="decimal" placeholder="Largura" value={dimensions.width} onChange={(e) => handleDimChange('width', e.target.value)} /></div>
+                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="length">Compr.(mm)</Label><Input id="length" type="text" inputMode="decimal" placeholder="Compr." value={dimensions.length} onChange={(e) => handleDimChange('length', e.target.value)} /></div>
+                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Esp.(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={dimensions.thickness} onChange={(e) => handleDimChange('thickness', e.target.value)} /></div>
                         </div>
                         <div className="flex gap-1">
-                             <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
+                             <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={dimensions.material} onChange={(e) => handleDimChange('material', e.target.value)} /></div>
                              <div className="space-y-1 flex-1 min-w-0">
                                 <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
                                 <Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} disabled={!!prefilledItem}/>
                             </div>
-                             <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="quantity">Qtde</Label><Input id="quantity" type="text" inputMode="decimal" placeholder="Qtd." value={fields.quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} /></div>
+                             <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="quantity">Qtde</Label><Input id="quantity" type="text" inputMode="decimal" placeholder="Qtd." value={dimensions.quantity} onChange={(e) => handleDimChange('quantity', e.target.value)} /></div>
                         </div>
                     </div>
                   ) : (
                     <div className="space-y-1">
                         <div className="flex gap-1">
-                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="diameter">Diâmetro(mm)</Label><Input id="diameter" type="text" inputMode="decimal" placeholder="Diâmetro" value={fields.diameter} onChange={(e) => handleInputChange('diameter', e.target.value)} /></div>
-                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Espessura(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
+                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="diameter">Diâmetro(mm)</Label><Input id="diameter" type="text" inputMode="decimal" placeholder="Diâmetro" value={dimensions.diameter} onChange={(e) => handleDimChange('diameter', e.target.value)} /></div>
+                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Espessura(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={dimensions.thickness} onChange={(e) => handleDimChange('thickness', e.target.value)} /></div>
                         </div>
                         <div className="flex gap-1">
-                           <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
+                           <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={dimensions.material} onChange={(e) => handleDimChange('material', e.target.value)} /></div>
                             <div className="space-y-1 flex-1 min-w-0">
                                 <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
                                 <Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} disabled={!!prefilledItem}/>
                             </div>
-                             <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="quantity">Quantidade</Label><Input id="quantity" type="text" inputMode="decimal" placeholder="Qtd." value={fields.quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} /></div>
+                             <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="quantity">Quantidade</Label><Input id="quantity" type="text" inputMode="decimal" placeholder="Qtd." value={dimensions.quantity} onChange={(e) => handleDimChange('quantity', e.target.value)} /></div>
                         </div>
                     </div>
                   )}
@@ -468,7 +469,6 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                         type="text"
                         inputMode="decimal"
                         value={currentCutPercentage > 0 ? formatNumber(currentCutPercentage, {minimumFractionDigits: 2}) : ""}
-                        onChange={(e) => { /* This is now a calculated field, so onChange is not needed for the user */ }}
                         readOnly
                         placeholder="0,00"
                         className="bg-muted/30"
@@ -478,7 +478,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
             <div className="flex gap-1 items-end">
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label htmlFor="weight">Peso (kg)</Label>
-                    <Input id="weight" type="text" inputMode="decimal" placeholder="Peso Final" value={fields.weight.replace('.', ',')} onChange={(e) => handleInputChange('weight', e.target.value)} />
+                    <Input id="weight" type="text" inputMode="decimal" placeholder="Peso Final" value={displayWeight.replace('.', ',')} onChange={(e) => handleWeightChange(e.target.value)} />
                 </div>
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label>P. Real (kg)</Label>

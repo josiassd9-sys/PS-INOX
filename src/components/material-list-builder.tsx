@@ -243,7 +243,7 @@ export function MaterialListBuilder() {
 
             
             {materialList.length > 0 && (
-                <div id="material-list-section" className="flex-1 flex flex-col min-h-0 pt-2">
+                <div id="material-list-section" className="flex-1 flex flex-col min-h-0 mt-2">
                     <h2 className="text-lg font-semibold text-center mb-1 text-foreground">Lista de Materiais</h2>
                      <Card className="flex-1 overflow-hidden flex flex-col bg-card border-border">
                         <CardContent className="p-0 flex-1 overflow-y-auto">

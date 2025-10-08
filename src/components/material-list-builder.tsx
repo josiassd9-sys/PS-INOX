@@ -216,7 +216,7 @@ export function MaterialListBuilder() {
     return (
       <div className="flex items-baseline justify-end tabular-nums">
         <span className="text-sm font-semibold">R$</span>
-        <span className="text-sm font-bold">{thousandsPart}</span>
+        <span className="text-sm font-bold text-[14px]">{thousandsPart}</span>
         <span className="text-[10px] font-semibold">{hundredsPart}</span>
         <span className="text-[6px] self-start mt-px">,{decimalPart}</span>
       </div>
@@ -346,7 +346,7 @@ export function MaterialListBuilder() {
                                <Table>
                                    <TableHeader>
                                        <TableRow className="border-b-border hover:bg-muted/50 flex">
-                                           <TableHead className="flex-1 pl-2 py-1 pr-1">Descrição</TableHead>
+                                           <TableHead className="flex-1 pl-2 pr-1 py-1">Descrição</TableHead>
                                            <TableHead className="text-center p-1 w-[80px]">PMQ</TableHead>
                                            <TableHead className="text-right p-1 w-[80px] bg-muted/50">Preço</TableHead>
                                        </TableRow>
@@ -358,7 +358,7 @@ export function MaterialListBuilder() {
                                                 onClick={() => handleRowClick(item.listItemId)}
                                                 className={cn("flex items-center cursor-pointer", editingItemId === item.listItemId && "bg-primary/20")}
                                             >
-                                              <TableCell className="font-medium text-[11px] flex-1 pl-2 py-1 pr-1">{item.description}</TableCell>
+                                              <TableCell className="font-medium text-[11px] flex-1 pl-2 pr-1 py-1">{item.description}</TableCell>
                                                <TableCell className="text-center text-muted-foreground p-1 w-[80px]">
                                                   <div className="flex flex-col items-center">
                                                     <span className="text-xs">{(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}</span>

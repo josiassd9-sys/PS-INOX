@@ -191,8 +191,8 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
   React.useEffect(() => {
     const getNum = (val: string) => parseFloat(val.replace(',', '.')) || 0;
     
-    let weight = 0;
     if (prefilledItem) {
+        let weight = 0;
         if (isPrefilledItemSheet) {
             weight = getNum(fields.weight);
         } else {
@@ -219,7 +219,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
       const t_mm = getNum(fields.thickness);
       const d_mm = getNum(fields.diameter);
       
-      let realWeight = null;
+      let realWeight: number | null = null;
       if (shape === 'rectangle') {
         if (w_mm > 0 && l_mm > 0 && t_mm > 0) {
             realWeight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
@@ -236,7 +236,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
 
       const activeElement = document.activeElement;
       if (activeElement?.id !== 'weight') {
-        if (realWeight) {
+        if (realWeight !== null) {
             const roundedUpWeight = Math.ceil(realWeight);
             setFields(prev => ({...prev, weight: roundedUpWeight.toString().replace('.',',')}));
         } else {

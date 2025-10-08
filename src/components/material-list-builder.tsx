@@ -250,31 +250,31 @@ export function MaterialListBuilder() {
                         <CardContent className="p-0 flex-1 overflow-y-auto">
                            <Table>
                                <TableHeader>
-                                   <TableRow className="border-b-border hover:bg-muted/50">
-                                       <TableHead>Descrição</TableHead>
-                                       <TableHead className="text-center w-28">Detalhe</TableHead>
-                                       <TableHead className="text-right w-28">Preço</TableHead>
+                                   <TableRow className="border-b-border hover:bg-muted/50 flex">
+                                       <TableHead className="flex-1">Descrição</TableHead>
+                                       <TableHead className="text-center w-[80px]">Detalhe</TableHead>
+                                       <TableHead className="text-right w-[90px]">Preço</TableHead>
                                    </TableRow>
                                </TableHeader>
                                <TableBody>
                                    {materialList.map(item => (
                                       <SwipeToDelete key={item.listItemId} onDelete={() => handleRemoveFromList(item.listItemId)}>
-                                        <TableRow className="border-b-border/50 bg-background">
-                                              <TableCell className="font-medium">{item.description}</TableCell>
-                                              <TableCell className="text-center text-muted-foreground">
+                                        <TableRow className="border-b-border/50 bg-background flex">
+                                              <TableCell className="font-medium flex-1">{item.description}</TableCell>
+                                              <TableCell className="text-center text-muted-foreground w-[80px]">
                                                   {item.unit === 'm' && item.quantity ? `${item.quantity} pç` : ''}
                                                   {item.unit === 'un' ? `${item.quantity} pç` : ''}
                                                   <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
                                               </TableCell>
-                                              <TableCell className="text-right font-semibold text-primary">{formatCurrency(item.price)}</TableCell>
+                                              <TableCell className="text-right font-semibold text-primary w-[90px]">{formatCurrency(item.price)}</TableCell>
                                         </TableRow>
                                       </SwipeToDelete>
                                    ))}
                                </TableBody>
                                <TableFooter>
-                                   <TableRow className="border-t-border hover:bg-muted/50">
-                                       <TableHead colSpan={2} className="text-lg">Total</TableHead>
-                                       <TableHead className="text-right text-lg font-bold text-primary">{formatCurrency(totalListPrice)}</TableHead>
+                                   <TableRow className="border-t-border hover:bg-muted/50 flex">
+                                       <TableHead className="flex-1 text-lg">Total</TableHead>
+                                       <TableHead className="text-right text-lg font-bold text-primary w-[170px]">{formatCurrency(totalListPrice)}</TableHead>
                                    </TableRow>
                                </TableFooter>
                            </Table>

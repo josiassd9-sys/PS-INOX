@@ -13,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFoo
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { ScrapCalculator } from "./scrap-calculator";
+import { SwipeToDelete } from "./ui/swipe-to-delete";
 
 const MATERIAL_LIST_KEY = "materialBuilderList";
 
@@ -193,6 +194,7 @@ export function MaterialListBuilder() {
                 costAdjustments={mockCostAdjustments}
                 onItemClick={handleItemClick}
                 onAddItem={handleAddItemToList}
+                onPrefillScrap={() => {}}
             />
         </div>
     );
@@ -252,32 +254,27 @@ export function MaterialListBuilder() {
                                        <TableHead>Descrição</TableHead>
                                        <TableHead className="text-center w-28">Detalhe</TableHead>
                                        <TableHead className="text-right w-28">Preço</TableHead>
-                                       <TableHead className="w-12"></TableHead>
                                    </TableRow>
                                </TableHeader>
                                <TableBody>
                                    {materialList.map(item => (
-                                       <TableRow key={item.listItemId} className="border-b-border/50">
-                                            <TableCell className="font-medium">{item.description}</TableCell>
-                                            <TableCell className="text-center text-muted-foreground">
-                                                {item.unit === 'm' && item.quantity ? `${item.quantity} pç` : ''}
-                                                {item.unit === 'un' ? `${item.quantity} pç` : ''}
-                                                <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
-                                            </TableCell>
-                                            <TableCell className="text-right font-semibold text-primary">{formatCurrency(item.price)}</TableCell>
-                                            <TableCell>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive/70 hover:text-destructive" onClick={() => handleRemoveFromList(item.listItemId)}>
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </TableCell>
-                                       </TableRow>
+                                      <SwipeToDelete key={item.listItemId} onDelete={() => handleRemoveFromList(item.listItemId)}>
+                                        <TableRow className="border-b-border/50 bg-background">
+                                              <TableCell className="font-medium">{item.description}</TableCell>
+                                              <TableCell className="text-center text-muted-foreground">
+                                                  {item.unit === 'm' && item.quantity ? `${item.quantity} pç` : ''}
+                                                  {item.unit === 'un' ? `${item.quantity} pç` : ''}
+                                                  <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
+                                              </TableCell>
+                                              <TableCell className="text-right font-semibold text-primary">{formatCurrency(item.price)}</TableCell>
+                                        </TableRow>
+                                      </SwipeToDelete>
                                    ))}
                                </TableBody>
                                <TableFooter>
                                    <TableRow className="border-t-border hover:bg-muted/50">
                                        <TableHead colSpan={2} className="text-lg">Total</TableHead>
                                        <TableHead className="text-right text-lg font-bold text-primary">{formatCurrency(totalListPrice)}</TableHead>
-                                       <TableHead></TableHead>
                                    </TableRow>
                                </TableFooter>
                            </Table>

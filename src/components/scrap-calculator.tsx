@@ -11,10 +11,8 @@ import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { STAINLESS_STEEL_DENSITY_KG_M3, SteelItem } from "@/lib/data";
 import { Button } from "./ui/button";
-import { PlusCircle, Printer, Save, Trash2, X } from "lucide-react";
+import { PlusCircle, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { SwipeToDelete } from "./ui/swipe-to-delete";
-import { AnimatePresence, motion } from "framer-motion";
 
 type Shape = "rectangle" | "disc";
 
@@ -33,11 +31,38 @@ interface ScrapCalculatorProps {
     prefilledItem: SteelItem | null;
     onClearPrefill: () => void;
     sellingPrice: number;
+    onAddItem: (item: ScrapPiece) => void;
 }
 
-const LOCAL_STORAGE_KEY = "scrapCalculatorList";
+const calculateCutPercentage = (lengthInMm: number, weightInKg: number): number => {
+    if (lengthInMm >= 6000) return 0;
+    if (lengthInMm > 3000) return 5;
 
-export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }: ScrapCalculatorProps) {
+    const minLength = 10;
+    const maxLength = 3000;
+
+    if (lengthInMm <= minLength) lengthInMm = minLength;
+    if (lengthInMm > maxLength) lengthInMm = maxLength;
+
+    let highPercentage: number;
+    let lowPercentage: number;
+
+    if (weightInKg <= 0.5) {
+      highPercentage = 100;
+      lowPercentage = 10;
+    } else if (weightInKg <= 2) {
+      highPercentage = 50;
+      lowPercentage = 10;
+    } else {
+      highPercentage = 30;
+      lowPercentage = 10;
+    }
+
+    const percentage = highPercentage + (lengthInMm - minLength) * (lowPercentage - highPercentage) / (maxLength - minLength);
+    return percentage;
+};
+
+export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice, onAddItem }: ScrapCalculatorProps) {
   const { toast } = useToast();
   const [shape, setShape] = React.useState<Shape>("rectangle");
   const [scrapPrice, setScrapPrice] = React.useState<string>("23");
@@ -53,54 +78,129 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
   });
   
   const [manualWeight, setManualWeight] = React.useState<string>("");
-  const [scrapList, setScrapList] = React.useState<ScrapPiece[]>([]);
-
-  // Load list from local storage on initial mount
-  React.useEffect(() => {
-    try {
-      const savedList = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (savedList) setScrapList(JSON.parse(savedList));
-    } catch (error) {
-      console.error("Failed to load state from localStorage", error);
-    }
-  }, []);
-
-  const saveListToLocalStorage = (list: ScrapPiece[]) => {
-    try {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(list));
-    } catch (error) {
-      console.error("Failed to save state to localStorage", error);
-      toast({ variant: "destructive", title: "Erro ao Salvar", description: "Não foi possível salvar a lista." });
-    }
-  };
 
   const handleDimChange = (field: keyof typeof dimensions, value: string) => {
-    // Logic was cleared
+    const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
+    if (/^\d*\,?\d*$/.test(sanitizedValue)) {
+        setDimensions(prev => ({ ...prev, [field]: sanitizedValue }));
+        setManualWeight(""); // Clear manual weight when dimensions change
+    }
   };
   
   const handleWeightChange = (value: string) => {
-    // Logic was cleared
+    const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
+    if (/^\d*\,?\d*$/.test(sanitizedValue)) {
+       setManualWeight(sanitizedValue);
+    }
   }
 
   const handleScrapPriceChange = (value: string) => {
-    // Logic was cleared
+    const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
+     if (/^\d*\,?\d*$/.test(sanitizedValue)) {
+       setScrapPrice(sanitizedValue);
+    }
   }
 
   const handleShapeChange = (value: Shape | "") => {
     if (value) {
       setShape(value);
+      setDimensions({ width: "", length: "", thickness: "", diameter: "", material: "304", scrapLength: "", quantity: "1" });
+      setManualWeight("");
     }
   };
+  
+  const { calculatedWeight, calculatedPrice, description, pricePerKg, cutPercentage } = React.useMemo(() => {
+    const qty = parseInt(dimensions.quantity) || 1;
+    let weight = 0;
+    let price = 0;
+    let desc = "Retalho";
+    let p_pricePerKg = parseFloat(scrapPrice.replace(',', '.')) || 0;
+    let p_cutPercentage = 0;
+
+    if (prefilledItem) {
+        p_pricePerKg = sellingPrice;
+        const scrapLengthMm = parseFloat(dimensions.scrapLength.replace(',', '.')) || 0;
+        
+        if (prefilledItem.unit === 'm' && scrapLengthMm > 0) {
+            const pieceWeight = prefilledItem.weight * (scrapLengthMm / 1000);
+            p_cutPercentage = calculateCutPercentage(scrapLengthMm, pieceWeight);
+            const piecePrice = pieceWeight * p_pricePerKg;
+            const finalPiecePrice = piecePrice * (1 + p_cutPercentage / 100);
+            
+            weight = pieceWeight * qty;
+            price = Math.ceil(finalPiecePrice) * qty;
+            desc = `${prefilledItem.description} - ${dimensions.scrapLength}mm`;
+        } else if (prefilledItem.unit === 'un') {
+            weight = prefilledItem.weight * qty;
+            price = p_pricePerKg * qty;
+            desc = prefilledItem.description;
+        }
+
+    } else { // Custom scrap calculation
+        const thick = parseFloat(dimensions.thickness.replace(',', '.')) || 0;
+        
+        if (shape === "rectangle") {
+            const width = parseFloat(dimensions.width.replace(',', '.')) || 0;
+            const length = parseFloat(dimensions.length.replace(',', '.')) || 0;
+            if (width > 0 && length > 0 && thick > 0) {
+                const volumeM3 = (width / 1000) * (length / 1000) * (thick / 1000);
+                weight = volumeM3 * STAINLESS_STEEL_DENSITY_KG_M3;
+                desc = `Chapa ${dimensions.material} ${dimensions.width}x${dimensions.length}x${dimensions.thickness}mm`;
+            }
+        } else { // Disc
+            const diameter = parseFloat(dimensions.diameter.replace(',', '.')) || 0;
+            if (diameter > 0 && thick > 0) {
+                const radiusM = (diameter / 1000) / 2;
+                const volumeM3 = Math.PI * Math.pow(radiusM, 2) * (thick / 1000);
+                weight = volumeM3 * STAINLESS_STEEL_DENSITY_KG_M3;
+                desc = `Disco ${dimensions.material} ø${dimensions.diameter}x${dimensions.thickness}mm`;
+            }
+        }
+        weight *= qty;
+        price = weight * p_pricePerKg;
+    }
+
+    const finalWeight = parseFloat(manualWeight.replace(',', '.')) || weight;
+    if (manualWeight && finalWeight > 0) {
+        price = finalWeight * p_pricePerKg * (1 + p_cutPercentage / 100);
+    }
+    if (prefilledItem?.unit === 'm') price = Math.ceil(price);
+
+
+    return { 
+        calculatedWeight: weight, 
+        calculatedPrice: price, 
+        description: desc,
+        pricePerKg: p_pricePerKg,
+        cutPercentage: p_cutPercentage,
+    };
+
+  }, [dimensions, shape, scrapPrice, prefilledItem, sellingPrice, manualWeight]);
+
 
   const addToList = () => {
-    toast({ title: "Lógica em manutenção", description: "A função de adicionar à lista será reimplementada." });
-  }
+    const qty = parseInt(dimensions.quantity) || 1;
+    const finalWeight = parseFloat(manualWeight.replace(',', '.')) || calculatedWeight;
 
-  const removeFromList = (id: string) => {
-    const newList = scrapList.filter(p => p.id !== id);
-    setScrapList(newList);
-    saveListToLocalStorage(newList);
-    toast({ title: "Peça removida." });
+    if (finalWeight > 0 && calculatedPrice > 0) {
+        onAddItem({
+            id: uuidv4(),
+            description: `${description} ${qty > 1 ? `(${qty} pçs)` : ''}`,
+            weight: finalWeight,
+            price: calculatedPrice,
+            pricePerKg,
+            length: prefilledItem ? parseFloat(dimensions.scrapLength.replace(',', '.')) : undefined,
+            quantity: qty,
+            unit: prefilledItem?.unit || 'kg',
+        });
+        toast({ title: "Item Adicionado!", description: `${description} foi adicionado à lista.` });
+        setDimensions({ width: "", length: "", thickness: "", diameter: "", material: "304", scrapLength: "", quantity: "1" });
+        setManualWeight("");
+        if(prefilledItem) onClearPrefill();
+
+    } else {
+        toast({ variant: "destructive", title: "Dados incompletos", description: "Preencha os campos para calcular e adicionar o item." });
+    }
   }
 
   const formatNumber = (value: string | number, options?: Intl.NumberFormatOptions) => {
@@ -109,17 +209,15 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     return new Intl.NumberFormat('pt-BR', options).format(num);
   }
 
-  const totalListPrice = scrapList.reduce((acc, item) => acc + item.price, 0);
-  const totalListWeight = scrapList.reduce((acc, item) => acc + item.weight, 0);
+  const finalWeightToShow = parseFloat(manualWeight.replace(',', '.')) || calculatedWeight;
 
   return (
-    <div className="flex flex-col h-full p-1">
-      <div id="scrap-calculator-form">
+    <div className="flex flex-col h-full p-1" id="scrap-calculator-form">
         {prefilledItem ? (
             <div className="mb-1 space-y-1 rounded-lg border border-primary/20 bg-primary/5 p-1">
                 <div className="flex justify-between items-start">
                     <div>
-                        <h3 className="font-semibold text-primary">Calculando retalho de item selecionado:</h3>
+                        <h3 className="font-semibold text-primary">Calcular retalho de item selecionado:</h3>
                         <p className="text-sm text-muted-foreground">{prefilledItem.description}</p>
                     </div>
                     <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 -mr-2 -mt-2" onClick={onClearPrefill}>
@@ -191,28 +289,30 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
         )}
         
         <div className="pt-1 mt-1 border-t space-y-1">
-             {prefilledItem && prefilledItem.unit !== 'un' && (
+             {prefilledItem && prefilledItem.unit === 'm' && (
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label htmlFor="cut-percentage">Acréscimo de Corte (%)</Label>
-                    <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm h-10 flex items-center text-muted-foreground">
-                        0,00
+                    <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm h-10 flex items-center">
+                        {cutPercentage.toFixed(2).replace('.', ',')}%
                     </div>
                 </div>
              )}
             <div className="flex gap-1 items-end">
                 <div className="space-y-1 flex-1 min-w-0">
-                    <Label htmlFor="weight">Peso (kg)</Label>
+                    <Label htmlFor="weight">Peso Manual (kg)</Label>
                     <Input id="weight" type="text" inputMode="decimal" placeholder="Peso Final" value={manualWeight} onChange={(e) => handleWeightChange(e.target.value)} />
                 </div>
                 <div className="space-y-1 flex-1 min-w-0">
-                    <Label>P. Real (kg)</Label>
-                    <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm h-10 flex items-center text-muted-foreground">
-                        ...
+                    <Label>Peso Calculado (kg)</Label>
+                    <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm h-10 flex items-center">
+                        {formatNumber(finalWeightToShow, { minimumFractionDigits: 3 })}
                     </div>
                 </div>
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label className="text-accent-price font-semibold">R$ Total</Label>
-                    <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">R$ 0,00</div>
+                    <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
+                        {formatNumber(calculatedPrice, {style: 'currency', currency: 'BRL'})}
+                    </div>
                 </div>
             </div>
         </div>
@@ -220,92 +320,9 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
         <div className="mt-1">
             <Button onClick={addToList} className="w-full gap-1">
                 <PlusCircle/>
-                Adicione à Lista
+                Adicionar à Lista
             </Button>
         </div>
-      </div>
-      
-      {scrapList.length > 0 && (
-        <div id="scrap-list-section" className="border-t flex-1 flex flex-col min-h-0 pt-1 mt-1">
-            <h2 className="text-lg font-semibold text-center mb-1">Lista de Materiais</h2>
-            <Card className="flex-1 overflow-hidden flex flex-col">
-                <CardContent className="p-0 flex-1 overflow-y-auto">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-sm table-fixed">
-                           <thead className="text-left sticky top-0 bg-background z-10">
-                                <tr className="border-b">
-                                    <th className="p-1 font-medium w-auto break-words">Descrição</th>
-                                    <th className="p-1 font-medium text-right w-24">Peso/Detalhe</th>
-                                    <th className="p-1 font-medium text-right text-primary w-28">Preço (R$)</th>
-                                </tr>
-                           </thead>
-                           <tbody>
-                               <AnimatePresence>
-                               {scrapList.map(item => (
-                                   <motion.tr
-                                     key={item.id}
-                                     layout
-                                     initial={{ opacity: 0, height: 0 }}
-                                     animate={{ opacity: 1, height: 'auto' }}
-                                     exit={{ opacity: 0, x: -200, transition: { duration: 0.2 } }}
-                                     className="border-b last:border-0 even:bg-primary/5"
-                                   >
-                                     <td colSpan={3} className="p-0">
-                                       <SwipeToDelete onDelete={() => removeFromList(item.id)}>
-                                         <div className="flex items-center">
-                                           <div className="p-1 flex-1 w-full break-words">{item.description}</div>
-                                           <div className="p-1 text-right w-24">
-                                             {item.unit === 'm' && item.length ? (
-                                               <>
-                                                 <div>{formatNumber(item.weight, { minimumFractionDigits: 3, maximumFractionDigits: 3 })} kg</div>
-                                                 <div className="text-xs text-muted-foreground font-normal">
-                                                     {`${formatNumber(item.length / 1000, { minimumFractionDigits: 3, maximumFractionDigits: 3 })} m`}
-                                                 </div>
-                                               </>
-                                             ) : item.unit === 'un' && item.quantity ? (
-                                                <>
-                                                  <div>{formatNumber(item.weight, { minimumFractionDigits: 3, maximumFractionDigits: 3 })} kg</div>
-                                                  <div className="text-xs text-muted-foreground font-normal">
-                                                     {`(${item.quantity} pç)`}
-                                                   </div>
-                                                </>
-                                             ) : (
-                                               <>
-                                                 <div>{formatNumber(item.weight, { minimumFractionDigits: 3, maximumFractionDigits: 3 })} kg</div>
-                                                 {item.pricePerKg && (
-                                                   <div className="text-xs text-muted-foreground font-normal">
-                                                     {`${formatNumber(item.pricePerKg, { style: 'currency', currency: 'BRL' })}/kg`}
-                                                   </div>
-                                                 )}
-                                               </>
-                                             )}
-                                           </div>
-                                           <div className="p-1 text-right font-medium text-primary w-28">{formatNumber(item.price, { style: 'currency', currency: 'BRL' })}</div>
-                                         </div>
-                                       </SwipeToDelete>
-                                     </td>
-                                   </motion.tr>
-                               ))}
-                               </AnimatePresence>
-                           </tbody>
-                           <tfoot className="font-semibold border-t sticky bottom-0 bg-background/95">
-                                <tr>
-                                    <td className="p-1 pt-1">TOTAL</td>
-                                    <td className="p-1 pt-1 text-right">{formatNumber(totalListWeight, {minimumFractionDigits: 3, maximumFractionDigits: 3})} kg</td>
-                                    <td className="p-1 pt-1 text-right text-primary">{formatNumber(totalListPrice, {style: 'currency', currency: 'BRL'})}</td>
-                                </tr>
-                           </tfoot>
-                        </table>
-                    </div>
-                </CardContent>
-            </Card>
-
-            <div className="flex justify-end gap-1 print:hidden pt-1">
-                <Button variant="outline" className="gap-1" onClick={() => {saveListToLocalStorage(scrapList); toast({ title: "Lista Salva!"});}}><Save/> Salvar</Button>
-                <Button className="gap-1" onClick={() => window.print()}><Printer/> Imprimir</Button>
-            </div>
-        </div>
-      )}
     </div>
   );
 }

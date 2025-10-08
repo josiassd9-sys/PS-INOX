@@ -2,7 +2,7 @@
 "use client";
 
 import * as React from "react";
-import { Search, Trash2 } from "lucide-react";
+import { Search, Trash2, X } from "lucide-react";
 import { PsInoxLogo } from "./ps-inox-logo";
 import { Input } from "./ui/input";
 import { ALL_CATEGORIES, Category, ConnectionGroup, ConnectionItem, SteelItem } from "@/lib/data";
@@ -12,6 +12,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "./ui/table";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
+import { ScrapCalculator } from "./scrap-calculator";
 
 const MATERIAL_LIST_KEY = "materialBuilderList";
 
@@ -37,6 +38,7 @@ export function MaterialListBuilder() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const { toast } = useToast();
   const [materialList, setMaterialList] = React.useState<ListItem[]>([]);
+  const [isScrapCalculatorOpen, setIsScrapCalculatorOpen] = React.useState(false);
   
   React.useEffect(() => {
     try {
@@ -67,6 +69,7 @@ export function MaterialListBuilder() {
     saveList(newList);
     toast({ title: "Item Adicionado!", description: `${item.description} foi adicionado à lista.` });
     setSearchTerm("");
+    setIsScrapCalculatorOpen(false);
   }
   
   const handleRemoveFromList = (listItemId: string) => {
@@ -75,13 +78,14 @@ export function MaterialListBuilder() {
     saveList(newList);
     toast({ title: "Item Removido" });
   }
-
-  const handlePrefillScrap = (item: SteelItem, sellingPrice: number) => {
-    toast({ title: "Ação não disponível", description: "A adição à lista de retalhos não está ativa nesta tela." });
-  };
   
   const handleItemClick = (item: SteelItem) => {
-     toast({ title: "Ação não disponível", description: "O ajuste de custo não está ativo nesta tela." });
+     if (item.id === 'retalhos') {
+        setIsScrapCalculatorOpen(true);
+        setSearchTerm("");
+     } else {
+        toast({ title: "Ação não disponível", description: "O ajuste de custo não está ativo nesta tela." });
+     }
   }
 
   const filteredCategories = React.useMemo(() => {
@@ -90,8 +94,13 @@ export function MaterialListBuilder() {
     const safeSearchTerm = searchTerm.replace(",", ".").toLowerCase();
   
     return ALL_CATEGORIES.map((category) => {
-        // Skip categories that are just tools/info
-        if (['retalhos', 'package-checker', 'balanca', 'tabela-sucata', 'normas-astm', 'processos-fabricacao', 'desenho-tecnico'].includes(category.id)) {
+        // Allow searching for "Retalhos"
+        if (category.id === 'retalhos' && category.name.toLowerCase().includes(safeSearchTerm)) {
+             return { ...category, items: [ {id: 'retalhos', description: 'Calcular retalho personalizado', categoryName: 'retalhos'} ]};
+        }
+
+        // Skip other tool categories
+        if (['package-checker', 'balanca', 'tabela-sucata', 'normas-astm', 'processos-fabricacao', 'desenho-tecnico'].includes(category.id)) {
             return null;
         }
 
@@ -164,10 +173,12 @@ export function MaterialListBuilder() {
       return null;
     }
 
-    if (filteredCategories.length === 0) {
+    if (filteredCategories.length === 0 && !isScrapCalculatorOpen) {
         return (
-            <div className="text-center text-muted-foreground py-10">
-                <p>Nenhum material encontrado para "{searchTerm}".</p>
+             <div className="absolute inset-x-0 top-full mt-1 bg-background z-20 border rounded-lg shadow-lg p-4 max-h-[60vh] overflow-y-auto">
+                <div className="text-center text-muted-foreground py-10">
+                    <p>Nenhum material encontrado para "{searchTerm}".</p>
+                </div>
             </div>
         );
     }
@@ -178,8 +189,7 @@ export function MaterialListBuilder() {
                 categories={filteredCategories}
                 priceParams={mockPriceParams}
                 searchTerm={searchTerm}
-                onPrefillScrap={handlePrefillScrap}
-                isScrapCalculatorActive={false}
+                isScrapCalculatorActive={false} // This is for prefilling the main scrap calculator, not for adding to list.
                 costAdjustments={mockCostAdjustments}
                 onItemClick={handleItemClick}
                 onAddItem={handleAddItemToList}
@@ -200,16 +210,36 @@ export function MaterialListBuilder() {
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                     type="search"
-                    placeholder="Buscar material..."
+                    placeholder="Buscar material ou 'retalho'..."
                     className="w-full rounded-lg bg-muted/50 border-input pl-8"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
+                    onFocus={() => setIsScrapCalculatorOpen(false)}
                 />
                 {renderResults()}
             </div>
         </div>
 
         <div className="flex-1 mt-2 overflow-y-auto relative z-0 p-1">
+             {isScrapCalculatorOpen && (
+                <div className="mb-2">
+                     <Card>
+                        <CardContent className="p-1">
+                             <div className="flex justify-between items-center pb-1">
+                                <h3 className="font-semibold px-1">Calcular Retalho Personalizado</h3>
+                                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setIsScrapCalculatorOpen(false)}><X/></Button>
+                            </div>
+                            <ScrapCalculator 
+                                prefilledItem={null} 
+                                onClearPrefill={() => {}} 
+                                sellingPrice={0} // Not used for custom scrap
+                                onAddItem={handleAddItemToList}
+                            />
+                        </CardContent>
+                    </Card>
+                </div>
+             )}
+
             
             {materialList.length > 0 && (
                 <div id="material-list-section" className="flex-1 flex flex-col min-h-0 pt-2">
@@ -256,7 +286,7 @@ export function MaterialListBuilder() {
                 </div>
             )}
             
-            {!searchTerm && materialList.length === 0 && (
+            {!searchTerm && materialList.length === 0 && !isScrapCalculatorOpen && (
                  <div className="text-center text-muted-foreground py-10">
                     <p>Sua lista de materiais está vazia.</p>
                     <p>Use a busca acima para adicionar itens.</p>

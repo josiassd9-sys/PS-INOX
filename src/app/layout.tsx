@@ -1,6 +1,7 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   manifest: "/manifest.json",
@@ -23,6 +24,11 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="font-body antialiased">
+        <div className="absolute top-0 right-0 p-4 z-50">
+          <Link href="/showcase" className="bg-primary text-primary-foreground p-2 rounded-md text-sm">
+            Ver Showcase
+          </Link>
+        </div>
         {children}
         <Toaster />
       </body>

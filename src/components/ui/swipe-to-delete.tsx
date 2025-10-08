@@ -4,15 +4,18 @@
 import * as React from "react";
 import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
 import { Trash2 } from "lucide-react";
+import { Slot } from "@radix-ui/react-slot";
+import { TableRow } from "./table";
 
 interface SwipeToDeleteProps {
-  children: React.ReactNode;
+  children: React.ReactElement;
   onDelete: () => void;
+  asChild?: boolean;
 }
 
 const SWIPE_THRESHOLD = -100;
 
-export function SwipeToDelete({ children, onDelete }: SwipeToDeleteProps) {
+export function SwipeToDelete({ children, onDelete, asChild = false }: SwipeToDeleteProps) {
   const x = useMotionValue(0);
 
   const [isDeleting, setIsDeleting] = React.useState(false);
@@ -39,6 +42,8 @@ export function SwipeToDelete({ children, onDelete }: SwipeToDeleteProps) {
   if (isDeleting) {
     return null; // The parent component will handle the removal from the list
   }
+  
+  const Comp = asChild ? Slot : motion.div;
 
   return (
     <div className="relative w-full overflow-hidden">
@@ -50,15 +55,15 @@ export function SwipeToDelete({ children, onDelete }: SwipeToDeleteProps) {
                 <Trash2 className="text-destructive-foreground" />
             </motion.div>
         </motion.div>
-      <motion.div
-        className="relative bg-background cursor-grab"
-        drag="x"
-        dragConstraints={{ left: 0, right: 0 }}
-        style={{ x }}
-        onDragEnd={handleDragEnd}
-      >
-        {children}
-      </motion.div>
+        <motion.div
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            style={{ x }}
+            onDragEnd={handleDragEnd}
+            className="relative cursor-grab"
+        >
+            {children}
+        </motion.div>
     </div>
   );
 }

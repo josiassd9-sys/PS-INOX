@@ -258,7 +258,7 @@ export function MaterialListBuilder() {
                                </TableHeader>
                                <TableBody>
                                    {materialList.map(item => (
-                                      <SwipeToDelete key={item.listItemId} onDelete={() => handleRemoveFromList(item.listItemId)}>
+                                      <SwipeToDelete key={item.listItemId} asChild onDelete={() => handleRemoveFromList(item.listItemId)}>
                                         <TableRow className="border-b-border/50 bg-background flex">
                                               <TableCell className="font-medium flex-1">{item.description}</TableCell>
                                               <TableCell className="text-center text-muted-foreground w-[80px]">

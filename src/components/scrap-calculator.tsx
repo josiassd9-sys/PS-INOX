@@ -207,41 +207,43 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                 setCalculatedWeight(null);
             }
         }
+        
+        const activeElement = document.activeElement;
+        if (activeElement?.id !== 'weight') {
+            setFields(prev => ({...prev, weight: weight ? weight.toFixed(3).replace('.', ',') : ''}));
+        }
+
     } else { // Manual calculation
       const w_mm = getNum(fields.width);
       const l_mm = getNum(fields.length);
       const t_mm = getNum(fields.thickness);
       const d_mm = getNum(fields.diameter);
       
-      let calculatedWeightValue = null;
+      let realWeight = null;
       if (shape === 'rectangle') {
         if (w_mm > 0 && l_mm > 0 && t_mm > 0) {
-            calculatedWeightValue = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
+            realWeight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
         }
       } else { // disc
         if (d_mm > 0 && t_mm > 0) {
             const r_m = d_mm / 2000;
             const vol_m3 = Math.PI * r_m * r_m * (t_mm / 1000);
-            calculatedWeightValue = vol_m3 * DENSITY;
+            realWeight = vol_m3 * DENSITY;
         }
       }
       
-      setCalculatedWeight(calculatedWeightValue);
+      setCalculatedWeight(realWeight);
 
-      if (calculatedWeightValue) {
-          const roundedUpWeight = Math.ceil(calculatedWeightValue);
-          setFields(prev => ({...prev, weight: roundedUpWeight.toString().replace('.',',')}));
-      } else {
-          setFields(prev => ({...prev, weight: ''}));
+      const activeElement = document.activeElement;
+      if (activeElement?.id !== 'weight') {
+        if (realWeight) {
+            const roundedUpWeight = Math.ceil(realWeight);
+            setFields(prev => ({...prev, weight: roundedUpWeight.toString().replace('.',',')}));
+        } else {
+            setFields(prev => ({...prev, weight: ''}));
+        }
       }
-      return; // Stop here, the weight field update will trigger the next useEffect
     }
-    
-    const activeElement = document.activeElement;
-    if (activeElement?.id !== 'weight') {
-        setFields(prev => ({...prev, weight: weight ? weight.toFixed(3).replace('.', ',') : ''}));
-    }
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fields.width, fields.length, fields.thickness, fields.diameter, shape, prefilledItem, fields.scrapLength, isPrefilledItemSheet]);
   
@@ -445,7 +447,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                             <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Esp.(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={fields.thickness} onChange={(e) => handleInputChange('thickness', e.target.value)} /></div>
                         </div>
                         <div className="flex gap-1">
-                            <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
+                             <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="material">Material</Label><Input id="material" placeholder="Ex: 304" value={fields.material} onChange={(e) => handleInputChange('material', e.target.value)} /></div>
                              <div className="space-y-1 flex-1 min-w-0">
                                 <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
                                 <Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} disabled={!!prefilledItem}/>

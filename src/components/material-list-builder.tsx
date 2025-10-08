@@ -222,7 +222,6 @@ export function MaterialListBuilder() {
                                            <TableHead className="flex-1 p-2">Descrição</TableHead>
                                            <TableHead className="text-center p-2 w-[70px] bg-muted/50">Detalhe</TableHead>
                                            <TableHead className="text-center p-2 w-[80px]">Preço</TableHead>
-                                           <TableHead className="px-1 w-[40px]"></TableHead>
                                        </TableRow>
                                    </TableHeader>
                                    <TableBody>
@@ -236,11 +235,6 @@ export function MaterialListBuilder() {
                                                   </div>
                                               </TableCell>
                                               <TableCell className="text-right font-semibold text-accent-price p-2 w-[80px]">{formatCurrency(item.price)}</TableCell>
-                                               <TableCell className="px-1 w-[40px]">
-                                                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleRemoveFromList(item.listItemId)}>
-                                                      <Trash2 className="h-4 w-4 text-destructive" />
-                                                  </Button>
-                                              </TableCell>
                                             </TableRow>
                                        ))}
                                    </TableBody>

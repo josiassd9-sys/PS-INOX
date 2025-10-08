@@ -57,6 +57,9 @@ const CATEGORIES: Category[] = [
     icon: 'Minus',
     unit: 'm',
     items: tubosOdItems,
+    hasOwnPriceControls: true,
+    defaultCostPrice: 30,
+    defaultMarkup: 50,
   },
   {
     id: 'tubos-alianca',
@@ -65,6 +68,9 @@ const CATEGORIES: Category[] = [
     icon: 'GalleryVertical',
     unit: 'm',
     items: tubosAliancaItems,
+    hasOwnPriceControls: true,
+    defaultCostPrice: 30,
+    defaultMarkup: 50,
   },
   {
     id: 'conexoes',
@@ -84,6 +90,9 @@ const CATEGORIES: Category[] = [
     icon: 'Square',
     unit: 'un',
     items: chapasItems,
+    hasOwnPriceControls: true,
+    defaultCostPrice: 30,
+    defaultMarkup: 50,
   },
   {
     id: 'tarugo-bronze',
@@ -136,6 +145,9 @@ const CATEGORIES: Category[] = [
     icon: 'Circle',
     unit: 'm',
     items: barrasRedondasItems,
+    hasOwnPriceControls: true,
+    defaultCostPrice: 30,
+    defaultMarkup: 50,
   },
   {
     id: 'barra-quadrada',
@@ -144,6 +156,9 @@ const CATEGORIES: Category[] = [
     icon: 'Square',
     unit: 'm',
     items: barrasQuadradasItems,
+    hasOwnPriceControls: true,
+    defaultCostPrice: 30,
+    defaultMarkup: 50,
   },
   {
     id: 'barra-sextavada',
@@ -152,6 +167,9 @@ const CATEGORIES: Category[] = [
     icon: 'Hexagon',
     unit: 'm',
     items: barrasSextavadasItems,
+    hasOwnPriceControls: true,
+    defaultCostPrice: 30,
+    defaultMarkup: 50,
   },
   {
     id: 'tubos-schedule',
@@ -160,6 +178,9 @@ const CATEGORIES: Category[] = [
     icon: 'Layers',
     unit: 'm',
     items: tubosScheduleItems,
+    hasOwnPriceControls: true,
+    defaultCostPrice: 30,
+    defaultMarkup: 50,
   },
   {
     id: 'cantoneiras',
@@ -168,6 +189,9 @@ const CATEGORIES: Category[] = [
     icon: 'FlipHorizontal',
     unit: 'm',
     items: cantoneirasItems,
+    hasOwnPriceControls: true,
+    defaultCostPrice: 30,
+    defaultMarkup: 50,
   },
   {
     id: 'barras-chatas',
@@ -176,6 +200,9 @@ const CATEGORIES: Category[] = [
     icon: 'RectangleHorizontal',
     unit: 'm',
     items: barrasChatasItems,
+    hasOwnPriceControls: true,
+    defaultCostPrice: 30,
+    defaultMarkup: 50,
   },
   {
     id: 'metalon-quadrado',
@@ -184,6 +211,9 @@ const CATEGORIES: Category[] = [
     icon: 'Square',
     unit: 'm',
     items: metalonQuadradoItems,
+    hasOwnPriceControls: true,
+    defaultCostPrice: 30,
+    defaultMarkup: 50,
   },
   {
     id: 'metalon-retangular',
@@ -192,6 +222,9 @@ const CATEGORIES: Category[] = [
     icon: 'RectangleHorizontal',
     unit: 'm',
     items: metalonRetangularItems,
+    hasOwnPriceControls: true,
+    defaultCostPrice: 30,
+    defaultMarkup: 50,
   },
   {
     id: 'normas-astm',

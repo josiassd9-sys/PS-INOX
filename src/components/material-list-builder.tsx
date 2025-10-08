@@ -237,7 +237,7 @@ export function MaterialListBuilder() {
           - 'mt-1': Margem no topo, separando da busca. Aumente para 'mt-4'.
           - 'p-1': Padding interno.
         */}
-        <div className="flex-1 mt-1 overflow-y-auto relative z-0 p-1 min-h-0">
+        <div className="flex-1 mt-0.5 overflow-y-auto relative z-0 p-1 min-h-0">
              {isScrapCalculatorOpen && (
                 <div className="mb-2">
                      <Card>
@@ -272,24 +272,23 @@ export function MaterialListBuilder() {
                                        */}
                                        <TableHead className="flex-1 p-2">Descrição</TableHead>
                                        
-                                       {/* GUIA DE AJUSTE DE COLUNA: Detalhe
-                                           - 'w-[80px]': Largura fixa. Altere para 'w-[90px]', 'w-1/3' (um terço), etc.
-                                           - 'p-2': Padding interno.
-                                       */}
-                                       <TableHead className="text-right p-2 w-[80px]">Preço</TableHead>
-                                       
                                        {/* GUIA DE AJUSTE DE COLUNA: Preço
                                            - 'w-[90px]': Largura fixa.
                                            - 'p-2': Padding interno.
                                        */}
-                                       <TableHead className="text-center p-2 w-[70px] bg-muted/50">Detalhe</TableHead>
+                                       <TableHead className="text-right p-2 w-[90px]">Preço</TableHead>
+                                       
+                                       {/* GUIA DE AJUSTE DE COLUNA: Detalhe
+                                           - 'w-[80px]': Largura fixa. Altere para 'w-[90px]', 'w-1/3' (um terço), etc.
+                                           - 'p-2': Padding interno.
+                                       */}
+                                       <TableHead className="text-center p-2 w-[80px] bg-muted/50">Detalhe</TableHead>
                                    </TableRow>
                                </TableHeader>
                                <TableBody>
                                   <AnimatePresence>
                                    {materialList.map(item => (
                                         <SwipeToDelete 
-                                          asChild 
                                           key={item.listItemId} 
                                           onDelete={() => handleRemoveFromList(item.listItemId)}
                                           initial={{ opacity: 0, height: 0 }}
@@ -303,10 +302,10 @@ export function MaterialListBuilder() {
                                                 <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
                                                 
                                                 {/* Célula do Preço */}
-                                                <TableCell className="text-right font-semibold text-accent-price p-2 w-[80px]">{formatCurrency(item.price)}</TableCell>
-
+                                                <TableCell className="text-right font-semibold text-accent-price p-2 w-[90px]">{formatCurrency(item.price)}</TableCell>
+                                                
                                                 {/* Célula do Detalhe (Peso/Qtd) */}
-                                                <TableCell className="text-center text-muted-foreground p-2 w-[70px] bg-muted/50">
+                                                <TableCell className="text-center text-muted-foreground p-2 w-[80px] bg-muted/50">
                                                     {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
                                                     <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
                                                 </TableCell>

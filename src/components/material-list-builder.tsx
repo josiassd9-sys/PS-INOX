@@ -191,15 +191,36 @@ export function MaterialListBuilder() {
   };
 
   const formatPrice = (value: number) => {
-    const parts = formatCurrency(value).split(',');
+    const formatter = new Intl.NumberFormat('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    const formatted = formatter.format(value); // ex: 1.075,20
+
+    const parts = formatted.split(',');
+    const integerPart = parts[0];
+    const decimalPart = parts[1];
+
+    let thousandsPart = '';
+    let hundredsPart = '';
+
+    if (integerPart.includes('.')) {
+      const integerSplits = integerPart.split('.');
+      thousandsPart = integerSplits.slice(0, -1).join('.') + '.';
+      hundredsPart = integerSplits.slice(-1)[0];
+    } else {
+      hundredsPart = integerPart;
+    }
+
     return (
-      <div className="flex items-baseline justify-end">
-        <span className="text-base">{parts[0]}</span>
-        <span className="text-xs self-start mt-px">,{parts[1]}</span>
+      <div className="flex items-baseline justify-end tabular-nums">
+        <span className="text-sm font-semibold">R$</span>
+        <span className="text-lg font-bold">{thousandsPart}</span>
+        <span className="text-base font-semibold">{hundredsPart}</span>
+        <span className="text-xs self-start mt-px">,{decimalPart}</span>
       </div>
     );
   };
-
   
   const formatNumber = (value: number, digits: number = 3) => {
     return new Intl.NumberFormat("pt-BR", {

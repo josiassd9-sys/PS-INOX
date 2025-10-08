@@ -191,7 +191,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice, o
             pricePerKg,
             length: prefilledItem ? parseFloat(dimensions.scrapLength.replace(',', '.')) : undefined,
             quantity: qty,
-            unit: prefilledItem?.unit || 'kg',
+            unit: prefilledItem?.unit || 'un',
         });
         toast({ title: "Item Adicionado!", description: `${description} foi adicionado à lista.` });
         setDimensions({ width: "", length: "", thickness: "", diameter: "", material: "304", scrapLength: "", quantity: "1" });

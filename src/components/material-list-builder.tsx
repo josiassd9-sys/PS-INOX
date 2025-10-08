@@ -14,6 +14,7 @@ import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { ScrapCalculator } from "./scrap-calculator";
 import { SwipeToDelete } from "./ui/swipe-to-delete";
+import { motion } from "framer-motion";
 
 const MATERIAL_LIST_KEY = "materialBuilderList";
 
@@ -258,16 +259,22 @@ export function MaterialListBuilder() {
                                </TableHeader>
                                <TableBody>
                                    {materialList.map(item => (
-                                      <SwipeToDelete key={item.listItemId} asChild onDelete={() => handleRemoveFromList(item.listItemId)}>
-                                        <TableRow className="border-b-border/50 bg-background flex">
+                                      <SwipeToDelete asChild key={item.listItemId} onDelete={() => handleRemoveFromList(item.listItemId)}>
+                                        <motion.tr
+                                            className="border-b-border/50 bg-background flex"
+                                            layout
+                                            initial={{ opacity: 0, y: -20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, x: -100 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
                                               <TableCell className="font-medium flex-1">{item.description}</TableCell>
                                               <TableCell className="text-center text-muted-foreground w-[80px]">
-                                                  {item.unit === 'm' && item.quantity ? `${item.quantity} pç` : ''}
-                                                  {item.unit === 'un' ? `${item.quantity} pç` : ''}
+                                                  {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
                                                   <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
                                               </TableCell>
                                               <TableCell className="text-right font-semibold text-primary w-[90px]">{formatCurrency(item.price)}</TableCell>
-                                        </TableRow>
+                                        </motion.tr>
                                       </SwipeToDelete>
                                    ))}
                                </TableBody>

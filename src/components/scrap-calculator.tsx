@@ -134,7 +134,6 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
         return;
     }
     setDimensions(prev => ({...prev, [field]: sanitizedValue}));
-    // Reset manual weight when dimensions change
     setIsWeightModified(false);
   };
   
@@ -174,32 +173,28 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
   const isPrefilledItemSheet = prefilledItem?.unit === 'un';
 
   React.useEffect(() => {
-    if (prefilledItem && sellingPrice > 0) {
-        setScrapPrice(sellingPrice.toFixed(2).replace('.', ','));
-    } else if (!prefilledItem) {
+    if (prefilledItem) {
+        if (sellingPrice > 0) {
+            setScrapPrice(sellingPrice.toFixed(2).replace('.', ','));
+        }
+        if (isPrefilledItemSheet) {
+          setDimensions(prev => ({ ...prev, scrapLength: "", quantity: "1" }));
+          setManualWeight(prefilledItem.weight > 0 ? prefilledItem.weight.toFixed(3).replace('.', ',') : '');
+          setIsWeightModified(true);
+        }
+    } else {
         setScrapPrice("23"); 
     }
-  }, [prefilledItem, sellingPrice]);
-  
-  React.useEffect(() => {
-    if (prefilledItem && isPrefilledItemSheet) {
-      setDimensions(prev => ({
-        ...prev,
-        scrapLength: "",
-        quantity: "1",
-      }));
-      setManualWeight(prefilledItem.weight > 0 ? prefilledItem.weight.toFixed(3).replace('.', ',') : '')
-      setIsWeightModified(true); // Treat prefilled sheet as manual weight
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prefilledItem, isPrefilledItemSheet]);
+  }, [prefilledItem, sellingPrice, isPrefilledItemSheet]);
 
 
   // DERIVED VALUES - The core of the calculation logic
-  const { calculatedWeight, currentCutPercentage, finalPrice, displayWeight } = React.useMemo(() => {
+  const { calculatedWeight, currentCutPercentage, finalPrice, weightForDisplay } = React.useMemo(() => {
     let realWeight: number | null = null;
     let cutPercentage = 0;
 
+    // --- 1. Calculate Real Weight ---
     if (prefilledItem && !isPrefilledItemSheet) {
         const scrapLength_mm = getNum(dimensions.scrapLength);
         if (scrapLength_mm > 0 && prefilledItem.weight > 0) {
@@ -221,20 +216,22 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
       }
     }
     
+    // --- 2. Determine Weight for Price Calculation ---
     let weightForPriceCalc: number;
-    let finalDisplayWeight: string;
+    let finalWeightForDisplay: string;
 
     if(isWeightModified) {
         weightForPriceCalc = getNum(manualWeight);
-        finalDisplayWeight = manualWeight;
-    } else if (realWeight !== null) {
+        finalWeightForDisplay = manualWeight;
+    } else if (realWeight !== null && realWeight > 0) {
         weightForPriceCalc = Math.ceil(realWeight);
-        finalDisplayWeight = weightForPriceCalc > 0 ? weightForPriceCalc.toString() : '';
+        finalWeightForDisplay = weightForPriceCalc.toString().replace('.', ',');
     } else {
         weightForPriceCalc = 0;
-        finalDisplayWeight = '';
+        finalWeightForDisplay = '';
     }
-
+    
+    // --- 3. Calculate Final Price ---
     const quantity = getNum(dimensions.quantity) || 1;
     let totalFinalPrice = 0;
 
@@ -257,7 +254,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     
     const finalPrice = Math.ceil(totalFinalPrice) * quantity;
 
-    return { calculatedWeight: realWeight, currentCutPercentage: cutPercentage, finalPrice, displayWeight: finalDisplayWeight };
+    return { calculatedWeight: realWeight, currentCutPercentage: cutPercentage, finalPrice, weightForDisplay: finalWeightForDisplay };
 
   }, [dimensions, shape, prefilledItem, scrapPrice, sellingPrice, isPrefilledItemSheet, manualWeight, isWeightModified]);
 
@@ -265,10 +262,10 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
   const addToList = () => {
     let description = "";
     
-    const weight = getNum(displayWeight);
+    const weightValue = getNum(isWeightModified ? manualWeight : weightForDisplay);
     const quantity = getNum(dimensions.quantity) || 1;
 
-     if (weight <= 0) {
+     if (weightValue <= 0) {
         toast({ variant: "destructive", title: "Peso inválido", description: "O peso da peça deve ser maior que zero." });
         return;
     }
@@ -280,7 +277,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
             newPiece = {
                 id: uuidv4(),
                 description,
-                weight: getNum(displayWeight) * quantity,
+                weight: weightValue * quantity,
                 price: finalPrice,
                 pricePerKg: sellingPrice,
                 unit: 'un',
@@ -298,7 +295,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
             newPiece = {
                 id: uuidv4(),
                 description,
-                weight: getNum(displayWeight) * quantity, // use display weight which is calculated
+                weight: (calculatedWeight || 0) * quantity,
                 price: finalPrice,
                 pricePerKg: pricePerMeter, // This is price per meter here
                 length: scrapLength_mm,
@@ -340,7 +337,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
         newPiece = {
             id: uuidv4(),
             description,
-            weight: weight * quantity,
+            weight: weightValue * quantity,
             price: finalPrice,
             pricePerKg: pricePerUnit,
             unit: 'kg',
@@ -478,7 +475,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
             <div className="flex gap-1 items-end">
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label htmlFor="weight">Peso (kg)</Label>
-                    <Input id="weight" type="text" inputMode="decimal" placeholder="Peso Final" value={displayWeight.replace('.', ',')} onChange={(e) => handleWeightChange(e.target.value)} />
+                    <Input id="weight" type="text" inputMode="decimal" placeholder="Peso Final" value={weightForDisplay} onChange={(e) => handleWeightChange(e.target.value)} />
                 </div>
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label>P. Real (kg)</Label>
@@ -585,3 +582,5 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     </div>
   );
 }
+
+    

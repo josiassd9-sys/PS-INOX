@@ -94,7 +94,6 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
   const [scrapList, setScrapList] = React.useState<ScrapPiece[]>([]);
   const [calculatedWeight, setCalculatedWeight] = React.useState<number | null>(null);
   const [currentCutPercentage, setCurrentCutPercentage] = React.useState(0);
-  const [isPrefilledItemUnit, setIsPrefilledItemUnit] = React.useState(false);
   const [finalPrice, setFinalPrice] = React.useState(0);
   const [isPrefilledItemSheet, setIsPrefilledItemSheet] = React.useState(false);
 
@@ -191,46 +190,41 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
   React.useEffect(() => {
     const getNum = (val: string) => parseFloat(val.replace(',', '.')) || 0;
     let realWeight: number | null = null;
-
+  
     if (prefilledItem) {
-        if (isPrefilledItemSheet) {
-            realWeight = prefilledItem.weight;
+      if (isPrefilledItemSheet) {
+        realWeight = prefilledItem.weight;
+      } else {
+        const scrapLength_mm = getNum(fields.scrapLength);
+        if (scrapLength_mm > 0 && prefilledItem.weight > 0) {
+          realWeight = (scrapLength_mm / 1000) * prefilledItem.weight;
+          setCurrentCutPercentage(calculateDynamicPercentage(scrapLength_mm, realWeight));
         } else {
-            const scrapLength_mm = getNum(fields.scrapLength);
-            if (scrapLength_mm > 0 && prefilledItem.weight > 0) {
-                realWeight = (scrapLength_mm / 1000) * prefilledItem.weight;
-                setCurrentCutPercentage(calculateDynamicPercentage(scrapLength_mm, realWeight));
-            } else {
-                setCurrentCutPercentage(0);
-            }
+          setCurrentCutPercentage(0);
         }
+      }
     } else { // Manual calculation
-        const w_mm = getNum(fields.width);
-        const l_mm = getNum(fields.length);
-        const t_mm = getNum(fields.thickness);
-        const d_mm = getNum(fields.diameter);
-        
-        if (shape === 'rectangle') {
-            if (w_mm > 0 && l_mm > 0 && t_mm > 0) {
-                realWeight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
-            }
-        } else { // disc
-            if (d_mm > 0 && t_mm > 0) {
-                const r_m = d_mm / 2000;
-                const vol_m3 = Math.PI * r_m * r_m * (t_mm / 1000);
-                realWeight = vol_m3 * DENSITY;
-            }
-        }
+      const w_mm = getNum(fields.width);
+      const l_mm = getNum(fields.length);
+      const t_mm = getNum(fields.thickness);
+      const d_mm = getNum(fields.diameter);
+      
+      if (shape === 'rectangle' && w_mm > 0 && l_mm > 0 && t_mm > 0) {
+        realWeight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
+      } else if (shape === 'disc' && d_mm > 0 && t_mm > 0) {
+        const r_m = d_mm / 2000;
+        const vol_m3 = Math.PI * r_m * r_m * (t_mm / 1000);
+        realWeight = vol_m3 * DENSITY;
+      }
     }
-    
+  
     setCalculatedWeight(realWeight);
-
-    // This is the logic to auto-fill the weight input
-    const weightInputIsEmpty = fields.weight === "";
-    
-    if (realWeight !== null && weightInputIsEmpty) {
+  
+    if (realWeight !== null && !prefilledItem) {
         const roundedUpWeight = Math.ceil(realWeight);
         setFields(prev => ({ ...prev, weight: roundedUpWeight.toString().replace('.', ',') }));
+    } else if (realWeight === null && !prefilledItem) {
+        setFields(prev => ({...prev, weight: ''}));
     }
     
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -588,3 +582,5 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     </div>
   );
 }
+
+    

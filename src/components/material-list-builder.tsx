@@ -344,7 +344,7 @@ export function MaterialListBuilder() {
                                                 onClick={() => handleRowClick(item.listItemId)}
                                                 className={cn("flex items-center cursor-pointer", editingItemId === item.listItemId && "bg-primary/20")}
                                             >
-                                              <TableCell className="font-medium text-[11px] flex-1 pl-2 py-2 pr-1">{item.description}</TableCell>
+                                              <TableCell className="font-medium text-[11px] flex-1 pl-2 py-1 pr-1">{item.description}</TableCell>
                                                <TableCell className="text-center text-muted-foreground p-1 w-[70px]">
                                                   <div className="flex flex-col items-center">
                                                     <span className="text-xs">{(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}</span>

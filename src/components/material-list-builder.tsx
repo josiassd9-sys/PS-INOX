@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from ".
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { ScrapCalculator } from "./scrap-calculator";
+import Link from "next/link";
 
 
 const MATERIAL_LIST_KEY = "materialBuilderList";
@@ -203,7 +204,9 @@ export function MaterialListBuilder() {
         
         <div className="relative z-40 w-full px-8 py-1 flex flex-col gap-1 shrink-0">
             <div className="flex justify-center pt-1">
-                <PsInoxLogo />
+                <Link href="/">
+                  <PsInoxLogo />
+                </Link>
             </div>
 
             <div className="relative">

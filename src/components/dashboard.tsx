@@ -321,7 +321,7 @@ function DashboardComponent() {
   const renderContent = () => {
     if (!selectedCategoryId) {
       return (
-        <WelcomeScreen />
+        <WelcomeScreen onSelectCategory={handleSelectCategory} />
       );
     }
 
@@ -593,5 +593,3 @@ export function Dashboard() {
     </SidebarProvider>
   )
 }
-
-    

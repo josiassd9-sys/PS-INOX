@@ -49,7 +49,11 @@ const itemVariants = {
   },
 };
 
-export function BlueprintMinimalist() {
+interface BlueprintMinimalistProps {
+    onSelectCategory: (categoryId: string) => void;
+}
+
+export function BlueprintMinimalist({ onSelectCategory }: BlueprintMinimalistProps) {
     return (
         <div className="relative w-full h-full flex flex-col items-center justify-center overflow-auto bg-slate-800 p-1">
             <div className="absolute inset-0 bg-grid-slate-700/[0.4] [mask-image:linear-gradient(to_bottom,white_10%,transparent_90%)]"></div>
@@ -75,6 +79,7 @@ export function BlueprintMinimalist() {
                             variants={itemVariants}
                             whileHover={{ scale: 1.1, backgroundColor: 'hsla(220, 14%, 96%, 0.1)', rotate: 5 }}
                             className="flex flex-col items-center justify-center gap-1 p-1 rounded-lg cursor-pointer aspect-square"
+                            onClick={() => onSelectCategory(item.id)}
                          >
                             <Icon name={item.icon} className="w-6 h-6 text-slate-300" />
                             <span className="text-[10px] text-slate-400 text-center leading-tight">{item.name}</span>
@@ -94,6 +99,7 @@ export function BlueprintMinimalist() {
                                     variants={itemVariants}
                                     whileHover={{ scale: 1.1, backgroundColor: 'hsla(220, 14%, 96%, 0.1)', rotate: -5 }}
                                     className="flex flex-col items-center justify-center gap-1 p-1 rounded-lg cursor-pointer aspect-square"
+                                    onClick={() => onSelectCategory(item.id)}
                                  >
                                     <Icon name={item.icon} className="w-5 h-5 text-slate-300" />
                                     <span className="text-[10px] text-slate-400 text-center leading-tight">{item.name}</span>
@@ -113,6 +119,7 @@ export function BlueprintMinimalist() {
                                     variants={itemVariants}
                                     whileHover={{ scale: 1.1, backgroundColor: 'hsla(220, 14%, 96%, 0.1)', rotate: -5 }}
                                     className="flex flex-col items-center justify-center gap-1 p-1 rounded-lg cursor-pointer aspect-square"
+                                    onClick={() => onSelectCategory(item.id)}
                                  >
                                     <Icon name={item.icon} className="w-5 h-5 text-slate-300" />
                                     <span className="text-[10px] text-slate-400 text-center leading-tight">{item.name}</span>
@@ -132,6 +139,7 @@ export function BlueprintMinimalist() {
                             variants={itemVariants}
                             whileHover={{ scale: 1.1, backgroundColor: 'hsla(220, 14%, 96%, 0.1)', rotate: -5 }}
                             className="flex flex-col items-center justify-center gap-1 p-1 rounded-lg cursor-pointer aspect-square"
+                            onClick={() => onSelectCategory(item.id)}
                          >
                             <Icon name={item.icon} className="w-6 h-6 text-slate-300" />
                             <span className="text-[10px] text-slate-400 text-center leading-tight">{item.name}</span>

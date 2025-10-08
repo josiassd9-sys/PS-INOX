@@ -347,7 +347,7 @@ export function MaterialListBuilder() {
                                    <TableHeader>
                                        <TableRow className="border-b-border hover:bg-muted/50 flex">
                                            <TableHead className="flex-1 pl-2 py-1 pr-1">Descrição</TableHead>
-                                           <TableHead className="text-center p-1 w-[80px]">Pç/Kg</TableHead>
+                                           <TableHead className="text-center p-1 w-[80px]">PMQ</TableHead>
                                            <TableHead className="text-right p-1 w-[80px] bg-muted/50">Preço</TableHead>
                                        </TableRow>
                                    </TableHeader>

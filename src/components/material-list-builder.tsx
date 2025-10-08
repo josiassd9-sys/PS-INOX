@@ -9,12 +9,12 @@ import { ALL_CATEGORIES, Category, ConnectionGroup, ConnectionItem, SteelItem } 
 import { GlobalSearchResults } from "./global-search-results";
 import { useToast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from "uuid";
-import { Table, TableBody, TableCell, TableHeader, TableRow, TableFooter } from "./ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import { ScrapCalculator } from "./scrap-calculator";
 import { SwipeToDelete } from "./ui/swipe-to-delete";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const MATERIAL_LIST_KEY = "materialBuilderList";
 
@@ -251,31 +251,38 @@ export function MaterialListBuilder() {
                            <Table>
                                <TableHeader>
                                    <TableRow className="border-b-border hover:bg-muted/50 flex">
-                                       <TableHead className="flex-1">Descrição</TableHead>
-                                       <TableHead className="text-center w-[80px]">Detalhe</TableHead>
-                                       <TableHead className="text-right w-[90px]">Preço</TableHead>
+                                       <TableHead className="flex-1 p-2">Descrição</TableHead>
+                                       <TableHead className="text-center w-[80px] p-2">Detalhe</TableHead>
+                                       <TableHead className="text-right w-[90px] p-2">Preço</TableHead>
                                    </TableRow>
                                </TableHeader>
                                <TableBody>
+                                   <AnimatePresence>
                                    {materialList.map(item => (
-                                        <SwipeToDelete asChild key={item.listItemId} onDelete={() => handleRemoveFromList(item.listItemId)}>
-                                            <TableRow
-                                                className="border-b-border/50 bg-background flex"
-                                                layout
-                                                initial={{ opacity: 0, y: -20 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, x: -100 }}
-                                                transition={{ duration: 0.2 }}
-                                            >
-                                                <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
-                                                <TableCell className="text-center text-muted-foreground w-[80px] p-2">
-                                                    {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
-                                                    <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
-                                                </TableCell>
-                                                <TableCell className="text-right font-semibold text-primary w-[90px] p-2">{formatCurrency(item.price)}</TableCell>
-                                            </TableRow>
-                                        </SwipeToDelete>
+                                        <motion.tr 
+                                            key={item.listItemId}
+                                            layout
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0, x: -100 }}
+                                            transition={{ duration: 0.2, type: "spring" }}
+                                            className="block"
+                                        >
+                                            <SwipeToDelete onDelete={() => handleRemoveFromList(item.listItemId)}>
+                                                <TableRow
+                                                    className="border-b-border/50 bg-background flex"
+                                                >
+                                                    <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
+                                                    <TableCell className="text-center text-muted-foreground w-[80px] p-2">
+                                                        {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
+                                                        <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
+                                                    </TableCell>
+                                                    <TableCell className="text-right font-semibold text-primary w-[90px] p-2">{formatCurrency(item.price)}</TableCell>
+                                                </TableRow>
+                                            </SwipeToDelete>
+                                        </motion.tr>
                                    ))}
+                                   </AnimatePresence>
                                </TableBody>
                            </Table>
                         </CardContent>
@@ -292,7 +299,7 @@ export function MaterialListBuilder() {
         </div>
 
         {materialList.length > 0 && (
-            <div className="shrink-0 border-t border-border bg-background/95 backdrop-blur-sm p-1">
+            <div className="shrink-0 border-t border-border bg-background/95 backdrop-blur-sm p-2">
                 <div className="flex items-center justify-between">
                     <span className="text-lg font-semibold">Total</span>
                     <span className="text-right text-lg font-bold text-accent-price">{formatCurrency(totalListPrice)}</span>

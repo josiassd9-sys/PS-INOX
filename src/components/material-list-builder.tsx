@@ -9,7 +9,7 @@ import { ALL_CATEGORIES, Category, ConnectionGroup, ConnectionItem, SteelItem } 
 import { GlobalSearchResults } from "./global-search-results";
 import { useToast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from "uuid";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "./ui/table";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 
@@ -66,6 +66,7 @@ export function MaterialListBuilder() {
     setMaterialList(newList);
     saveList(newList);
     toast({ title: "Item Adicionado!", description: `${item.description} foi adicionado à lista.` });
+    setSearchTerm("");
   }
   
   const handleRemoveFromList = (listItemId: string) => {
@@ -160,38 +161,35 @@ export function MaterialListBuilder() {
 
   const renderResults = () => {
     if (!searchTerm) {
-      return (
-        <div className="text-center text-slate-500 py-10">
-          <p>Comece a digitar para buscar um material.</p>
-        </div>
-      );
+      return null;
     }
 
     if (filteredCategories.length === 0) {
         return (
-            <div className="text-center text-slate-500 py-10">
+            <div className="text-center text-muted-foreground py-10">
                 <p>Nenhum material encontrado para "{searchTerm}".</p>
             </div>
         );
     }
 
     return (
-        <GlobalSearchResults
-            categories={filteredCategories}
-            priceParams={mockPriceParams}
-            searchTerm={searchTerm}
-            onPrefillScrap={handlePrefillScrap}
-            isScrapCalculatorActive={false}
-            costAdjustments={mockCostAdjustments}
-            onItemClick={handleItemClick}
-            onAddItem={handleAddItemToList}
-        />
+        <div className="absolute inset-x-0 top-full mt-1 bg-background z-20 border rounded-lg shadow-lg p-1 max-h-[60vh] overflow-y-auto">
+            <GlobalSearchResults
+                categories={filteredCategories}
+                priceParams={mockPriceParams}
+                searchTerm={searchTerm}
+                onPrefillScrap={handlePrefillScrap}
+                isScrapCalculatorActive={false}
+                costAdjustments={mockCostAdjustments}
+                onItemClick={handleItemClick}
+                onAddItem={handleAddItemToList}
+            />
+        </div>
     );
   }
 
   return (
-    <div className="relative w-full h-full flex flex-col overflow-hidden bg-slate-800 text-slate-100 p-1">
-        <div className="absolute inset-0 bg-grid-slate-700/[0.4] [mask-image:linear-gradient(to_bottom,white_10%,transparent_90%)]"></div>
+    <div className="relative w-full h-full flex flex-col overflow-hidden bg-background text-foreground p-1">
         
         <div className="relative z-10 w-full p-1 flex flex-col gap-2 shrink-0">
             <div className="flex justify-center pt-2">
@@ -199,44 +197,44 @@ export function MaterialListBuilder() {
             </div>
 
             <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                     type="search"
                     placeholder="Buscar material..."
-                    className="w-full rounded-lg bg-slate-900/80 border-slate-700 text-slate-300 pl-8 focus:ring-slate-500"
+                    className="w-full rounded-lg bg-muted/50 border-input pl-8"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
+                {renderResults()}
             </div>
         </div>
 
-        <div className="flex-1 mt-2 overflow-y-auto relative z-10 p-1">
-            {searchTerm ? renderResults() : null}
+        <div className="flex-1 mt-2 overflow-y-auto relative z-0 p-1">
             
             {materialList.length > 0 && (
-                <div id="material-list-section" className="border-t border-slate-700 flex-1 flex flex-col min-h-0 pt-2 mt-2">
-                    <h2 className="text-lg font-semibold text-center mb-1 text-slate-300">Lista de Materiais</h2>
-                     <Card className="flex-1 overflow-hidden flex flex-col bg-slate-900/50 border-slate-700">
+                <div id="material-list-section" className="flex-1 flex flex-col min-h-0 pt-2">
+                    <h2 className="text-lg font-semibold text-center mb-1 text-foreground">Lista de Materiais</h2>
+                     <Card className="flex-1 overflow-hidden flex flex-col bg-card border-border">
                         <CardContent className="p-0 flex-1 overflow-y-auto">
                            <Table>
                                <TableHeader>
-                                   <TableRow className="border-b-slate-700 hover:bg-slate-800/50">
-                                       <TableHead className="text-slate-300">Descrição</TableHead>
-                                       <TableHead className="text-slate-300 text-center w-28">Detalhe</TableHead>
-                                       <TableHead className="text-slate-300 text-right w-28">Preço</TableHead>
+                                   <TableRow className="border-b-border hover:bg-muted/50">
+                                       <TableHead>Descrição</TableHead>
+                                       <TableHead className="text-center w-28">Detalhe</TableHead>
+                                       <TableHead className="text-right w-28">Preço</TableHead>
                                        <TableHead className="w-12"></TableHead>
                                    </TableRow>
                                </TableHeader>
                                <TableBody>
                                    {materialList.map(item => (
-                                       <TableRow key={item.listItemId} className="border-b-slate-800">
-                                            <TableCell className="font-medium text-slate-300">{item.description}</TableCell>
-                                            <TableCell className="text-center text-slate-400">
-                                                {item.unit === 'm' ? `${item.quantity} pç` : ''}
+                                       <TableRow key={item.listItemId} className="border-b-border/50">
+                                            <TableCell className="font-medium">{item.description}</TableCell>
+                                            <TableCell className="text-center text-muted-foreground">
+                                                {item.unit === 'm' && item.quantity ? `${item.quantity} pç` : ''}
                                                 {item.unit === 'un' ? `${item.quantity} pç` : ''}
                                                 <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
                                             </TableCell>
-                                            <TableCell className="text-right font-semibold text-slate-200">{formatCurrency(item.price)}</TableCell>
+                                            <TableCell className="text-right font-semibold text-primary">{formatCurrency(item.price)}</TableCell>
                                             <TableCell>
                                                 <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive/70 hover:text-destructive" onClick={() => handleRemoveFromList(item.listItemId)}>
                                                     <Trash2 className="h-4 w-4" />
@@ -246,9 +244,9 @@ export function MaterialListBuilder() {
                                    ))}
                                </TableBody>
                                <TableFooter>
-                                   <TableRow className="border-t-slate-700 hover:bg-slate-800/50">
-                                       <TableHead colSpan={2} className="text-lg text-slate-200">Total</TableHead>
-                                       <TableHead className="text-right text-lg font-bold text-slate-100">{formatCurrency(totalListPrice)}</TableHead>
+                                   <TableRow className="border-t-border hover:bg-muted/50">
+                                       <TableHead colSpan={2} className="text-lg">Total</TableHead>
+                                       <TableHead className="text-right text-lg font-bold text-primary">{formatCurrency(totalListPrice)}</TableHead>
                                        <TableHead></TableHead>
                                    </TableRow>
                                </TableFooter>
@@ -259,7 +257,7 @@ export function MaterialListBuilder() {
             )}
             
             {!searchTerm && materialList.length === 0 && (
-                 <div className="text-center text-slate-500 py-10">
+                 <div className="text-center text-muted-foreground py-10">
                     <p>Sua lista de materiais está vazia.</p>
                     <p>Use a busca acima para adicionar itens.</p>
                 </div>

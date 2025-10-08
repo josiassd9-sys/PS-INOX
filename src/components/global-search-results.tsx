@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import * as React from "react";
@@ -28,14 +29,14 @@ interface GlobalSearchResultsProps {
     onAddItem: (item: any) => void;
 }
 
-function AddByUnitForm({ item, onAdd }: { item: SteelItem; onAdd: (item: any) => void }) {
+function AddByUnitForm({ item, onAdd }: { item: SteelItem & {price: number}; onAdd: (item: any) => void }) {
     const [quantity, setQuantity] = React.useState("1");
     
     const handleAdd = () => {
         const qty = parseInt(quantity) || 1;
         onAdd({
             ...item,
-            price: item.weight * qty,
+            price: item.price * qty,
             weight: item.weight * qty,
             quantity: qty,
         });
@@ -154,7 +155,7 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
                                                                      <TableRow>
                                                                          <TableCell colSpan={3} className="p-0">
                                                                              <AddByUnitForm 
-                                                                                item={{...(item as any), unit: 'un', weight: item.weight * sellingPrice}}
+                                                                                item={{...(item as any), unit: 'un', price: itemPrice}}
                                                                                 onAdd={(newItem) => {
                                                                                     onAddItem(newItem);
                                                                                     setSelectedItemId(null);
@@ -257,7 +258,7 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
                                                                     </div>
                                                                 ) : (
                                                                      <AddByUnitForm 
-                                                                        item={{...item, unit: 'un', weight: itemPrice}}
+                                                                        item={{...item, unit: 'un', price: itemPrice}}
                                                                         onAdd={(newItem) => {
                                                                             onAddItem(newItem);
                                                                             setSelectedItemId(null);

@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import * as React from "react";
@@ -16,7 +17,6 @@ import { GlobalSearchResults } from "./global-search-results";
 import { COST_ADJUSTMENTS_LOCAL_STORAGE_KEY, EDITED_CONNECTIONS_WEIGHTS_KEY } from "./dashboard";
 import { Label } from "./ui/label";
 import { cn } from "@/lib/utils";
-import { ScrapCalculator } from "./scrap-calculator";
 
 
 const MATERIAL_LIST_KEY = "materialBuilderList";
@@ -286,7 +286,7 @@ export function MaterialListBuilder() {
         
       })
       .filter((category): category is Category => category !== null);
-  }, [searchTerm]);
+  }, [searchTerm, costAdjustments, priceParams]);
 
 
   return (
@@ -317,7 +317,6 @@ export function MaterialListBuilder() {
                     categories={filteredCategories as any}
                     priceParams={priceParams}
                     searchTerm={searchTerm}
-                    onPrefillScrap={() => {}}
                     isScrapCalculatorActive={false}
                     costAdjustments={costAdjustments}
                     onItemClick={() => {}} 
@@ -335,7 +334,7 @@ export function MaterialListBuilder() {
                                        <TableRow className="border-b-border hover:bg-muted/50 flex">
                                            <TableHead className="flex-1 p-2">Descrição</TableHead>
                                            <TableHead className="text-center p-2 w-[70px] bg-muted/50">Detalhe</TableHead>
-                                           <TableHead className="text-center p-2 w-[80px]">Preço</TableHead>
+                                           <TableHead className="text-center p-1 w-[80px]">Preço</TableHead>
                                        </TableRow>
                                    </TableHeader>
                                    <TableBody>
@@ -352,7 +351,7 @@ export function MaterialListBuilder() {
                                                     <span className="text-xs">{formatNumber(item.weight, 3)} kg</span>
                                                   </div>
                                               </TableCell>
-                                              <TableCell className="text-right font-semibold text-accent-price p-2 w-[80px]">
+                                              <TableCell className="text-right font-semibold text-accent-price p-1 w-[80px]">
                                                 {formatPrice(item.price)}
                                               </TableCell>
                                             </TableRow>
@@ -392,3 +391,4 @@ export function MaterialListBuilder() {
       </div>
   );
 }
+

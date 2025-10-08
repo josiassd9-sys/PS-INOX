@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -211,5 +212,7 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
     </div>
   )
 }
+
+    
 
     

@@ -249,3 +249,5 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
   );
 }
 
+
+    

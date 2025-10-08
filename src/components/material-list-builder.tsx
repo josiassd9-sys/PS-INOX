@@ -5,13 +5,32 @@ import * as React from "react";
 import { Search } from "lucide-react";
 import { PsInoxLogo } from "./ps-inox-logo";
 import { Input } from "./ui/input";
-import { PhoneMockup } from "./showcase/phone-mockup";
 import { ALL_CATEGORIES, Category, ConnectionGroup, ConnectionItem, SteelItem } from "@/lib/data";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
-import { Table, TableBody, TableCell, TableRow } from "./ui/table";
+import { GlobalSearchResults } from "./global-search-results";
+import { useToast } from "@/hooks/use-toast";
+
+
+// Mock data, to be replaced with state management
+const mockPriceParams = {
+    global: { costPrice: 30, markup: 50, sellingPrice: 45 },
+    "tubos-od": { costPrice: 32, markup: 55, sellingPrice: 49.6 },
+    chapas: { costPrice: 28, markup: 60, sellingPrice: 44.8 },
+    conexoes: { costPrice: 50, markup: 100, sellingPrice: 100 },
+};
+const mockCostAdjustments = {};
+
 
 export function MaterialListBuilder() {
   const [searchTerm, setSearchTerm] = React.useState("");
+  const { toast } = useToast();
+
+  const handlePrefillScrap = (item: SteelItem, sellingPrice: number) => {
+    toast({ title: "Ação não disponível", description: "A adição à lista de retalhos não está ativa nesta tela." });
+  };
+  
+  const handleItemClick = (item: SteelItem) => {
+     toast({ title: "Ação não disponível", description: "O ajuste de custo não está ativo nesta tela." });
+  }
 
   const filteredCategories = React.useMemo(() => {
     if (!searchTerm) return [];
@@ -89,36 +108,20 @@ export function MaterialListBuilder() {
     }
 
     return (
-        <Accordion type="multiple" className="w-full space-y-1" defaultValue={filteredCategories.map(c => c.id)}>
-            {filteredCategories.map(category => (
-                <AccordionItem value={category.id} key={category.id} className="border-slate-700 rounded-lg overflow-hidden bg-slate-900/50">
-                    <AccordionTrigger className="px-2 py-2 hover:bg-slate-700/50 text-base font-semibold text-slate-300">
-                        {category.name} ({category.id === 'conexoes' ? (category.items as ConnectionGroup[]).reduce((acc, g) => acc + g.items.length, 0) : category.items.length})
-                    </AccordionTrigger>
-                    <AccordionContent className="p-0">
-                         <div className="overflow-auto border-t border-slate-700">
-                            <Table>
-                                <TableBody>
-                                    {(category.items as SteelItem[]).map(item => (
-                                        <TableRow key={item.id} className="border-slate-800 hover:bg-slate-700/30 cursor-pointer">
-                                            <TableCell className="text-slate-400 text-xs p-2">
-                                                {item.description}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                         </div>
-                    </AccordionContent>
-                </AccordionItem>
-            ))}
-        </Accordion>
+        <GlobalSearchResults
+            categories={filteredCategories}
+            priceParams={mockPriceParams}
+            searchTerm={searchTerm}
+            onPrefillScrap={handlePrefillScrap}
+            isScrapCalculatorActive={false}
+            costAdjustments={mockCostAdjustments}
+            onItemClick={handleItemClick}
+        />
     );
   }
 
   return (
-    <PhoneMockup>
-      <div className="relative w-full h-full flex flex-col overflow-hidden bg-slate-800 p-1">
+    <div className="relative w-full h-full flex flex-col overflow-hidden bg-slate-800 text-slate-100 p-1">
         <div className="absolute inset-0 bg-grid-slate-700/[0.4] [mask-image:linear-gradient(to_bottom,white_10%,transparent_90%)]"></div>
         
         <div className="relative z-10 w-full p-1 flex flex-col gap-2 shrink-0">
@@ -126,7 +129,6 @@ export function MaterialListBuilder() {
                 <PsInoxLogo />
             </div>
 
-            {/* Search Input */}
             <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-slate-400" />
                 <Input
@@ -139,11 +141,11 @@ export function MaterialListBuilder() {
             </div>
         </div>
 
-        {/* List Area */}
         <div className="flex-1 mt-2 overflow-y-auto relative z-10 p-1">
             {renderResults()}
         </div>
       </div>
-    </PhoneMockup>
   );
 }
+
+    

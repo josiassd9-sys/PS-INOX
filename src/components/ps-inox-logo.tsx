@@ -1,78 +1,98 @@
-
 "use client";
 
 import { motion } from "framer-motion";
 
 export function PsInoxLogo() {
+  const svgVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const textVariants = {
+    hidden: { opacity: 0, y: 100 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.8,
+        delay: 0.2,
+        ease: "easeOut",
+      },
+    },
+  };
+
+  const shineVariants = {
+    hidden: { x: "-150%" },
+    visible: {
+      x: "150%",
+      transition: {
+        duration: 3,
+        ease: "easeInOut",
+        delay: 1.2,
+        repeat: Infinity,
+        repeatDelay: 2.5,
+      },
+    },
+  };
+
   return (
     <motion.svg
-      width="300"
-      height="80"
-      viewBox="0 0 300 80"
+      width="20"
+      height="70"
+      viewBox="0 0 200 70"
       xmlns="http://www.w3.org/2000/svg"
+      variants={svgVariants}
+      initial="hidden"
+      animate="visible"
+      className="max-w-[240px] md:max-w-[280px]"
     >
       <defs>
-        {/* Filtros para o efeito 3D metálico */}
-        <filter id="metal-shadow" x="-50%" y="-50%" width="200%" height="200%">
-          <feDropShadow dx="3" dy="5" stdDeviation="3" floodColor="#000000" floodOpacity="0.4" />
-        </filter>
-
-        <linearGradient id="metal-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#d0d0d0" />
-          <stop offset="50%" stopColor="#c0c0c0" />
-          <stop offset="100%" stopColor="#b0b0b0" />
+        <linearGradient id="shineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.6" />
+          <stop offset="50%" stopColor="hsl(var(--primary-foreground))" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.6" />
         </linearGradient>
 
-        <linearGradient id="metal-side-grad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#666666" />
-          <stop offset="100%" stopColor="#444444" />
+        <linearGradient id="metallicGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="hsl(var(--primary) / 0.9)" />
+            <stop offset="50%" stopColor="hsl(var(--primary))" />
+            <stop offset="100%" stopColor="hsl(var(--primary) / 0.8)" />
         </linearGradient>
-        
-        {/* Gradiente de Arco-íris */}
-        <linearGradient id="rainbow-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#ff0000" />
-            <stop offset="17%" stopColor="#ff7f00" />
-            <stop offset="33%" stopColor="#ffff00" />
-            <stop offset="50%" stopColor="#00ff00" />
-            <stop offset="67%" stopColor="#0000ff" />
-            <stop offset="83%" stopColor="#4b0082" />
-            <stop offset="100%" stopColor="#ee82ee" />
-        </linearGradient>
+
+        <mask id="logoMask">
+            <g fontFamily="var(--font-headline), sans-serif" fontSize="58" fontWeight="bold" fill="white">
+                <motion.text x="8" y="60" variants={textVariants}>PS</motion.text>
+                <motion.text x="85" y="60" variants={textVariants}>-INOX</motion.text>
+            </g>
+        </mask>
       </defs>
-      
-      <g fontFamily="Teko, sans-serif" fontSize="50" fontWeight="700" textAnchor="middle" filter="url(#metal-shadow)">
-        
-        {/* --- Camada Base: Efeito Metálico 3D --- */}
-        <g>
-          {/* Extrusão 3D */}
-          <text x="151" y="52" fill="url(#metal-side-grad)">PS INOX</text>
-          {/* Face Superior Metálica */}
-          <text x="150" y="50" fill="url(#metal-grad)" stroke="#ffffff" strokeWidth="0.5">
-            PS INOX
-          </text>
-        </g>
-        
-        {/* --- Camada Superior: Efeito Arco-íris (Animada) --- */}
-        <motion.g
-          initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 1, 1, 0, 0] }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            repeatDelay: 2,
-            ease: "easeInOut",
-            times: [0, 0.25, 0.75, 0.9, 1]
-          }}
-        >
-          {/* Extrusão 3D (para manter a profundidade) */}
-          <text x="151" y="52" fill="url(#metal-side-grad)">PS INOX</text>
-           {/* Face Superior com gradiente de arco-íris */}
-          <text x="150" y="50" fill="url(#rainbow-grad)" stroke="#ffffff" strokeWidth="0.5">
-            PS INOX
-          </text>
-        </motion.g>
 
+      {/* 3D Extrusion Effect */}
+      <g fontFamily="var(--font-headline), sans-serif" fontSize="61" fontWeight="bold" fill="hsl(var(--primary) / 0.4)">
+          <motion.text x="2" y="62" variants={textVariants}>PS</motion.text>
+          <motion.text x="87" y="62" variants={textVariants}>-INOX</motion.text>
       </g>
+
+      {/* Base Logo with Metallic Gradient */}
+      <g fill="url(#metallicGradient)" mask="url(#logoMask)">
+          <motion.rect x="0" y="0" width="100%" height="100%" />
+      </g>
+      
+      {/* Animated Shine Effect */}
+      <motion.rect
+        x="0"
+        y="0"
+        width="100%"
+        height="100%"
+        fill="url(#shineGradient)"
+        mask="url(#logoMask)"
+        variants={shineVariants}
+      />
     </motion.svg>
   );
 }

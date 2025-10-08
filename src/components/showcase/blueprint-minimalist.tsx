@@ -5,8 +5,14 @@ import { Icon } from "@/components/icons"
 import { CATEGORY_GROUPS } from "@/lib/data"
 
 const mainIcons = CATEGORY_GROUPS.flatMap(g => g.items)
-  .filter(c => ['tubos-od', 'metalon-quadrado', 'barras-chatas', 'chapas', 'conexoes', 'cantoneiras', 'tubos-schedule', 'metalon-retangular', 'barras-redondas', 'barra-quadrada', 'barra-sextavada'].includes(c.id))
-  .map(c => ({ name: c.name, icon: c.icon as any}));
+  .filter(c => ['tubos-od', 'metalon-quadrado', 'barras-chatas', 'chapas', 'conexoes', 'cantoneiras', 'tubos-schedule', 'metalon-retangular', 'barras-redondas', 'barra-quadrada', 'barra-sextavada', 'tubos-alianca'].includes(c.id))
+  .map(c => {
+      let icon = c.icon as any;
+      if (c.id === 'tubos-alianca') {
+          icon = 'AllianceRing';
+      }
+      return { name: c.name, icon };
+  });
   
 const otherMetalsIcons = CATEGORY_GROUPS.flatMap(g => g.items)
   .filter(c => ['tarugo-bronze', 'verg-aluminio', 'chapas-aluminio', 'verg-latao'].includes(c.id))
@@ -65,7 +71,7 @@ export function BlueprintMinimalist() {
                             key={item.name}
                             variants={itemVariants}
                             whileHover={{ scale: 1.1, backgroundColor: 'hsla(220, 14%, 96%, 0.1)', rotate: 5 }}
-                            className="flex flex-col items-center justify-center gap-1 p-1 rounded-lg cursor-pointer"
+                            className="flex flex-col items-center justify-center gap-1 p-1 rounded-lg cursor-pointer aspect-square"
                          >
                             <Icon name={item.icon} className="w-6 h-6 text-slate-300" />
                             <span className="text-[10px] text-slate-400 text-center leading-tight">{item.name}</span>
@@ -84,7 +90,7 @@ export function BlueprintMinimalist() {
                                     key={item.name}
                                     variants={itemVariants}
                                     whileHover={{ scale: 1.1, backgroundColor: 'hsla(220, 14%, 96%, 0.1)', rotate: -5 }}
-                                    className="flex flex-col items-center justify-center gap-1 p-1 rounded-lg cursor-pointer"
+                                    className="flex flex-col items-center justify-center gap-1 p-1 rounded-lg cursor-pointer aspect-square"
                                  >
                                     <Icon name={item.icon} className="w-5 h-5 text-slate-300" />
                                     <span className="text-[10px] text-slate-400 text-center leading-tight">{item.name}</span>
@@ -103,7 +109,7 @@ export function BlueprintMinimalist() {
                                     key={item.name}
                                     variants={itemVariants}
                                     whileHover={{ scale: 1.1, backgroundColor: 'hsla(220, 14%, 96%, 0.1)', rotate: -5 }}
-                                    className="flex flex-col items-center justify-center gap-1 p-1 rounded-lg cursor-pointer"
+                                    className="flex flex-col items-center justify-center gap-1 p-1 rounded-lg cursor-pointer aspect-square"
                                  >
                                     <Icon name={item.icon} className="w-5 h-5 text-slate-300" />
                                     <span className="text-[10px] text-slate-400 text-center leading-tight">{item.name}</span>
@@ -122,7 +128,7 @@ export function BlueprintMinimalist() {
                             key={item.name}
                             variants={itemVariants}
                             whileHover={{ scale: 1.1, backgroundColor: 'hsla(220, 14%, 96%, 0.1)', rotate: -5 }}
-                            className="flex flex-col items-center justify-center gap-1 p-1 rounded-lg cursor-pointer"
+                            className="flex flex-col items-center justify-center gap-1 p-1 rounded-lg cursor-pointer aspect-square"
                          >
                             <Icon name={item.icon} className="w-6 h-6 text-slate-300" />
                             <span className="text-[10px] text-slate-400 text-center leading-tight">{item.name}</span>

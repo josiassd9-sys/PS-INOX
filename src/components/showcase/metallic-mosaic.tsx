@@ -77,7 +77,7 @@ export function MetallicMosaic() {
   });
 
   return (
-    <div className="relative w-full h-auto py-16 flex flex-col items-center justify-center overflow-hidden bg-background">
+    <div className="relative w-full min-h-screen py-16 flex flex-col items-center justify-center overflow-hidden bg-background">
       <svg width="0" height="0" className="absolute">
         <defs>
             <linearGradient id="showcase-metal-grad" x1="0%" y1="0%" x2="0%" y2="100%">

@@ -1,3 +1,4 @@
+
 import type { SteelItem } from './types';
 import { BRONZE_BAR_WEIGHT_CONSTANT } from './constants';
 
@@ -24,7 +25,7 @@ const generateBronzeRods = (): SteelItem[] => {
         id: `bronze-${d.inch.replace(/ /g, '')}`,
         description: `Tarugo Bronze TM23 ${d.inch} (${d.mm.toFixed(2)}mm)`,
         weight: Math.pow(d.mm, 2) * BRONZE_BAR_WEIGHT_CONSTANT,
-        categoryName: 'Tarugo Bronze',
+        categoryName: 'tarugo-bronze',
         unit: 'm'
     }));
 };

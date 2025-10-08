@@ -308,6 +308,15 @@ function DashboardComponent() {
   const isConnectionsCategory = selectedCategoryId === 'conexoes';
   
   const showCustomHeader = !searchTerm && !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isConnectionsCategory;
+
+  const getScrapPrefillPrice = (item: SteelItem): number => {
+    const category = ALL_CATEGORIES.find(c => c.id === item.categoryName);
+    const priceKey = category?.hasOwnPriceControls ? category.id : 'global';
+    const params = priceParams[priceKey] || priceParams['global'];
+    const adjustment = costAdjustments[item.id] || 0;
+    const adjustedCost = params.costPrice * (1 + adjustment / 100);
+    return adjustedCost * (1 + params.markup / 100);
+  }
   
   const renderContent = () => {
     if (!selectedCategory) {
@@ -323,7 +332,7 @@ function DashboardComponent() {
             categories={filteredCategories as any}
             priceParams={priceParams}
             searchTerm={searchTerm}
-            onPrefillScrap={handlePrefillScrapItem}
+            onPrefillScrap={(item) => handlePrefillScrapItem(item, getScrapPrefillPrice(item))}
             isScrapCalculatorActive={true}
             costAdjustments={costAdjustments}
             onItemClick={handleItemClickForAdjustment}
@@ -339,7 +348,7 @@ function DashboardComponent() {
           categories={filteredCategories as any}
           priceParams={priceParams}
           searchTerm={searchTerm}
-          onPrefillScrap={handlePrefillScrapItem}
+          onPrefillScrap={(item) => handlePrefillScrapItem(item, getScrapPrefillPrice(item))}
           isScrapCalculatorActive={false}
           costAdjustments={costAdjustments}
           onItemClick={handleItemClickForAdjustment}
@@ -582,3 +591,4 @@ export function Dashboard() {
     </SidebarProvider>
   )
 }
+

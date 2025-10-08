@@ -1,9 +1,10 @@
+
 import type { SteelItem } from './types';
 import { ALUMINUM_SHEET_WEIGHT_CONSTANT } from './constants';
 
 const generateChapasAluminio = (): SteelItem[] => {
     const items: SteelItem[] = [];
-    const categoryName = 'Chapa Alumínio';
+    const categoryName = 'chapas-aluminio';
     const thicknesses = [0.8, 1.0, 1.2, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 8.0, 10.0];
     const dimensions = [
         { w: 1.25, h: 2.0, desc: '1250x2000' },

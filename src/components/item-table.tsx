@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -63,6 +64,7 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
         description: newDescription,
         weight: parseFloat(newWeight.replace(',', '.')),
         unit: category.unit,
+        categoryName: category.id,
       };
       setItems([...items, newItem]);
       setNewDescription("");
@@ -246,3 +248,4 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
       </>
   );
 }
+

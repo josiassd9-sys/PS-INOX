@@ -1,3 +1,4 @@
+
 import type { Category, CategoryGroup } from './types';
 import { scrapItems } from './sucata';
 import { tubosOdItems } from './tubos-od';
@@ -299,3 +300,5 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
 ]
 
 export const ALL_CATEGORIES = CATEGORY_GROUPS.flatMap(group => group.items);
+export * from './types';
+

@@ -1,3 +1,4 @@
+
 import type { SteelItem } from './types';
 import { BRASS_BAR_WEIGHT_CONSTANT } from './constants';
 
@@ -24,7 +25,7 @@ const generateBrassRods = (): SteelItem[] => {
         id: `brass-${d.inch.replace(/ /g, '')}`,
         description: `Verg. Latão Red. ${d.inch} (${d.mm.toFixed(2)}mm)`,
         weight: Math.pow(d.mm, 2) * BRASS_BAR_WEIGHT_CONSTANT,
-        categoryName: 'Verg. Latão',
+        categoryName: 'verg-latao',
         unit: 'm'
     }));
 };

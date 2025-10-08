@@ -40,18 +40,13 @@ const DENSITY = STAINLESS_STEEL_DENSITY_KG_M3;
 const LOCAL_STORAGE_KEY = "scrapCalculatorList";
 
 const calculateDynamicPercentage = (lengthInMm: number, weightInKg: number): number => {
-    if (lengthInMm >= 6000) {
-      return 0;
-    }
-    if (lengthInMm > 3000) {
-      return 5;
-    }
+    if (lengthInMm >= 6000) return 0;
+    if (lengthInMm > 3000) return 5;
 
     const minLength = 10;
     const maxLength = 3000;
 
-    if (lengthInMm <= minLength) lengthInMm = minLength;
-    if (lengthInMm > maxLength) lengthInMm = maxLength; 
+    lengthInMm = Math.max(minLength, Math.min(lengthInMm, maxLength));
 
     let highPercentage: number;
     let lowPercentage: number;
@@ -67,10 +62,8 @@ const calculateDynamicPercentage = (lengthInMm: number, weightInKg: number): num
       lowPercentage = 10;
     }
 
-    const percentage = highPercentage + (lengthInMm - minLength) * (lowPercentage - highPercentage) / (maxLength - minLength);
-
-    return percentage;
-  };
+    return highPercentage + (lengthInMm - minLength) * (lowPercentage - highPercentage) / (maxLength - minLength);
+};
 
 
 export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }: ScrapCalculatorProps) {
@@ -88,18 +81,14 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     quantity: "1",
   });
   
-  const [weightInput, setWeightInput] = React.useState<string>("");
-  const [isWeightModified, setIsWeightModified] = React.useState(false);
-
-
+  const [manualWeight, setManualWeight] = React.useState<string>("");
+  const [isWeightManuallyEdited, setIsWeightManuallyEdited] = React.useState(false);
   const [scrapList, setScrapList] = React.useState<ScrapPiece[]>([]);
 
   React.useEffect(() => {
     try {
       const savedList = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (savedList) {
-        setScrapList(JSON.parse(savedList));
-      }
+      if (savedList) setScrapList(JSON.parse(savedList));
     } catch (error) {
       console.error("Failed to load state from localStorage", error);
     }
@@ -110,11 +99,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(list));
     } catch (error) {
       console.error("Failed to save state to localStorage", error);
-      toast({
-        variant: "destructive",
-        title: "Erro ao Salvar",
-        description: "Não foi possível salvar a lista.",
-      });
+      toast({ variant: "destructive", title: "Erro ao Salvar", description: "Não foi possível salvar a lista." });
     }
   };
   
@@ -126,41 +111,34 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
     }
     return 0;
   };
-  
-  const handleDimChange = (field: keyof typeof dimensions, value: string) => {
-    const sanitizedValue = field === 'material' ? value : value.replace(/[^0-9,.]/g, '');
-    if (field !== 'material' && !/^\d*[,.]?\d*$/.test(sanitizedValue)) {
-        return;
-    }
-    setDimensions(prev => ({...prev, [field]: sanitizedValue}));
-    setIsWeightModified(false);
-  };
-  
-  const handleWeightChange = (value: string) => {
-    const sanitizedValue = value.replace(/[^0-9,.]/g, '');
-     if (!/^\d*[,.]?\d*$/.test(sanitizedValue)) {
-        return;
-    }
-    setWeightInput(sanitizedValue);
-    setIsWeightModified(true);
-  }
-
-
-  const handleScrapPriceChange = (value: string) => {
-    const sanitizedValue = value.replace(/[^0-9,.]/g, '');
-     if (!/^\d*[,.]?\d*$/.test(sanitizedValue)) {
-        return;
-    }
-    setScrapPrice(sanitizedValue);
-  }
 
   const resetFields = (keepMaterial = true) => {
     const material = keepMaterial ? dimensions.material : "304";
     setDimensions({ width: "", length: "", thickness: "", diameter: "", material, scrapLength: "", quantity: "1" });
-    setWeightInput("");
-    setIsWeightModified(false);
+    setManualWeight("");
+    setIsWeightManuallyEdited(false);
     if(prefilledItem) onClearPrefill();
   };
+  
+  const handleDimChange = (field: keyof typeof dimensions, value: string) => {
+    const sanitizedValue = field === 'material' ? value : value.replace(/[^0-9,.]/g, '');
+    if (field !== 'material' && !/^\d*[,.]?\d*$/.test(sanitizedValue)) return;
+    setDimensions(prev => ({...prev, [field]: sanitizedValue}));
+    setIsWeightManuallyEdited(false);
+  };
+  
+  const handleWeightChange = (value: string) => {
+    const sanitizedValue = value.replace(/[^0-9,.]/g, '');
+    if (!/^\d*[,.]?\d*$/.test(sanitizedValue)) return;
+    setManualWeight(sanitizedValue);
+    setIsWeightManuallyEdited(true);
+  }
+
+  const handleScrapPriceChange = (value: string) => {
+    const sanitizedValue = value.replace(/[^0-9,.]/g, '');
+    if (!/^\d*[,.]?\d*$/.test(sanitizedValue)) return;
+    setScrapPrice(sanitizedValue);
+  }
 
   const handleShapeChange = (value: Shape | "") => {
     if (value) {
@@ -168,155 +146,110 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
       resetFields();
     }
   };
-  
-  const isPrefilledItemSheet = prefilledItem?.unit === 'un';
 
   // --- DERIVED VALUES ---
   const { calculatedWeight, currentCutPercentage } = React.useMemo(() => {
-    let weight: number = 0;
-    let cutPercentage = 0;
-
-    if (prefilledItem && !isPrefilledItemSheet) {
+    if (prefilledItem && prefilledItem.unit !== 'un') {
       const scrapLength_mm = getNum(dimensions.scrapLength);
       if (scrapLength_mm > 0 && prefilledItem.weight > 0) {
-        weight = (scrapLength_mm / 1000) * prefilledItem.weight;
-        cutPercentage = calculateDynamicPercentage(scrapLength_mm, weight);
+        const weight = (scrapLength_mm / 1000) * prefilledItem.weight;
+        const cutPercentage = calculateDynamicPercentage(scrapLength_mm, weight);
+        return { calculatedWeight: weight, currentCutPercentage: cutPercentage };
       }
-    } else if (!prefilledItem) { // Manual calculation
+    } else if (!prefilledItem) {
       const w_mm = getNum(dimensions.width);
       const l_mm = getNum(dimensions.length);
       const t_mm = getNum(dimensions.thickness);
       const d_mm = getNum(dimensions.diameter);
 
       if (shape === 'rectangle' && w_mm > 0 && l_mm > 0 && t_mm > 0) {
-        weight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
+        const weight = (w_mm / 1000) * (l_mm / 1000) * (t_mm / 1000) * DENSITY;
+        return { calculatedWeight: weight, currentCutPercentage: 0 };
       } else if (shape === 'disc' && d_mm > 0 && t_mm > 0) {
         const r_m = d_mm / 2000;
         const vol_m3 = Math.PI * r_m * r_m * (t_mm / 1000);
-        weight = vol_m3 * DENSITY;
+        return { calculatedWeight: vol_m3 * DENSITY, currentCutPercentage: 0 };
       }
     }
-    return { calculatedWeight: weight, currentCutPercentage: cutPercentage };
-  }, [dimensions, shape, prefilledItem, isPrefilledItemSheet]);
+    return { calculatedWeight: 0, currentCutPercentage: 0 };
+  }, [dimensions, shape, prefilledItem]);
+
 
   React.useEffect(() => {
     if (prefilledItem) {
-      if (sellingPrice > 0) {
-        setScrapPrice(sellingPrice.toFixed(2).replace('.', ','));
-      }
-      if (isPrefilledItemSheet) {
-        setDimensions(prev => ({ ...prev, scrapLength: "", quantity: "1" }));
-        const prefilledWeight = prefilledItem.weight > 0 ? prefilledItem.weight.toFixed(3).replace('.', ',') : '';
-        setWeightInput(prefilledWeight);
-        setIsWeightModified(true); // Treat prefilled sheet as a manual weight entry
-      } else {
-        setIsWeightModified(false); // For tubes/bars, weight is calculated
-      }
+        if (sellingPrice > 0) setScrapPrice(sellingPrice.toFixed(2).replace('.', ','));
+        
+        if (prefilledItem.unit === 'un') { // Sheets
+            setManualWeight(prefilledItem.weight > 0 ? prefilledItem.weight.toFixed(3).replace('.', ',') : '');
+            setIsWeightManuallyEdited(true);
+        } else { // Tubes, Bars
+             setIsWeightManuallyEdited(false);
+        }
     } else {
-        setScrapPrice("23"); 
+        setScrapPrice("23");
+        setIsWeightManuallyEdited(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefilledItem, sellingPrice]);
 
 
-  React.useEffect(() => {
-    if (!isWeightModified) {
-      if (calculatedWeight > 0) {
-        const roundedWeight = Math.ceil(calculatedWeight);
-        setWeightInput(roundedWeight.toString().replace('.', ','));
-      } else {
-        setWeightInput("");
-      }
-    }
-  }, [calculatedWeight, isWeightModified]);
+  const finalWeight = isWeightManuallyEdited ? getNum(manualWeight) : Math.ceil(calculatedWeight);
+  const displayWeightInput = isWeightManuallyEdited ? manualWeight : (calculatedWeight > 0 ? String(Math.ceil(calculatedWeight)) : "");
 
   const finalPrice = React.useMemo(() => {
-    const weightForCalc = getNum(weightInput);
-    if (weightForCalc <= 0) return 0;
+    if (finalWeight <= 0) return 0;
     
     const quantity = getNum(dimensions.quantity) || 1;
     let singlePiecePrice = 0;
 
     if (prefilledItem) {
-      if (isPrefilledItemSheet) {
-        // Price is based on the (potentially manual) weight * selling price per kg
-        singlePiecePrice = weightForCalc * sellingPrice;
-      } else {
-        // Price for cut items is based on length and cut percentage
+      if (prefilledItem.unit === 'un') { // Sheet
+        singlePiecePrice = finalWeight * sellingPrice;
+      } else { // Tube/Bar
         const pricePerMeter = Math.ceil(sellingPrice * prefilledItem.weight);
         const scrapLength_mm = getNum(dimensions.scrapLength);
         const basePrice = pricePerMeter * (scrapLength_mm / 1000);
         singlePiecePrice = basePrice * (1 + currentCutPercentage / 100);
       }
-    } else {
-      // Manual scrap price
+    } else { // Manual scrap
       const pricePerKg = getNum(scrapPrice);
-      singlePiecePrice = weightForCalc * pricePerKg;
+      singlePiecePrice = finalWeight * pricePerKg;
     }
 
     return Math.ceil(singlePiecePrice) * quantity;
-  }, [weightInput, dimensions.quantity, prefilledItem, isPrefilledItemSheet, sellingPrice, scrapPrice, currentCutPercentage, dimensions.scrapLength]);
-
+  }, [finalWeight, dimensions.quantity, prefilledItem, sellingPrice, scrapPrice, currentCutPercentage, dimensions.scrapLength]);
 
   const addToList = () => {
     let description = "";
-    
-    const weightValue = getNum(weightInput);
     const quantity = getNum(dimensions.quantity) || 1;
 
-     if (weightValue <= 0) {
+    if (finalWeight <= 0) {
         toast({ variant: "destructive", title: "Peso inválido", description: "O peso da peça deve ser maior que zero." });
         return;
     }
 
+    let newPiece: ScrapPiece;
+
     if (prefilledItem) {
-        let newPiece: ScrapPiece;
-        if (isPrefilledItemSheet) {
-            description = `${prefilledItem.description} ${quantity > 1 ? `${quantity}pç` : ''}`.trim();
-            newPiece = {
-                id: uuidv4(),
-                description,
-                weight: weightValue * quantity,
-                price: finalPrice,
-                pricePerKg: sellingPrice,
-                unit: 'un',
-                quantity: quantity
-            };
+        const quantityText = quantity > 1 ? `(${quantity}x) ` : '';
+        if (prefilledItem.unit === 'un') {
+            description = `${quantityText}${prefilledItem.description}`;
+            newPiece = { id: uuidv4(), description, weight: finalWeight * quantity, price: finalPrice, pricePerKg: sellingPrice, unit: 'un', quantity };
         } else {
             const scrapLength_mm = getNum(dimensions.scrapLength);
             if (scrapLength_mm <= 0) {
                 toast({ variant: "destructive", title: "Comprimento inválido", description: "O comprimento do retalho deve ser maior que zero." });
                 return;
             }
-            const quantityText = quantity > 1 ? `(${quantity}x) ` : '';
             description = `${quantityText}${prefilledItem.description} x ${formatNumber(scrapLength_mm, {minimumFractionDigits: 0})} mm`;
             const pricePerMeter = Math.ceil(sellingPrice * prefilledItem.weight);
-            newPiece = {
-                id: uuidv4(),
-                description,
-                weight: calculatedWeight * quantity,
-                price: finalPrice,
-                pricePerKg: pricePerMeter, // This is price per meter here
-                length: scrapLength_mm,
-                unit: 'm',
-                quantity: quantity
-            };
+            newPiece = { id: uuidv4(), description, weight: calculatedWeight * quantity, price: finalPrice, pricePerKg: pricePerMeter, length: scrapLength_mm, unit: 'm', quantity };
         }
-        
-        const newList = [...scrapList, newPiece];
-        setScrapList(newList);
-        saveListToLocalStorage(newList);
-        toast({ title: "Peça adicionada!", description: newPiece.description });
-
-
     } else { // Manual scrap
-        let newPiece: ScrapPiece;
         const pricePerUnit = getNum(scrapPrice);
         const quantityText = quantity > 1 ? `(${quantity}x) ` : '';
         if (shape === 'rectangle') {
-            const t = getNum(dimensions.thickness);
-            const w = getNum(dimensions.width);
-            const l = getNum(dimensions.length);
+            const t = getNum(dimensions.thickness); const w = getNum(dimensions.width); const l = getNum(dimensions.length);
             if (t <= 0 || w <= 0 || l <= 0) {
                 toast({ variant: "destructive", title: "Dimensões inválidas", description: "Espessura, largura e comprimento devem ser preenchidos." });
                 return;
@@ -324,31 +257,20 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
             const dims = [w, l].sort((a,b) => a-b);
             description = `${quantityText}Ret. Chapa ${dimensions.material} ${formatNumber(t, {minimumFractionDigits: 2})}x${formatNumber(dims[0], {minimumFractionDigits: 0})}x${formatNumber(dims[1], {minimumFractionDigits: 0})} mm`;
         } else { // disc
-            const t = getNum(dimensions.thickness);
-            const d = getNum(dimensions.diameter);
+            const t = getNum(dimensions.thickness); const d = getNum(dimensions.diameter);
             if (t <= 0 || d <= 0) {
                 toast({ variant: "destructive", title: "Dimensões inválidas", description: "Espessura e diâmetro devem ser preenchidos." });
                 return;
             }
             description = `${quantityText}Ret. Disco ${dimensions.material} ${formatNumber(t, {minimumFractionDigits: 2})} Ø${formatNumber(d, {minimumFractionDigits: 0})} mm`;
         }
-        
-        newPiece = {
-            id: uuidv4(),
-            description,
-            weight: weightValue * quantity,
-            price: finalPrice,
-            pricePerKg: pricePerUnit,
-            unit: 'kg',
-            quantity: quantity,
-        };
-
-        const newList = [...scrapList, newPiece];
-        setScrapList(newList);
-        saveListToLocalStorage(newList);
-        toast({ title: "Peça adicionada!", description: newPiece.description });
+        newPiece = { id: uuidv4(), description, weight: finalWeight * quantity, price: finalPrice, pricePerKg: pricePerUnit, unit: 'kg', quantity };
     }
     
+    const newList = [...scrapList, newPiece];
+    setScrapList(newList);
+    saveListToLocalStorage(newList);
+    toast({ title: "Peça adicionada!", description: newPiece.description });
     resetFields();
   }
 
@@ -366,16 +288,6 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
   }
 
   const totalListPrice = scrapList.reduce((acc, item) => acc + item.price, 0);
-
-  const handlePrint = () => {
-    window.print();
-  }
-
-  const handleSave = () => {
-    saveListToLocalStorage(scrapList);
-    toast({ title: "Lista Salva!", description: "Sua lista de materiais foi salva com sucesso." });
-  }
-
   const totalListWeight = scrapList.reduce((acc, item) => acc + item.weight, 0);
 
   return (
@@ -392,12 +304,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                         <X/>
                     </Button>
                 </div>
-                {isPrefilledItemSheet ? (
-                    <div className="space-y-1">
-                        <Label htmlFor="quantity">Quantidade de Peças</Label>
-                        <Input id="quantity" type="text" inputMode="decimal" placeholder="Insira a quantidade" value={dimensions.quantity} onChange={(e) => handleDimChange('quantity', e.target.value)} />
-                    </div>
-                ) : (
+                {prefilledItem.unit !== 'un' ? (
                     <div className="flex gap-1">
                         <div className="space-y-1 flex-1">
                             <Label htmlFor="scrapLength">Comprimento do Retalho (mm)</Label>
@@ -408,6 +315,11 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                             <Input id="quantity" type="text" inputMode="decimal" placeholder="Qtd." value={dimensions.quantity} onChange={(e) => handleDimChange('quantity', e.target.value)} />
                         </div>
                    </div>
+                ) : (
+                    <div className="space-y-1">
+                        <Label htmlFor="quantity">Quantidade de Peças</Label>
+                        <Input id="quantity" type="text" inputMode="decimal" placeholder="Insira a quantidade" value={dimensions.quantity} onChange={(e) => handleDimChange('quantity', e.target.value)} />
+                    </div>
                 )}
             </div>
         ) : (
@@ -457,13 +369,12 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
         )}
         
         <div className="pt-1 mt-1 border-t space-y-1">
-             {prefilledItem && !isPrefilledItemSheet && (
+             {prefilledItem && prefilledItem.unit !== 'un' && (
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label htmlFor="cut-percentage">Acréscimo de Corte (%)</Label>
                     <Input
                         id="cut-percentage"
                         type="text"
-                        inputMode="decimal"
                         value={currentCutPercentage > 0 ? formatNumber(currentCutPercentage, {minimumFractionDigits: 2}) : ""}
                         readOnly
                         placeholder="0,00"
@@ -474,7 +385,7 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
             <div className="flex gap-1 items-end">
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label htmlFor="weight">Peso (kg)</Label>
-                    <Input id="weight" type="text" inputMode="decimal" placeholder="Peso Final" value={weightInput} onChange={(e) => handleWeightChange(e.target.value)} />
+                    <Input id="weight" type="text" inputMode="decimal" placeholder="Peso Final" value={displayWeightInput} onChange={(e) => handleWeightChange(e.target.value)} />
                 </div>
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label>P. Real (kg)</Label>
@@ -562,9 +473,9 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
                            </tbody>
                            <tfoot className="font-semibold border-t sticky bottom-0 bg-background/95">
                                 <tr>
-                                    <td className="p-1 pt-10">TOTAL</td>
-                                    <td className="p-1 pt-10 text-right">{formatNumber(totalListWeight, {minimumFractionDigits: 3, maximumFractionDigits: 3})} kg</td>
-                                    <td className="p-1 pt-10 text-right text-primary">{formatNumber(totalListPrice, {style: 'currency', currency: 'BRL'})}</td>
+                                    <td className="p-1 pt-1">TOTAL</td>
+                                    <td className="p-1 pt-1 text-right">{formatNumber(totalListWeight, {minimumFractionDigits: 3, maximumFractionDigits: 3})} kg</td>
+                                    <td className="p-1 pt-1 text-right text-primary">{formatNumber(totalListPrice, {style: 'currency', currency: 'BRL'})}</td>
                                 </tr>
                            </tfoot>
                         </table>
@@ -573,8 +484,8 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
             </Card>
 
             <div className="flex justify-end gap-1 print:hidden pt-1">
-                <Button variant="outline" className="gap-1" onClick={handleSave}><Save/> Salvar</Button>
-                <Button className="gap-1" onClick={handlePrint}><Printer/> Imprimir</Button>
+                <Button variant="outline" className="gap-1" onClick={() => {saveListToLocalStorage(scrapList); toast({ title: "Lista Salva!"});}}><Save/> Salvar</Button>
+                <Button className="gap-1" onClick={() => window.print()}><Printer/> Imprimir</Button>
             </div>
         </div>
       )}
@@ -582,4 +493,3 @@ export function ScrapCalculator({ prefilledItem, onClearPrefill, sellingPrice }:
   );
 }
 
-    

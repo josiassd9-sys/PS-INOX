@@ -1,3 +1,4 @@
+
 import type { SteelItem } from './types';
 import { SHEET_WEIGHT_CONSTANT, INCH_TO_MM } from './constants';
 
@@ -46,7 +47,7 @@ const dimensionsGroup2 = [
 
 const generateChapas = (): SteelItem[] => {
     const items: SteelItem[] = [];
-    const categoryName = 'Chapa';
+    const categoryName = 'chapas';
     chapasGroup1.forEach(chapa => {
         dimensionsGroup1.forEach(dim => {
             items.push({

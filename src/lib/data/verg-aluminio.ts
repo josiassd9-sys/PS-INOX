@@ -1,3 +1,4 @@
+
 import type { SteelItem } from './types';
 import { ALUMINUM_BAR_WEIGHT_CONSTANT } from './constants';
 
@@ -24,7 +25,7 @@ const generateAluminumRods = (): SteelItem[] => {
         id: `aluminum-${d.inch.replace(/ /g, '')}`,
         description: `Verg. Alum. Liga 6351 T6 Red. ${d.inch} (${d.mm.toFixed(2)}mm)`,
         weight: Math.pow(d.mm, 2) * ALUMINUM_BAR_WEIGHT_CONSTANT,
-        categoryName: 'Verg. Alumínio',
+        categoryName: 'verg-aluminio',
         unit: 'm'
     }));
 };

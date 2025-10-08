@@ -281,14 +281,12 @@ export function MaterialListBuilder() {
                                           exit={{ opacity: 0, height: 0 }}
                                           transition={{ duration: 0.3, type: "spring" }}
                                         >
-                                            <TableRow>
-                                                <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
-                                                <TableCell className="text-right font-semibold text-accent-price p-2 w-[90px]">{formatCurrency(item.price)}</TableCell>
-                                                <TableCell className="text-center text-muted-foreground p-2 w-[80px] bg-muted/50">
-                                                    {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
-                                                    <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
-                                                </TableCell>
-                                            </TableRow>
+                                            <TableCell className="font-medium flex-1 p-2 bg-background">{item.description}</TableCell>
+                                            <TableCell className="text-right font-semibold text-accent-price p-2 w-[90px] bg-background">{formatCurrency(item.price)}</TableCell>
+                                            <TableCell className="text-center text-muted-foreground p-2 w-[80px] bg-muted/50">
+                                                {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
+                                                <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
+                                            </TableCell>
                                         </SwipeToDelete>
                                    ))}
                                </TableBody>

@@ -287,33 +287,32 @@ export function MaterialListBuilder() {
                                <TableBody>
                                    <AnimatePresence>
                                    {materialList.map(item => (
-                                        <motion.div 
-                                            key={item.listItemId}
-                                            layout
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0, x: -100 }}
-                                            transition={{ duration: 0.2, type: "spring" }}
-                                            className="block"
+                                        <SwipeToDelete
+                                          key={item.listItemId}
+                                          asChild
+                                          onDelete={() => handleRemoveFromList(item.listItemId)}
                                         >
-                                            <SwipeToDelete onDelete={() => handleRemoveFromList(item.listItemId)}>
-                                                <TableRow
-                                                    className="border-b-border/50 bg-background flex"
-                                                >
-                                                    {/* Célula da Descrição */}
-                                                    <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
-                                                    
-                                                    {/* Célula do Detalhe (Peso/Qtd) */}
-                                                    <TableCell className="text-center text-muted-foreground w-[80px] p-2">
-                                                        {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
-                                                        <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
-                                                    </TableCell>
-                                                    
-                                                    {/* Célula do Preço */}
-                                                    <TableCell className="text-right font-semibold text-primary w-[90px] p-2">{formatCurrency(item.price)}</TableCell>
-                                                </TableRow>
-                                            </SwipeToDelete>
-                                        </motion.div>
+                                            <TableRow
+                                                className="border-b-border/50 bg-background"
+                                                layout
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: 'auto' }}
+                                                exit={{ opacity: 0, height: 0, x: -100 }}
+                                                transition={{ duration: 0.3, type: "spring" }}
+                                            >
+                                                {/* Célula da Descrição */}
+                                                <TableCell className="font-medium flex-1 p-2">{item.description}</TableCell>
+                                                
+                                                {/* Célula do Detalhe (Peso/Qtd) */}
+                                                <TableCell className="text-center text-muted-foreground w-[80px] p-2">
+                                                    {(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}
+                                                    <div className="text-xs">{formatNumber(item.weight, 3)} kg</div>
+                                                </TableCell>
+                                                
+                                                {/* Célula do Preço */}
+                                                <TableCell className="text-right font-semibold text-primary w-[90px] p-2">{formatCurrency(item.price)}</TableCell>
+                                            </TableRow>
+                                        </SwipeToDelete>
                                    ))}
                                    </AnimatePresence>
                                </TableBody>

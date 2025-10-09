@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "./ui/button";
 import { PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { STAINLESS_STEEL_DENSITY_KG_M3 } from "@/lib/data/constants";
 
 interface ScrapPiece {
     id: string;
@@ -49,34 +50,33 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
        setScrapPrice(sanitizedValue);
     }
   }
+  
+  const parseDimension = (val: string) => {
+    const num = parseFloat(val.replace(',', '.'));
+    if (isNaN(num)) return 0;
+    return num / 1000;
+  };
 
-  const { calculatedWeight, description } = React.useMemo(() => {
-    const parseDimension = (val: string) => {
-        const num = parseFloat(val.replace(',', '.'));
-        if (isNaN(num)) return 0;
-        return num / 1000;
-    };
-
+  const calculatedWeight = React.useMemo(() => {
     const widthM = parseDimension(dimensions.width);
     const lengthM = parseDimension(dimensions.length);
     const thicknessM = parseDimension(dimensions.thickness);
     const qty = parseInt(dimensions.quantity) || 0;
     
-    let weight = 0;
-    let desc = "Retalho";
-
     if (widthM > 0 && lengthM > 0 && thicknessM > 0 && qty > 0) {
         const volumeM3 = widthM * lengthM * thicknessM;
-        weight = volumeM3 * 8000 * qty;
-        desc = `Chapa ${dimensions.width}x${dimensions.length}x${dimensions.thickness}mm`;
+        return volumeM3 * 8000 * qty;
     }
-    
-    return { calculatedWeight: weight, description: desc };
+    return 0;
   }, [dimensions]);
 
-
   React.useEffect(() => {
-    setFinalWeight(calculatedWeight > 0 ? calculatedWeight.toFixed(3).replace('.', ',') : "");
+    if (calculatedWeight > 0) {
+      const roundedWeight = Math.ceil(calculatedWeight);
+      setFinalWeight(roundedWeight.toString());
+    } else {
+      setFinalWeight("");
+    }
   }, [calculatedWeight]);
 
 
@@ -88,6 +88,17 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     }
     return 0;
   }, [finalWeight, scrapPrice]);
+  
+  const description = React.useMemo(() => {
+     if (
+      !dimensions.width &&
+      !dimensions.length &&
+      !dimensions.thickness
+    ) {
+      return "Retalho";
+    }
+    return `Chapa ${dimensions.width || "?"}x${dimensions.length || "?"}x${dimensions.thickness || "?"}mm`;
+  }, [dimensions]);
 
 
   const addToList = () => {
@@ -141,7 +152,7 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
             <div className="flex gap-1 items-end">
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label htmlFor="weight">Peso Final (kg)</Label>
-                    <Input id="weight" type="text" inputMode="decimal" placeholder="Peso Final" value={finalWeight} readOnly className="font-semibold bg-muted/50"/>
+                    <Input id="weight" type="text" inputMode="decimal" placeholder="Peso Final" value={finalWeight} onChange={(e) => setFinalWeight(e.target.value.replace(/[^0-9,.]/g, ''))} className="font-semibold bg-muted/50"/>
                 </div>
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label className="text-accent-price font-semibold">R$ Total</Label>

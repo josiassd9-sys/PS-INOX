@@ -419,11 +419,9 @@ function DashboardComponent() {
                        {group.title === 'FERRAMENTAS' && (
                         <SidebarMenuItem>
                           <Link href="/retalho-inox" passHref>
-                            <SidebarMenuButton asChild className="w-full justify-start h-8">
-                                <>
+                            <SidebarMenuButton className="w-full justify-start h-8">
                                 <Scissors />
                                 <span>Retalho Inox</span>
-                                </>
                             </SidebarMenuButton>
                           </Link>
                         </SidebarMenuItem>

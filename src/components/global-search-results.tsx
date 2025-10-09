@@ -24,6 +24,7 @@ interface GlobalSearchResultsProps {
     costAdjustments: Record<string, number>;
     onItemClick: (item: SteelItem) => void;
     onAddItem: (item: any) => void;
+    isScrapCalculatorActive: boolean;
 }
 
 function AddByUnitForm({ item, onAdd }: { item: SteelItem & {price: number}; onAdd: (item: any) => void }) {
@@ -61,7 +62,7 @@ function AddByUnitForm({ item, onAdd }: { item: SteelItem & {price: number}; onA
     )
 }
 
-export function GlobalSearchResults({ categories, priceParams, searchTerm, costAdjustments, onItemClick, onAddItem }: GlobalSearchResultsProps) {
+export function GlobalSearchResults({ categories, priceParams, searchTerm, costAdjustments, onItemClick, onAddItem, isScrapCalculatorActive }: GlobalSearchResultsProps) {
     const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
 
     const handleItemSelection = (item: SteelItem, category: Category) => {
@@ -91,13 +92,13 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
         }).format(value);
     };
 
-    if (categories.length === 0) {
+    if (categories.length === 0 && !isScrapCalculatorActive) {
         return <div className="text-center text-muted-foreground py-10">Nenhum item encontrado para "{searchTerm}".</div>
     }
 
   return (
     <div className="space-y-1">
-        <h2 className="text-xl font-semibold">Resultados da Busca para "{searchTerm}"</h2>
+        {!isScrapCalculatorActive && <h2 className="text-xl font-semibold">Resultados da Busca para "{searchTerm}"</h2>}
         <Accordion type="multiple" className="w-full space-y-1" defaultValue={categories.map(c => c.id)}>
             {categories.map((category) => {
                  if (category.id === 'conexoes') {

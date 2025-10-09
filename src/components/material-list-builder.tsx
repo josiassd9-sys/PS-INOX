@@ -296,6 +296,87 @@ export function MaterialListBuilder() {
       .filter((category): category is Category => category !== null);
   }, [searchTerm, isScrapCalculatorActive]);
 
+  const renderContent = () => {
+    if (searchTerm) {
+      if (isScrapCalculatorActive) {
+        return (
+          <div className="p-2 bg-card rounded-lg border">
+            <h2 className="text-lg font-semibold text-center mb-1 text-foreground">Calculadora de Retalhos</h2>
+            <ScrapCalculator onAddItem={handleAddItemToList} />
+          </div>
+        );
+      }
+      return (
+        <GlobalSearchResults
+          categories={filteredCategories as any}
+          priceParams={priceParams}
+          searchTerm={searchTerm}
+          costAdjustments={costAdjustments}
+          onItemClick={() => {}} 
+          onAddItem={handleAddItemToList}
+          isScrapCalculatorActive={isScrapCalculatorActive}
+        />
+      );
+    }
+    
+    if (materialList.length > 0) {
+      return (
+        <div id="material-list-section" className="flex-1 flex flex-col min-h-0 pt-2">
+            <h2 className="text-lg font-semibold text-center mb-1 text-foreground">Lista de Materiais</h2>
+             <Card className="flex-1 overflow-hidden flex flex-col bg-card border-border">
+                <CardContent className="p-0 flex-1 overflow-y-auto">
+                   <Table>
+                       <TableHeader>
+                           <TableRow className="border-b-border hover:bg-muted/50 flex">
+                               <TableHead className="flex-1 pl-2 pr-1 py-1">Descrição</TableHead>
+                               <TableHead className="text-center p-1 w-[80px]">PMQ</TableHead>
+                               <TableHead className="text-right p-1 w-[80px] bg-muted/50">Preço</TableHead>
+                           </TableRow>
+                       </TableHeader>
+                       <TableBody>
+                           {materialList.map(item => (
+                               <React.Fragment key={item.listItemId}>
+                                <TableRow 
+                                    onClick={() => handleRowClick(item.listItemId)}
+                                    className={cn("flex items-center cursor-pointer", editingItemId === item.listItemId && "bg-primary/20")}
+                                >
+                                  <TableCell className="font-medium text-[11px] flex-1 pl-2 pr-1 py-1">{item.description}</TableCell>
+                                   <TableCell className="text-center text-muted-foreground p-1 w-[80px]">
+                                      <div className="flex flex-col items-center">
+                                        <span className="text-xs">{(item.unit === 'un' || item.unit === 'm' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}</span>
+                                        {formatWeight(item.weight)}
+                                      </div>
+                                  </TableCell>
+                                  <TableCell className="text-right font-semibold text-accent-price p-1 w-[80px] bg-muted/50">
+                                    {formatPrice(item.price)}
+                                  </TableCell>
+                                </TableRow>
+                                {editingItemId === item.listItemId && (
+                                    <EditForm 
+                                        item={item}
+                                        onUpdate={handleUpdateQuantity}
+                                        onDelete={handleRemoveFromList}
+                                        onCancel={() => setEditingItemId(null)}
+                                    />
+                                )}
+                               </React.Fragment>
+                           ))}
+                       </TableBody>
+                   </Table>
+                </CardContent>
+             </Card>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="text-center text-muted-foreground py-10">
+          <p>Sua lista de materiais está vazia.</p>
+          <p>Use a busca acima para adicionar itens.</p>
+      </div>
+    );
+  };
+
 
   return (
     <div className="relative w-full h-full flex flex-col overflow-hidden bg-background text-foreground">
@@ -320,78 +401,7 @@ export function MaterialListBuilder() {
         </div>
 
         <div className="flex-1 mt-px overflow-y-auto relative z-0 p-1 min-h-0">
-             {searchTerm ? (
-                isScrapCalculatorActive ? (
-                  <div className="p-2 bg-card rounded-lg border">
-                    <h2 className="text-lg font-semibold text-center mb-1 text-foreground">Calculadora de Retalhos</h2>
-                    <ScrapCalculator onAddItem={handleAddItemToList} />
-                  </div>
-                ) : (
-                    <GlobalSearchResults
-                        categories={filteredCategories as any}
-                        priceParams={priceParams}
-                        searchTerm={searchTerm}
-                        costAdjustments={costAdjustments}
-                        onItemClick={() => {}} 
-                        onAddItem={handleAddItemToList}
-                    />
-                )
-             ) : (
-                <>
-                {materialList.length > 0 ? (
-                    <div id="material-list-section" className="flex-1 flex flex-col min-h-0 pt-2">
-                        <h2 className="text-lg font-semibold text-center mb-1 text-foreground">Lista de Materiais</h2>
-                         <Card className="flex-1 overflow-hidden flex flex-col bg-card border-border">
-                            <CardContent className="p-0 flex-1 overflow-y-auto">
-                               <Table>
-                                   <TableHeader>
-                                       <TableRow className="border-b-border hover:bg-muted/50 flex">
-                                           <TableHead className="flex-1 pl-2 pr-1 py-1">Descrição</TableHead>
-                                           <TableHead className="text-center p-1 w-[80px]">PMQ</TableHead>
-                                           <TableHead className="text-right p-1 w-[80px] bg-muted/50">Preço</TableHead>
-                                       </TableRow>
-                                   </TableHeader>
-                                   <TableBody>
-                                       {materialList.map(item => (
-                                           <React.Fragment key={item.listItemId}>
-                                            <TableRow 
-                                                onClick={() => handleRowClick(item.listItemId)}
-                                                className={cn("flex items-center cursor-pointer", editingItemId === item.listItemId && "bg-primary/20")}
-                                            >
-                                              <TableCell className="font-medium text-[11px] flex-1 pl-2 pr-1 py-1">{item.description}</TableCell>
-                                               <TableCell className="text-center text-muted-foreground p-1 w-[80px]">
-                                                  <div className="flex flex-col items-center">
-                                                    <span className="text-xs">{(item.unit === 'un' || item.unit === 'm' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}</span>
-                                                    {formatWeight(item.weight)}
-                                                  </div>
-                                              </TableCell>
-                                              <TableCell className="text-right font-semibold text-accent-price p-1 w-[80px] bg-muted/50">
-                                                {formatPrice(item.price)}
-                                              </TableCell>
-                                            </TableRow>
-                                            {editingItemId === item.listItemId && (
-                                                <EditForm 
-                                                    item={item}
-                                                    onUpdate={handleUpdateQuantity}
-                                                    onDelete={handleRemoveFromList}
-                                                    onCancel={() => setEditingItemId(null)}
-                                                />
-                                            )}
-                                           </React.Fragment>
-                                       ))}
-                                   </TableBody>
-                               </Table>
-                            </CardContent>
-                         </Card>
-                    </div>
-                ) : (
-                     <div className="text-center text-muted-foreground py-10">
-                        <p>Sua lista de materiais está vazia.</p>
-                        <p>Use a busca acima para adicionar itens.</p>
-                    </div>
-                )}
-                </>
-             )}
+             {renderContent()}
         </div>
 
         {materialList.length > 0 && !searchTerm && (

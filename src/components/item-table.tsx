@@ -107,7 +107,7 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
   const weightUnitLabel = `kg/${unitLabel}`;
   const priceUnitLabel = `R$/${unitLabel}`;
 
-  const calculateItemPrice = (item: SteelItem) => {
+  const calculateItemPrice = React.useCallback((item: SteelItem) => {
     const adjustment = costAdjustments[item.id] || 0;
     const adjustedCost = priceParams.costPrice * (1 + adjustment / 100);
     const sellingPrice = adjustedCost * (1 + priceParams.markup / 100);
@@ -116,7 +116,7 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
       return Math.ceil(item.weight * sellingPrice);
     }
     return item.weight * sellingPrice;
-  };
+  }, [costAdjustments, priceParams, category.unit]);
 
 
   return (

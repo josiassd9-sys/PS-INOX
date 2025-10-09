@@ -93,11 +93,15 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
   React.useEffect(() => {
     if (calculatedWeight > 0) {
        const roundedWeight = Math.ceil(calculatedWeight);
-       setFinalWeight(roundedWeight.toString());
+       if (roundedWeight.toString() !== finalWeight) {
+         setFinalWeight(roundedWeight.toString());
+       }
     } else {
-      setFinalWeight("");
+      if (finalWeight !== "") {
+        setFinalWeight("");
+      }
     }
-  }, [calculatedWeight, dimensions]);
+  }, [calculatedWeight, finalWeight]);
 
 
   const calculatedPrice = React.useMemo(() => {

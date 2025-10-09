@@ -8,10 +8,8 @@ interface WelcomeScreenProps {
 
 export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
     return (
-        <div className="flex flex-col items-center justify-center w-full h-full p-4">
+        <div className="flex flex-col items-center justify-center w-full h-full">
            <BlueprintMinimalist onSelectCategory={onSelectCategory} />
         </div>
     )
 }
-
-    

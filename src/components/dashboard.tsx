@@ -289,7 +289,7 @@ function DashboardComponent() {
         </div>
       );
     }
-
+  
     const showSearchResults = searchTerm && filteredCategories.length > 0;
   
     if (showSearchResults) {
@@ -360,9 +360,7 @@ function DashboardComponent() {
   }
   
   if (!selectedCategoryId) {
-    return (
-      <WelcomeScreen onSelectCategory={handleSelectCategory} />
-    );
+    return <WelcomeScreen onSelectCategory={handleSelectCategory} />;
   }
 
   const showCustomHeader = !searchTerm && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isConnectionsCategory;
@@ -587,9 +585,3 @@ export function Dashboard() {
     </SidebarProvider>
   )
 }
-
-    
-
-    
-
-    

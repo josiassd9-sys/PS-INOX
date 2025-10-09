@@ -48,13 +48,11 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
   });
   
   const [finalWeight, setFinalWeight] = React.useState<string>("");
-  const [isWeightManual, setIsWeightManual] = React.useState(false);
 
   const handleDimChange = (field: keyof typeof dimensions, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
     if (/^\d*\,?\d*$/.test(sanitizedValue)) {
         setDimensions(prev => ({ ...prev, [field]: sanitizedValue }));
-        setIsWeightManual(false); 
     }
   };
   
@@ -62,10 +60,6 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
     if (/^\d*\,?\d*$/.test(sanitizedValue)) {
        setFinalWeight(sanitizedValue);
-       setIsWeightManual(true);
-       if (sanitizedValue.trim() === "") {
-         setIsWeightManual(false);
-       }
     }
   }
 
@@ -81,7 +75,6 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
       setShape(value);
       setDimensions({ width: "", length: "", thickness: "", diameter: "", material: "304", quantity: "1" });
       setFinalWeight("");
-      setIsWeightManual(false);
     }
   };
   
@@ -119,24 +112,24 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
         pricePerKg: p_pricePerKg,
     };
 
-  }, [dimensions, shape]);
+  }, [dimensions, shape, scrapPrice]);
 
-  const calculatedPrice = React.useMemo(() => {
-    const weightForPriceCalc = parseFloat(finalWeight.replace(',', '.')) || 0;
-    const p_pricePerKg = parseFloat(scrapPrice.replace(',', '.')) || 0;
-    let price = weightForPriceCalc * p_pricePerKg;
-    return Math.ceil(price);
-  }, [finalWeight, scrapPrice])
+   const calculatedPrice = React.useMemo(() => {
+    const weightValue = parseFloat(finalWeight.replace(',', '.')) || 0;
+    const priceValue = parseFloat(scrapPrice.replace(',', '.')) || 0;
+    if (weightValue > 0 && priceValue > 0) {
+      return Math.ceil(weightValue * priceValue);
+    }
+    return 0;
+  }, [finalWeight, scrapPrice]);
 
  React.useEffect(() => {
-    if (!isWeightManual) {
-        if (calculatedWeight > 0) {
-            setFinalWeight(calculatedWeight.toFixed(3).replace('.', ','));
-        } else {
-            setFinalWeight('');
-        }
+    if (calculatedWeight > 0) {
+      setFinalWeight(calculatedWeight.toFixed(3).replace('.', ','));
+    } else {
+      setFinalWeight('');
     }
-  }, [calculatedWeight, isWeightManual]);
+  }, [calculatedWeight]);
 
 
   const addToList = () => {
@@ -156,7 +149,6 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
         toast({ title: "Item Adicionado!", description: `${description} foi adicionado à lista.` });
         setDimensions({ width: "", length: "", thickness: "", diameter: "", material: "304", quantity: "1" });
         setFinalWeight("");
-        setIsWeightManual(false);
 
     } else {
         toast({ variant: "destructive", title: "Dados incompletos", description: "Preencha os campos para calcular e adicionar o item." });

@@ -110,11 +110,15 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
   }, [finalWeight, scrapPrice]);
   
   const description = React.useMemo(() => {
-     const material = materialClass ? `${materialClass} ` : '';
+     const material = materialClass || "";
+     const thick = dimensions.thickness || "?";
      if (shape === 'rectangle') {
-        return `Chapa ${material}${dimensions.width || "?"}x${dimensions.length || "?"}x${dimensions.thickness || "?"}mm`;
+        const width = dimensions.width || "?";
+        const len = dimensions.length || "?";
+        return `Chapa Ret. Inox ${material} ${thick} X ${width} X ${len}mm`;
      } else {
-        return `Disco ${material}Ø${dimensions.diameter || "?"}x${dimensions.thickness || "?"}mm`;
+        const diam = dimensions.diameter || "?";
+        return `Disco Inox ${material} Ø${diam} X ${thick}mm`;
      }
   }, [dimensions, shape, materialClass]);
 
@@ -127,7 +131,7 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     if (weightValue > 0 && calculatedPrice > 0) {
         onAddItem({
             id: uuidv4(),
-            description: `${description} ${qty > 1 ? `(${qty} pçs)` : ''}`,
+            description: `${description} - ${qty} pç`,
             weight: weightValue,
             price: calculatedPrice,
             pricePerKg,
@@ -224,3 +228,4 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
   );
 }
 
+    

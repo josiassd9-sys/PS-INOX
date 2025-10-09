@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -38,29 +39,30 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
   const [scrapPrice, setScrapPrice] = React.useState<string>("23");
   
   const [dimensions, setDimensions] = React.useState({
-    width: "",
-    length: "",
-    thickness: "",
+    width: "580",
+    length: "1500",
+    thickness: "3,5",
     diameter: "",
     material: "304",
-    scrapLength: "",
     quantity: "1",
   });
   
-  const [manualWeight, setManualWeight] = React.useState<string>("");
+  const [finalWeight, setFinalWeight] = React.useState<string>("");
+  const [isWeightManual, setIsWeightManual] = React.useState(false);
 
   const handleDimChange = (field: keyof typeof dimensions, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
     if (/^\d*\,?\d*$/.test(sanitizedValue)) {
         setDimensions(prev => ({ ...prev, [field]: sanitizedValue }));
-        setManualWeight(""); // Clear manual weight when dimensions change
+        setIsWeightManual(false); // Resets to auto-calculation when dimensions change
     }
   };
   
   const handleWeightChange = (value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
     if (/^\d*\,?\d*$/.test(sanitizedValue)) {
-       setManualWeight(sanitizedValue);
+       setFinalWeight(sanitizedValue);
+       setIsWeightManual(true); // Mark weight as manually entered
     }
   }
 
@@ -74,8 +76,9 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
   const handleShapeChange = (value: Shape | "") => {
     if (value) {
       setShape(value);
-      setDimensions({ width: "", length: "", thickness: "", diameter: "", material: "304", scrapLength: "", quantity: "1" });
-      setManualWeight("");
+      setDimensions({ width: "", length: "", thickness: "", diameter: "", material: "304", quantity: "1" });
+      setFinalWeight("");
+      setIsWeightManual(false);
     }
   };
   
@@ -105,43 +108,47 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
             desc = `Disco ${dimensions.material} ø${dimensions.diameter}x${dimensions.thickness}mm`;
         }
     }
-    weight *= qty;
-    price = weight * p_pricePerKg;
     
-    const finalWeight = parseFloat(manualWeight.replace(',', '.')) || weight;
-    if (manualWeight && finalWeight > 0) {
-        price = finalWeight * p_pricePerKg;
+    const weightResult = weight * qty;
+    
+    // Update the finalWeight state only if it's not being manually edited
+    if (!isWeightManual) {
+        // Using a timeout to defer state update and avoid re-render conflicts
+        setTimeout(() => setFinalWeight(weightResult > 0 ? weightResult.toFixed(3).replace('.',',') : ''), 0);
     }
-    
+
+    const weightForPriceCalc = parseFloat(finalWeight.replace(',', '.')) || 0;
+    price = weightForPriceCalc * p_pricePerKg;
     price = Math.ceil(price);
 
     return { 
-        calculatedWeight: weight, 
+        calculatedWeight: weightResult, 
         calculatedPrice: price, 
         description: desc,
         pricePerKg: p_pricePerKg,
     };
 
-  }, [dimensions, shape, scrapPrice, manualWeight]);
+  }, [dimensions, shape, scrapPrice, finalWeight, isWeightManual]);
 
 
   const addToList = () => {
     const qty = parseInt(dimensions.quantity) || 1;
-    const finalWeight = parseFloat(manualWeight.replace(',', '.')) || calculatedWeight;
+    const weightValue = parseFloat(finalWeight.replace(',', '.')) || 0;
 
-    if (finalWeight > 0 && calculatedPrice > 0) {
+    if (weightValue > 0 && calculatedPrice > 0) {
         onAddItem({
             id: uuidv4(),
             description: `${description} ${qty > 1 ? `(${qty} pçs)` : ''}`,
-            weight: finalWeight,
+            weight: weightValue,
             price: calculatedPrice,
             pricePerKg,
             quantity: qty,
             unit: 'un',
         });
         toast({ title: "Item Adicionado!", description: `${description} foi adicionado à lista.` });
-        setDimensions({ width: "", length: "", thickness: "", diameter: "", material: "304", scrapLength: "", quantity: "1" });
-        setManualWeight("");
+        setDimensions({ width: "", length: "", thickness: "", diameter: "", material: "304", quantity: "1" });
+        setFinalWeight("");
+        setIsWeightManual(false);
 
     } else {
         toast({ variant: "destructive", title: "Dados incompletos", description: "Preencha os campos para calcular e adicionar o item." });
@@ -153,8 +160,6 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     if (isNaN(num)) return "";
     return new Intl.NumberFormat('pt-BR', options).format(num);
   }
-
-  const finalWeightToShow = parseFloat(manualWeight.replace(',', '.')) || calculatedWeight;
 
   return (
     <div className="flex flex-col h-full p-1" id="scrap-calculator-form">
@@ -205,14 +210,8 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
         <div className="pt-1 mt-1 border-t space-y-1">
             <div className="flex gap-1 items-end">
                 <div className="space-y-1 flex-1 min-w-0">
-                    <Label htmlFor="weight">Peso Manual (kg)</Label>
-                    <Input id="weight" type="text" inputMode="decimal" placeholder="Peso Final" value={manualWeight} onChange={(e) => handleWeightChange(e.target.value)} />
-                </div>
-                <div className="space-y-1 flex-1 min-w-0">
-                    <Label>Peso Calculado (kg)</Label>
-                    <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm h-10 flex items-center">
-                        {formatNumber(finalWeightToShow, { minimumFractionDigits: 3 })}
-                    </div>
+                    <Label htmlFor="weight">Peso Final (kg)</Label>
+                    <Input id="weight" type="text" inputMode="decimal" placeholder="Peso Final" value={finalWeight} onChange={(e) => handleWeightChange(e.target.value)} className="font-semibold"/>
                 </div>
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label className="text-accent-price font-semibold">R$ Total</Label>
@@ -232,3 +231,5 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     </div>
   );
 }
+
+    

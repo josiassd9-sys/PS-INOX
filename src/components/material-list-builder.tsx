@@ -217,9 +217,9 @@ export function MaterialListBuilder() {
     return (
       <div className="flex items-baseline justify-end tabular-nums">
         <span className="text-sm font-semibold">R$</span>
-        <span className="text-sm font-bold text-[14px]">{thousandsPart}</span>
-        <span className="text-[10px] font-semibold">{hundredsPart}</span>
-        <span className="text-[6px] self-start mt-px">,{decimalPart}</span>
+        <span className="font-bold text-[15px]">{thousandsPart}</span>
+        <span className="text-[12px] font-semibold">{hundredsPart}</span>
+        <span className="text-[9px] self-start mt-px">,{decimalPart}</span>
       </div>
     );
   };
@@ -232,18 +232,19 @@ export function MaterialListBuilder() {
     
     return (
         <div className="flex items-baseline justify-center tabular-nums">
-            <span className="text-[10px]">{integerPart}</span>
-            <span className="text-[6px] self-start mt-px">,{decimalPart} kg</span>
+            <span className="text-[11px]">{integerPart}</span>
+            <span className="text-[8px] self-start mt-px">,{decimalPart} kg</span>
         </div>
     )
   }
   
   const totalListPrice = materialList.reduce((acc, item) => acc + item.price, 0);
 
-  const isScrapCalculatorActive = searchTerm.trim().length > 0 && 'retalho'.startsWith(searchTerm.toLowerCase());
+  const isScrapCalculatorActive = searchTerm.trim().length > 0 && ('retalho'.startsWith(searchTerm.toLowerCase()) || 'ret'.startsWith(searchTerm.toLowerCase()));
+
 
   const filteredCategories = React.useMemo(() => {
-    if (!searchTerm || isScrapCalculatorActive) {
+    if (isScrapCalculatorActive || !searchTerm) {
       return [];
     }
   

@@ -54,7 +54,7 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
     if (/^\d*\,?\d*$/.test(sanitizedValue)) {
         setDimensions(prev => ({ ...prev, [field]: sanitizedValue }));
-        setIsWeightManual(false); // Resets to auto-calculation when dimensions change
+        setIsWeightManual(false); 
     }
   };
   
@@ -62,7 +62,7 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
     if (/^\d*\,?\d*$/.test(sanitizedValue)) {
        setFinalWeight(sanitizedValue);
-       setIsWeightManual(true); // Mark weight as manually entered
+       setIsWeightManual(true); 
     }
   }
 
@@ -111,12 +111,6 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     
     const weightResult = weight * qty;
     
-    // Update the finalWeight state only if it's not being manually edited
-    if (!isWeightManual) {
-        // Using a timeout to defer state update and avoid re-render conflicts
-        setTimeout(() => setFinalWeight(weightResult > 0 ? weightResult.toFixed(3).replace('.',',') : ''), 0);
-    }
-
     const weightForPriceCalc = parseFloat(finalWeight.replace(',', '.')) || 0;
     price = weightForPriceCalc * p_pricePerKg;
     price = Math.ceil(price);
@@ -128,7 +122,13 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
         pricePerKg: p_pricePerKg,
     };
 
-  }, [dimensions, shape, scrapPrice, finalWeight, isWeightManual]);
+  }, [dimensions, shape, scrapPrice, finalWeight]);
+
+  React.useEffect(() => {
+    if (!isWeightManual) {
+        setFinalWeight(calculatedWeight > 0 ? calculatedWeight.toFixed(3).replace('.',',') : '');
+    }
+  }, [calculatedWeight, isWeightManual]);
 
 
   const addToList = () => {

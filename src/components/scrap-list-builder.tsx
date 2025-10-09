@@ -11,6 +11,10 @@ import { Input } from "./ui/input";
 import { cn } from "@/lib/utils";
 import { PsInoxLogo } from "./ps-inox-logo";
 import Link from "next/link";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
+import { Printer, Trash2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
 
 const SCRAP_LIST_KEY = "scrapBuilderList";
 
@@ -75,6 +79,7 @@ function EditForm({ item, onUpdate, onDelete, onCancel }: EditFormProps) {
 export function ScrapListBuilder() {
   const [scrapList, setScrapList] = React.useState<ScrapPiece[]>([]);
   const [editingItemId, setEditingItemId] = React.useState<string | null>(null);
+  const { toast } = useToast();
   
   React.useEffect(() => {
     try {
@@ -131,6 +136,15 @@ export function ScrapListBuilder() {
     saveList(newList);
     setEditingItemId(null);
   };
+  
+  const handleClearList = () => {
+    setScrapList([]);
+    saveList([]);
+    toast({
+        title: "Lista Limpa",
+        description: "A lista de retalhos foi esvaziada.",
+    })
+  }
 
   const handleRowClick = (listItemId: string) => {
       if (editingItemId === listItemId) {
@@ -262,6 +276,33 @@ export function ScrapListBuilder() {
                 <div className="flex items-center justify-between">
                     <span className="text-lg font-semibold">Total</span>
                     <span className="text-right text-lg font-bold text-accent-price">{formatCurrency(totalListPrice)}</span>
+                </div>
+                <div className="flex justify-end pt-1 gap-1 print:hidden">
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="sm">
+                                <Trash2 className="mr-1 h-4 w-4" />
+                                Limpar
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                            <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                Esta ação não pode ser desfeita. Isso limpará todos os itens da sua lista de retalhos.
+                            </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleClearList}>Sim, Limpar Lista</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+
+                    <Button onClick={() => window.print()} size="sm">
+                        <Printer className="mr-1 h-4 w-4" />
+                        Imprimir
+                    </Button>
                 </div>
             </div>
         )}

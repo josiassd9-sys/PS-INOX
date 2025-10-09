@@ -12,6 +12,8 @@ const MOCKUP_VIEW_KEY = "mockupViewEnabled";
 export default function Home() {
   const [mockupView, setMockupView] = React.useState(true);
   const { toast } = useToast();
+  const isInitialMount = React.useRef(true);
+
 
   React.useEffect(() => {
     try {
@@ -23,21 +25,27 @@ export default function Home() {
       console.error("Failed to load mockup view preference", error);
     }
   }, []);
+  
+  React.useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    try {
+      localStorage.setItem(MOCKUP_VIEW_KEY, JSON.stringify(mockupView));
+      toast({
+        title: `Visualização Alterada`,
+        description: `Modo ${mockupView ? "celular" : "desktop"} ativado.`,
+      });
+    } catch (error) {
+      console.error("Failed to save mockup view preference", error);
+    }
+  }, [mockupView, toast]);
+
 
   const toggleMockupView = () => {
-    setMockupView(prev => {
-      const newPreference = !prev;
-      try {
-        localStorage.setItem(MOCKUP_VIEW_KEY, JSON.stringify(newPreference));
-        toast({
-          title: `Visualização Alterada`,
-          description: `Modo ${newPreference ? "celular" : "desktop"} ativado.`,
-        });
-      } catch (error) {
-        console.error("Failed to save mockup view preference", error);
-      }
-      return newPreference;
-    });
+    setMockupView(prev => !prev);
   };
 
   const mainContent = <Dashboard />;

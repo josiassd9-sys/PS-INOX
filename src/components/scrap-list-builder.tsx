@@ -111,13 +111,13 @@ export function ScrapListBuilder() {
             </Link>
         </div>
 
-        <div className="flex-1 grid md:grid-cols-2 gap-2 min-h-0">
-            <div className="w-full h-full rounded-lg bg-card p-2 flex flex-col border">
+        <div className="flex-1 flex flex-col gap-2 min-h-0">
+            <div className="w-full rounded-lg bg-card p-2 flex flex-col border">
                 <h2 className="text-lg font-semibold text-center mb-1 text-foreground">Calculadora de Chapas</h2>
                 <ScrapCalculator onAddItem={handleAddItemToList} />
             </div>
 
-            <div className="w-full h-full rounded-lg flex flex-col min-h-0 border bg-card p-2">
+            <div className="w-full rounded-lg flex flex-col min-h-0 border bg-card p-2">
                 <ScrapList 
                     scrapList={scrapList}
                     editingItemId={editingItemId}

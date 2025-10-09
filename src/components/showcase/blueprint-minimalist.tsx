@@ -55,7 +55,7 @@ interface BlueprintMinimalistProps {
 
 export function BlueprintMinimalist({ onSelectCategory }: BlueprintMinimalistProps) {
     return (
-        <div className="relative w-full h-full flex flex-col items-center justify-center overflow-auto bg-slate-800 p-1">
+        <div className="relative w-full h-full flex flex-col items-center justify-center overflow-auto bg-slate-800">
             <div className="absolute inset-0 bg-grid-slate-700/[0.4] [mask-image:linear-gradient(to_bottom,white_10%,transparent_90%)]"></div>
 
             <motion.div
@@ -64,7 +64,11 @@ export function BlueprintMinimalist({ onSelectCategory }: BlueprintMinimalistPro
                 initial="hidden"
                 animate="visible"
             >
-                <motion.div variants={itemVariants} className="mb-2">
+                <motion.div 
+                    variants={itemVariants} 
+                    className="mb-2 cursor-pointer"
+                    onClick={() => onSelectCategory('package-checker')}
+                >
                      <h2 className="text-lg font-bold text-slate-100">PS INOX</h2>
                     <p className="text-sm text-slate-400">Calculadora de Preços</p>
                 </motion.div>
@@ -170,5 +174,3 @@ export function BlueprintMinimalist({ onSelectCategory }: BlueprintMinimalistPro
         </div>
     )
 }
-
-    

@@ -240,7 +240,7 @@ export function MaterialListBuilder() {
   
   const totalListPrice = materialList.reduce((acc, item) => acc + item.price, 0);
 
-  const isScrapCalculatorActive = searchTerm.toLowerCase().includes('retalho');
+  const isScrapCalculatorActive = searchTerm.trim().length > 0 && 'retalho'.startsWith(searchTerm.toLowerCase());
 
   const filteredCategories = React.useMemo(() => {
     if (!searchTerm || isScrapCalculatorActive) {
@@ -297,15 +297,16 @@ export function MaterialListBuilder() {
   }, [searchTerm, isScrapCalculatorActive]);
 
   const renderContent = () => {
+    if (isScrapCalculatorActive) {
+      return (
+        <div className="p-2 bg-card rounded-lg border">
+          <h2 className="text-lg font-semibold text-center mb-1 text-foreground">Calculadora de Retalhos</h2>
+          <ScrapCalculator onAddItem={handleAddItemToList} />
+        </div>
+      );
+    }
+    
     if (searchTerm) {
-      if (isScrapCalculatorActive) {
-        return (
-          <div className="p-2 bg-card rounded-lg border">
-            <h2 className="text-lg font-semibold text-center mb-1 text-foreground">Calculadora de Retalhos</h2>
-            <ScrapCalculator onAddItem={handleAddItemToList} />
-          </div>
-        );
-      }
       return (
         <GlobalSearchResults
           categories={filteredCategories as any}

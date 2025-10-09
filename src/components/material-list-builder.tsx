@@ -243,7 +243,9 @@ export function MaterialListBuilder() {
   const isScrapCalculatorActive = searchTerm.toLowerCase().includes('retalho');
 
   const filteredCategories = React.useMemo(() => {
-    if (!searchTerm || isScrapCalculatorActive) return [];
+    if (!searchTerm || isScrapCalculatorActive) {
+      return [];
+    }
   
     const safeSearchTerm = searchTerm.replace(",", ".").toLowerCase();
   
@@ -332,7 +334,6 @@ export function MaterialListBuilder() {
                         costAdjustments={costAdjustments}
                         onItemClick={() => {}} 
                         onAddItem={handleAddItemToList}
-                        isScrapCalculatorActive={isScrapCalculatorActive}
                     />
                 )
              ) : (

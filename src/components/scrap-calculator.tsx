@@ -62,7 +62,10 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
     if (/^\d*\,?\d*$/.test(sanitizedValue)) {
        setFinalWeight(sanitizedValue);
-       setIsWeightManual(true); 
+       setIsWeightManual(true);
+       if (sanitizedValue === "") {
+        setIsWeightManual(false);
+       }
     }
   }
 
@@ -164,7 +167,7 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
 
   return (
     <div className="flex flex-col h-full p-1" id="scrap-calculator-form">
-        <>
+        
             <div className="flex justify-center">
                 <ToggleGroup type="single" value={shape} onValueChange={handleShapeChange} className="w-full grid grid-cols-2">
                     <ToggleGroupItem value="rectangle" aria-label="Retangular" className="h-12 text-base">Retangular</ToggleGroupItem>
@@ -206,7 +209,6 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
                 </div>
               )}
             </div>
-        </>
         
         <div className="pt-1 mt-1 border-t space-y-1">
             <div className="flex gap-1 items-end">

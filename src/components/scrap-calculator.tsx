@@ -9,6 +9,7 @@ import { PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from "uuid";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
+import { STAINLESS_STEEL_DENSITY_KG_M3 } from "@/lib/data/constants";
 
 interface ScrapPiece {
     id: string;
@@ -59,7 +60,7 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
   const parseDimension = (val: string) => {
     if (!val) return 0;
     const num = parseFloat(val.replace(',', '.'));
-    if (isNaN(num) || num === 0) return 0;
+    if (isNaN(num)) return 0;
     return num / 1000; // convert mm to meters
   };
 
@@ -70,24 +71,23 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
 
     if (thicknessM <= 0 || qty <= 0) return 0;
 
+    let volumeM3 = 0;
     if (shape === 'rectangle') {
       const widthM = parseDimension(dimensions.width);
       const lengthM = parseDimension(dimensions.length);
       if (widthM > 0 && lengthM > 0) {
-        const volumeM3 = widthM * lengthM * thicknessM;
-        return volumeM3 * density * qty;
+        volumeM3 = widthM * lengthM * thicknessM;
       }
     } else if (shape === 'disc') {
       const diameterM = parseDimension(dimensions.diameter);
       if (diameterM > 0) {
         const radiusM = diameterM / 2;
         const areaM2 = Math.PI * Math.pow(radiusM, 2);
-        const volumeM3 = areaM2 * thicknessM;
-        return volumeM3 * density * qty;
+        volumeM3 = areaM2 * thicknessM;
       }
     }
     
-    return 0;
+    return volumeM3 * density * qty;
   }, [dimensions, shape]);
 
   React.useEffect(() => {
@@ -158,48 +158,48 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
             <div className="space-y-1">
                 <div className="pb-1">
                     <Label>Formato</Label>
-                    <ToggleGroup type="single" value={shape} onValueChange={handleShapeChange} className="w-full grid grid-cols-2">
+                    <ToggleGroup type="single" value={shape} onValueChange={handleShapeChange} className="w-full grid grid-cols-2 gap-px">
                         <ToggleGroupItem value="rectangle" aria-label="Retangular">Retangular</ToggleGroupItem>
                         <ToggleGroupItem value="disc" aria-label="Disco">Disco</ToggleGroupItem>
                     </ToggleGroup>
                 </div>
 
                 {shape === 'rectangle' ? (
-                    <div className="flex gap-1">
-                        <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="width">Larg.(mm)</Label><Input id="width" type="text" inputMode="decimal" placeholder="Largura" value={dimensions.width} onChange={(e) => handleDimChange('width', e.target.value)} /></div>
-                        <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="length">Compr.(mm)</Label><Input id="length" type="text" inputMode="decimal" placeholder="Compr." value={dimensions.length} onChange={(e) => handleDimChange('length', e.target.value)} /></div>
-                         <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Esp.(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={dimensions.thickness} onChange={(e) => handleDimChange('thickness', e.target.value)} /></div>
+                    <div className="flex gap-px">
+                        <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="width">Larg.(mm)</Label><Input id="width" type="text" inputMode="decimal" placeholder="Largura" value={dimensions.width} onChange={(e) => handleDimChange('width', e.target.value)} className="px-1"/></div>
+                        <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="length">Compr.(mm)</Label><Input id="length" type="text" inputMode="decimal" placeholder="Compr." value={dimensions.length} onChange={(e) => handleDimChange('length', e.target.value)} className="px-1"/></div>
+                         <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Esp.(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={dimensions.thickness} onChange={(e) => handleDimChange('thickness', e.target.value)} className="px-1"/></div>
                     </div>
                 ) : (
-                    <div className="flex gap-1">
+                    <div className="flex gap-px">
                         <div className="space-y-1 flex-1 min-w-0">
                             <Label htmlFor="diameter">Diâmetro(mm)</Label>
-                            <Input id="diameter" type="text" inputMode="decimal" placeholder="Diâmetro" value={dimensions.diameter} onChange={(e) => handleDimChange('diameter', e.target.value)} />
+                            <Input id="diameter" type="text" inputMode="decimal" placeholder="Diâmetro" value={dimensions.diameter} onChange={(e) => handleDimChange('diameter', e.target.value)} className="px-1"/>
                         </div>
-                         <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Esp.(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={dimensions.thickness} onChange={(e) => handleDimChange('thickness', e.target.value)} /></div>
+                         <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Esp.(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={dimensions.thickness} onChange={(e) => handleDimChange('thickness', e.target.value)} className="px-1"/></div>
                     </div>
                 )}
 
 
-                <div className="flex gap-1">
+                <div className="flex gap-px">
                      <div className="space-y-1 flex-1 min-w-0">
                         <Label htmlFor="material-class">Classe</Label>
-                        <Input id="material-class" type="text" placeholder="Ex: 304" value={materialClass} onChange={(e) => setMaterialClass(e.target.value)} />
+                        <Input id="material-class" type="text" placeholder="Ex: 304" value={materialClass} onChange={(e) => setMaterialClass(e.target.value)} className="px-1"/>
                      </div>
                      <div className="space-y-1 flex-1 min-w-0">
                         <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
-                        <Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} />
+                        <Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} className="px-1"/>
                     </div>
-                     <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="quantity">Qtde</Label><Input id="quantity" type="text" inputMode="decimal" placeholder="Qtd." value={dimensions.quantity} onChange={(e) => handleDimChange('quantity', e.target.value)} /></div>
+                     <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="quantity">Qtde</Label><Input id="quantity" type="text" inputMode="decimal" placeholder="Qtd." value={dimensions.quantity} onChange={(e) => handleDimChange('quantity', e.target.value)} className="px-1"/></div>
                 </div>
             </div>
         </div>
     
         <div className="pt-2 mt-2 border-t space-y-2">
-            <div className="flex gap-1 items-end">
+            <div className="flex gap-px items-end">
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label htmlFor="weight">Peso Final (kg)</Label>
-                    <Input id="weight" type="text" inputMode="decimal" placeholder="Peso Final" value={finalWeight} onChange={(e) => setFinalWeight(e.target.value.replace(/[^0-9,.]/g, ''))} className="font-semibold bg-muted/50"/>
+                    <Input id="weight" type="text" inputMode="decimal" placeholder="Peso Final" value={finalWeight} onChange={(e) => setFinalWeight(e.target.value.replace(/[^0-9,.]/g, ''))} className="font-semibold bg-muted/50 px-1"/>
                 </div>
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label className="text-accent-price font-semibold">R$ Total</Label>
@@ -219,3 +219,5 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     </div>
   );
 }
+
+    

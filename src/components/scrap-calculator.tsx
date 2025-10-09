@@ -5,7 +5,6 @@ import * as React from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { STAINLESS_STEEL_DENSITY_KG_M3 } from "@/lib/data";
 import { Button } from "./ui/button";
 import { PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -39,7 +38,7 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
 
   const handleDimChange = (field: keyof typeof dimensions, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
-    if (/^\d*\,?\d*$/.test(sanitizedValue)) {
+     if (/^\d*\,?\d*$/.test(sanitizedValue)) {
         setDimensions(prev => ({ ...prev, [field]: sanitizedValue }));
     }
   };
@@ -52,7 +51,11 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
   }
 
   const { calculatedWeight, description } = React.useMemo(() => {
-    const parseDimension = (val: string) => parseFloat(val.replace(',', '.')) / 1000 || 0;
+    const parseDimension = (val: string) => {
+        const num = parseFloat(val.replace(',', '.'));
+        if (isNaN(num)) return 0;
+        return num / 1000;
+    };
 
     const widthM = parseDimension(dimensions.width);
     const lengthM = parseDimension(dimensions.length);
@@ -64,7 +67,7 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
 
     if (widthM > 0 && lengthM > 0 && thicknessM > 0 && qty > 0) {
         const volumeM3 = widthM * lengthM * thicknessM;
-        weight = volumeM3 * STAINLESS_STEEL_DENSITY_KG_M3 * qty;
+        weight = volumeM3 * 8000 * qty;
         desc = `Chapa ${dimensions.width}x${dimensions.length}x${dimensions.thickness}mm`;
     }
     

@@ -38,6 +38,7 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     diameter: "",
     quantity: "1",
   });
+  const [materialClass, setMaterialClass] = React.useState("304");
   
   const [finalWeight, setFinalWeight] = React.useState<string>("");
 
@@ -56,6 +57,7 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
   }
   
   const parseDimension = (val: string) => {
+    if (!val) return 0;
     const num = parseFloat(val.replace(',', '.'));
     if (isNaN(num) || num === 0) return 0;
     return num / 1000; // convert mm to meters
@@ -108,12 +110,13 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
   }, [finalWeight, scrapPrice]);
   
   const description = React.useMemo(() => {
+     const material = materialClass ? `${materialClass} ` : '';
      if (shape === 'rectangle') {
-        return `Chapa ${dimensions.width || "?"}x${dimensions.length || "?"}x${dimensions.thickness || "?"}mm`;
+        return `Chapa ${material}${dimensions.width || "?"}x${dimensions.length || "?"}x${dimensions.thickness || "?"}mm`;
      } else {
-        return `Disco Ø${dimensions.diameter || "?"}x${dimensions.thickness || "?"}mm`;
+        return `Disco ${material}Ø${dimensions.diameter || "?"}x${dimensions.thickness || "?"}mm`;
      }
-  }, [dimensions, shape]);
+  }, [dimensions, shape, materialClass]);
 
 
   const addToList = () => {
@@ -132,14 +135,6 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
             unit: 'un',
         });
         toast({ title: "Item Adicionado!", description: `${description} foi adicionado à lista.` });
-        setDimensions(prev => ({ 
-            ...prev, 
-            width: "", 
-            length: "", 
-            thickness: "",
-            diameter: "",
-            quantity: "1"
-        }));
     } else {
         toast({ variant: "destructive", title: "Dados incompletos", description: "Preencha os campos para calcular e adicionar o item." });
     }
@@ -173,17 +168,24 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
                     <div className="flex gap-1">
                         <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="width">Larg.(mm)</Label><Input id="width" type="text" inputMode="decimal" placeholder="Largura" value={dimensions.width} onChange={(e) => handleDimChange('width', e.target.value)} /></div>
                         <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="length">Compr.(mm)</Label><Input id="length" type="text" inputMode="decimal" placeholder="Compr." value={dimensions.length} onChange={(e) => handleDimChange('length', e.target.value)} /></div>
+                         <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Esp.(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={dimensions.thickness} onChange={(e) => handleDimChange('thickness', e.target.value)} /></div>
                     </div>
                 ) : (
-                    <div className="space-y-1 flex-1 min-w-0">
-                        <Label htmlFor="diameter">Diâmetro(mm)</Label>
-                        <Input id="diameter" type="text" inputMode="decimal" placeholder="Diâmetro" value={dimensions.diameter} onChange={(e) => handleDimChange('diameter', e.target.value)} />
+                    <div className="flex gap-1">
+                        <div className="space-y-1 flex-1 min-w-0">
+                            <Label htmlFor="diameter">Diâmetro(mm)</Label>
+                            <Input id="diameter" type="text" inputMode="decimal" placeholder="Diâmetro" value={dimensions.diameter} onChange={(e) => handleDimChange('diameter', e.target.value)} />
+                        </div>
+                         <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Esp.(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={dimensions.thickness} onChange={(e) => handleDimChange('thickness', e.target.value)} /></div>
                     </div>
                 )}
 
 
                 <div className="flex gap-1">
-                     <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Esp.(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={dimensions.thickness} onChange={(e) => handleDimChange('thickness', e.target.value)} /></div>
+                     <div className="space-y-1 flex-1 min-w-0">
+                        <Label htmlFor="material-class">Classe</Label>
+                        <Input id="material-class" type="text" placeholder="Ex: 304" value={materialClass} onChange={(e) => setMaterialClass(e.target.value)} />
+                     </div>
                      <div className="space-y-1 flex-1 min-w-0">
                         <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
                         <Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} />
@@ -217,5 +219,3 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     </div>
   );
 }
-
-    

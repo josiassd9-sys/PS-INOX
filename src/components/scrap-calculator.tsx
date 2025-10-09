@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "./ui/button";
 import { PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { v4 as uuidv4 } from "uuid";
+import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
 
 interface ScrapPiece {
     id: string;
@@ -22,14 +24,18 @@ interface ScrapCalculatorProps {
     onAddItem: (item: ScrapPiece) => void;
 }
 
+type Shape = "rectangle" | "disc";
+
 export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
   const { toast } = useToast();
   const [scrapPrice, setScrapPrice] = React.useState<string>("23");
+  const [shape, setShape] = React.useState<Shape>("rectangle");
   
   const [dimensions, setDimensions] = React.useState({
     width: "580",
     length: "1500",
     thickness: "3,5",
+    diameter: "",
     quantity: "1",
   });
   
@@ -51,22 +57,36 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
   
   const parseDimension = (val: string) => {
     const num = parseFloat(val.replace(',', '.'));
-    if (isNaN(num)) return 0;
-    return num / 1000;
+    if (isNaN(num) || num === 0) return 0;
+    return num / 1000; // convert mm to meters
   };
 
   const calculatedWeight = React.useMemo(() => {
-    const widthM = parseDimension(dimensions.width);
-    const lengthM = parseDimension(dimensions.length);
     const thicknessM = parseDimension(dimensions.thickness);
     const qty = parseInt(dimensions.quantity) || 0;
-    
-    if (widthM > 0 && lengthM > 0 && thicknessM > 0 && qty > 0) {
+    const density = 8000;
+
+    if (thicknessM <= 0 || qty <= 0) return 0;
+
+    if (shape === 'rectangle') {
+      const widthM = parseDimension(dimensions.width);
+      const lengthM = parseDimension(dimensions.length);
+      if (widthM > 0 && lengthM > 0) {
         const volumeM3 = widthM * lengthM * thicknessM;
-        return volumeM3 * 8000 * qty;
+        return volumeM3 * density * qty;
+      }
+    } else if (shape === 'disc') {
+      const diameterM = parseDimension(dimensions.diameter);
+      if (diameterM > 0) {
+        const radiusM = diameterM / 2;
+        const areaM2 = Math.PI * Math.pow(radiusM, 2);
+        const volumeM3 = areaM2 * thicknessM;
+        return volumeM3 * density * qty;
+      }
     }
+    
     return 0;
-  }, [dimensions]);
+  }, [dimensions, shape]);
 
   React.useEffect(() => {
     if (calculatedWeight > 0) {
@@ -88,15 +108,12 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
   }, [finalWeight, scrapPrice]);
   
   const description = React.useMemo(() => {
-     if (
-      !dimensions.width &&
-      !dimensions.length &&
-      !dimensions.thickness
-    ) {
-      return "Retalho";
-    }
-    return `Chapa ${dimensions.width || "?"}x${dimensions.length || "?"}x${dimensions.thickness || "?"}mm`;
-  }, [dimensions]);
+     if (shape === 'rectangle') {
+        return `Chapa ${dimensions.width || "?"}x${dimensions.length || "?"}x${dimensions.thickness || "?"}mm`;
+     } else {
+        return `Disco Ø${dimensions.diameter || "?"}x${dimensions.thickness || "?"}mm`;
+     }
+  }, [dimensions, shape]);
 
 
   const addToList = () => {
@@ -106,7 +123,7 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
 
     if (weightValue > 0 && calculatedPrice > 0) {
         onAddItem({
-            id: 'placeholder', // id is generated in parent
+            id: uuidv4(),
             description: `${description} ${qty > 1 ? `(${qty} pçs)` : ''}`,
             weight: weightValue,
             price: calculatedPrice,
@@ -115,7 +132,14 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
             unit: 'un',
         });
         toast({ title: "Item Adicionado!", description: `${description} foi adicionado à lista.` });
-        setDimensions(prev => ({ ...prev, width: "", length: "", thickness: "", quantity: "1"}));
+        setDimensions(prev => ({ 
+            ...prev, 
+            width: "", 
+            length: "", 
+            thickness: "",
+            diameter: "",
+            quantity: "1"
+        }));
     } else {
         toast({ variant: "destructive", title: "Dados incompletos", description: "Preencha os campos para calcular e adicionar o item." });
     }
@@ -127,16 +151,39 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     return new Intl.NumberFormat('pt-BR', options).format(num);
   }
 
+  const handleShapeChange = (value: Shape | "") => {
+    if (value) {
+      setShape(value);
+    }
+  }
+
   return (
     <div className="flex flex-col h-full" id="scrap-calculator-form">
         <div className="space-y-1 mt-1 flex-1">
             <div className="space-y-1">
-                <div className="flex gap-1">
-                    <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="width">Larg.(mm)</Label><Input id="width" type="text" inputMode="decimal" placeholder="Largura" value={dimensions.width} onChange={(e) => handleDimChange('width', e.target.value)} /></div>
-                    <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="length">Compr.(mm)</Label><Input id="length" type="text" inputMode="decimal" placeholder="Compr." value={dimensions.length} onChange={(e) => handleDimChange('length', e.target.value)} /></div>
-                    <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Esp.(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={dimensions.thickness} onChange={(e) => handleDimChange('thickness', e.target.value)} /></div>
+                <div className="pb-1">
+                    <Label>Formato</Label>
+                    <ToggleGroup type="single" value={shape} onValueChange={handleShapeChange} className="w-full grid grid-cols-2">
+                        <ToggleGroupItem value="rectangle" aria-label="Retangular">Retangular</ToggleGroupItem>
+                        <ToggleGroupItem value="disc" aria-label="Disco">Disco</ToggleGroupItem>
+                    </ToggleGroup>
                 </div>
+
+                {shape === 'rectangle' ? (
+                    <div className="flex gap-1">
+                        <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="width">Larg.(mm)</Label><Input id="width" type="text" inputMode="decimal" placeholder="Largura" value={dimensions.width} onChange={(e) => handleDimChange('width', e.target.value)} /></div>
+                        <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="length">Compr.(mm)</Label><Input id="length" type="text" inputMode="decimal" placeholder="Compr." value={dimensions.length} onChange={(e) => handleDimChange('length', e.target.value)} /></div>
+                    </div>
+                ) : (
+                    <div className="space-y-1 flex-1 min-w-0">
+                        <Label htmlFor="diameter">Diâmetro(mm)</Label>
+                        <Input id="diameter" type="text" inputMode="decimal" placeholder="Diâmetro" value={dimensions.diameter} onChange={(e) => handleDimChange('diameter', e.target.value)} />
+                    </div>
+                )}
+
+
                 <div className="flex gap-1">
+                     <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Esp.(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={dimensions.thickness} onChange={(e) => handleDimChange('thickness', e.target.value)} /></div>
                      <div className="space-y-1 flex-1 min-w-0">
                         <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
                         <Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} />
@@ -170,3 +217,5 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     </div>
   );
 }
+
+    

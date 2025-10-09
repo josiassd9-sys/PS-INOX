@@ -17,6 +17,7 @@ import { GlobalSearchResults } from "./global-search-results";
 import { COST_ADJUSTMENTS_LOCAL_STORAGE_KEY, EDITED_CONNECTIONS_WEIGHTS_KEY } from "./dashboard";
 import { Label } from "./ui/label";
 import { cn } from "@/lib/utils";
+import { ScrapCalculator } from "./scrap-calculator";
 
 
 const MATERIAL_LIST_KEY = "materialBuilderList";
@@ -239,8 +240,10 @@ export function MaterialListBuilder() {
   
   const totalListPrice = materialList.reduce((acc, item) => acc + item.price, 0);
 
+  const isScrapCalculatorActive = searchTerm.toLowerCase() === 'retalho';
+
   const filteredCategories = React.useMemo(() => {
-    if (!searchTerm) return [];
+    if (!searchTerm || isScrapCalculatorActive) return [];
   
     const safeSearchTerm = searchTerm.replace(",", ".").toLowerCase();
   
@@ -289,7 +292,7 @@ export function MaterialListBuilder() {
         
       })
       .filter((category): category is Category => category !== null);
-  }, [searchTerm, costAdjustments, priceParams]);
+  }, [searchTerm, costAdjustments, priceParams, isScrapCalculatorActive]);
 
 
   return (
@@ -316,15 +319,21 @@ export function MaterialListBuilder() {
 
         <div className="flex-1 mt-px overflow-y-auto relative z-0 p-1 min-h-0">
              {searchTerm ? (
-                <GlobalSearchResults
-                    categories={filteredCategories as any}
-                    priceParams={priceParams}
-                    searchTerm={searchTerm}
-                    isScrapCalculatorActive={false}
-                    costAdjustments={costAdjustments}
-                    onItemClick={() => {}} 
-                    onAddItem={handleAddItemToList}
-                />
+                isScrapCalculatorActive ? (
+                  <div className="p-2 bg-card rounded-lg border">
+                    <h2 className="text-lg font-semibold text-center mb-1 text-foreground">Calculadora de Retalhos</h2>
+                    <ScrapCalculator onAddItem={handleAddItemToList} />
+                  </div>
+                ) : (
+                    <GlobalSearchResults
+                        categories={filteredCategories as any}
+                        priceParams={priceParams}
+                        searchTerm={searchTerm}
+                        costAdjustments={costAdjustments}
+                        onItemClick={() => {}} 
+                        onAddItem={handleAddItemToList}
+                    />
+                )
              ) : (
                 <>
                 {materialList.length > 0 ? (

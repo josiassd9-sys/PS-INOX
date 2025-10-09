@@ -247,10 +247,6 @@ export function MaterialListBuilder() {
     return ALL_CATEGORIES.map((category) => {
         let filteredItems: any[] = [];
         
-        if (category.id === "retalhos" && ("retalho".includes(safeSearchTerm) || "calculadora retalhos".includes(safeSearchTerm))) {
-          return category;
-        }
-  
         if (category.id === "conexoes") {
           const connectionGroups = category.items as ConnectionGroup[];
           const filteredGroups = connectionGroups

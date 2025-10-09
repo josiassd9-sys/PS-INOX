@@ -20,14 +20,6 @@ import { metalonRetangularItems } from './metalon-retangular';
 
 const CATEGORIES: Category[] = [
   {
-    id: 'retalhos',
-    name: 'Calculadora Retalhos',
-    description: 'Preencha os campos para calcular o valor.',
-    icon: 'Scissors',
-    unit: 'calc',
-    items: [],
-  },
-  {
     id: 'package-checker',
     name: 'Conferência',
     description: 'Selecione item e insira os dados para calculo de metragem e custo.',
@@ -257,7 +249,6 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
     {
         title: 'FERRAMENTAS',
         items: [
-            CATEGORIES.find(c => c.id === 'retalhos')!,
             CATEGORIES.find(c => c.id === 'package-checker')!,
             CATEGORIES.find(c => c.id === 'balanca')!,
             CATEGORIES.find(c => c.id === 'tabela-sucata')!,
@@ -301,5 +292,6 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
 
 export const ALL_CATEGORIES = CATEGORY_GROUPS.flatMap(group => group.items);
 export * from './types';
+
 
 

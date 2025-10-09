@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -67,11 +68,6 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, isScr
     const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
 
     const handleItemSelection = (item: SteelItem, category: Category) => {
-        if (category.id === 'retalhos') {
-            onItemClick(item);
-            return;
-        }
-
         if (isScrapCalculatorActive) {
             // This path is not expected to be hit with the new logic, but kept for safety.
         } else {
@@ -111,23 +107,6 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, isScr
         <h2 className="text-xl font-semibold">Resultados da Busca para "{searchTerm}"</h2>
         <Accordion type="multiple" className="w-full space-y-1" defaultValue={categories.map(c => c.id)}>
             {categories.map((category) => {
-                 if (category.id === 'retalhos') {
-                    return (
-                        <AccordionItem value={category.id} key={category.id} className="border rounded-lg overflow-hidden bg-card">
-                             <AccordionTrigger className="px-1 py-1 hover:bg-primary/10 text-lg font-semibold">
-                                {category.name}
-                            </AccordionTrigger>
-                            <AccordionContent>
-                                <Card>
-                                    <CardContent className="p-1">
-                                        <ScrapCalculator onAddItem={onAddItem} />
-                                    </CardContent>
-                                </Card>
-                            </AccordionContent>
-                        </AccordionItem>
-                    )
-                 }
-
                  if (category.id === 'conexoes') {
                     const connectionGroups = category.items as ConnectionGroup[];
                     const sellingPrice = priceParams['conexoes']?.sellingPrice || priceParams['global'].sellingPrice;
@@ -239,7 +218,7 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, isScr
                                                                 {hasAdjustment && <Tag className="h-3 w-3 text-accent-price" />}
                                                                 {item.description}
                                                             </div>
-                                                            {(isScrapCalculatorActive || category.id === 'retalhos') && (
+                                                            {(isScrapCalculatorActive) && (
                                                                 <PlusCircle className="h-5 w-5 text-primary/50 ml-1" />
                                                             )}
                                                         </TableCell>

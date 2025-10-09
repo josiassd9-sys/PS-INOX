@@ -288,7 +288,6 @@ function DashboardComponent() {
     );
   }
   
-  const isScrapCategory = selectedCategoryId === 'retalhos';
   const isPackageCheckerCategory = selectedCategoryId === 'package-checker';
   const isScaleCategory = selectedCategoryId === 'balanca';
   const isScrapTableCategory = selectedCategoryId === 'tabela-sucata';
@@ -297,7 +296,7 @@ function DashboardComponent() {
   const isTechnicalDrawingCategory = selectedCategoryId === 'desenho-tecnico';
   const isConnectionsCategory = selectedCategoryId === 'conexoes';
   
-  const showCustomHeader = !searchTerm && !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isConnectionsCategory;
+  const showCustomHeader = !searchTerm && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isConnectionsCategory;
 
   const renderContent = () => {
     if (!selectedCategoryId) {
@@ -308,10 +307,6 @@ function DashboardComponent() {
 
     const showSearchResults = searchTerm && filteredCategories.length > 0;
   
-    if (isScrapCategory) {
-      return <ScrapCalculator onAddItem={() => {}} />;
-    }
-
     if (showSearchResults) {
       return (
         <GlobalSearchResults
@@ -428,7 +423,7 @@ function DashboardComponent() {
         </SidebarContent>
       </Sidebar>
       <SidebarInset>
-        <div className={cn("p-1 h-screen flex flex-col gap-1", isScrapCategory && "p-0 md:p-0")}>
+        <div className={cn("p-1 h-screen flex flex-col gap-1")}>
           <div className="bg-background rounded-lg border flex-1 flex flex-col overflow-hidden">
             <header className={cn(
               "flex items-center justify-between gap-1 p-1 border-b"
@@ -524,7 +519,7 @@ function DashboardComponent() {
                 </div>
               )}
               <div className="flex-1 overflow-y-auto">
-                <div className={cn("p-1", (isScrapTableCategory || (isScrapCategory && !searchTerm) || isConnectionsCategory) && "p-0 md:p-0")}>
+                <div className={cn("p-1", (isScrapTableCategory || isConnectionsCategory) && "p-0 md:p-0")}>
                  {renderContent()}
                 </div>
               </div>

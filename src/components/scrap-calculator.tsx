@@ -67,7 +67,6 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
   const handleShapeChange = (value: Shape | "") => {
     if (value) {
       setShape(value);
-      // Reset dimensions and weight when shape changes
       setDimensions({ width: "", length: "", thickness: "", diameter: "", material: "304", quantity: "1" });
       setFinalWeight("");
     }
@@ -135,7 +134,8 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
             unit: 'un',
         });
         toast({ title: "Item Adicionado!", description: `${description} foi adicionado à lista.` });
-        setDimensions({ width: "", length: "", thickness: "", diameter: "", material: "304", quantity: "1" });
+        // Don't reset all fields, just the ones that change per piece
+        setDimensions(prev => ({ ...prev, width: "", length: "", diameter: "", thickness: "", quantity: "1"}));
         setFinalWeight("");
     } else {
         toast({ variant: "destructive", title: "Dados incompletos", description: "Preencha os campos para calcular e adicionar o item." });

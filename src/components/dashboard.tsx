@@ -418,12 +418,12 @@ function DashboardComponent() {
                       ))}
                        {group.title === 'FERRAMENTAS' && (
                         <SidebarMenuItem>
-                          <Link href="/retalho-inox" passHref legacyBehavior>
+                          <Link href="/retalho-inox" passHref>
                             <SidebarMenuButton asChild className="w-full justify-start h-8">
-                              <a>
+                                <>
                                 <Scissors />
                                 <span>Retalho Inox</span>
-                              </a>
+                                </>
                             </SidebarMenuButton>
                           </Link>
                         </SidebarMenuItem>
@@ -569,3 +569,5 @@ export function Dashboard() {
     </SidebarProvider>
   )
 }
+
+    

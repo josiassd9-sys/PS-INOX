@@ -9,6 +9,8 @@ import { ScrapCalculator } from "./scrap-calculator";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { cn } from "@/lib/utils";
+import { PsInoxLogo } from "./ps-inox-logo";
+import Link from "next/link";
 
 const SCRAP_LIST_KEY = "scrapBuilderList";
 
@@ -195,7 +197,11 @@ export function ScrapListBuilder() {
 
   return (
     <div className="relative w-full h-full flex flex-col overflow-hidden bg-background text-foreground p-1 gap-1">
-        <h1 className="text-lg font-bold text-center text-foreground">Retalho Inox</h1>
+        <div className="flex justify-center py-1">
+            <Link href="/">
+              <PsInoxLogo />
+            </Link>
+        </div>
         
         <ScrapCalculator onAddItem={handleAddItemToList} />
 

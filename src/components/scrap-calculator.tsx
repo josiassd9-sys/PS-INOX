@@ -2,13 +2,11 @@
 "use client";
 
 import * as React from "react";
-import { v4 as uuidv4 } from "uuid";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "./ui/button";
 import { PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { STAINLESS_STEEL_DENSITY_KG_M3 } from "@/lib/data/constants";
 
 interface ScrapPiece {
     id: string;
@@ -108,7 +106,7 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
 
     if (weightValue > 0 && calculatedPrice > 0) {
         onAddItem({
-            id: uuidv4(),
+            id: 'placeholder', // id is generated in parent
             description: `${description} ${qty > 1 ? `(${qty} pçs)` : ''}`,
             weight: weightValue,
             price: calculatedPrice,
@@ -130,8 +128,8 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
   }
 
   return (
-    <div className="flex flex-col h-full p-1" id="scrap-calculator-form">
-        <div className="space-y-1 mt-1">
+    <div className="flex flex-col h-full" id="scrap-calculator-form">
+        <div className="space-y-1 mt-1 flex-1">
             <div className="space-y-1">
                 <div className="flex gap-1">
                     <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="width">Larg.(mm)</Label><Input id="width" type="text" inputMode="decimal" placeholder="Largura" value={dimensions.width} onChange={(e) => handleDimChange('width', e.target.value)} /></div>
@@ -148,7 +146,7 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
             </div>
         </div>
     
-        <div className="pt-1 mt-1 border-t space-y-1">
+        <div className="pt-2 mt-2 border-t space-y-2">
             <div className="flex gap-1 items-end">
                 <div className="space-y-1 flex-1 min-w-0">
                     <Label htmlFor="weight">Peso Final (kg)</Label>
@@ -163,7 +161,7 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
             </div>
         </div>
 
-        <div className="mt-1">
+        <div className="mt-2">
             <Button onClick={addToList} className="w-full gap-1">
                 <PlusCircle/>
                 Adicionar à Lista

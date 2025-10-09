@@ -235,6 +235,7 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
                                         selectedItem={item}
                                         sellingPrice={itemPrice / item.weight}
                                         onClose={() => setSelectedItemIdForCut(null)}
+                                        onAddItem={() => {}}
                                     />
                                   </div>
                               </TableCell>
@@ -248,6 +249,3 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
       </>
   );
 }
-
-
-    

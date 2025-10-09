@@ -16,14 +16,11 @@ import { PlusCircle, Tag } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
-import { ScrapCalculator } from "./scrap-calculator";
-import { Card, CardContent } from "./ui/card";
 
 interface GlobalSearchResultsProps {
     categories: (Category | { id: 'conexoes'; name: string; items: ConnectionGroup[] })[];
     priceParams: Record<string, { costPrice: number; markup: number; sellingPrice: number }>;
     searchTerm: string;
-    isScrapCalculatorActive: boolean;
     costAdjustments: Record<string, number>;
     onItemClick: (item: SteelItem) => void;
     onAddItem: (item: any) => void;
@@ -64,18 +61,14 @@ function AddByUnitForm({ item, onAdd }: { item: SteelItem & {price: number}; onA
     )
 }
 
-export function GlobalSearchResults({ categories, priceParams, searchTerm, isScrapCalculatorActive, costAdjustments, onItemClick, onAddItem }: GlobalSearchResultsProps) {
+export function GlobalSearchResults({ categories, priceParams, searchTerm, costAdjustments, onItemClick, onAddItem }: GlobalSearchResultsProps) {
     const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
 
     const handleItemSelection = (item: SteelItem, category: Category) => {
-        if (isScrapCalculatorActive) {
-            // This path is not expected to be hit with the new logic, but kept for safety.
+         if (selectedItemId === item.id) {
+            setSelectedItemId(null);
         } else {
-             if (selectedItemId === item.id) {
-                setSelectedItemId(null);
-            } else {
-                setSelectedItemId(item.id);
-            }
+            setSelectedItemId(item.id);
         }
     };
 
@@ -146,7 +139,7 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, isScr
                                                                     <TableCell className="w-1/3 text-center">{formatNumber(item.weight)}</TableCell>
                                                                     <TableCell className="w-1/3 text-right font-medium text-primary">{formatCurrency(itemPrice)}</TableCell>
                                                                 </TableRow>
-                                                                {isSelected && !isScrapCalculatorActive && (
+                                                                {isSelected && (
                                                                      <TableRow>
                                                                          <TableCell colSpan={3} className="p-0">
                                                                              <AddByUnitForm 
@@ -218,9 +211,6 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, isScr
                                                                 {hasAdjustment && <Tag className="h-3 w-3 text-accent-price" />}
                                                                 {item.description}
                                                             </div>
-                                                            {(isScrapCalculatorActive) && (
-                                                                <PlusCircle className="h-5 w-5 text-primary/50 ml-1" />
-                                                            )}
                                                         </TableCell>
                                                         <TableCell
                                                             className={cn("w-1/3 text-center", !isSelected && 'hover:bg-primary/10')}
@@ -238,7 +228,7 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, isScr
                                                             )}
                                                         </TableCell>
                                                     </TableRow>
-                                                    {isSelected && !isScrapCalculatorActive && (
+                                                    {isSelected && (
                                                         <TableRow>
                                                             <TableCell colSpan={3} className="p-0">
                                                                 {(category as Category).unit === 'm' ? (

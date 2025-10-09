@@ -332,6 +332,7 @@ export function MaterialListBuilder() {
                         costAdjustments={costAdjustments}
                         onItemClick={() => {}} 
                         onAddItem={handleAddItemToList}
+                        isScrapCalculatorActive={isScrapCalculatorActive}
                     />
                 )
              ) : (

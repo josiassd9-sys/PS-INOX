@@ -363,8 +363,6 @@ function DashboardComponent() {
     return <WelcomeScreen onSelectCategory={handleSelectCategory} />;
   }
 
-  const showCustomHeader = !searchTerm && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isConnectionsCategory;
-
   const isPackageCheckerCategory = selectedCategoryId === 'package-checker';
   const isScaleCategory = selectedCategoryId === 'balanca';
   const isScrapTableCategory = selectedCategoryId === 'tabela-sucata';
@@ -538,7 +536,7 @@ function DashboardComponent() {
             </header>
             
             <div className="flex-1 flex flex-col overflow-hidden">
-              {showCustomHeader && selectedCategory && (
+              {selectedCategory && (
                 <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm -mx-1 px-1">
                     <div className="flex h-12 items-center border-b px-1 text-sm font-medium text-muted-foreground">
                         <div className="flex-1 px-1">Descrição</div>

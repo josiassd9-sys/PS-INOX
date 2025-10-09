@@ -223,15 +223,8 @@ export function MaterialListBuilder() {
     );
   };
   
-  const formatNumber = (value: number, digits: number = 3) => {
-    return new Intl.NumberFormat("pt-BR", {
-      minimumFractionDigits: digits,
-      maximumFractionDigits: digits,
-    }).format(value);
-  };
-
   const formatWeight = (value: number) => {
-    const formatted = formatNumber(value, 3);
+    const formatted = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(value);
     const parts = formatted.split(',');
     const integerPart = parts[0];
     const decimalPart = parts[1];
@@ -254,7 +247,7 @@ export function MaterialListBuilder() {
     return ALL_CATEGORIES.map((category) => {
         let filteredItems: any[] = [];
         
-        if (category.id === "retalhos" && "retalho".includes(safeSearchTerm)) {
+        if (category.id === "retalhos" && ("retalho".includes(safeSearchTerm) || "calculadora retalhos".includes(safeSearchTerm))) {
           return category;
         }
   
@@ -361,7 +354,7 @@ export function MaterialListBuilder() {
                                               <TableCell className="font-medium text-[11px] flex-1 pl-2 pr-1 py-1">{item.description}</TableCell>
                                                <TableCell className="text-center text-muted-foreground p-1 w-[80px]">
                                                   <div className="flex flex-col items-center">
-                                                    <span className="text-xs">{(item.unit === 'm' || item.unit === 'un' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}</span>
+                                                    <span className="text-xs">{(item.unit === 'un' || item.unit === 'm' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}</span>
                                                     {formatWeight(item.weight)}
                                                   </div>
                                               </TableCell>

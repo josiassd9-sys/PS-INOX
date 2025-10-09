@@ -20,7 +20,7 @@ const otherMetalsIcons = CATEGORY_GROUPS.flatMap(g => g.items)
   .map(c => ({ name: c.name, icon: c.icon as any, id: c.id }));
 
 const toolsIcons = CATEGORY_GROUPS.flatMap(g => g.items)
-    .filter(c => ['retalhos', 'package-checker', 'balanca', 'tabela-sucata'].includes(c.id))
+    .filter(c => ['package-checker', 'balanca', 'tabela-sucata'].includes(c.id))
     .map(c => ({ name: c.name, icon: c.icon as any, id: c.id }));
 
 const infoIcons = [
@@ -125,6 +125,16 @@ export function BlueprintMinimalist({ onSelectCategory }: BlueprintMinimalistPro
                                     <span className="text-[10px] text-slate-400 text-center leading-tight">{item.name}</span>
                                  </motion.div>
                             ))}
+                             <Link href="/retalho-inox" passHref>
+                              <motion.div
+                                variants={itemVariants}
+                                whileHover={{ scale: 1.1, backgroundColor: 'hsla(220, 14%, 96%, 0.1)', rotate: -5 }}
+                                className="flex flex-col items-center justify-center gap-1 p-1 rounded-lg cursor-pointer aspect-square"
+                              >
+                                <Icon name="Scissors" className="w-5 h-5 text-slate-300" />
+                                <span className="text-[10px] text-slate-400 text-center leading-tight">Calculadora Retalhos</span>
+                              </motion.div>
+                            </Link>
                         </motion.div>
                     </div>
                 </div>

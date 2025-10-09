@@ -22,7 +22,6 @@ interface GlobalSearchResultsProps {
     categories: (Category | { id: 'conexoes'; name: string; items: ConnectionGroup[] })[];
     priceParams: Record<string, { costPrice: number; markup: number; sellingPrice: number }>;
     searchTerm: string;
-    onPrefillScrap: (item: SteelItem, sellingPrice: number) => void;
     isScrapCalculatorActive: boolean;
     costAdjustments: Record<string, number>;
     onItemClick: (item: SteelItem) => void;
@@ -64,7 +63,7 @@ function AddByUnitForm({ item, onAdd }: { item: SteelItem & {price: number}; onA
     )
 }
 
-export function GlobalSearchResults({ categories, priceParams, searchTerm, onPrefillScrap, isScrapCalculatorActive, costAdjustments, onItemClick, onAddItem }: GlobalSearchResultsProps) {
+export function GlobalSearchResults({ categories, priceParams, searchTerm, isScrapCalculatorActive, costAdjustments, onItemClick, onAddItem }: GlobalSearchResultsProps) {
     const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
 
     const handleItemSelection = (item: SteelItem, category: Category) => {
@@ -74,12 +73,7 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, onPre
         }
 
         if (isScrapCalculatorActive) {
-            const priceKey = category.hasOwnPriceControls ? category.id : 'global';
-            const { costPrice, markup } = priceParams[priceKey] || priceParams['global'];
-            const adjustment = costAdjustments[item.id] || 0;
-            const adjustedCost = costPrice * (1 + adjustment / 100);
-            const sellingPrice = adjustedCost * (1 + markup / 100);
-            onPrefillScrap(item, sellingPrice);
+            // This path is not expected to be hit with the new logic, but kept for safety.
         } else {
              if (selectedItemId === item.id) {
                 setSelectedItemId(null);

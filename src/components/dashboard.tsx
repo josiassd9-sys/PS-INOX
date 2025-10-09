@@ -24,7 +24,6 @@ import { ItemTable } from "./item-table";
 import { Icon } from "./icons";
 import { Input } from "./ui/input";
 import { GlobalSearchResults } from "./global-search-results";
-import { ScrapCalculator } from "./scrap-calculator";
 import {
   Dialog,
   DialogClose,
@@ -52,6 +51,7 @@ import { TechnicalDrawingGuide } from "./technical-drawing-guide";
 import { ConnectionsTable } from "./connections-table";
 import { CostAdjustmentCalculator } from "./cost-adjustment-calculator";
 import { WelcomeScreen } from "./welcome-screen";
+import { ScrapCalculator } from "./scrap-calculator";
 
 interface PriceParams {
   costPrice: number;
@@ -106,8 +106,6 @@ function DashboardComponent() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const { setOpenMobile, isMobile } = useSidebar();
   const [isScrapItemDialogOpen, setIsScrapItemDialogOpen] = React.useState(false);
-  const [prefillScrapItem, setPrefillScrapItem] = React.useState<SteelItem | null>(null);
-  const [prefillSellingPrice, setPrefillSellingPrice] = React.useState<number>(0);
   const [customerName, setCustomerName] = React.useState("");
   const [editedWeights, setEditedWeights] = React.useState<Record<string, number>>({});
   const [costAdjustments, setCostAdjustments] = React.useState<Record<string, number>>({});
@@ -220,17 +218,9 @@ function DashboardComponent() {
   const handleSelectCategory = (categoryId: string | null) => {
     setSelectedCategoryId(categoryId);
     setSearchTerm("");
-    setPrefillScrapItem(null);
     if (isMobile) {
       setOpenMobile(false);
     }
-  };
-
-  const handlePrefillScrapItem = (item: SteelItem, sellingPrice: number) => {
-    setPrefillScrapItem(item);
-    setPrefillSellingPrice(sellingPrice);
-    setSelectedCategoryId('retalhos');
-    setSearchTerm("");
   };
 
   const handleItemClickForAdjustment = (item: SteelItem) => {
@@ -309,15 +299,6 @@ function DashboardComponent() {
   
   const showCustomHeader = !searchTerm && !isScrapCategory && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isConnectionsCategory;
 
-  const getScrapPrefillPrice = (item: SteelItem): number => {
-    const category = ALL_CATEGORIES.find(c => c.id === item.categoryName);
-    const priceKey = category?.hasOwnPriceControls ? category.id : 'global';
-    const params = priceParams[priceKey] || priceParams['global'];
-    const adjustment = costAdjustments[item.id] || 0;
-    const adjustedCost = params.costPrice * (1 + adjustment / 100);
-    return adjustedCost * (1 + params.markup / 100);
-  }
-  
   const renderContent = () => {
     if (!selectedCategoryId) {
       return (
@@ -328,20 +309,7 @@ function DashboardComponent() {
     const showSearchResults = searchTerm && filteredCategories.length > 0;
   
     if (isScrapCategory) {
-      if (showSearchResults) {
-        return (
-          <GlobalSearchResults
-            categories={filteredCategories as any}
-            priceParams={priceParams}
-            searchTerm={searchTerm}
-            onPrefillScrap={(item) => handlePrefillScrapItem(item, getScrapPrefillPrice(item))}
-            isScrapCalculatorActive={true}
-            costAdjustments={costAdjustments}
-            onItemClick={handleItemClickForAdjustment}
-          />
-        );
-      }
-      return <ScrapCalculator prefilledItem={prefillScrapItem} onClearPrefill={() => setPrefillScrapItem(null)} sellingPrice={prefillSellingPrice} />;
+      return <ScrapCalculator onAddItem={() => {}} />;
     }
 
     if (showSearchResults) {
@@ -350,10 +318,10 @@ function DashboardComponent() {
           categories={filteredCategories as any}
           priceParams={priceParams}
           searchTerm={searchTerm}
-          onPrefillScrap={(item) => handlePrefillScrapItem(item, getScrapPrefillPrice(item))}
           isScrapCalculatorActive={false}
           costAdjustments={costAdjustments}
           onItemClick={handleItemClickForAdjustment}
+          onAddItem={() => {}}
         />
       );
     }
@@ -460,7 +428,7 @@ function DashboardComponent() {
         </SidebarContent>
       </Sidebar>
       <SidebarInset>
-        <div className={cn("p-1 h-screen flex flex-col gap-1", isScrapCategory ? "p-1 gap-1" : "p-1")}>
+        <div className={cn("p-1 h-screen flex flex-col gap-1", isScrapCategory && "p-0 md:p-0")}>
           <div className="bg-background rounded-lg border flex-1 flex flex-col overflow-hidden">
             <header className={cn(
               "flex items-center justify-between gap-1 p-1 border-b"

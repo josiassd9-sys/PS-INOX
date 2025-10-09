@@ -21,7 +21,7 @@ import { metalonRetangularItems } from './metalon-retangular';
 const CATEGORIES: Category[] = [
   {
     id: 'retalhos',
-    name: 'Retalhos',
+    name: 'Calculadora Retalhos',
     description: 'Preencha os campos para calcular o valor.',
     icon: 'Scissors',
     unit: 'calc',
@@ -301,4 +301,5 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
 
 export const ALL_CATEGORIES = CATEGORY_GROUPS.flatMap(group => group.items);
 export * from './types';
+
 

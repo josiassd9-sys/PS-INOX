@@ -240,7 +240,7 @@ export function MaterialListBuilder() {
   
   const totalListPrice = materialList.reduce((acc, item) => acc + item.price, 0);
 
-  const isScrapCalculatorActive = searchTerm.toLowerCase() === 'retalho';
+  const isScrapCalculatorActive = searchTerm.toLowerCase().includes('retalho');
 
   const filteredCategories = React.useMemo(() => {
     if (!searchTerm || isScrapCalculatorActive) return [];
@@ -292,7 +292,7 @@ export function MaterialListBuilder() {
         
       })
       .filter((category): category is Category => category !== null);
-  }, [searchTerm, costAdjustments, priceParams, isScrapCalculatorActive]);
+  }, [searchTerm, isScrapCalculatorActive]);
 
 
   return (
@@ -309,7 +309,7 @@ export function MaterialListBuilder() {
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                 type="search"
-                placeholder="Buscar materiais para adicionar à lista..."
+                placeholder="Buscar materiais ou 'retalho'..."
                 className="w-full rounded-lg bg-muted pl-8"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}

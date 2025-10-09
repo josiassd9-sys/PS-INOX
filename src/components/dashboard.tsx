@@ -18,7 +18,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
-import { Search, Warehouse, SlidersHorizontal, PlusCircle, Link } from "lucide-react";
+import { Search, Warehouse, SlidersHorizontal, PlusCircle, Link as LinkIcon, Scissors } from "lucide-react";
 import { PriceControls } from "./price-controls";
 import { ItemTable } from "./item-table";
 import { Icon } from "./icons";
@@ -52,6 +52,7 @@ import { ConnectionsTable } from "./connections-table";
 import { CostAdjustmentCalculator } from "./cost-adjustment-calculator";
 import { WelcomeScreen } from "./welcome-screen";
 import { ScrapCalculator } from "./scrap-calculator";
+import Link from "next/link";
 
 interface PriceParams {
   costPrice: number;
@@ -415,6 +416,18 @@ function DashboardComponent() {
                           </SidebarMenuButton>
                         </SidebarMenuItem>
                       ))}
+                       {group.title === 'FERRAMENTAS' && (
+                        <SidebarMenuItem>
+                          <Link href="/retalho-inox" passHref legacyBehavior>
+                            <SidebarMenuButton asChild className="w-full justify-start h-8">
+                              <a>
+                                <Scissors />
+                                <span>Retalho Inox</span>
+                              </a>
+                            </SidebarMenuButton>
+                          </Link>
+                        </SidebarMenuItem>
+                      )}
                     </SidebarMenu>
                  </AccordionContent>
                </AccordionItem>

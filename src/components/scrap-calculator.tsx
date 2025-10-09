@@ -63,8 +63,8 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     if (/^\d*\,?\d*$/.test(sanitizedValue)) {
        setFinalWeight(sanitizedValue);
        setIsWeightManual(true);
-       if (sanitizedValue === "") {
-        setIsWeightManual(false);
+       if (sanitizedValue.trim() === "") {
+         setIsWeightManual(false);
        }
     }
   }
@@ -85,7 +85,7 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     }
   };
   
-  const { calculatedWeight, calculatedPrice, description, pricePerKg } = React.useMemo(() => {
+  const { calculatedWeight, description, pricePerKg } = React.useMemo(() => {
     const qty = parseInt(dimensions.quantity) || 1;
     let weight = 0;
     let desc = "Retalho";
@@ -113,24 +113,28 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     
     const weightResult = weight * qty;
     
-    const weightForPriceCalc = parseFloat(finalWeight.replace(',', '.')) || 0;
-    let price = weightForPriceCalc * p_pricePerKg;
-    price = Math.ceil(price);
-
     return { 
         calculatedWeight: weightResult, 
-        calculatedPrice: price, 
         description: desc,
         pricePerKg: p_pricePerKg,
     };
 
-  }, [dimensions, shape, scrapPrice, finalWeight]);
+  }, [dimensions, shape]);
+
+  const calculatedPrice = React.useMemo(() => {
+    const weightForPriceCalc = parseFloat(finalWeight.replace(',', '.')) || 0;
+    const p_pricePerKg = parseFloat(scrapPrice.replace(',', '.')) || 0;
+    let price = weightForPriceCalc * p_pricePerKg;
+    return Math.ceil(price);
+  }, [finalWeight, scrapPrice])
 
  React.useEffect(() => {
-    if (!isWeightManual && calculatedWeight > 0) {
-      setFinalWeight(calculatedWeight.toFixed(3).replace('.', ','));
-    } else if (!isWeightManual && calculatedWeight === 0) {
-      setFinalWeight('');
+    if (!isWeightManual) {
+        if (calculatedWeight > 0) {
+            setFinalWeight(calculatedWeight.toFixed(3).replace('.', ','));
+        } else {
+            setFinalWeight('');
+        }
     }
   }, [calculatedWeight, isWeightManual]);
 

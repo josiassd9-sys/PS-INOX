@@ -115,10 +115,10 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
      if (shape === 'rectangle') {
         const width = dimensions.width || "?";
         const len = dimensions.length || "?";
-        return `Chapa Ret. Inox ${material} ${thick} X ${width} X ${len}mm`;
+        return `Chapa Ret. Inox ${material} ${thick}X${width}X${len} mm`;
      } else {
         const diam = dimensions.diameter || "?";
-        return `Disco Inox ${material} Ø${diam} X ${thick}mm`;
+        return `Disco Inox ${material} Ø${diam}X${thick} mm`;
      }
   }, [dimensions, shape, materialClass]);
 
@@ -227,5 +227,7 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     </div>
   );
 }
+
+    
 
     

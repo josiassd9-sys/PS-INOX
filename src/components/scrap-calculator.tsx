@@ -85,7 +85,6 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
   const { calculatedWeight, calculatedPrice, description, pricePerKg } = React.useMemo(() => {
     const qty = parseInt(dimensions.quantity) || 1;
     let weight = 0;
-    let price = 0;
     let desc = "Retalho";
     let p_pricePerKg = parseFloat(scrapPrice.replace(',', '.')) || 0;
     
@@ -112,7 +111,7 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     const weightResult = weight * qty;
     
     const weightForPriceCalc = parseFloat(finalWeight.replace(',', '.')) || 0;
-    price = weightForPriceCalc * p_pricePerKg;
+    let price = weightForPriceCalc * p_pricePerKg;
     price = Math.ceil(price);
 
     return { 
@@ -124,9 +123,11 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
 
   }, [dimensions, shape, scrapPrice, finalWeight]);
 
-  React.useEffect(() => {
-    if (!isWeightManual) {
-        setFinalWeight(calculatedWeight > 0 ? calculatedWeight.toFixed(3).replace('.',',') : '');
+ React.useEffect(() => {
+    if (!isWeightManual && calculatedWeight > 0) {
+      setFinalWeight(calculatedWeight.toFixed(3).replace('.', ','));
+    } else if (!isWeightManual && calculatedWeight === 0) {
+      setFinalWeight('');
     }
   }, [calculatedWeight, isWeightManual]);
 
@@ -231,5 +232,3 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     </div>
   );
 }
-
-    

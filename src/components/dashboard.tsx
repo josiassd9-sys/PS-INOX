@@ -281,28 +281,12 @@ function DashboardComponent() {
       .filter((category): category is Category => category !== null && category.items.length > 0);
   }, [searchTerm]);
 
-  if (!isPriceParamsInitialized || !currentPriceParams) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p>Carregando...</p>
-      </div>
-    );
-  }
-  
-  const isPackageCheckerCategory = selectedCategoryId === 'package-checker';
-  const isScaleCategory = selectedCategoryId === 'balanca';
-  const isScrapTableCategory = selectedCategoryId === 'tabela-sucata';
-  const isAstmStandardsCategory = selectedCategoryId === 'normas-astm';
-  const isManufacturingProcessesCategory = selectedCategoryId === 'processos-fabricacao';
-  const isTechnicalDrawingCategory = selectedCategoryId === 'desenho-tecnico';
-  const isConnectionsCategory = selectedCategoryId === 'conexoes';
-  
-  const showCustomHeader = !searchTerm && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isConnectionsCategory;
-
   const renderContent = () => {
-    if (!selectedCategoryId) {
+    if (!isPriceParamsInitialized || !currentPriceParams) {
       return (
-        <WelcomeScreen onSelectCategory={handleSelectCategory} />
+        <div className="flex items-center justify-center h-screen">
+          <p>Carregando...</p>
+        </div>
       );
     }
 
@@ -321,6 +305,14 @@ function DashboardComponent() {
         />
       );
     }
+
+    const isPackageCheckerCategory = selectedCategoryId === 'package-checker';
+    const isScaleCategory = selectedCategoryId === 'balanca';
+    const isScrapTableCategory = selectedCategoryId === 'tabela-sucata';
+    const isAstmStandardsCategory = selectedCategoryId === 'normas-astm';
+    const isManufacturingProcessesCategory = selectedCategoryId === 'processos-fabricacao';
+    const isTechnicalDrawingCategory = selectedCategoryId === 'desenho-tecnico';
+    const isConnectionsCategory = selectedCategoryId === 'conexoes';
 
     if (isPackageCheckerCategory) {
       return <PackageChecker />;
@@ -353,6 +345,9 @@ function DashboardComponent() {
             onWeightChange={handleWeightChange}
         />;
     }
+
+    const showCustomHeader = !searchTerm && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isConnectionsCategory;
+
     return (
       <ItemTable 
         category={selectedCategory as any} 
@@ -363,6 +358,21 @@ function DashboardComponent() {
       />
     );
   }
+  
+  if (!selectedCategoryId) {
+    return (
+      <WelcomeScreen onSelectCategory={handleSelectCategory} />
+    );
+  }
+
+  const showCustomHeader = !searchTerm && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isConnectionsCategory;
+
+  const isPackageCheckerCategory = selectedCategoryId === 'package-checker';
+  const isScaleCategory = selectedCategoryId === 'balanca';
+  const isScrapTableCategory = selectedCategoryId === 'tabela-sucata';
+  const isAstmStandardsCategory = selectedCategoryId === 'normas-astm';
+  const isManufacturingProcessesCategory = selectedCategoryId === 'processos-fabricacao';
+  const isTechnicalDrawingCategory = selectedCategoryId === 'desenho-tecnico';
   
   const showPriceControls = selectedCategory && (selectedCategory.hasOwnPriceControls || (!isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory));
 
@@ -540,7 +550,7 @@ function DashboardComponent() {
                 </div>
               )}
               <div className="flex-1 overflow-y-auto">
-                <div className={cn("p-1", (isScrapTableCategory || isConnectionsCategory) && "p-0 md:p-0")}>
+                <div className={cn("p-1", (isScrapTableCategory || selectedCategoryId === 'conexoes') && "p-0 md:p-0")}>
                  {renderContent()}
                 </div>
               </div>

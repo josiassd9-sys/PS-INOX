@@ -52,14 +52,8 @@ export default function Home() {
 
   return (
     <>
-      <main className={!mockupView ? "min-h-screen bg-background" : "min-h-screen bg-slate-900"}>
-        {mockupView ? (
-          <div className="flex flex-col items-center justify-center w-full h-full p-4">
-            <PhoneMockup>{mainContent}</PhoneMockup>
-          </div>
-        ) : (
-          mainContent
-        )}
+      <main className={!mockupView ? "min-h-screen bg-background" : "flex flex-col items-center justify-center min-h-screen bg-slate-900 p-4"}>
+        {mockupView ? <PhoneMockup>{mainContent}</PhoneMockup> : mainContent}
       </main>
       <Button
         variant="outline"

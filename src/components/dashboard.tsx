@@ -18,7 +18,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
-import { Search, Warehouse, SlidersHorizontal, PlusCircle, Link as LinkIcon, Scissors } from "lucide-react";
+import { Search, Warehouse, SlidersHorizontal, PlusCircle, Link as LinkIcon, Scissors, ClipboardList } from "lucide-react";
 import { PriceControls } from "./price-controls";
 import { ItemTable } from "./item-table";
 import { Icon } from "./icons";
@@ -426,6 +426,16 @@ function DashboardComponent() {
                           </Link>
                         </SidebarMenuItem>
                       )}
+                      {group.title === 'INFORMATIVOS' && (
+                        <SidebarMenuItem>
+                          <Link href="/lista-materiais" passHref>
+                            <SidebarMenuButton className="w-full justify-start h-8">
+                                <ClipboardList />
+                                <span>Lista de Materiais</span>
+                            </SidebarMenuButton>
+                          </Link>
+                        </SidebarMenuItem>
+                      )}
                     </SidebarMenu>
                  </AccordionContent>
                </AccordionItem>
@@ -567,5 +577,7 @@ export function Dashboard() {
     </SidebarProvider>
   )
 }
+
+    
 
     

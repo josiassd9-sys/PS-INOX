@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { Icon } from "@/components/icons"
 import { CATEGORY_GROUPS } from "@/lib/data"
 import Link from "next/link";
+import { Home } from "lucide-react";
 
 const mainIcons = CATEGORY_GROUPS.flatMap(g => g.items)
   .filter(c => ['tubos-od', 'metalon-quadrado', 'barras-chatas', 'chapas', 'conexoes', 'cantoneiras', 'tubos-schedule', 'metalon-retangular', 'barras-redondas', 'barra-quadrada', 'barra-sextavada', 'tubos-alianca'].includes(c.id))
@@ -129,16 +130,15 @@ export function BlueprintMinimalist({ onSelectCategory }: BlueprintMinimalistPro
                                     <span className="text-[10px] text-slate-400 text-center leading-tight">{item.name}</span>
                                  </motion.div>
                             ))}
-                             <Link href="/retalho-inox" passHref>
-                              <motion.div
+                             <motion.div
                                 variants={itemVariants}
                                 whileHover={{ scale: 1.1, backgroundColor: 'hsla(220, 14%, 96%, 0.1)', rotate: -5 }}
                                 className="flex flex-col items-center justify-center gap-1 p-1 rounded-lg cursor-pointer aspect-square"
+                                onClick={() => onSelectCategory('retalho-inox')}
                               >
                                 <Icon name="Scissors" className="w-5 h-5 text-slate-300" />
                                 <span className="text-[10px] text-slate-400 text-center leading-tight">Calculadora Retalhos</span>
                               </motion.div>
-                            </Link>
                         </motion.div>
                     </div>
                 </div>
@@ -159,16 +159,15 @@ export function BlueprintMinimalist({ onSelectCategory }: BlueprintMinimalistPro
                             <span className="text-[10px] text-slate-400 text-center leading-tight">{item.name}</span>
                          </motion.div>
                     ))}
-                    <Link href="/lista-materiais" passHref>
-                      <motion.div
-                        variants={itemVariants}
-                        whileHover={{ scale: 1.1, backgroundColor: 'hsla(220, 14%, 96%, 0.1)', rotate: -5 }}
-                        className="flex flex-col items-center justify-center gap-1 p-1 rounded-lg cursor-pointer aspect-square"
-                      >
-                        <Icon name="ClipboardList" className="w-6 h-6 text-slate-300" />
-                        <span className="text-[10px] text-slate-400 text-center leading-tight">Lista de Materiais</span>
-                      </motion.div>
-                    </Link>
+                    <motion.div
+                      variants={itemVariants}
+                      whileHover={{ scale: 1.1, backgroundColor: 'hsla(220, 14%, 96%, 0.1)', rotate: -5 }}
+                      className="flex flex-col items-center justify-center gap-1 p-1 rounded-lg cursor-pointer aspect-square"
+                      onClick={() => onSelectCategory('lista-materiais')}
+                    >
+                      <Icon name="ClipboardList" className="w-6 h-6 text-slate-300" />
+                      <span className="text-[10px] text-slate-400 text-center leading-tight">Lista de Materiais</span>
+                    </motion.div>
                 </motion.div>
             </motion.div>
         </div>

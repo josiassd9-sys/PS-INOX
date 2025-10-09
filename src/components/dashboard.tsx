@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import * as React from "react";
@@ -18,7 +17,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
-import { Search, Warehouse, SlidersHorizontal, PlusCircle, Link as LinkIcon, Scissors, ClipboardList } from "lucide-react";
+import { Search, Warehouse, SlidersHorizontal, PlusCircle, Link as LinkIcon, Scissors, ClipboardList, Home } from "lucide-react";
 import { PriceControls } from "./price-controls";
 import { ItemTable } from "./item-table";
 import { Icon } from "./icons";
@@ -50,8 +49,6 @@ import {
 import { TechnicalDrawingGuide } from "./technical-drawing-guide";
 import { ConnectionsTable } from "./connections-table";
 import { CostAdjustmentCalculator } from "./cost-adjustment-calculator";
-import { WelcomeScreen } from "./welcome-screen";
-import { ScrapCalculator } from "./scrap-calculator";
 import Link from "next/link";
 
 interface PriceParams {
@@ -98,12 +95,11 @@ const initializePriceParams = (): Record<string, PriceParams> => {
   return params;
 };
 
-function DashboardComponent() {
+function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }) {
   const { toast } = useToast();
   const [priceParams, setPriceParams] = React.useState<Record<string, PriceParams>>({});
-  const [isPriceParamsInitialized, setIsPriceParamsInitialized] = React.useState(false);
   
-  const [selectedCategoryId, setSelectedCategoryId] = React.useState<string | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = React.useState<string | null>(initialCategoryId);
   const [searchTerm, setSearchTerm] = React.useState("");
   const { setOpenMobile, isMobile } = useSidebar();
   const [isScrapItemDialogOpen, setIsScrapItemDialogOpen] = React.useState(false);
@@ -127,8 +123,6 @@ function DashboardComponent() {
     } catch (error) {
       console.error("Failed to load data from localStorage", error);
     }
-
-    setIsPriceParamsInitialized(true);
   }, []);
   
   const savePriceParams = () => {
@@ -282,7 +276,7 @@ function DashboardComponent() {
   }, [searchTerm]);
 
   const renderContent = () => {
-    if (!isPriceParamsInitialized || !currentPriceParams) {
+    if (!currentPriceParams) {
       return (
         <div className="flex items-center justify-center h-screen">
           <p>Carregando...</p>
@@ -359,10 +353,6 @@ function DashboardComponent() {
     );
   }
   
-  if (!selectedCategoryId) {
-    return <WelcomeScreen onSelectCategory={handleSelectCategory} />;
-  }
-
   const isPackageCheckerCategory = selectedCategoryId === 'package-checker';
   const isScaleCategory = selectedCategoryId === 'balanca';
   const isScrapTableCategory = selectedCategoryId === 'tabela-sucata';
@@ -392,14 +382,10 @@ function DashboardComponent() {
     <>
       <Sidebar>
         <SidebarHeader>
-          <button
-            onClick={() => handleSelectCategory(null)}
-            className="flex items-center gap-1 cursor-pointer w-full text-left"
-            aria-label="Voltar para a tela inicial"
-          >
-            <Warehouse className="size-6 text-primary" />
+          <Link href="/" className="flex items-center gap-1 cursor-pointer w-full text-left" aria-label="Voltar para a tela inicial">
+            <Home className="size-6 text-primary" />
             <h1 className="text-lg font-semibold">PS INOX</h1>
-          </button>
+          </Link>
         </SidebarHeader>
         <SidebarContent className="p-1">
            <Accordion type="multiple" defaultValue={CATEGORY_GROUPS.map(g => g.title)} className="w-full flex flex-col gap-1">
@@ -412,14 +398,15 @@ function DashboardComponent() {
                     <SidebarMenu>
                       {group.items.map((category) => (
                         <SidebarMenuItem key={category.id}>
-                          <SidebarMenuButton
-                            onClick={() => handleSelectCategory(category.id)}
-                            isActive={selectedCategoryId === category.id && !searchTerm}
-                            className="w-full justify-start h-8"
-                          >
-                            <Icon name={category.icon as any} />
-                            <span>{category.name}</span>
-                          </SidebarMenuButton>
+                          <Link href={`/calculator/${category.id}`} passHref>
+                            <SidebarMenuButton
+                              isActive={selectedCategoryId === category.id && !searchTerm}
+                              className="w-full justify-start h-8"
+                            >
+                              <Icon name={category.icon as any} />
+                              <span>{category.name}</span>
+                            </SidebarMenuButton>
+                          </Link>
                         </SidebarMenuItem>
                       ))}
                        {group.title === 'FERRAMENTAS' && (
@@ -576,10 +563,10 @@ function DashboardComponent() {
   );
 }
 
-export function Dashboard() {
+export function Dashboard({ initialCategoryId }: { initialCategoryId?: string }) {
   return (
     <SidebarProvider>
-      <DashboardComponent />
+      <DashboardComponent initialCategoryId={initialCategoryId!} />
     </SidebarProvider>
   )
 }

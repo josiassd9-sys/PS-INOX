@@ -1,15 +1,1 @@
-"use client";
-
-import { BlueprintMinimalist } from "@/components/showcase/blueprint-minimalist";
-
-interface WelcomeScreenProps {
-    onSelectCategory: (categoryId: string) => void;
-}
-
-export function WelcomeScreen({ onSelectCategory }: WelcomeScreenProps) {
-    return (
-        <div className="flex flex-col items-center justify-center w-full h-full">
-           <BlueprintMinimalist onSelectCategory={onSelectCategory} />
-        </div>
-    )
-}
+// This file is no longer needed and can be deleted.

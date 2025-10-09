@@ -1,6 +1,6 @@
 "use client";
 
-import { LucideProps, icons, RectangleHorizontal, Hexagon, Scissors, PackageCheck, Weight, Printer, Save, Download, Trash2, Eye, EyeOff, GalleryVertical, Book, Factory, Sparkles, DraftingCompass, Link, ClipboardList } from 'lucide-react';
+import { LucideProps, icons, RectangleHorizontal, Hexagon, Scissors, PackageCheck, Weight, Printer, Save, Download, Trash2, Eye, EyeOff, GalleryVertical, Book, Factory, Sparkles, DraftingCompass, Link, ClipboardList, Home } from 'lucide-react';
 
 const AllianceRing = (props: LucideProps) => (
   <svg
@@ -38,7 +38,8 @@ const customIcons = {
     DraftingCompass,
     Link,
     AllianceRing,
-    ClipboardList
+    ClipboardList,
+    Home
 }
 
 interface IconProps extends LucideProps {

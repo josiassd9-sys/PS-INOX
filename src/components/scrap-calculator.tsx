@@ -166,42 +166,42 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
 
                 {shape === 'rectangle' ? (
                     <div className="flex gap-px">
-                        <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="width">Larg.(mm)</Label><Input id="width" type="text" inputMode="decimal" placeholder="Largura" value={dimensions.width} onChange={(e) => handleDimChange('width', e.target.value)} className="px-1"/></div>
-                        <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="length">Compr.(mm)</Label><Input id="length" type="text" inputMode="decimal" placeholder="Compr." value={dimensions.length} onChange={(e) => handleDimChange('length', e.target.value)} className="px-1"/></div>
-                         <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Esp.(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={dimensions.thickness} onChange={(e) => handleDimChange('thickness', e.target.value)} className="px-1"/></div>
+                        <div className="space-y-1 min-w-0"><Label htmlFor="width">Larg.(mm)</Label><Input id="width" type="text" inputMode="decimal" placeholder="Largura" value={dimensions.width} onChange={(e) => handleDimChange('width', e.target.value)} className="px-1 w-full"/></div>
+                        <div className="space-y-1 min-w-0"><Label htmlFor="length">Compr.(mm)</Label><Input id="length" type="text" inputMode="decimal" placeholder="Compr." value={dimensions.length} onChange={(e) => handleDimChange('length', e.target.value)} className="px-1 w-full"/></div>
+                         <div className="space-y-1 min-w-0"><Label htmlFor="thickness">Esp.(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={dimensions.thickness} onChange={(e) => handleDimChange('thickness', e.target.value)} className="px-1 w-full"/></div>
                     </div>
                 ) : (
                     <div className="flex gap-px">
-                        <div className="space-y-1 flex-1 min-w-0">
+                        <div className="space-y-1 min-w-0">
                             <Label htmlFor="diameter">Diâmetro(mm)</Label>
-                            <Input id="diameter" type="text" inputMode="decimal" placeholder="Diâmetro" value={dimensions.diameter} onChange={(e) => handleDimChange('diameter', e.target.value)} className="px-1"/>
+                            <Input id="diameter" type="text" inputMode="decimal" placeholder="Diâmetro" value={dimensions.diameter} onChange={(e) => handleDimChange('diameter', e.target.value)} className="px-1 w-full"/>
                         </div>
-                         <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="thickness">Esp.(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={dimensions.thickness} onChange={(e) => handleDimChange('thickness', e.target.value)} className="px-1"/></div>
+                         <div className="space-y-1 min-w-0"><Label htmlFor="thickness">Esp.(mm)</Label><Input id="thickness" type="text" inputMode="decimal" placeholder="Espessura" value={dimensions.thickness} onChange={(e) => handleDimChange('thickness', e.target.value)} className="px-1 w-full"/></div>
                     </div>
                 )}
 
 
                 <div className="flex gap-px">
-                     <div className="space-y-1 flex-1 min-w-0">
+                     <div className="space-y-1 min-w-0">
                         <Label htmlFor="material-class">Classe</Label>
-                        <Input id="material-class" type="text" placeholder="Ex: 304" value={materialClass} onChange={(e) => setMaterialClass(e.target.value)} className="px-1"/>
+                        <Input id="material-class" type="text" placeholder="Ex: 304" value={materialClass} onChange={(e) => setMaterialClass(e.target.value)} className="px-1 w-full"/>
                      </div>
-                     <div className="space-y-1 flex-1 min-w-0">
+                     <div className="space-y-1 min-w-0">
                         <Label htmlFor="scrap-price">Preço (R$/kg)</Label>
-                        <Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} className="px-1"/>
+                        <Input id="scrap-price" type="text" inputMode="decimal" value={scrapPrice} onChange={(e) => handleScrapPriceChange(e.target.value)} className="px-1 w-full"/>
                     </div>
-                     <div className="space-y-1 flex-1 min-w-0"><Label htmlFor="quantity">Qtde</Label><Input id="quantity" type="text" inputMode="decimal" placeholder="Qtd." value={dimensions.quantity} onChange={(e) => handleDimChange('quantity', e.target.value)} className="px-1"/></div>
+                     <div className="space-y-1 min-w-0"><Label htmlFor="quantity">Qtde</Label><Input id="quantity" type="text" inputMode="decimal" placeholder="Qtd." value={dimensions.quantity} onChange={(e) => handleDimChange('quantity', e.target.value)} className="px-1 w-full"/></div>
                 </div>
             </div>
         </div>
     
         <div className="pt-2 mt-2 border-t space-y-2">
             <div className="flex gap-px items-end">
-                <div className="space-y-1 flex-1 min-w-0">
+                <div className="space-y-1 min-w-0">
                     <Label htmlFor="weight">Peso Final (kg)</Label>
-                    <Input id="weight" type="text" inputMode="decimal" placeholder="Peso Final" value={finalWeight} onChange={(e) => setFinalWeight(e.target.value.replace(/[^0-9,.]/g, ''))} className="font-semibold bg-muted/50 px-1"/>
+                    <Input id="weight" type="text" inputMode="decimal" placeholder="Peso Final" value={finalWeight} onChange={(e) => setFinalWeight(e.target.value.replace(/[^0-9,.]/g, ''))} className="font-semibold bg-muted/50 px-1 w-full"/>
                 </div>
-                <div className="space-y-1 flex-1 min-w-0">
+                <div className="space-y-1 min-w-0">
                     <Label className="text-accent-price font-semibold">R$ Total</Label>
                     <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
                         {formatNumber(calculatedPrice, {style: 'currency', currency: 'BRL'})}
@@ -219,5 +219,3 @@ export function ScrapCalculator({ onAddItem }: ScrapCalculatorProps) {
     </div>
   );
 }
-
-    

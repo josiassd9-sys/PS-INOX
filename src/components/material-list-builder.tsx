@@ -335,7 +335,7 @@ export function MaterialListBuilder() {
                        </TableHeader>
                        <TableBody>
                            {materialList.map((item, index) => {
-                                const isEven = index % 2 === 1; // 0-indexed, so 1, 3, 5 are "even"
+                                const isEven = index % 2 === 1;
                                return (
                                <React.Fragment key={item.listItemId}>
                                 <TableRow 
@@ -430,3 +430,4 @@ export function MaterialListBuilder() {
 }
 
     
+

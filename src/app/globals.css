@@ -46,10 +46,11 @@
     --table-header-fg: hsl(210, 40%, 98%);
     --table-item-fg: hsl(259, 47%, 41%);
 
-    --row-odd-bg-standard: hsl(0, 0%, 100%);
-    --row-odd-bg-accent: hsl(210, 40%, 97%);
-    --row-even-bg-accent: hsl(210, 40%, 97%);
-    --row-even-bg-strong: hsl(210, 30%, 92%);
+    /* Cores para o padrão de planilha */
+    --row-odd-bg-standard: hsl(0, 0%, 100%); /* Linha ímpar, colunas 1 e 2 (Branco) */
+    --row-odd-bg-accent: hsl(210, 40%, 97%); /* Linha ímpar, coluna 3 (Azul Claro) */
+    --row-even-bg-accent: hsl(210, 40%, 97%); /* Linha par, coluna 1 (Azul Claro) */
+    --row-even-bg-strong: hsl(210, 30%, 92%); /* Linha par, colunas 2 e 3 (Azul Mais Forte) */
 
     --table-price-fg: hsl(140, 80%, 35%);
   }
@@ -95,10 +96,11 @@
     --table-header-fg: hsl(210, 40%, 98%);
     --table-item-fg: hsl(259, 47%, 61%);
 
-    --row-odd-bg-standard: hsl(220, 10%, 40%);
-    --row-odd-bg-accent: hsl(210, 10%, 45%);
-    --row-even-bg-accent: hsl(210, 10%, 45%);
-    --row-even-bg-strong: hsl(210, 10%, 50%);
+    /* Cores para o padrão de planilha no modo escuro */
+    --row-odd-bg-standard: hsl(220, 10%, 40%); /* Linha ímpar, colunas 1 e 2 */
+    --row-odd-bg-accent: hsl(210, 10%, 45%);   /* Linha ímpar, coluna 3 e Linha par, coluna 1 */
+    --row-even-bg-accent: hsl(210, 10%, 45%);  /* Duplicado para clareza */
+    --row-even-bg-strong: hsl(210, 10%, 50%);  /* Linha par, colunas 2 e 3 */
 
     --table-price-fg: hsl(140, 60%, 70%);
   }

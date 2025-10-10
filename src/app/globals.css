@@ -46,9 +46,11 @@
     --table-header-fg: hsl(210, 40%, 98%);
     --table-item-fg: hsl(259, 47%, 41%);
 
-    --table-odd-bg: hsl(0, 0%, 100%);
-    --table-odd-accent-bg: hsl(210, 25%, 94%);
-    --table-even-accent-bg: hsl(210, 20%, 88%);
+    --row-odd-bg-standard: hsl(0, 0%, 100%);
+    --row-odd-bg-accent: hsl(210, 40%, 97%);
+    --row-even-bg-accent: hsl(210, 40%, 97%);
+    --row-even-bg-strong: hsl(210, 30%, 92%);
+
     --table-price-fg: hsl(140, 80%, 35%);
   }
 
@@ -93,9 +95,11 @@
     --table-header-fg: hsl(210, 40%, 98%);
     --table-item-fg: hsl(259, 47%, 61%);
 
-    --table-odd-bg: hsl(220, 10%, 40%);
-    --table-odd-accent-bg: hsl(210, 10%, 45%);
-    --table-even-accent-bg: hsl(210, 10%, 50%);
+    --row-odd-bg-standard: hsl(220, 10%, 40%);
+    --row-odd-bg-accent: hsl(210, 10%, 45%);
+    --row-even-bg-accent: hsl(210, 10%, 45%);
+    --row-even-bg-strong: hsl(210, 10%, 50%);
+
     --table-price-fg: hsl(140, 60%, 70%);
   }
 }

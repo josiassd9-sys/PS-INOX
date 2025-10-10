@@ -344,13 +344,13 @@ export function MaterialListBuilder() {
                                 >
                                   <TableCell className={cn(
                                       "font-medium text-[11px] flex-1 p-1 border-r border-black text-table-item-fg",
-                                      isEven ? "bg-[hsl(var(--table-even-accent-bg))]" : "bg-[hsl(var(--table-odd-bg))]"
+                                      isEven ? "bg-[hsl(var(--row-even-bg-accent))]" : "bg-[hsl(var(--row-odd-bg-standard))]"
                                   )}>
                                     {item.description}
                                   </TableCell>
                                   <TableCell className={cn(
                                       "text-center p-1 w-[80px] border-r border-black",
-                                      isEven ? "bg-[hsl(var(--table-even-accent-bg))]" : "bg-[hsl(var(--table-odd-bg))]"
+                                      isEven ? "bg-[hsl(var(--row-even-bg-strong))]" : "bg-[hsl(var(--row-odd-bg-standard))]"
                                   )}>
                                       <div className="flex flex-col items-center justify-center h-full">
                                         <span className="text-xs">{item.unit === 'm' ? 'M' : item.unit.toUpperCase()}</span>
@@ -359,7 +359,7 @@ export function MaterialListBuilder() {
                                   </TableCell>
                                   <TableCell className={cn(
                                       "text-right font-semibold p-1 w-[80px]",
-                                      isEven ? "bg-[hsl(var(--table-even-accent-bg))]" : "bg-[hsl(var(--table-odd-accent-bg))]"
+                                      isEven ? "bg-[hsl(var(--row-even-bg-strong))]" : "bg-[hsl(var(--row-odd-bg-accent))]"
                                   )}>
                                     <div className="h-full flex items-center justify-end text-[hsl(var(--table-price-fg))]">
                                       {formatPrice(item.price)}

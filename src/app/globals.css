@@ -130,28 +130,34 @@
     display: none;
   }
 
-  #scrap-list-section {
-    border-top: none !important;
-    padding-top: 0 !important;
-    margin-top: 0 !important;
+  #material-list-section {
+     padding: 0 !important;
   }
-  
-  #scrap-list-section h2 {
+
+  #material-list-section h2 {
       font-size: 1.5rem;
       margin-bottom: 1rem;
   }
-  #scrap-list-section table {
+  #material-list-section table {
     font-size: 10pt;
   }
-  #scrap-list-section td, #scrap-list-section th {
+  #material-list-section td, #material-list-section th {
     padding: 8px;
     color: black !important;
+    border-color: #333 !important;
   }
-   #scrap-list-section .text-primary {
+   #material-list-section .text-table-item-fg {
     color: black !important;
   }
-  #scrap-list-section tr {
-    border-color: #ccc !important;
+  #material-list-section .text-\[hsl\(var\(--table-price-fg\)\] {
+    color: #008000 !important;
+  }
+  #material-list-section tr {
+    border-color: #333 !important;
+  }
+  #material-list-section .bg-table-header-bg {
+    background-color: #333 !important;
+    color: white !important;
   }
 
   #scale-calculator-printable-area {

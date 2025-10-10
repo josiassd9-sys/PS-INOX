@@ -322,7 +322,7 @@ export function MaterialListBuilder() {
     
     if (materialList.length > 0) {
       return (
-        <div id="material-list-section" className="flex-1 flex flex-col min-h-0 pt-2">
+        <div id="material-list-section" className="flex-1 flex flex-col min-h-0 pt-2 print:pt-0">
              <Card className="flex-1 overflow-hidden flex flex-col border-black">
                 <CardContent className="p-0 flex-1 overflow-y-auto">
                    <Table>
@@ -396,7 +396,7 @@ export function MaterialListBuilder() {
   return (
     <div className="relative w-full h-full flex flex-col overflow-hidden bg-background text-foreground">
         
-        <div style={{backgroundColor: 'var(--table-header-bg)'}} className="relative z-40 w-full px-8 py-1 flex flex-col gap-1 shrink-0">
+        <div style={{backgroundColor: 'var(--table-header-bg)'}} className="relative z-40 w-full px-8 py-1 flex flex-col gap-1 shrink-0 print:hidden">
             <div className="flex justify-center pt-1 text-4xl font-bold text-white tracking-wider">
                 PS INOX
             </div>
@@ -418,7 +418,7 @@ export function MaterialListBuilder() {
         </div>
 
         {materialList.length > 0 && !searchTerm && (
-            <div style={{backgroundColor: 'var(--table-header-bg)'}} className="shrink-0 border-t-2 border-black p-2">
+            <div style={{backgroundColor: 'var(--table-header-bg)'}} className="shrink-0 border-t-2 border-black p-2 print:hidden">
                 <div className="flex items-center justify-end gap-4">
                     <span className="text-lg font-bold text-white">Total</span>
                     <span className="text-right text-lg font-bold text-green-500 bg-white px-2 py-1 rounded-sm min-w-[120px]">{formatCurrency(totalListPrice)}</span>
@@ -430,4 +430,5 @@ export function MaterialListBuilder() {
 }
 
     
+
 

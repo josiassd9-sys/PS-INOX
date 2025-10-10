@@ -42,11 +42,11 @@
     --sidebar-border: 0 0% 15%;
     --sidebar-ring: 0 0% 60%;
 
-    --table-header-bg: 216 41% 35%;
-    --table-header-fg: 210 40% 98%;
-    --table-col-1-bg: 220 14% 96%;
-    --table-col-2-bg: 204 38% 92%;
-    --table-item-fg: 259 47% 41%;
+    --table-header-bg: hsl(216, 41%, 35%);
+    --table-header-fg: hsl(210, 40%, 98%);
+    --table-col-1-bg: hsl(220, 14%, 96%);
+    --table-col-2-bg: hsl(204, 38%, 92%);
+    --table-item-fg: hsl(259, 47%, 41%);
   }
 
   .dark {
@@ -86,11 +86,11 @@
     --sidebar-border: 0 0% 40%;
     --sidebar-ring: 0-0-80;
 
-    --table-header-bg: 216 41% 35%;
-    --table-header-fg: 210 40% 98%;
-    --table-col-1-bg: 220 10% 35%;
-    --table-col-2-bg: 204 10% 40%;
-    --table-item-fg: 259 47% 61%;
+    --table-header-bg: hsl(216, 41%, 35%);
+    --table-header-fg: hsl(210, 40%, 98%);
+    --table-col-1-bg: hsl(220, 10%, 35%);
+    --table-col-2-bg: hsl(204, 10%, 40%);
+    --table-item-fg: hsl(259, 47%, 61%);
   }
 }
 

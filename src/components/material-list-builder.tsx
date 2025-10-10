@@ -347,7 +347,7 @@ export function MaterialListBuilder() {
                                         {formatWeight(item.weight)}
                                       </div>
                                   </TableCell>
-                                  <TableCell className="text-right font-semibold p-1 w-[80px] bg-table-col-1-bg text-green-700">
+                                  <TableCell className="text-right font-semibold p-1 w-[80px] bg-table-col-2-bg text-green-700">
                                     <div className="h-full flex items-center justify-end">
                                       {formatPrice(item.price)}
                                     </div>
@@ -383,7 +383,7 @@ export function MaterialListBuilder() {
   return (
     <div className="relative w-full h-full flex flex-col overflow-hidden bg-background text-foreground">
         
-        <div className="relative z-40 w-full px-8 py-1 flex flex-col gap-1 shrink-0 bg-table-header-bg">
+        <div style={{backgroundColor: 'var(--table-header-bg)'}} className="relative z-40 w-full px-8 py-1 flex flex-col gap-1 shrink-0">
             <div className="flex justify-center pt-1 text-4xl font-bold text-white tracking-wider">
                 PS INOX
             </div>
@@ -405,7 +405,7 @@ export function MaterialListBuilder() {
         </div>
 
         {materialList.length > 0 && !searchTerm && (
-            <div className="shrink-0 border-t-2 border-black bg-table-header-bg p-2">
+            <div style={{backgroundColor: 'var(--table-header-bg)'}} className="shrink-0 border-t-2 border-black p-2">
                 <div className="flex items-center justify-end gap-4">
                     <span className="text-lg font-bold text-white">Total</span>
                     <span className="text-right text-lg font-bold text-green-500 bg-white px-2 py-1 rounded-sm min-w-[120px]">{formatCurrency(totalListPrice)}</span>

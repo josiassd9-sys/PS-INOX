@@ -344,13 +344,13 @@ export function MaterialListBuilder() {
                                 >
                                   <TableCell className={cn(
                                       "font-medium text-[11px] flex-1 p-1 border-r border-black text-table-item-fg",
-                                      isEven ? "bg-[hsl(var(--row-even-bg-accent))]" : "bg-[hsl(var(--row-odd-bg-standard))]"
+                                      isEven ? "bg-[blue-800]" : "bg-[blue-350.]"
                                   )}>
                                     {item.description}
                                   </TableCell>
                                   <TableCell className={cn(
                                       "text-center p-1 w-[80px] border-r border-black",
-                                      isEven ? "bg-[hsl(var(--row-even-bg-strong))]" : "bg-[hsl(var(--row-odd-bg-standard))]"
+                                      isEven ? "bg-[blue-1000]" : "bg-[blue-200]"
                                   )}>
                                       <div className="flex flex-col items-center justify-center h-full">
                                         <span className="text-xs">{item.unit === 'm' ? 'M' : item.unit.toUpperCase()}</span>

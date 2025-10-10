@@ -81,7 +81,7 @@ function EditForm({ item, onUpdate, onDelete, onCancel }: EditFormProps) {
 
     return (
         <TableRow className="bg-primary/10">
-            <TableCell colSpan={4} className="p-2">
+            <TableCell colSpan={3} className="p-2">
                 <div className="flex items-end gap-2">
                     <div className="space-y-1">
                         <Label htmlFor="edit-quantity" className="text-xs">Quantidade</Label>
@@ -197,7 +197,7 @@ export function MaterialListBuilder() {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
-    const formatted = formatter.format(value); // ex: 1.075,20
+    const formatted = formatter.format(value); 
 
     const parts = formatted.split(',');
     const integerPart = parts[0];
@@ -215,9 +215,8 @@ export function MaterialListBuilder() {
     }
 
     return (
-      <div className="flex items-baseline justify-end tabular-nums">
-        <span className="text-sm font-semibold">R$</span>
-        <span className="font-bold text-[15px]">{thousandsPart}</span>
+      <div className="flex items-baseline justify-end tabular-nums font-sans">
+        <span className="text-[15px] font-semibold">{thousandsPart}</span>
         <span className="text-[12px] font-semibold">{hundredsPart}</span>
         <span className="text-[9px] self-start mt-px">,{decimalPart}</span>
       </div>
@@ -231,8 +230,8 @@ export function MaterialListBuilder() {
     const decimalPart = parts[1];
     
     return (
-        <div className="flex items-baseline justify-center tabular-nums">
-            <span className="text-[11px]">{integerPart}</span>
+        <div className="flex items-baseline justify-center tabular-nums font-sans">
+            <span className="text-[11px] font-semibold">{integerPart}</span>
             <span className="text-[8px] self-start mt-px">,{decimalPart} kg</span>
         </div>
     )
@@ -324,15 +323,14 @@ export function MaterialListBuilder() {
     if (materialList.length > 0) {
       return (
         <div id="material-list-section" className="flex-1 flex flex-col min-h-0 pt-2">
-            <h2 className="text-lg font-semibold text-center mb-1 text-foreground">Lista de Materiais</h2>
-             <Card className="flex-1 overflow-hidden flex flex-col bg-card border-border">
+             <Card className="flex-1 overflow-hidden flex flex-col border-black">
                 <CardContent className="p-0 flex-1 overflow-y-auto">
                    <Table>
                        <TableHeader>
-                           <TableRow className="border-b-border hover:bg-muted/50 flex">
-                               <TableHead className="flex-1 pl-2 pr-1 py-1">Descrição</TableHead>
-                               <TableHead className="text-center p-1 w-[80px]">PMQ</TableHead>
-                               <TableHead className="text-right p-1 w-[80px] bg-muted/50">Preço</TableHead>
+                           <TableRow className="border-b-black hover:bg-transparent flex">
+                               <TableHead className="flex-1 p-1 bg-table-header-bg text-table-header-fg border-r border-black font-bold">Descrição</TableHead>
+                               <TableHead className="text-center p-1 w-[80px] bg-table-header-bg text-table-header-fg border-r border-black font-bold">PMQ</TableHead>
+                               <TableHead className="text-center p-1 w-[80px] bg-table-header-bg text-table-header-fg font-bold">VALOR</TableHead>
                            </TableRow>
                        </TableHeader>
                        <TableBody>
@@ -340,17 +338,19 @@ export function MaterialListBuilder() {
                                <React.Fragment key={item.listItemId}>
                                 <TableRow 
                                     onClick={() => handleRowClick(item.listItemId)}
-                                    className={cn("flex items-center cursor-pointer", editingItemId === item.listItemId && "bg-primary/20")}
+                                    className={cn("flex items-stretch cursor-pointer border-b-black", editingItemId === item.listItemId && "bg-primary/20")}
                                 >
-                                  <TableCell className="font-medium text-[11px] flex-1 pl-2 pr-1 py-1">{item.description}</TableCell>
-                                   <TableCell className="text-center text-muted-foreground p-1 w-[80px]">
-                                      <div className="flex flex-col items-center">
-                                        <span className="text-xs">{(item.unit === 'un' || item.unit === 'm' || item.unit === 'kg') && item.quantity ? `${item.quantity} pç` : ''}</span>
+                                  <TableCell className="font-medium text-[11px] flex-1 p-1 bg-table-col-1-bg text-table-item-fg border-r border-black">{item.description}</TableCell>
+                                   <TableCell className="text-center text-foreground p-1 w-[80px] bg-table-col-2-bg border-r border-black">
+                                      <div className="flex flex-col items-center justify-center h-full">
+                                        <span className="text-xs">{item.unit === 'm' ? 'M' : item.unit.toUpperCase()}</span>
                                         {formatWeight(item.weight)}
                                       </div>
                                   </TableCell>
-                                  <TableCell className="text-right font-semibold text-accent-price p-1 w-[80px] bg-muted/50">
-                                    {formatPrice(item.price)}
+                                  <TableCell className="text-right font-semibold p-1 w-[80px] bg-table-col-2-bg">
+                                    <div className="h-full flex items-center justify-end text-green-700">
+                                      {formatPrice(item.price)}
+                                    </div>
                                   </TableCell>
                                 </TableRow>
                                 {editingItemId === item.listItemId && (
@@ -383,11 +383,9 @@ export function MaterialListBuilder() {
   return (
     <div className="relative w-full h-full flex flex-col overflow-hidden bg-background text-foreground">
         
-        <div className="relative z-40 w-full px-8 py-1 flex flex-col gap-1 shrink-0">
-            <div className="flex justify-center pt-1">
-                <Link href="/">
-                  <PsInoxLogo />
-                </Link>
+        <div className="relative z-40 w-full px-8 py-1 flex flex-col gap-1 shrink-0 bg-table-header-bg">
+            <div className="flex justify-center pt-1 text-4xl font-bold text-white tracking-wider">
+                PS INOX
             </div>
             
             <div className="relative">
@@ -407,10 +405,10 @@ export function MaterialListBuilder() {
         </div>
 
         {materialList.length > 0 && !searchTerm && (
-            <div className="shrink-0 border-t border-border bg-background/95 backdrop-blur-sm p-2">
-                <div className="flex items-center justify-between">
-                    <span className="text-lg font-semibold">Total</span>
-                    <span className="text-right text-lg font-bold text-accent-price">{formatCurrency(totalListPrice)}</span>
+            <div className="shrink-0 border-t-2 border-black bg-table-header-bg p-2">
+                <div className="flex items-center justify-end gap-4">
+                    <span className="text-lg font-bold text-white">Total</span>
+                    <span className="text-right text-lg font-bold text-green-500 bg-white px-2 py-1 rounded-sm min-w-[120px]">{formatCurrency(totalListPrice)}</span>
                 </div>
             </div>
         )}

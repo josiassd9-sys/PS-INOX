@@ -342,12 +342,12 @@ export function MaterialListBuilder() {
                                 >
                                   <TableCell className="font-medium text-[11px] flex-1 p-1 bg-table-col-1-bg text-table-item-fg border-r border-black">{item.description}</TableCell>
                                    <TableCell className="text-center text-foreground p-1 w-[80px] bg-table-col-2-bg border-r border-black">
-                                      <div className="flex flex-col items-center justify-center h-full">
+                                      <div className="flex flex-col items-center justify-center h-full text-foreground">
                                         <span className="text-xs">{item.unit === 'm' ? 'M' : item.unit.toUpperCase()}</span>
                                         {formatWeight(item.weight)}
                                       </div>
                                   </TableCell>
-                                  <TableCell className="text-right font-semibold p-1 w-[80px] bg-table-col-2-bg">
+                                  <TableCell className="text-right font-semibold p-1 w-[80px] bg-table-col-1-bg">
                                     <div className="h-full flex items-center justify-end text-green-700">
                                       {formatPrice(item.price)}
                                     </div>
@@ -415,3 +415,5 @@ export function MaterialListBuilder() {
       </div>
   );
 }
+
+    

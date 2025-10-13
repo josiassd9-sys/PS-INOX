@@ -323,13 +323,13 @@ export function MaterialListBuilder() {
     if (materialList.length > 0) {
       return (
         <div id="material-list-section" className="flex-1 flex flex-col min-h-0 pt-2 print:pt-0">
-             <Card className="flex-1 overflow-hidden flex flex-col border-[hsl(var(--sheet-header-bg))]">
+             <Card className="flex-1 overflow-hidden flex flex-col">
                 <CardContent className="p-0 flex-1 overflow-y-auto">
                    <Table>
                        <TableHeader>
-                           <TableRow className="border-b-[hsl(var(--sheet-header-bg))] hover:bg-transparent flex">
-                               <TableHead className="flex-1 p-1 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] border-r border-[hsl(var(--sheet-header-bg))] font-bold">Descrição</TableHead>
-                               <TableHead className="text-center p-1 w-[80px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] border-r border-[hsl(var(--sheet-header-bg))] font-bold">PMQ</TableHead>
+                           <TableRow className="hover:bg-transparent flex">
+                               <TableHead className="flex-1 p-1 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Descrição</TableHead>
+                               <TableHead className="text-center p-1 w-[80px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">PMQ</TableHead>
                                <TableHead className="text-center p-1 w-[80px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">VALOR</TableHead>
                            </TableRow>
                        </TableHeader>
@@ -341,15 +341,15 @@ export function MaterialListBuilder() {
                                 <TableRow 
                                     onClick={() => handleRowClick(item.listItemId)}
                                     className={cn(
-                                        "flex items-stretch cursor-pointer border-b-[hsl(var(--sheet-header-bg))]",
+                                        "flex items-stretch cursor-pointer",
                                         !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-even-bg))]",
                                         editingItemId === item.listItemId && "bg-primary/20"
                                     )}
                                 >
-                                  <TableCell className="font-medium text-[hsl(var(--text-item-pink))] text-[11px] flex-1 p-1 border-r border-[hsl(var(--sheet-header-bg))]">
+                                  <TableCell className="font-medium text-[hsl(var(--text-item-pink))] text-[11px] flex-1 p-1">
                                     {item.description}
                                   </TableCell>
-                                  <TableCell className={cn("text-center p-1 w-[80px] border-r border-[hsl(var(--sheet-header-bg))]",
+                                  <TableCell className={cn("text-center p-1 w-[80px]",
                                     isEven ? "bg-[hsl(var(--row-pmq-bg))]" : "bg-[hsl(var(--row-even-bg))]"
                                   )}>
                                       <div className="flex flex-col items-center justify-center h-full">
@@ -359,7 +359,7 @@ export function MaterialListBuilder() {
                                   </TableCell>
                                   <TableCell className={cn(
                                       "text-right font-semibold p-1 w-[80px]",
-                                      isEven ? "bg-[hsl(var(--row-pmq-bg))]" : "bg-[hsl(var(--row-even-bg))]"
+                                       isEven ? "bg-[hsl(var(--row-pmq-bg))]" : "bg-[hsl(var(--row-even-bg))]"
                                   )}>
                                     <div className="h-full flex items-center justify-end text-[hsl(var(--sheet-total-price-fg))]">
                                       {formatPrice(item.price)}
@@ -445,5 +445,7 @@ export function MaterialListBuilder() {
 
 
 
+
+    
 
     

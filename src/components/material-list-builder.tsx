@@ -323,13 +323,13 @@ export function MaterialListBuilder() {
     if (materialList.length > 0) {
       return (
         <div id="material-list-section" className="flex-1 flex flex-col min-h-0 pt-2 print:pt-0">
-             <Card className="flex-1 overflow-hidden flex flex-col border-black">
+             <Card className="flex-1 overflow-hidden flex flex-col border-[hsl(var(--sheet-header-bg))]">
                 <CardContent className="p-0 flex-1 overflow-y-auto">
                    <Table>
                        <TableHeader>
-                           <TableRow className="border-b-black hover:bg-transparent flex">
-                               <TableHead className="flex-1 p-1 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] border-r border-black font-bold">Descrição</TableHead>
-                               <TableHead className="text-center p-1 w-[80px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] border-r border-black font-bold">PMQ</TableHead>
+                           <TableRow className="border-b-[hsl(var(--sheet-header-bg))] hover:bg-transparent flex">
+                               <TableHead className="flex-1 p-1 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] border-r border-[hsl(var(--sheet-header-bg))] font-bold">Descrição</TableHead>
+                               <TableHead className="text-center p-1 w-[80px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] border-r border-[hsl(var(--sheet-header-bg))] font-bold">PMQ</TableHead>
                                <TableHead className="text-center p-1 w-[80px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">VALOR</TableHead>
                            </TableRow>
                        </TableHeader>
@@ -341,15 +341,15 @@ export function MaterialListBuilder() {
                                 <TableRow 
                                     onClick={() => handleRowClick(item.listItemId)}
                                     className={cn(
-                                        "flex items-stretch cursor-pointer border-b-black",
-                                        isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-odd-bg))]",
+                                        "flex items-stretch cursor-pointer border-b-[hsl(var(--sheet-header-bg))]",
+                                        !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-even-bg))]",
                                         editingItemId === item.listItemId && "bg-primary/20"
                                     )}
                                 >
-                                  <TableCell className="font-medium text-[hsl(var(--text-item-pink))] text-[11px] flex-1 p-1 border-r border-black">
+                                  <TableCell className="font-medium text-[hsl(var(--text-item-pink))] text-[11px] flex-1 p-1 border-r border-[hsl(var(--sheet-header-bg))]">
                                     {item.description}
                                   </TableCell>
-                                  <TableCell className={cn("text-center p-1 w-[80px] border-r border-black",
+                                  <TableCell className={cn("text-center p-1 w-[80px] border-r border-[hsl(var(--sheet-header-bg))]",
                                     isEven ? "bg-[hsl(var(--row-pmq-bg))]" : "bg-[hsl(var(--row-even-bg))]"
                                   )}>
                                       <div className="flex flex-col items-center justify-center h-full">
@@ -418,7 +418,7 @@ export function MaterialListBuilder() {
         </div>
 
         {materialList.length > 0 && !searchTerm && (
-            <div className="shrink-0 border-t-2 border-black print:hidden flex">
+            <div className="shrink-0 border-t-2 border-[hsl(var(--sheet-header-bg))] print:hidden flex">
                 <div style={{backgroundColor: 'hsl(var(--sheet-total-bg))'}} className="flex-1 p-2 flex items-center justify-end">
                     <span className="text-lg font-bold text-[hsl(var(--sheet-header-fg))]">Total</span>
                 </div>
@@ -444,3 +444,6 @@ export function MaterialListBuilder() {
     
 
 
+
+
+    

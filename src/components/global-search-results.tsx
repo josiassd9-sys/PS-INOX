@@ -62,6 +62,83 @@ function AddByUnitForm({ item, onAdd }: { item: SteelItem & {price: number}; onA
     )
 }
 
+function AddSheetForm({ item, initialSellingPrice, onAdd }: { item: SteelItem; initialSellingPrice: number; onAdd: (item: any) => void }) {
+    const [quantity, setQuantity] = React.useState("1");
+    const [sellingPrice, setSellingPrice] = React.useState(initialSellingPrice.toFixed(2).replace('.', ','));
+
+    const handlePriceChange = (value: string) => {
+        const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
+        if (/^\d*\,?\d*$/.test(sanitizedValue)) {
+            setSellingPrice(sanitizedValue);
+        }
+    };
+    
+    const { finalPrice, finalWeight } = React.useMemo(() => {
+        const qty = parseInt(quantity) || 0;
+        const pricePerKg = parseFloat(sellingPrice.replace(',', '.')) || 0;
+        
+        if (qty > 0 && pricePerKg > 0) {
+            const calculatedWeight = item.weight * qty;
+            const calculatedPrice = calculatedWeight * pricePerKg;
+            return { finalPrice: calculatedPrice, finalWeight: calculatedWeight };
+        }
+        return { finalPrice: 0, finalWeight: 0 };
+    }, [quantity, sellingPrice, item.weight]);
+
+
+    const handleAdd = () => {
+        if (finalPrice > 0 && finalWeight > 0) {
+            onAdd({
+                ...item,
+                price: finalPrice,
+                weight: finalWeight,
+                quantity: parseInt(quantity) || 1,
+            });
+        }
+    }
+
+    return (
+        <div className="p-2 bg-primary/5 space-y-2">
+            <div className="flex gap-2 items-end">
+                <div className="space-y-1 w-1/3">
+                    <Label htmlFor={`qty-${item.id}`} className="text-xs">Quantidade</Label>
+                    <Input
+                        id={`qty-${item.id}`}
+                        type="text"
+                        inputMode="numeric"
+                        value={quantity}
+                        onChange={(e) => setQuantity(e.target.value.replace(/[^0-9]/g, ''))}
+                        placeholder="Qtd."
+                    />
+                </div>
+                <div className="space-y-1 flex-1">
+                    <Label htmlFor={`price-${item.id}`} className="text-xs">Venda (R$/kg)</Label>
+                    <Input
+                        id={`price-${item.id}`}
+                        type="text"
+                        inputMode="decimal"
+                        value={sellingPrice}
+                        onChange={(e) => handlePriceChange(e.target.value)}
+                        placeholder="R$/kg"
+                    />
+                </div>
+            </div>
+            <div className="flex gap-2 items-end">
+                <div className="space-y-1 flex-1">
+                     <Label className="text-accent-price font-semibold">Preço Final da Chapa</Label>
+                     <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-2 text-base md:text-sm font-bold text-accent-price h-10 flex items-center">
+                        {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(finalPrice)}
+                     </div>
+                </div>
+                <Button onClick={handleAdd} className="h-10 gap-2">
+                    <PlusCircle /> Adicionar
+                </Button>
+            </div>
+        </div>
+    )
+}
+
+
 export function GlobalSearchResults({ categories, priceParams, searchTerm, costAdjustments, onItemClick, onAddItem, isScrapCalculatorActive }: GlobalSearchResultsProps) {
     const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
 
@@ -278,6 +355,15 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
                                                                             onAddItem={onAddItem}
                                                                         />
                                                                     </div>
+                                                                ) : (category as Category).id === 'chapas' || (category as Category).id === 'chapas-aluminio' ? (
+                                                                    <AddSheetForm
+                                                                        item={item as SteelItem}
+                                                                        initialSellingPrice={sellingPrice}
+                                                                        onAdd={(newItem) => {
+                                                                            onAddItem(newItem);
+                                                                            setSelectedItemId(null);
+                                                                        }}
+                                                                    />
                                                                 ) : (
                                                                      <AddByUnitForm 
                                                                         item={{...item, unit: 'un', price: itemPrice}}
@@ -302,3 +388,5 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
     </div>
   )
 }
+
+    

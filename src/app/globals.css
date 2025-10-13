@@ -140,6 +140,14 @@
   #scrap-calculator-form, .sidebar, .sidebar-inset > .p-1 > .bg-background > header {
     display: none;
   }
+  
+  #material-list-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+  }
 
   #material-list-section {
      padding: 0 !important;

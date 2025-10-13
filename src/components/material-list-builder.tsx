@@ -427,8 +427,8 @@ export function MaterialListBuilder() {
         </div>
 
         {materialList.length > 0 && !searchTerm && (
-             <div className="shrink-0 border-t-2 border-[hsl(var(--sheet-header-bg))] print:hidden flex items-center" style={{backgroundColor: 'hsl(var(--sheet-total-bg))'}}>
-                <div className="p-2 flex items-center gap-2">
+             <div id="material-list-footer" className="shrink-0 border-t-2 border-[hsl(var(--sheet-header-bg))] flex items-center" style={{backgroundColor: 'hsl(var(--sheet-total-bg))'}}>
+                <div className="p-2 flex items-center gap-2 print:hidden">
                     <Link href="/calculator/package-checker" passHref>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10">
                             <Menu />

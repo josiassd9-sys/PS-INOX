@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -23,6 +24,7 @@ import {
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Icon } from "./icons";
+import { cn } from "@/lib/utils";
 
 interface ScrapTableProps {
   category: Category;
@@ -117,6 +119,25 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
     }));
   }
 
+    const formatCurrency = (value: number) => {
+        const formatter = new Intl.NumberFormat('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        });
+        const formatted = formatter.format(value); 
+
+        const parts = formatted.split(',');
+        const integerPart = parts[0];
+        const decimalPart = parts[1];
+
+        return (
+        <div className="flex items-baseline justify-end tabular-nums font-sans text-[hsl(var(--sheet-total-price-fg))]">
+            <span className="text-[12px] font-semibold">{integerPart}</span>
+            <span className="text-[9px] self-start mt-px">,{decimalPart}</span>
+        </div>
+        );
+    };
+
   const filteredAndVisibleItems = React.useMemo(() => {
     const visibleItems = allItems.filter(item => !hiddenItemIds.has(item.id));
     if (!searchTerm) {
@@ -199,46 +220,47 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
             </DialogContent>
         </Dialog>
       </div>
-      <div className="-mx-1 border rounded-lg overflow-hidden flex-1 flex flex-col">
+      <div className="-mx-1 rounded-lg overflow-hidden flex-1 flex flex-col">
         <div className="relative overflow-auto flex-1">
         <Table>
           <TableHeader className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
-             <TableRow className="bg-primary/5 hover:bg-primary/10 flex items-center">
-                <TableHead className="flex-1 px-1">Material (Composição)</TableHead>
-                <TableHead className="w-32 text-right font-semibold text-primary px-1">
-                  Preço (R$/kg)
-                </TableHead>
-                 <TableHead className="w-12 px-1"></TableHead>
+             <TableRow className="hover:bg-transparent flex">
+                <TableHead className="flex-1 p-1 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Material (Composição)</TableHead>
+                <TableHead className="text-center p-1 w-32 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Preço (R$/kg)</TableHead>
+                 <TableHead className="w-12 p-1 bg-[hsl(var(--sheet-table-header-bg))]"></TableHead>
               </TableRow>
           </TableHeader>
           <TableBody>
             {filteredAndVisibleItems.length > 0 ? (
-                filteredAndVisibleItems.map((item) => (
-                <TableRow key={item.id} className="even:bg-primary/5 odd:bg-transparent flex items-center">
-                    <TableCell className="flex-1 px-1">
-                    <div className="font-medium">{item.material}</div>
-                    <div className="text-xs text-muted-foreground">{item.composition}</div>
-                    </TableCell>
-                    <TableCell className="w-32 text-right font-medium text-primary px-1">
-                        <Input
-                            type="text"
-                            inputMode="decimal"
-                            value={item.price.toFixed(2).replace('.', ',')}
-                            onBlur={(e) => handlePriceChange(item.id, e.target.value)}
-                            onChange={(e) => {
-                                const value = e.target.value;
-                                setAllItems(prevItems => prevItems.map(i => i.id === item.id ? {...i, price: parseFloat(value.replace(',', '.')) || 0} : i))
-                            }}
-                            className="h-8 text-right border-primary/20 bg-transparent"
-                        />
-                    </TableCell>
-                    <TableCell className="w-12 px-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => toggleItemVisibility(item.id)}>
-                            <Icon name={hiddenItemIds.has(item.id) ? "EyeOff" : "Eye"} className="h-4 w-4 text-muted-foreground" />
-                        </Button>
-                    </TableCell>
-                </TableRow>
-                ))
+                filteredAndVisibleItems.map((item, index) => {
+                    const isEven = index % 2 === 1;
+                    return (
+                    <TableRow key={item.id} className={cn("flex items-stretch", !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-even-bg))]")}>
+                        <TableCell className="font-medium text-[hsl(var(--text-item-pink))] text-[11px] flex-1 p-1">
+                            <div>{item.material}</div>
+                            <div className="text-xs text-muted-foreground">{item.composition}</div>
+                        </TableCell>
+                        <TableCell className={cn("text-right font-semibold p-1 w-32", !isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}>
+                            <Input
+                                type="text"
+                                inputMode="decimal"
+                                value={item.price.toFixed(2).replace('.', ',')}
+                                onBlur={(e) => handlePriceChange(item.id, e.target.value)}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    setAllItems(prevItems => prevItems.map(i => i.id === item.id ? {...i, price: parseFloat(value.replace(',', '.')) || 0} : i))
+                                }}
+                                className="h-8 text-right bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                                style={{color: 'hsl(var(--sheet-total-price-fg))'}}
+                            />
+                        </TableCell>
+                        <TableCell className="w-12 px-1">
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => toggleItemVisibility(item.id)}>
+                                <Icon name={hiddenItemIds.has(item.id) ? "EyeOff" : "Eye"} className="h-4 w-4 text-muted-foreground" />
+                            </Button>
+                        </TableCell>
+                    </TableRow>
+                )})
             ) : (
                 <TableRow>
                     <TableCell colSpan={3} className="text-center text-muted-foreground py-10">

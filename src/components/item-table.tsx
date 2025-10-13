@@ -90,22 +90,53 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
   const filteredItems = items;
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
+    const formatter = new Intl.NumberFormat('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    const formatted = formatter.format(value); 
+
+    const parts = formatted.split(',');
+    const integerPart = parts[0];
+    const decimalPart = parts[1];
+
+    let thousandsPart = '';
+    let hundredsPart = '';
+
+    if (integerPart.includes('.')) {
+      const integerSplits = integerPart.split('.');
+      thousandsPart = integerSplits.slice(0, -1).join('.') + '.';
+      hundredsPart = integerSplits.slice(-1)[0];
+    } else {
+      hundredsPart = integerPart;
+    }
+
+    return (
+      <div className="flex items-baseline justify-end tabular-nums font-sans">
+        <span className="text-[15px] font-semibold">{thousandsPart}</span>
+        <span className="text-[12px] font-semibold">{hundredsPart}</span>
+        <span className="text-[9px] self-start mt-px">,{decimalPart}</span>
+      </div>
+    );
   };
 
-  const formatNumber = (value: number, digits: number = 3) => {
-    return new Intl.NumberFormat("pt-BR", {
-      minimumFractionDigits: digits,
-      maximumFractionDigits: digits,
-    }).format(value);
-  };
+  const formatWeight = (value: number) => {
+    const formatted = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(value);
+    const parts = formatted.split(',');
+    const integerPart = parts[0];
+    const decimalPart = parts[1];
+    
+    return (
+        <div className="flex items-baseline justify-center tabular-nums font-sans text-[hsl(var(--text-item-red))]">
+            <span className="text-[11px] font-semibold">{integerPart}</span>
+            <span className="text-[8px] self-start mt-px">,{decimalPart} kg</span>
+        </div>
+    )
+  }
   
   const unitLabel = category.unit === "m" ? "m" : category.unit === 'm²' ? "m²" : "un";
-  const weightUnitLabel = `kg/${unitLabel}`;
-  const priceUnitLabel = `R$/${unitLabel}`;
+  const weightUnitLabel = `Peso (kg/${unitLabel})`;
+  const priceUnitLabel = `Preço (R$/${unitLabel})`;
 
   const calculateItemPrice = React.useCallback((item: SteelItem) => {
     const adjustment = costAdjustments[item.id] || 0;
@@ -149,7 +180,7 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
               </div>
               <div className="grid grid-cols-4 items-center gap-1">
                 <Label htmlFor="weight" className="text-right">
-                  Peso ({weightUnitLabel})
+                  Peso ({`kg/${unitLabel}`})
                 </Label>
                 <Input
                   id="weight"
@@ -173,58 +204,55 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
       <div className="border rounded-lg overflow-hidden">
         <Table>
           {showTableHeader && (
-            <TableHeader>
-              <TableRow className="bg-primary/5 hover:bg-primary/10 flex">
-                <TableHead className="flex-1">Descrição</TableHead>
-                <TableHead className="w-1/3 text-center">
-                  Peso ({weightUnitLabel})
-                </TableHead>
-                <TableHead className="w-1/3 text-right font-semibold text-primary">
-                  Preço ({priceUnitLabel})
-                </TableHead>
-              </TableRow>
+             <TableHeader>
+                <TableRow className="hover:bg-transparent flex">
+                    <TableHead className="flex-1 p-1 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Descrição</TableHead>
+                    <TableHead className="text-center p-1 w-[120px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">{weightUnitLabel}</TableHead>
+                    <TableHead className="text-center p-1 w-[120px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">{priceUnitLabel}</TableHead>
+                </TableRow>
             </TableHeader>
           )}
           <TableBody>
-            {filteredItems.map((item) => {
+            {filteredItems.map((item, index) => {
                 const itemPrice = calculateItemPrice(item);
                 const isSelectedForCut = selectedItemIdForCut === item.id;
                 const hasAdjustment = (costAdjustments[item.id] || 0) !== 0;
+                const isEven = index % 2 === 1;
 
               return (
                   <React.Fragment key={item.id}>
                       <TableRow 
                           className={cn(
-                              'even:bg-primary/5 odd:bg-transparent',
-                              'flex items-center',
-                              isSelectedForCut && 'bg-primary/20 hover:bg-primary/20',
+                              'flex items-stretch cursor-pointer',
+                              !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-even-bg))]",
+                              isSelectedForCut && 'bg-primary/20 hover:bg-primary/20'
                           )}
                           >
                           <TableCell 
                             onClick={() => handleCostAdjustmentClick(item)}
-                            className={cn('flex-1 px-1 flex items-center gap-1 cursor-pointer', !isSelectedForCut && 'hover:bg-primary/10')}
+                            className="font-medium text-[hsl(var(--text-item-pink))] text-[11px] flex-1 p-1 flex items-center gap-1"
                           >
                             {hasAdjustment && <Tag className="h-3 w-3 text-accent-price" />}
                             {item.description}
                           </TableCell>
                           <TableCell 
                              onClick={() => handleCutCalculatorToggle(item)}
-                             className={cn("w-1/3 text-center px-1", category.unit === 'm' && 'cursor-pointer', !isSelectedForCut && 'hover:bg-primary/10')}
+                             className={cn("text-center p-1 w-[120px]", !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}
                           >
-                              {formatNumber(item.weight, 3)}
+                              <div className="h-full flex items-center justify-center">{formatWeight(item.weight)}</div>
                           </TableCell>
                           <TableCell 
                             onClick={() => handleCutCalculatorToggle(item)}
-                            className={cn("w-1/3 text-right font-medium text-primary px-1", category.unit === 'm' && 'cursor-pointer', !isSelectedForCut && 'hover:bg-primary/10')}
+                            className={cn("text-right font-semibold p-1 w-[120px]", !isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}
                           >
-                              <div className="flex items-center justify-end gap-1">
-                                <span>{formatCurrency(itemPrice)}</span>
-                              </div>
-                              {category.unit === 'm' && (
-                                  <div className="text-xs text-muted-foreground font-normal">
-                                      {formatCurrency(itemPrice * 6)} / barra
-                                  </div>
-                              )}
+                            <div className="h-full flex flex-col items-end justify-center text-[hsl(var(--sheet-total-price-fg))]">
+                                {formatCurrency(itemPrice)}
+                                {category.unit === 'm' && (
+                                    <div className="text-xs text-muted-foreground font-normal">
+                                        / barra: {formatCurrency(itemPrice * 6)}
+                                    </div>
+                                )}
+                            </div>
                           </TableCell>
                       </TableRow>
                       {isSelectedForCut && category.unit === 'm' && (

@@ -79,18 +79,49 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
     }
     
     const formatCurrency = (value: number) => {
-        return new Intl.NumberFormat("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-        }).format(value);
+      const formatter = new Intl.NumberFormat('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      const formatted = formatter.format(value); 
+
+      const parts = formatted.split(',');
+      const integerPart = parts[0];
+      const decimalPart = parts[1];
+
+      let thousandsPart = '';
+      let hundredsPart = '';
+
+      if (integerPart.includes('.')) {
+        const integerSplits = integerPart.split('.');
+        thousandsPart = integerSplits.slice(0, -1).join('.') + '.';
+        hundredsPart = integerSplits.slice(-1)[0];
+      } else {
+        hundredsPart = integerPart;
+      }
+
+      return (
+        <div className="flex items-baseline justify-end tabular-nums font-sans">
+          <span className="text-[15px] font-semibold">{thousandsPart}</span>
+          <span className="text-[12px] font-semibold">{hundredsPart}</span>
+          <span className="text-[9px] self-start mt-px">,{decimalPart}</span>
+        </div>
+      );
     };
     
-    const formatNumber = (value: number, digits: number = 3) => {
-        return new Intl.NumberFormat("pt-BR", {
-          minimumFractionDigits: digits,
-          maximumFractionDigits: digits,
-        }).format(value);
-    };
+    const formatWeight = (value: number) => {
+      const formatted = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(value);
+      const parts = formatted.split(',');
+      const integerPart = parts[0];
+      const decimalPart = parts[1];
+      
+      return (
+          <div className="flex items-baseline justify-center tabular-nums font-sans text-[hsl(var(--text-item-red))]">
+              <span className="text-[11px] font-semibold">{integerPart}</span>
+              <span className="text-[8px] self-start mt-px">,{decimalPart}</span>
+          </div>
+      )
+    }
 
     if (categories.length === 0 && !isScrapCalculatorActive) {
         return <div className="text-center text-muted-foreground py-10">Nenhum item encontrado para "{searchTerm}".</div>
@@ -120,25 +151,34 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
                                             <AccordionContent className="p-0">
                                                 <Table>
                                                     <TableHeader>
-                                                        <TableRow className="bg-primary/10 hover:bg-primary/10 flex items-center">
-                                                            <TableHead className="flex-1">Descrição</TableHead>
-                                                            <TableHead className="w-1/3 text-center">Peso (kg/un)</TableHead>
-                                                            <TableHead className="w-1/3 text-right font-semibold text-primary">Preço (R$/un)</TableHead>
+                                                        <TableRow className="hover:bg-transparent flex">
+                                                            <TableHead className="flex-1 p-1 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Descrição</TableHead>
+                                                            <TableHead className="text-center p-1 w-[80px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Peso</TableHead>
+                                                            <TableHead className="text-center p-1 w-[80px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Preço</TableHead>
                                                         </TableRow>
                                                     </TableHeader>
                                                     <TableBody>
-                                                        {group.items.map(item => {
+                                                        {group.items.map((item, index) => {
+                                                             const isEven = index % 2 === 1;
                                                              const itemPrice = Math.ceil(item.weight * sellingPrice);
                                                              const isSelected = selectedItemId === item.id;
                                                             return (
                                                                 <React.Fragment key={item.id}>
                                                                 <TableRow 
                                                                     onClick={() => handleItemSelection(item as any, category as any)}
-                                                                    className={cn("even:bg-primary/5 odd:bg-transparent flex items-center cursor-pointer", isSelected && 'bg-primary/20 hover:bg-primary/20')}
+                                                                    className={cn(
+                                                                        "flex items-stretch cursor-pointer",
+                                                                        !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-even-bg))]",
+                                                                        isSelected && "bg-primary/20"
+                                                                    )}
                                                                 >
-                                                                    <TableCell className="flex-1">{item.description}</TableCell>
-                                                                    <TableCell className="w-1/3 text-center">{formatNumber(item.weight)}</TableCell>
-                                                                    <TableCell className="w-1/3 text-right font-medium text-primary">{formatCurrency(itemPrice)}</TableCell>
+                                                                    <TableCell className="font-medium text-[hsl(var(--text-item-pink))] text-[11px] flex-1 p-1">{item.description}</TableCell>
+                                                                    <TableCell className={cn("text-center p-1 w-[80px]", !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}>
+                                                                        <div className="h-full flex items-center justify-center">{formatWeight(item.weight)}</div>
+                                                                    </TableCell>
+                                                                    <TableCell className={cn("text-right font-semibold p-1 w-[80px]", !isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}>
+                                                                        <div className="h-full flex items-center justify-end text-[hsl(var(--sheet-total-price-fg))]">{formatCurrency(itemPrice)}</div>
+                                                                    </TableCell>
                                                                 </TableRow>
                                                                 {isSelected && (
                                                                      <TableRow>
@@ -175,17 +215,18 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
                             {category.name} ({category.items.length})
                         </AccordionTrigger>
                         <AccordionContent className="p-0">
-                            <div className="overflow-auto border-t">
+                            <div className="overflow-auto">
                                 <Table>
                                     <TableHeader>
-                                    <TableRow className="bg-primary/5 hover:bg-primary/10 flex items-center">
-                                        <TableHead className="flex-1">Descrição</TableHead>
-                                        <TableHead className="w-1/3 text-center">Peso (kg/{(category as Category).unit})</TableHead>
-                                        <TableHead className="w-1/3 text-right font-semibold text-primary">Preço (R$/{(category as Category).unit})</TableHead>
+                                    <TableRow className="hover:bg-transparent flex">
+                                        <TableHead className="flex-1 p-1 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Descrição</TableHead>
+                                        <TableHead className="text-center p-1 w-[120px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Peso (kg/{(category as Category).unit})</TableHead>
+                                        <TableHead className="text-center p-1 w-[120px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Preço (R$/{(category as Category).unit})</TableHead>
                                     </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {(category.items as SteelItem[]).map(item => {
+                                        {(category.items as SteelItem[]).map((item, index) => {
+                                            const isEven = index % 2 === 1;
                                             const adjustment = costAdjustments[item.id] || 0;
                                             const adjustedCost = costPrice * (1 + adjustment / 100);
                                             const sellingPrice = adjustedCost * (1 + markup / 100);
@@ -199,34 +240,30 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
                                                     <TableRow
                                                         onClick={() => handleItemSelection(item as SteelItem, category as Category)}
                                                         className={cn(
-                                                            'even:bg-primary/5 odd:bg-transparent',
-                                                            'flex items-center cursor-pointer',
-                                                            isSelected && 'bg-primary/20 hover:bg-primary/20',
+                                                            "flex items-stretch cursor-pointer",
+                                                            !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-even-bg))]",
+                                                            isSelected && "bg-primary/20"
                                                         )}
                                                     >
                                                         <TableCell 
                                                           onDoubleClick={() => handleCostAdjustmentClick(item as SteelItem, category as Category)}
-                                                          className={cn('flex-1 flex justify-between items-center', !isSelected && 'hover:bg-primary/10')}
+                                                          className="font-medium text-[hsl(var(--text-item-pink))] text-[11px] flex-1 p-1 flex items-center gap-1"
                                                         >
-                                                           <div className="flex items-center gap-1">
-                                                                {hasAdjustment && <Tag className="h-3 w-3 text-accent-price" />}
-                                                                {item.description}
+                                                           {hasAdjustment && <Tag className="h-3 w-3 text-accent-price" />}
+                                                            {item.description}
+                                                        </TableCell>
+                                                        <TableCell className={cn("text-center p-1 w-[120px]", !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}>
+                                                            <div className="h-full flex items-center justify-center">{formatWeight(item.weight)}</div>
+                                                        </TableCell>
+                                                        <TableCell className={cn("text-right font-semibold p-1 w-[120px]", !isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}>
+                                                            <div className="h-full flex flex-col items-end justify-center text-[hsl(var(--sheet-total-price-fg))]">
+                                                                {formatCurrency(itemPrice)}
+                                                                {(category as Category).unit === 'm' && (
+                                                                    <div className="text-xs text-muted-foreground font-normal">
+                                                                        por barra: {formatCurrency(itemPrice * 6)}
+                                                                    </div>
+                                                                )}
                                                             </div>
-                                                        </TableCell>
-                                                        <TableCell
-                                                            className={cn("w-1/3 text-center", !isSelected && 'hover:bg-primary/10')}
-                                                        >
-                                                          {formatNumber(item.weight)}
-                                                        </TableCell>
-                                                        <TableCell 
-                                                            className={cn("w-1/3 text-right font-medium text-primary", !isSelected && 'hover:bg-primary/10')}
-                                                        >
-                                                            {formatCurrency(itemPrice)}
-                                                            {(category as Category).unit === 'm' && (
-                                                                <div className="text-xs text-muted-foreground font-normal">
-                                                                    {formatCurrency(itemPrice * 6)} / barra
-                                                                </div>
-                                                            )}
                                                         </TableCell>
                                                     </TableRow>
                                                     {isSelected && (

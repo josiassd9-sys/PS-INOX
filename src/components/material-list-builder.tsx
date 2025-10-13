@@ -353,13 +353,13 @@ export function MaterialListBuilder() {
                                     isEven ? "bg-[hsl(var(--row-pmq-bg))]" : "bg-[hsl(var(--row-even-bg))]"
                                   )}>
                                       <div className="flex flex-col items-center justify-center h-full">
-                                        <span className="text-xs">{item.unit === 'm' ? 'M' : item.unit.toUpperCase()}</span>
+                                        <span className="text-xs">{item.unit === 'm' ? 'M' : item.unit?.toUpperCase()}</span>
                                         {formatWeight(item.weight)}
                                       </div>
                                   </TableCell>
                                   <TableCell className={cn(
                                       "text-right font-semibold p-1 w-[80px]",
-                                      isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-even-bg))]"
+                                      isEven ? "bg-[hsl(var(--row-pmq-bg))]" : "bg-[hsl(var(--row-even-bg))]"
                                   )}>
                                     <div className="h-full flex items-center justify-end text-[hsl(var(--sheet-total-price-fg))]">
                                       {formatPrice(item.price)}
@@ -442,4 +442,5 @@ export function MaterialListBuilder() {
     
 
     
+
 

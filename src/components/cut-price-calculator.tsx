@@ -140,7 +140,15 @@ export function CutPriceCalculator({
     if (finalPrice > 0 && pieceWeight > 0) {
         
         const descriptionParts = selectedItem.description.split(" ");
-        descriptionParts.splice(1, 0, "Inox", materialClass || "");
+        // Find the word that contains "Inox", but case-insensitive
+        const inoxIndex = descriptionParts.findIndex(p => p.toLowerCase().includes('inox'));
+
+        if (inoxIndex !== -1) {
+            descriptionParts.splice(inoxIndex + 1, 0, materialClass || "");
+        } else {
+             descriptionParts.splice(1, 0, "Inox", materialClass || "");
+        }
+
         const newDescription = descriptionParts.join(" ");
 
         onAddItem({

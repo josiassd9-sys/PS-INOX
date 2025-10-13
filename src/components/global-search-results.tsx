@@ -91,7 +91,14 @@ function AddSheetForm({ item, initialSellingPrice, onAdd }: { item: SteelItem; i
     const handleAdd = () => {
         if (finalPrice > 0 && finalWeight > 0) {
              const descriptionParts = item.description.split(" ");
-             descriptionParts.splice(1, 0, materialClass || "");
+             const inoxIndex = descriptionParts.findIndex(p => p.toLowerCase().includes('inox'));
+
+             if (inoxIndex !== -1) {
+                descriptionParts.splice(inoxIndex + 1, 0, materialClass || "");
+             } else {
+                descriptionParts.splice(1, 0, "Inox", materialClass || "");
+             }
+             
              const newDescription = descriptionParts.join(" ");
 
             onAdd({

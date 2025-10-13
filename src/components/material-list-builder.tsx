@@ -406,7 +406,7 @@ export function MaterialListBuilder() {
     <div className="relative w-full h-full flex flex-col overflow-hidden bg-background text-foreground">
         
         <div style={{backgroundColor: 'hsl(var(--sheet-header-bg))', color: 'hsl(var(--sheet-header-fg))'}} className="relative z-40 w-full px-8 py-1 flex flex-col gap-1 shrink-0">
-            <div className="flex justify-center pt-1 text-4xl font-bold tracking-wider">
+            <div id="material-list-header" className="flex justify-center pt-1 text-4xl font-bold tracking-wider">
                 PS INOX
             </div>
             
@@ -429,8 +429,8 @@ export function MaterialListBuilder() {
         {materialList.length > 0 && !searchTerm && (
              <div id="material-list-footer" className="shrink-0 border-t-2 border-[hsl(var(--sheet-header-bg))] flex items-center" style={{backgroundColor: 'hsl(var(--sheet-total-bg))'}}>
                 <div className="p-2 flex items-center gap-2">
-                    <Link href="/calculator/package-checker" passHref>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10 print:hidden">
+                    <Link href="/calculator/package-checker" passHref className="print:hidden">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10">
                             <Menu />
                         </Button>
                     </Link>

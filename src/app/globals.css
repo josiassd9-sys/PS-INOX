@@ -137,6 +137,10 @@
     display: none;
   }
 
+  #material-list-header {
+    font-size: 2rem !important; /* Aumenta o tamanho da fonte do título na impressão */
+  }
+
   #scrap-calculator-form, .sidebar, .sidebar-inset > .p-1 > .bg-background > header {
     display: none;
   }

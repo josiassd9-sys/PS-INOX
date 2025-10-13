@@ -163,7 +163,7 @@
   #material-list-section td, #material-list-section th {
     padding: 8px;
     color: black !important;
-    border-color: #333 !important;
+    border: none;
   }
    #material-list-section .text-table-item-fg {
     color: black !important;
@@ -172,7 +172,7 @@
     color: #008000 !important;
   }
   #material-list-section tr {
-    border-color: #333 !important;
+    border: none;
   }
   #material-list-section .bg-table-header-bg {
     background-color: #333 !important;

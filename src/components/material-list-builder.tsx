@@ -359,7 +359,7 @@ export function MaterialListBuilder() {
                                   </TableCell>
                                   <TableCell className={cn(
                                       "text-right font-semibold p-1 w-[80px]",
-                                       !isEven ? "bg-[hsl(var(--row-pmq-bg))]" : "bg-[hsl(var(--row-pmq-bg))]"
+                                       !isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-pmq-bg))]"
                                   )}>
                                     <div className="h-full flex items-center justify-end text-[hsl(var(--sheet-total-price-fg))]">
                                       {formatPrice(item.price)}
@@ -449,4 +449,5 @@ export function MaterialListBuilder() {
     
 
     
+
 

@@ -3,7 +3,7 @@
 "use client";
 
 import * as React from "react";
-import { Search } from "lucide-react";
+import { Menu, Printer, Save, Search } from "lucide-react";
 import { PsInoxLogo } from "./ps-inox-logo";
 import { Input } from "./ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -105,6 +105,7 @@ function EditForm({ item, onUpdate, onDelete, onCancel }: EditFormProps) {
 
 
 export function MaterialListBuilder() {
+  const { toast } = useToast();
   const [materialList, setMaterialList] = React.useState<ListItem[]>([]);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [editingItemId, setEditingItemId] = React.useState<string | null>(null);
@@ -137,6 +138,14 @@ export function MaterialListBuilder() {
       } catch (error) {
            console.error("Failed to save material list to localStorage", error);
       }
+  }
+
+  const handleSaveList = () => {
+    saveList(materialList);
+    toast({
+        title: "Lista Salva!",
+        description: "Sua lista de materiais foi salva com sucesso."
+    })
   }
   
   const handleAddItemToList = (item: any) => {
@@ -418,8 +427,21 @@ export function MaterialListBuilder() {
         </div>
 
         {materialList.length > 0 && !searchTerm && (
-            <div className="shrink-0 border-t-2 border-[hsl(var(--sheet-header-bg))] print:hidden flex">
-                <div style={{backgroundColor: 'hsl(var(--sheet-total-bg))'}} className="flex-1 p-2 flex items-center justify-end">
+             <div className="shrink-0 border-t-2 border-[hsl(var(--sheet-header-bg))] print:hidden flex items-center" style={{backgroundColor: 'hsl(var(--sheet-total-bg))'}}>
+                <div className="p-2 flex items-center gap-2">
+                    <Link href="/calculator/package-checker" passHref>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10">
+                            <Menu />
+                        </Button>
+                    </Link>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10" onClick={handleSaveList}>
+                        <Save />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10" onClick={() => window.print()}>
+                        <Printer />
+                    </Button>
+                </div>
+                <div className="flex-1 p-2 flex items-center justify-end">
                     <span className="text-lg font-bold text-[hsl(var(--sheet-header-fg))]">Total</span>
                 </div>
                 <div style={{backgroundColor: 'hsl(var(--sheet-total-price-bg))'}} className="p-2 min-w-[150px]">
@@ -430,24 +452,3 @@ export function MaterialListBuilder() {
       </div>
   );
 }
-
-    
-
-
-
-
-
-
-
-    
-
-    
-
-
-
-
-    
-
-    
-
-

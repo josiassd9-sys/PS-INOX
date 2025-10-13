@@ -32,6 +32,7 @@ export function CutPriceCalculator({
   const [finalPrice, setFinalPrice] = React.useState(0);
   const [currentCutPercentage, setCurrentCutPercentage] = React.useState(0);
   const [quantity, setQuantity] = React.useState<string>("1");
+  const [materialClass, setMaterialClass] = React.useState<string>("304");
 
 
   // Function to calculate dynamic percentage based on length and weight
@@ -108,6 +109,7 @@ export function CutPriceCalculator({
     setPieceWeight(0);
     setCurrentCutPercentage(0);
     setQuantity("1");
+    setMaterialClass("304");
   }, [selectedItem, sellingPrice]);
   
   const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
@@ -135,9 +137,14 @@ export function CutPriceCalculator({
   const handleAdd = () => {
     const qty = parseInt(quantity) || 1;
     if (finalPrice > 0 && pieceWeight > 0) {
+        
+        const descriptionParts = selectedItem.description.split(" ");
+        descriptionParts.splice(1, 0, "Inox", materialClass || "");
+        const newDescription = descriptionParts.join(" ");
+
         onAddItem({
             ...selectedItem,
-            description: `${selectedItem.description} - ${cutLength}mm`,
+            description: `${newDescription} - ${cutLength}mm`,
             price: finalPrice * qty,
             weight: pieceWeight * qty,
             length: parseFloat(cutLength.replace(",", ".")),
@@ -178,7 +185,17 @@ export function CutPriceCalculator({
                 placeholder="Ex: 500"
               />
             </div>
-             <div className="space-y-1 w-1/3">
+            <div className="space-y-1 w-1/4">
+              <Label htmlFor="material-class">Classe Inox</Label>
+              <Input
+                id="material-class"
+                type="text"
+                value={materialClass}
+                onChange={(e) => setMaterialClass(e.target.value)}
+                placeholder="304"
+              />
+            </div>
+             <div className="space-y-1 w-1/4">
               <Label htmlFor="quantity">Quantidade</Label>
               <Input
                 id="quantity"

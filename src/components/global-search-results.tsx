@@ -65,6 +65,8 @@ function AddByUnitForm({ item, onAdd }: { item: SteelItem & {price: number}; onA
 function AddSheetForm({ item, initialSellingPrice, onAdd }: { item: SteelItem; initialSellingPrice: number; onAdd: (item: any) => void }) {
     const [quantity, setQuantity] = React.useState("1");
     const [sellingPrice, setSellingPrice] = React.useState(initialSellingPrice.toFixed(2).replace('.', ','));
+    const [materialClass, setMaterialClass] = React.useState<string>("304");
+
 
     const handlePriceChange = (value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -88,8 +90,13 @@ function AddSheetForm({ item, initialSellingPrice, onAdd }: { item: SteelItem; i
 
     const handleAdd = () => {
         if (finalPrice > 0 && finalWeight > 0) {
+             const descriptionParts = item.description.split(" ");
+             descriptionParts.splice(1, 0, "Inox", materialClass || "");
+             const newDescription = descriptionParts.join(" ");
+
             onAdd({
                 ...item,
+                description: newDescription,
                 price: finalPrice,
                 weight: finalWeight,
                 quantity: parseInt(quantity) || 1,
@@ -100,7 +107,7 @@ function AddSheetForm({ item, initialSellingPrice, onAdd }: { item: SteelItem; i
     return (
         <div className="p-2 bg-primary/5 space-y-2">
             <div className="flex gap-2 items-end">
-                <div className="space-y-1 w-1/3">
+                <div className="space-y-1 w-1/4">
                     <Label htmlFor={`qty-${item.id}`} className="text-xs">Quantidade</Label>
                     <Input
                         id={`qty-${item.id}`}
@@ -109,6 +116,16 @@ function AddSheetForm({ item, initialSellingPrice, onAdd }: { item: SteelItem; i
                         value={quantity}
                         onChange={(e) => setQuantity(e.target.value.replace(/[^0-9]/g, ''))}
                         placeholder="Qtd."
+                    />
+                </div>
+                 <div className="space-y-1 w-1/4">
+                    <Label htmlFor={`material-class-${item.id}`} className="text-xs">Classe Inox</Label>
+                    <Input
+                        id={`material-class-${item.id}`}
+                        type="text"
+                        value={materialClass}
+                        onChange={(e) => setMaterialClass(e.target.value)}
+                        placeholder="304"
                     />
                 </div>
                 <div className="space-y-1 flex-1">
@@ -355,7 +372,7 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
                                                                             onAddItem={onAddItem}
                                                                         />
                                                                     </div>
-                                                                ) : (category as Category).id === 'chapas' || (category as Category).id === 'chapas-aluminio' ? (
+                                                                ) : (category as Category).id === 'chapas' ? (
                                                                     <AddSheetForm
                                                                         item={item as SteelItem}
                                                                         initialSellingPrice={sellingPrice}
@@ -388,5 +405,3 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
     </div>
   )
 }
-
-    

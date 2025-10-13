@@ -42,17 +42,22 @@
     --sidebar-border: 0 0% 15%;
     --sidebar-ring: 0 0% 60%;
 
-    --table-header-bg: hsl(216, 41%, 35%);
-    --table-header-fg: hsl(210, 40%, 98%);
-    --table-item-fg: hsl(259, 47%, 41%);
+    /* Cores para o padrão de planilha 'Lista de Materiais' */
+    --sheet-header-bg: 211 51% 34%; /* Azul escuro #2C5484 */
+    --sheet-header-fg: 0 0% 100%; /* Branco #FFFFFF */
+    --sheet-table-header-bg: 207 43% 41%; /* Azul médio #4578AA */
+    --sheet-table-header-fg: 0 0% 100%; /* Branco #FFFFFF */
 
-    /* Cores para o padrão de planilha */
-    --row-odd-bg-standard: hsl(0, 0%, 100%); /* Linha ímpar, colunas 1 e 2 (Branco) */
-    --row-odd-bg-accent: hsl(152, 100%, 80%); /* Linha ímpar, coluna 3 (Verde Claro) */
-    --row-even-bg-accent: hsl(152, 100%, 80%); /* Linha par, coluna 1 (Verde Claro) */
-    --row-even-bg-strong: hsl(197, 100%, 68%); /* Linha par, colunas 2 e 3 (Azul Mais Forte) */
+    --row-odd-bg: 0 0% 100%; /* Branco #FFFFFF */
+    --row-even-bg: 209 67% 95%; /* Azul muito claro #EAF4FA */
+    --row-pmq-bg: 202 81% 90%; /* Azul claro #D1ECF9 */
+    
+    --text-item-pink: 300 100% 38%; /* Rosa/roxo claro #C000C0 */
+    --text-item-red: 0 100% 50%; /* Vermelho vivo #FF0000 */
 
-    --table-price-fg: hsl(140, 80%, 29%);
+    --sheet-total-bg: 211 51% 34%; /* Azul escuro #2C5484 */
+    --sheet-total-price-bg: 114 78% 90%; /* Verde claro #D9F5D6 */
+    --sheet-total-price-fg: 145 100% 34%; /* Verde escuro #00B050 */
   }
   
 
@@ -93,17 +98,22 @@
     --sidebar-border: 0 0% 40%;
     --sidebar-ring: 0-0-80;
 
-    --table-header-bg: hsl(216, 41%, 35%);
-    --table-header-fg: hsl(210, 40%, 98%);
-    --table-item-fg: hsl(259, 47%, 61%);
-
     /* Cores para o padrão de planilha no modo escuro */
-    --row-odd-bg-standard: hsl(220, 10%, 40%); /* Linha ímpar, colunas 1 e 2 */
-    --row-odd-bg-accent: hsl(152, 40%, 45%);   /* Linha ímpar, coluna 3 e Linha par, coluna 1 */
-    --row-even-bg-accent: hsl(152, 40%, 45%);  /* Duplicado para clareza */
-    --row-even-bg-strong: hsl(210, 10%, 50%);  /* Linha par, colunas 2 e 3 */
+    --sheet-header-bg: 211 51% 34%;
+    --sheet-header-fg: 0 0% 100%;
+    --sheet-table-header-bg: 207 43% 41%;
+    --sheet-table-header-fg: 0 0% 100%;
 
-    --table-price-fg: hsl(140, 60%, 70%);
+    --row-odd-bg: 220 10% 25%;
+    --row-even-bg: 210 15% 30%;
+    --row-pmq-bg: 205 20% 35%;
+    
+    --text-item-pink: 300 100% 78%;
+    --text-item-red: 0 100% 70%;
+
+    --sheet-total-bg: 211 51% 34%;
+    --sheet-total-price-bg: 114 30% 30%;
+    --sheet-total-price-fg: 145 100% 74%;
   }
 }
 

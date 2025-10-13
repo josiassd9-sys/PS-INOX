@@ -230,7 +230,7 @@ export function MaterialListBuilder() {
     const decimalPart = parts[1];
     
     return (
-        <div className="flex items-baseline justify-center tabular-nums font-sans">
+        <div className="flex items-baseline justify-center tabular-nums font-sans text-[hsl(var(--text-item-red))]">
             <span className="text-[11px] font-semibold">{integerPart}</span>
             <span className="text-[8px] self-start mt-px">,{decimalPart} kg</span>
         </div>
@@ -328,9 +328,9 @@ export function MaterialListBuilder() {
                    <Table>
                        <TableHeader>
                            <TableRow className="border-b-black hover:bg-transparent flex">
-                               <TableHead className="flex-1 p-1 bg-table-header-bg text-table-header-fg border-r border-black font-bold">Descrição</TableHead>
-                               <TableHead className="text-center p-1 w-[80px] bg-table-header-bg text-table-header-fg border-r border-black font-bold">PMQ</TableHead>
-                               <TableHead className="text-center p-1 w-[80px] bg-table-header-bg text-table-header-fg font-bold">VALOR</TableHead>
+                               <TableHead className="flex-1 p-1 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] border-r border-black font-bold">Descrição</TableHead>
+                               <TableHead className="text-center p-1 w-[80px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] border-r border-black font-bold">PMQ</TableHead>
+                               <TableHead className="text-center p-1 w-[80px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">VALOR</TableHead>
                            </TableRow>
                        </TableHeader>
                        <TableBody>
@@ -340,18 +340,16 @@ export function MaterialListBuilder() {
                                <React.Fragment key={item.listItemId}>
                                 <TableRow 
                                     onClick={() => handleRowClick(item.listItemId)}
-                                    className={cn("flex items-stretch cursor-pointer border-b-black", editingItemId === item.listItemId && "bg-primary/20")}
+                                    className={cn(
+                                        "flex items-stretch cursor-pointer border-b-black",
+                                        isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-odd-bg))]",
+                                        editingItemId === item.listItemId && "bg-primary/20"
+                                    )}
                                 >
-                                  <TableCell className={cn(
-                                      "font-medium text-table-item-fg text-[11px] flex-1 p-1 border-r border-black",
-                                      isEven ? "bg-[var(--row-even-bg-accent)]" : "bg-[var(--row-odd-bg-standard)]"
-                                  )}>
+                                  <TableCell className="font-medium text-[hsl(var(--text-item-pink))] text-[11px] flex-1 p-1 border-r border-black">
                                     {item.description}
                                   </TableCell>
-                                  <TableCell className={cn(
-                                      "text-center p-1 w-[80px] border-r border-black",
-                                      isEven ? "bg-[var(--row-even-bg-strong)]" : "bg-[var(--row-odd-bg-standard)]"
-                                  )}>
+                                  <TableCell className="text-center p-1 w-[80px] border-r border-black bg-[hsl(var(--row-pmq-bg))]">
                                       <div className="flex flex-col items-center justify-center h-full">
                                         <span className="text-xs">{item.unit === 'm' ? 'M' : item.unit.toUpperCase()}</span>
                                         {formatWeight(item.weight)}
@@ -359,9 +357,9 @@ export function MaterialListBuilder() {
                                   </TableCell>
                                   <TableCell className={cn(
                                       "text-right font-semibold p-1 w-[80px]",
-                                      isEven ? "bg-[var(--row-even-bg-strong)]" : "bg-[var(--row-odd-bg-accent)]"
+                                      isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-odd-bg))]"
                                   )}>
-                                    <div className="h-full flex items-center justify-end text-[hsl(var(--table-price-fg))]">
+                                    <div className="h-full flex items-center justify-end text-[hsl(var(--sheet-total-price-fg))]">
                                       {formatPrice(item.price)}
                                     </div>
                                   </TableCell>
@@ -396,8 +394,8 @@ export function MaterialListBuilder() {
   return (
     <div className="relative w-full h-full flex flex-col overflow-hidden bg-background text-foreground">
         
-        <div style={{backgroundColor: 'var(--table-header-bg)'}} className="relative z-40 w-full px-8 py-1 flex flex-col gap-1 shrink-0 print:hidden">
-            <div className="flex justify-center pt-1 text-4xl font-bold text-white tracking-wider">
+        <div style={{backgroundColor: 'hsl(var(--sheet-header-bg))', color: 'hsl(var(--sheet-header-fg))'}} className="relative z-40 w-full px-8 py-1 flex flex-col gap-1 shrink-0 print:hidden">
+            <div className="flex justify-center pt-1 text-4xl font-bold tracking-wider">
                 PS INOX
             </div>
             
@@ -418,10 +416,12 @@ export function MaterialListBuilder() {
         </div>
 
         {materialList.length > 0 && !searchTerm && (
-            <div style={{backgroundColor: 'var(--table-header-bg)'}} className="shrink-0 border-t-2 border-black p-2 print:hidden">
-                <div className="flex items-center justify-end gap-4">
-                    <span className="text-lg font-bold text-white">Total</span>
-                    <span className="text-right text-lg font-bold text-green-500 bg-white px-2 py-1 rounded-sm min-w-[120px]">{formatCurrency(totalListPrice)}</span>
+            <div className="shrink-0 border-t-2 border-black print:hidden flex">
+                <div style={{backgroundColor: 'hsl(var(--sheet-total-bg))'}} className="flex-1 p-2 flex items-center justify-end">
+                    <span className="text-lg font-bold text-[hsl(var(--sheet-header-fg))]">Total</span>
+                </div>
+                <div style={{backgroundColor: 'hsl(var(--sheet-total-price-bg))'}} className="p-2 min-w-[150px]">
+                    <span style={{color: 'hsl(var(--sheet-total-price-fg))'}} className="text-right text-lg font-bold block">{formatCurrency(totalListPrice)}</span>
                 </div>
             </div>
         )}

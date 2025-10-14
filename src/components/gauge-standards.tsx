@@ -84,6 +84,28 @@ const gaugeData = {
     { gauge: "24", inches: "0.0201", mm: "0.511" },
     { gauge: "25", inches: "0.0179", mm: "0.455" },
     { gauge: "26", inches: "0.0159", mm: "0.404" },
+  ],
+  equivalence: [
+    { msg: "10", inches: "0.1345", mm: "3.416", weight: "26.80" },
+    { msg: "11", inches: "0.1196", mm: "3.038", weight: "23.83" },
+    { msg: "12", inches: "0.1046", mm: "2.657", weight: "20.84" },
+    { msg: "13", inches: "0.0897", mm: "2.278", weight: "17.87" },
+    { msg: "14", inches: "0.0747", mm: "1.897", weight: "14.89" },
+    { msg: "16", inches: "0.0598", mm: "1.519", weight: "11.91" },
+    { msg: "18", inches: "0.0478", mm: "1.214", weight: "9.52" },
+    { msg: "19", inches: "0.0418", mm: "1.062", weight: "8.33" },
+    { msg: "20", inches: "0.0359", mm: "0.912", weight: "7.15" },
+    { msg: "22", inches: "0.0299", mm: "0.759", weight: "5.96" },
+    { msg: "24", inches: "0.0239", mm: "0.607", weight: "4.76" },
+    { msg: "26", inches: "0.0179", mm: "0.455", weight: "3.57" },
+    { msg: "28", inches: "0.0149", mm: "0.378", weight: "2.97" },
+    { msg: "30", inches: "0.0120", mm: "0.305", weight: "2.39" },
+  ],
+  coatings: [
+    { coating: "Z100", layer: "7" },
+    { coating: "Z180", layer: "13" },
+    { coating: "Z275", layer: "20" },
+    { coating: "AZ150", layer: "20" },
   ]
 };
 
@@ -122,10 +144,11 @@ export function GaugeStandards() {
       </Card>
 
       <Tabs defaultValue="stainless" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="stainless">Aço Inox</TabsTrigger>
           <TabsTrigger value="standard">Aço Padrão</TabsTrigger>
           <TabsTrigger value="aluminum">Alumínio</TabsTrigger>
+          <TabsTrigger value="equivalence">Equivalências</TabsTrigger>
         </TabsList>
         <TabsContent value="standard">
             <Card>
@@ -145,6 +168,58 @@ export function GaugeStandards() {
             <Card>
                 <CardContent className="p-1">
                     <GaugeTable data={gaugeData.aluminum} />
+                </CardContent>
+            </Card>
+        </TabsContent>
+        <TabsContent value="equivalence">
+            <Card className="mb-1">
+                <CardHeader>
+                    <CardTitle className="text-lg">Tabela de Equivalência de Chapas Finas a Frio</CardTitle>
+                </CardHeader>
+                <CardContent className="p-1">
+                     <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Bitola (MSG)</TableHead>
+                                <TableHead>Polegadas (in)</TableHead>
+                                <TableHead>Milímetros (mm)</TableHead>
+                                <TableHead className="text-right">Peso (kg/m²)</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {gaugeData.equivalence.map((item) => (
+                                <TableRow key={item.msg}>
+                                    <TableCell className="font-medium">{item.msg}</TableCell>
+                                    <TableCell>{item.inches}</TableCell>
+                                    <TableCell>{item.mm}</TableCell>
+                                    <TableCell className="text-right">{item.weight}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+            <Card>
+                 <CardHeader>
+                    <CardTitle className="text-lg">Conversão de Revestimentos</CardTitle>
+                </CardHeader>
+                <CardContent className="p-1">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Revestimento (g/m²)</TableHead>
+                                <TableHead className="text-right">Camada (µm) por lado</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {gaugeData.coatings.map((item) => (
+                                <TableRow key={item.coating}>
+                                    <TableCell className="font-medium">{item.coating}</TableCell>
+                                    <TableCell className="text-right">{item.layer}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
                 </CardContent>
             </Card>
         </TabsContent>

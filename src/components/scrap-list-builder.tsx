@@ -292,9 +292,9 @@ export function ScrapListBuilder() {
     const decimalPart = parts[1];
     
     return (
-        <div className="flex items-baseline justify-center tabular-nums font-sans">
-            <span className="text-[11px] font-semibold text-primary">{integerPart}</span>
-            <span className="text-[8px] self-start mt-px text-primary">,{decimalPart} kg</span>
+        <div className="flex items-baseline justify-center tabular-nums font-sans text-[hsl(var(--text-item-red))]">
+            <span className="text-[11px] font-semibold">{integerPart}</span>
+            <span className="text-[8px] self-start mt-px">,{decimalPart} kg</span>
         </div>
     )
   }
@@ -418,8 +418,7 @@ export function ScrapListBuilder() {
                                     {item.description}
                                   </TableCell>
                                   <TableCell className={cn("text-center p-1 w-[80px]",
-                                    !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-pmq-bg))]"
-                                  )}>
+                                    !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}>
                                       <div className="flex flex-col items-center justify-center h-full text-[hsl(var(--text-item-red))]">
                                         <span className="text-xs">{item.unit === 'un' ? `${item.quantity} pç` : ''}</span>
                                         {formatWeight(item.weight)}

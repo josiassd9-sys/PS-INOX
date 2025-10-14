@@ -3,7 +3,7 @@
 "use client";
 
 import * as React from "react";
-import type { Category, ConnectionGroup, SteelItem } from "@/lib/data";
+import type { Category, ConnectionGroup, SteelItem, ScrapItem } from "@/lib/data";
 import {
     Accordion,
     AccordionContent,
@@ -23,7 +23,7 @@ interface GlobalSearchResultsProps {
     priceParams: Record<string, { costPrice: number; markup: number; sellingPrice: number }>;
     searchTerm: string;
     costAdjustments: Record<string, number>;
-    onItemClick: (item: SteelItem) => void;
+    onItemClick: (item: SteelItem | ScrapItem) => void;
     onAddItem: (item: any) => void;
     isScrapCalculatorActive: boolean;
 }
@@ -167,7 +167,7 @@ function AddSheetForm({ item, initialSellingPrice, onAdd }: { item: SteelItem; i
 export function GlobalSearchResults({ categories, priceParams, searchTerm, costAdjustments, onItemClick, onAddItem, isScrapCalculatorActive }: GlobalSearchResultsProps) {
     const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
 
-    const handleItemSelection = (item: SteelItem, category: Category) => {
+    const handleItemSelection = (item: SteelItem | ScrapItem, category: Category) => {
          if (selectedItemId === item.id) {
             setSelectedItemId(null);
         } else {

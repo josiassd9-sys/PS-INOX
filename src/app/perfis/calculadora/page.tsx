@@ -21,8 +21,6 @@ const tiposAco = [
     { nome: "ASTM A572 G50", fy: 345 },
 ];
 
-const FCK_CONCRETO = 25; // MPa, para concreto C25
-const PESO_CONCRETO_KN_M3 = 24; // kN/m³
 const PESO_CONCRETO_KGF_M3 = 2400; // kgf/m³
 
 type BudgetItem = {
@@ -612,3 +610,5 @@ export default function Page() {
       </Dashboard>
   );
 }
+
+    

@@ -242,6 +242,14 @@ const CATEGORIES: Category[] = [
     icon: 'DraftingCompass',
     unit: 'calc',
     items: [],
+  },
+   {
+    id: 'gauge',
+    name: 'Tabela de Gauges',
+    description: 'Tabela de referência para espessuras de chapas (gauge).',
+    icon: 'Sheet',
+    unit: 'calc',
+    items: [],
   }
 ];
 
@@ -286,12 +294,14 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
             CATEGORIES.find(c => c.id === 'normas-astm')!,
             CATEGORIES.find(c => c.id === 'processos-fabricacao')!,
             CATEGORIES.find(c => c.id === 'desenho-tecnico')!,
+            CATEGORIES.find(c => c.id === 'gauge')!,
         ]
     }
 ]
 
 export const ALL_CATEGORIES = CATEGORY_GROUPS.flatMap(group => group.items);
 export * from './types';
+
 
 
 

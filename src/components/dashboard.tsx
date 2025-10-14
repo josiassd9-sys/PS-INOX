@@ -17,7 +17,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
-import { Search, Warehouse, SlidersHorizontal, PlusCircle, Link as LinkIcon, Scissors, ClipboardList, Home } from "lucide-react";
+import { Search, Warehouse, SlidersHorizontal, PlusCircle, Link as LinkIcon, Scissors, ClipboardList, Home, Sheet } from "lucide-react";
 import { PriceControls } from "./price-controls";
 import { ItemTable } from "./item-table";
 import { Icon } from "./icons";
@@ -50,6 +50,7 @@ import { TechnicalDrawingGuide } from "./technical-drawing-guide";
 import { ConnectionsTable } from "./connections-table";
 import { CostAdjustmentCalculator } from "./cost-adjustment-calculator";
 import Link from "next/link";
+import { GaugeStandards } from "./gauge-standards";
 
 interface PriceParams {
   costPrice: number;
@@ -307,6 +308,7 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
     const isManufacturingProcessesCategory = selectedCategoryId === 'processos-fabricacao';
     const isTechnicalDrawingCategory = selectedCategoryId === 'desenho-tecnico';
     const isConnectionsCategory = selectedCategoryId === 'conexoes';
+    const isGaugeCategory = selectedCategoryId === 'gauge';
 
     if (isPackageCheckerCategory) {
       return <PackageChecker />;
@@ -339,8 +341,11 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
             onWeightChange={handleWeightChange}
         />;
     }
+    if (isGaugeCategory) {
+      return <GaugeStandards />;
+    }
 
-    const showCustomHeader = !searchTerm && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isConnectionsCategory;
+    const showCustomHeader = !searchTerm && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isConnectionsCategory && !isGaugeCategory;
 
     return (
       <ItemTable 
@@ -359,10 +364,11 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
   const isAstmStandardsCategory = selectedCategoryId === 'normas-astm';
   const isManufacturingProcessesCategory = selectedCategoryId === 'processos-fabricacao';
   const isTechnicalDrawingCategory = selectedCategoryId === 'desenho-tecnico';
+  const isGaugeCategory = selectedCategoryId === 'gauge';
   
-  const showPriceControls = selectedCategory && (selectedCategory.hasOwnPriceControls || (!isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory));
+  const showPriceControls = selectedCategory && (selectedCategory.hasOwnPriceControls || (!isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isGaugeCategory));
 
-  const showGlobalSearch = selectedCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory;
+  const showGlobalSearch = selectedCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isGaugeCategory;
 
   
   const priceControlTitle = () => {
@@ -396,19 +402,22 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
                  </AccordionTrigger>
                  <AccordionContent className="pt-1">
                     <SidebarMenu>
-                      {group.items.map((category) => (
-                        <SidebarMenuItem key={category.id}>
-                          <Link href={`/calculator/${category.id}`} passHref>
-                            <SidebarMenuButton
-                              isActive={selectedCategoryId === category.id && !searchTerm}
-                              className="w-full justify-start h-8"
-                            >
-                              <Icon name={category.icon as any} />
-                              <span>{category.name}</span>
-                            </SidebarMenuButton>
-                          </Link>
-                        </SidebarMenuItem>
-                      ))}
+                      {group.items.map((category) => {
+                          const href = category.id === 'gauge' ? '/gauge' : `/calculator/${category.id}`;
+                          return (
+                            <SidebarMenuItem key={category.id}>
+                              <Link href={href} passHref>
+                                <SidebarMenuButton
+                                  isActive={selectedCategoryId === category.id && !searchTerm}
+                                  className="w-full justify-start h-8"
+                                >
+                                  <Icon name={category.icon as any} />
+                                  <span>{category.name}</span>
+                                </SidebarMenuButton>
+                              </Link>
+                            </SidebarMenuItem>
+                          );
+                      })}
                        {group.title === 'FERRAMENTAS' && (
                         <SidebarMenuItem>
                           <Link href="/retalho-inox" passHref>

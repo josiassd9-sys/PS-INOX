@@ -26,14 +26,14 @@ const E_ACO_MPA = 200000; // Módulo de Elasticidade do Aço em MPa
 
 type BudgetItem = {
   id: string;
-  perfil: Perfil | PerfilIpe;
-  span: number;
+  perfil: Perfil | PerfilIpe | SteelDeck;
+  span?: number; // Opcional para itens como Steel Deck
   quantity: number;
   weightPerBeam: number;
   totalWeight: number;
   costPerBeam: number;
   totalCost: number;
-  type: 'Viga Principal' | 'Viga Secundária';
+  type: 'Viga Principal' | 'Viga Secundária' | 'Steel Deck';
 };
 
 function VigaPrincipalCalculator({ onAddToBudget }: { onAddToBudget: (item: BudgetItem) => void }) {
@@ -441,12 +441,16 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
   );
 }
 
-function SteelDeckCalculator({ onCalculated }: { onCalculated: (load: number) => void}) {
+function SteelDeckCalculator({ onCalculated, onAddToBudget }: { onCalculated: (load: number) => void, onAddToBudget: (item: BudgetItem) => void }) {
     const [selectedDeckId, setSelectedDeckId] = React.useState<string>(steelDeckData[0].nome);
     const [concreteThickness, setConcreteThickness] = React.useState<string>("10");
     const [extraLoad, setExtraLoad] = React.useState<string>("250");
     const [totalLoad, setTotalLoad] = React.useState<number>(0);
     const { toast } = useToast();
+
+    // Budget fields
+    const [quantity, setQuantity] = React.useState("1");
+    const [pricePerKg, setPricePerKg] = React.useState("7.80"); // Galvanized steel price
 
     const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -469,11 +473,44 @@ function SteelDeckCalculator({ onCalculated }: { onCalculated: (load: number) =>
             onCalculated(finalLoad);
             toast({
               title: "Cálculo da Laje Concluído!",
-              description: `A carga total de ${finalLoad.toFixed(0)} kgf/m² foi calculada e está pronta para ser usada na aba de vigas secundárias.`,
+              description: `A carga total de ${finalLoad.toFixed(0)} kgf/m² foi calculada.`,
             })
         } else {
             setTotalLoad(0);
         }
+    };
+
+    const handleAddToBudget = () => {
+        const deck = steelDeckData.find(d => d.nome === selectedDeckId);
+        if (!deck) return;
+
+        const qty = parseInt(quantity);
+        const price = parseFloat(pricePerKg.replace(",", "."));
+        
+        if (isNaN(qty) || isNaN(price) || qty <= 0 || price <= 0) {
+            toast({ variant: "destructive", title: "Valores Inválidos para Orçamento" });
+            return;
+        }
+
+        // Assuming the deck is sold per square meter, we use its weight per m²
+        const weightPerUnit = deck.pesoProprio; // weight in kg/m²
+        const totalWeight = weightPerUnit * qty; // Here quantity is treated as m²
+        const costPerUnit = weightPerUnit * price;
+        const totalCost = totalWeight * price;
+
+        const newItem: BudgetItem = {
+            id: `${deck.nome}-${Date.now()}`,
+            perfil: deck,
+            quantity: qty,
+            weightPerBeam: weightPerUnit,
+            totalWeight,
+            costPerBeam: costPerUnit,
+            totalCost,
+            type: 'Steel Deck',
+        };
+
+        onAddToBudget(newItem);
+        toast({ title: "Item Adicionado!", description: `${qty}m² de ${deck.nome} adicionado(s) ao orçamento.` });
     };
 
     React.useEffect(() => {
@@ -492,7 +529,7 @@ function SteelDeckCalculator({ onCalculated }: { onCalculated: (load: number) =>
             <CardHeader>
                 <CardTitle>Calculadora de Carga de Laje Steel Deck</CardTitle>
                 <CardDescription>
-                    Calcule a carga total (kgf/m²) da sua laje para usar no dimensionamento das vigas secundárias.
+                    Calcule a carga total (kgf/m²) da sua laje e adicione o material ao orçamento.
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -511,7 +548,7 @@ function SteelDeckCalculator({ onCalculated }: { onCalculated: (load: number) =>
                         </Select>
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="concrete-thickness">Espessura da Laje de Concreto (cm)</Label>
+                        <Label htmlFor="concrete-thickness">Espessura do Concreto (cm)</Label>
                         <Input id="concrete-thickness" type="text" inputMode="decimal" value={concreteThickness} onChange={e => handleInputChange(setConcreteThickness, e.target.value)} placeholder="Ex: 10"/>
                     </div>
                      <div className="space-y-2">
@@ -526,18 +563,25 @@ function SteelDeckCalculator({ onCalculated }: { onCalculated: (load: number) =>
                         <CardHeader>
                             <AlertTitle className="text-primary font-bold flex items-center gap-2"><CheckCircle className="h-5 w-5"/> Resultado do Cálculo</AlertTitle>
                         </CardHeader>
-                         <CardContent className="space-y-2">
+                         <CardContent className="space-y-4">
                             <div className="text-center py-2">
                                 <p className="text-sm text-muted-foreground">Carga Total da Laje (kgf/m²)</p>
                                 <p className="text-4xl font-bold text-primary">{formatNumber(totalLoad, 0)}</p>
-                                <p className="text-xs text-muted-foreground mt-1">Agora, vá para a aba "Viga Secundária (IPE)" e use este valor.</p>
+                                <p className="text-xs text-muted-foreground mt-1">Use este valor na aba "Viga Secundária (IPE)".</p>
                             </div>
                             <Separator />
-                            <div className="text-xs pt-2 grid grid-cols-3 gap-x-2">
-                                <p><strong>Peso Próprio:</strong><br/>{formatNumber(selectedDeck.pesoProprio)} kgf/m²</p>
-                                <p><strong>Peso do Concreto:</strong><br/>{formatNumber((parseFloat(concreteThickness.replace(',','.'))/100) * PESO_CONCRETO_KGF_M3)} kgf/m²</p>
-                                <p><strong>Sobrecarga:</strong><br/>{formatNumber(parseFloat(extraLoad.replace(',','.')))} kgf/m²</p>
+                            <div className="grid grid-cols-2 gap-4 border-t pt-4">
+                               <div className="space-y-2">
+                                  <Label htmlFor="deck-quantity">Quantidade (m²)</Label>
+                                  <Input id="deck-quantity" type="text" inputMode="numeric" value={quantity} onChange={(e) => handleInputChange(setQuantity, e.target.value)} placeholder="Ex: 50" />
+                              </div>
+                               <div className="space-y-2">
+                                  <Label htmlFor="deck-pricePerKg">Preço Aço Galvanizado (R$/kg)</Label>
+                                  <Input id="deck-pricePerKg" type="text" inputMode="decimal" value={pricePerKg} onChange={(e) => handleInputChange(setPricePerKg, e.target.value)} placeholder="Ex: 7,80" />
+                              </div>
                             </div>
+                            <Button onClick={handleAddToBudget} className="w-full gap-2"><PlusCircle/> Adicionar Steel Deck ao Orçamento</Button>
+
                         </CardContent>
                     </Card>
                 )}
@@ -597,7 +641,7 @@ export default function Page() {
                     <TabsTrigger value="tirantes" disabled>Tirantes</TabsTrigger>
                 </TabsList>
                 <TabsContent value="laje-deck">
-                    <SteelDeckCalculator onCalculated={setLastSlabLoad} />
+                    <SteelDeckCalculator onCalculated={setLastSlabLoad} onAddToBudget={handleAddToBudget} />
                 </TabsContent>
                 <TabsContent value="viga-secundaria">
                     <VigaSecundariaCalculator onAddToBudget={handleAddToBudget} lastSlabLoad={lastSlabLoad}/>
@@ -639,12 +683,12 @@ export default function Page() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Item</TableHead>
-                                    <TableHead>Perfil</TableHead>
+                                    <TableHead>Perfil/Descrição</TableHead>
                                     <TableHead className="text-center">Qtd.</TableHead>
-                                    <TableHead className="text-center">Vão (m)</TableHead>
-                                    <TableHead className="text-center">Peso/Peça (kg)</TableHead>
+                                    <TableHead className="text-center">Vão/Área</TableHead>
+                                    <TableHead className="text-center">Peso/Unid. (kg)</TableHead>
                                     <TableHead className="text-center">Peso Total (kg)</TableHead>
-                                    <TableHead className="text-right">Custo/Peça (R$)</TableHead>
+                                    <TableHead className="text-right">Custo/Unid. (R$)</TableHead>
                                     <TableHead className="text-right">Custo Total (R$)</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -652,9 +696,9 @@ export default function Page() {
                                 {budgetItems.map(item => (
                                     <TableRow key={item.id}>
                                         <TableCell className="font-medium">{item.type}</TableCell>
-                                        <TableCell>{item.perfil.nome}</TableCell>
+                                        <TableCell>{(item.perfil as any).nome}</TableCell>
                                         <TableCell className="text-center">{item.quantity}</TableCell>
-                                        <TableCell className="text-center">{formatNumber(item.span)}</TableCell>
+                                        <TableCell className="text-center">{item.type === 'Steel Deck' ? `${item.quantity} m²` : `${formatNumber(item.span || 0)} m`}</TableCell>
                                         <TableCell className="text-center">{formatNumber(item.weightPerBeam)}</TableCell>
                                         <TableCell className="text-center font-semibold">{formatNumber(item.totalWeight)}</TableCell>
                                         <TableCell className="text-right">{formatCurrency(item.costPerBeam)}</TableCell>
@@ -681,3 +725,5 @@ export default function Page() {
       </Dashboard>
   );
 }
+
+    

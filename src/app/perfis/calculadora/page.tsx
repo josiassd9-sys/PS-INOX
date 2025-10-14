@@ -22,6 +22,7 @@ const tiposAco = [
 ];
 
 const PESO_CONCRETO_KGF_M3 = 2400; // kgf/m³
+const E_ACO_MPA = 200000; // Módulo de Elasticidade do Aço em MPa
 
 type BudgetItem = {
   id: string;
@@ -54,12 +55,12 @@ function VigaPrincipalCalculator({ onAddToBudget }: { onAddToBudget: (item: Budg
   };
 
   const handleCalculate = () => {
-    const L = parseFloat(span.replace(",", "."));
-    const q = parseFloat(load.replace(",", "."));
+    const L_m = parseFloat(span.replace(",", "."));
+    const q_kgf_m = parseFloat(load.replace(",", "."));
     setError(null);
     setRecommendedProfile(null);
 
-    if (isNaN(L) || isNaN(q) || L <= 0 || q <= 0) {
+    if (isNaN(L_m) || isNaN(q_kgf_m) || L_m <= 0 || q_kgf_m <= 0) {
       setError("Por favor, insira valores válidos e positivos para o vão e a carga.");
       return;
     }
@@ -70,18 +71,27 @@ function VigaPrincipalCalculator({ onAddToBudget }: { onAddToBudget: (item: Budg
         return;
     }
 
+    // --- Verificação de Resistência (Momento Fletor) ---
     const fy_MPa = selectedSteel.fy;
     const fy_kN_cm2 = fy_MPa / 10;
-    
-    const q_kN_m = q * 0.009807;
-    const maxMoment_kNm = (q_kN_m * Math.pow(L, 2)) / 8;
+    const q_kN_m = q_kgf_m * 0.009807;
+    const maxMoment_kNm = (q_kN_m * Math.pow(L_m, 2)) / 8;
     const maxMoment_kNcm = maxMoment_kNm * 100;
-    const requiredWx = maxMoment_kNcm / fy_kN_cm2;
+    const requiredWx_cm3 = maxMoment_kNcm / fy_kN_cm2;
     
-    const suitableProfiles = perfisData.filter(p => p.Wx >= requiredWx);
+    // --- Verificação de Deformação (Flecha) ---
+    const L_cm = L_m * 100;
+    const allowedDeflection_cm = L_cm / 360; // L/360
+    const q_kN_cm = q_kN_m / 100;
+    const E_kN_cm2 = E_ACO_MPA / 10;
+    // requiredIx = (5 * q * L^4) / (384 * E * delta_max)
+    const requiredIx_cm4 = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * allowedDeflection_cm);
+
+    // Filtrar perfis que atendem a AMBOS os critérios
+    const suitableProfiles = perfisData.filter(p => p.Wx >= requiredWx_cm3 && p.Ix >= requiredIx_cm4);
     
     if (suitableProfiles.length === 0) {
-      setError("Nenhum perfil na tabela atende aos requisitos. A carga ou o vão podem ser muito grandes.");
+      setError("Nenhum perfil na tabela atende aos requisitos de resistência e/ou deformação. A carga ou o vão podem ser muito grandes.");
       return;
     }
     
@@ -150,7 +160,7 @@ function VigaPrincipalCalculator({ onAddToBudget }: { onAddToBudget: (item: Budg
         <CardHeader>
           <CardTitle>Calculadora de Viga Principal (Perfil W)</CardTitle>
           <CardDescription>
-            Pré-dimensione o perfil W e adicione-o à lista para montar seu orçamento.
+            Pré-dimensione o perfil W (considerando resistência e deformação) e adicione-o à lista para montar seu orçamento.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -191,7 +201,7 @@ function VigaPrincipalCalculator({ onAddToBudget }: { onAddToBudget: (item: Budg
                 <CardHeader>
                     <AlertTitle className="text-primary font-bold flex items-center gap-2"><CheckCircle className="h-5 w-5"/> Perfil Recomendado</AlertTitle>
                     <AlertDescription className="space-y-2 pt-2">
-                        <p>Para um vão de <span className="font-semibold">{span}m</span> e carga de <span className="font-semibold">{load}kgf/m</span> com aço <span className="font-semibold">{steelType}</span>, o perfil mais leve é:</p>
+                        <p>Para um vão de <span className="font-semibold">{span}m</span> e carga de <span className="font-semibold">{load}kgf/m</span> com aço <span className="font-semibold">{steelType}</span>, o perfil mais leve que atende aos critérios de resistência e deformação (flecha L/360) é:</p>
                         <div className="text-2xl font-bold text-center py-2 text-primary">{recommendedProfile.nome}</div>
                          <p className="text-xs text-muted-foreground pt-1">
                             Agora, defina a quantidade e o preço para adicionar ao orçamento.
@@ -251,20 +261,20 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
   };
 
   const handleCalculate = () => {
-    const L = parseFloat(span.replace(",", "."));
-    const E = parseFloat(spacing.replace(",", "."));
-    const S = parseFloat(slabLoad.replace(",", "."));
+    const L_m = parseFloat(span.replace(",", "."));
+    const E_m = parseFloat(spacing.replace(",", "."));
+    const S_kgf_m2 = parseFloat(slabLoad.replace(",", "."));
     setError(null);
     setRecommendedProfile(null);
     setDistributedLoad(0);
 
-    if (isNaN(L) || isNaN(E) || isNaN(S) || L <= 0 || E <= 0 || S <= 0) {
+    if (isNaN(L_m) || isNaN(E_m) || isNaN(S_kgf_m2) || L_m <= 0 || E_m <= 0 || S_kgf_m2 <= 0) {
       setError("Por favor, insira valores válidos e positivos para todos os campos.");
       return;
     }
 
-    const q_dist = S * E; // Carga linear (kgf/m)
-    setDistributedLoad(q_dist);
+    const q_dist_kgf_m = S_kgf_m2 * E_m; // Carga linear (kgf/m)
+    setDistributedLoad(q_dist_kgf_m);
     
     const selectedSteel = tiposAco.find(s => s.nome === steelType);
     if (!selectedSteel) {
@@ -272,15 +282,23 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
         return;
     }
 
+    // --- Verificação de Resistência (Momento Fletor) ---
     const fy_MPa = selectedSteel.fy;
     const fy_kN_cm2 = fy_MPa / 10;
-    
-    const q_kN_m = q_dist * 0.009807;
-    const maxMoment_kNm = (q_kN_m * Math.pow(L, 2)) / 8;
+    const q_kN_m = q_dist_kgf_m * 0.009807;
+    const maxMoment_kNm = (q_kN_m * Math.pow(L_m, 2)) / 8;
     const maxMoment_kNcm = maxMoment_kNm * 100;
-    const requiredWx = maxMoment_kNcm / fy_kN_cm2;
+    const requiredWx_cm3 = maxMoment_kNcm / fy_kN_cm2;
     
-    const suitableProfiles = perfisIpeData.filter(p => p.Wx >= requiredWx);
+    // --- Verificação de Deformação (Flecha) ---
+    const L_cm = L_m * 100;
+    const allowedDeflection_cm = L_cm / 360;
+    const q_kN_cm = q_kN_m / 100;
+    const E_kN_cm2 = E_ACO_MPA / 10;
+    const requiredIx_cm4 = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * allowedDeflection_cm);
+
+    // Filtrar perfis que atendem a AMBOS os critérios
+    const suitableProfiles = perfisIpeData.filter(p => p.Wx >= requiredWx_cm3 && p.Ix >= requiredIx_cm4);
     
     if (suitableProfiles.length === 0) {
       setError("Nenhum perfil IPE na tabela atende aos requisitos. A carga, vão ou espaçamento podem ser muito grandes.");
@@ -374,7 +392,7 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
                 <CardHeader>
                     <AlertTitle className="text-primary font-bold flex items-center gap-2"><CheckCircle className="h-5 w-5"/> Perfil IPE Recomendado</AlertTitle>
                     <AlertDescription className="space-y-2 pt-2">
-                        <p>Carga linear calculada na viga: <span className="font-semibold">{distributedLoad.toFixed(2)} kgf/m</span>. O perfil mais leve para esta condição é:</p>
+                        <p>Carga linear calculada na viga: <span className="font-semibold">{distributedLoad.toFixed(2)} kgf/m</span>. O perfil mais leve que atende aos critérios de resistência e deformação é:</p>
                         <div className="text-2xl font-bold text-center py-2 text-primary">{recommendedProfile.nome}</div>
                     </AlertDescription>
                 </CardHeader>

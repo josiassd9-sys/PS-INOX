@@ -15,19 +15,36 @@ import { perfisData, Perfil } from "@/lib/data/perfis";
 import { Dashboard } from "@/components/dashboard";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { Label } from "@/components/ui/label";
 
 function TableComponent() {
   const [searchTerm, setSearchTerm] = React.useState("");
+  const [filters, setFilters] = React.useState({
+    minPeso: "",
+    minH: "",
+    minWx: "",
+  });
+
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFilters(prev => ({ ...prev, [id]: value }));
+  };
 
   const filteredData = React.useMemo(() => {
-    if (!searchTerm) {
-      return perfisData;
-    }
     const lowercasedFilter = searchTerm.toLowerCase();
-    return perfisData.filter((perfil) =>
-      perfil.nome.toLowerCase().includes(lowercasedFilter)
-    );
-  }, [searchTerm]);
+    const minPeso = parseFloat(filters.minPeso) || 0;
+    const minH = parseFloat(filters.minH) || 0;
+    const minWx = parseFloat(filters.minWx) || 0;
+
+    return perfisData.filter((perfil) => {
+      const nameMatch = perfil.nome.toLowerCase().includes(lowercasedFilter);
+      const pesoMatch = !minPeso || perfil.peso >= minPeso;
+      const hMatch = !minH || perfil.h >= minH;
+      const wxMatch = !minWx || perfil.Wx >= minWx;
+
+      return nameMatch && pesoMatch && hMatch && wxMatch;
+    });
+  }, [searchTerm, filters]);
 
   return (
     <div className="container mx-auto p-4">
@@ -38,7 +55,7 @@ function TableComponent() {
                     Consulte as propriedades geométricas e físicas dos perfis de aço padrão W (Gerdau/Açominas).
                 </CardDescription>
                  <div className="relative pt-2">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute left-2.5 top-4 h-4 w-4 text-muted-foreground" />
                   <Input
                     type="search"
                     placeholder="Buscar perfil por nome..."
@@ -46,7 +63,21 @@ function TableComponent() {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
-              </div>
+                 </div>
+                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2 pt-2">
+                    <div className="space-y-1">
+                        <Label htmlFor="minPeso" className="text-xs font-normal">Peso ≥ (kg/m)</Label>
+                        <Input id="minPeso" type="number" placeholder="Ex: 20" value={filters.minPeso} onChange={handleFilterChange} />
+                    </div>
+                     <div className="space-y-1">
+                        <Label htmlFor="minH" className="text-xs font-normal">Altura ≥ (mm)</Label>
+                        <Input id="minH" type="number" placeholder="Ex: 250" value={filters.minH} onChange={handleFilterChange} />
+                    </div>
+                     <div className="space-y-1">
+                        <Label htmlFor="minWx" className="text-xs font-normal">Wx ≥ (cm³)</Label>
+                        <Input id="minWx" type="number" placeholder="Ex: 300" value={filters.minWx} onChange={handleFilterChange} />
+                    </div>
+                 </div>
             </CardHeader>
             <CardContent className="overflow-x-auto">
                 <Table>
@@ -85,6 +116,9 @@ function TableComponent() {
                         ))}
                     </TableBody>
                 </Table>
+                 {filteredData.length === 0 && (
+                    <div className="text-center p-4 text-muted-foreground">Nenhum perfil encontrado com os critérios especificados.</div>
+                )}
             </CardContent>
         </Card>
     </div>

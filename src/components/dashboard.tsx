@@ -284,6 +284,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                          selectedCategoryId === 'desenho-tecnico' ||
                          selectedCategoryId === 'conexoes' ||
                          selectedCategoryId === 'gauge' ||
+                         selectedCategoryId === 'ai-assistant' ||
                          selectedCategoryId?.startsWith('perfis/');
 
   const renderContent = () => {
@@ -339,7 +340,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
   const showGlobalSearch = selectedCategory && !isSpecialPage;
 
   const getPageTitle = () => {
-    if (children && selectedCategoryId?.startsWith('perfis/')) {
+    if (children && (selectedCategoryId?.startsWith('perfis/') || selectedCategoryId === 'ai-assistant')) {
         return selectedCategory?.name ?? "Perfis de Aço";
     }
     if (searchTerm) return "Resultados da Busca";
@@ -348,7 +349,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
   }
 
   const getPageDescription = () => {
-      if (children && selectedCategoryId?.startsWith('perfis/')) {
+      if (children && (selectedCategoryId?.startsWith('perfis/') || selectedCategoryId === 'ai-assistant')) {
         return selectedCategory?.description ?? "";
       }
       if (searchTerm) return `Buscando por "${searchTerm}"`;
@@ -375,7 +376,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                  <AccordionContent className="pt-1">
                     <SidebarMenu>
                       {group.items.map((category) => {
-                          const href = category.unit === 'calc' && !category.id.startsWith('perfis/') ? `/${category.id}` : category.id.startsWith('perfis/') ? `/${category.id}` : `/calculator/${category.id}`;
+                          const href = category.unit === 'calc' ? `/${category.id}` : `/calculator/${category.id}`;
                           return (
                             <SidebarMenuItem key={category.id}>
                               <Link href={href} passHref>

@@ -251,6 +251,14 @@ const CATEGORIES: Category[] = [
     unit: 'calc',
     items: [],
   },
+  {
+    id: 'ai-assistant',
+    name: 'Assistente IA',
+    description: 'Assistente de IA para otimização de preços e custos.',
+    icon: 'Sparkles',
+    unit: 'calc',
+    items: [],
+  },
    {
     id: 'perfis/parametros-vigas-i',
     name: 'Parâmetros Vigas I',
@@ -331,7 +339,7 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
     {
         title: 'OUTROS METAIS',
         items: [
-            CATEGORIES.find(c => c.id === 'tarugo-bronze')!,
+            CATEGORIES.find(c => c_id === 'tarugo-bronze')!,
             CATEGORIES.find(c => c.id === 'verg-aluminio')!,
             CATEGORIES.find(c => c.id === 'chapas-aluminio')!,
             CATEGORIES.find(c => c.id === 'verg-latao')!,
@@ -345,6 +353,7 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
             CATEGORIES.find(c => c.id === 'processos-fabricacao')!,
             CATEGORIES.find(c => c.id === 'desenho-tecnico')!,
             CATEGORIES.find(c => c.id === 'gauge')!,
+            CATEGORIES.find(c => c.id === 'ai-assistant')!,
         ]
     },
     {

@@ -399,6 +399,6 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
 
 export const ALL_CATEGORIES = CATEGORIES;
 export * from './types';
-export { perfisData, perfisIpeData, steelDeckData };
-
-    
+export * from './perfis';
+export * from './perfis-ipe';
+export * from './steel-deck';

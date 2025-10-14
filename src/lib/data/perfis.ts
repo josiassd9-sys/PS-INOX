@@ -16,6 +16,60 @@ export type Perfil = {
     ry: number; // cm
 };
 
+export type BudgetItem = {
+  id: string;
+  perfil: Perfil | PerfilIpe | SteelDeck;
+  span?: number; 
+  height?: number; 
+  quantity: number;
+  weightPerUnit: number;
+  totalWeight: number;
+  costPerUnit: number;
+  totalCost: number;
+  type: 'Viga Principal' | 'Viga Secundária' | 'Steel Deck' | 'Pilar';
+};
+
+export type SupportReaction = {
+  vigaPrincipal: number;
+  vigaSecundaria: number;
+};
+
+export type PerfilIpe = {
+    nome: string;
+    h: number; // mm
+    b: number; // mm
+    tw: number; // mm
+    tf: number; // mm
+    area: number; // cm²
+    peso: number; // kg/m
+    Ix: number; // cm⁴
+    Wx: number; // cm³
+    rx: number; // cm
+    Iy: number; // cm⁴
+    Wy: number; // cm³
+    ry: number; // cm
+};
+
+export type SteelDeck = {
+    nome: string;
+    tipo: 'MD57' | 'MD75';
+    espessuraChapa: number; // mm
+    pesoProprio: number; // kg/m²
+    vaosMaximos: {
+        simples: { '150kgf': number, '250kgf': number, '400kgf': number };
+        duplo: { '150kgf': number, '250kgf': number, '400kgf': number };
+    };
+};
+
+export const tiposAco = [
+    { nome: "ASTM A36", fy: 250 },
+    { nome: "ASTM A572 G50", fy: 345 },
+];
+
+export const PESO_CONCRETO_KGF_M3 = 2400; // kgf/m³
+export const E_ACO_MPA = 200000; // Módulo de Elasticidade do Aço em MPa
+
+
 // Catálogo Gerdau (W) completo
 export const perfisData: Perfil[] = [
     { nome: "W150x13", peso: 13.0, area: 16.6, h: 150, b: 100, tw: 4.8, tf: 5.8, d: 125, Ix: 699, Wx: 93.3, rx: 6.49, Iy: 97.4, Wy: 19.5, ry: 2.42 },

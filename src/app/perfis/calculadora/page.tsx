@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle, Calculator, PlusCircle, Trash2, Save, Printer } from "lucide-react";
+import { CheckCircle, Calculator, PlusCircle, Trash2, Save, Printer, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -220,7 +220,7 @@ function VigaPrincipalCalculator({ onAddToBudget }: { onAddToBudget: (item: Budg
 }
 
 
-function VigaSecundariaCalculator({ onAddToBudget }: { onAddToBudget: (item: BudgetItem) => void }) {
+function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudget: (item: BudgetItem) => void, lastSlabLoad: number }) {
   const [span, setSpan] = React.useState("4");
   const [spacing, setSpacing] = React.useState("1.5");
   const [slabLoad, setSlabLoad] = React.useState("450");
@@ -232,6 +232,16 @@ function VigaSecundariaCalculator({ onAddToBudget }: { onAddToBudget: (item: Bud
   const [distributedLoad, setDistributedLoad] = React.useState(0);
   const [error, setError] = React.useState<string | null>(null);
   const { toast } = useToast();
+  
+  const handleApplySlabLoad = () => {
+    if (lastSlabLoad > 0) {
+      setSlabLoad(lastSlabLoad.toFixed(0));
+      toast({
+        title: "Carga da Laje Aplicada!",
+        description: `O valor ${lastSlabLoad.toFixed(0)} kgf/m² foi inserido no campo de carga.`
+      })
+    }
+  }
 
   const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -344,7 +354,14 @@ function VigaSecundariaCalculator({ onAddToBudget }: { onAddToBudget: (item: Bud
               <Input id="vs-spacing" type="text" inputMode="decimal" value={spacing} onChange={(e) => handleInputChange(setSpacing, e.target.value)} placeholder="Ex: 1,5" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="vs-slab-load">Carga Total da Laje (kgf/m²)</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="vs-slab-load">Carga Total da Laje (kgf/m²)</Label>
+                {lastSlabLoad > 0 && (
+                   <Button variant="ghost" size="icon" className="h-6 w-6 text-primary" onClick={handleApplySlabLoad}>
+                     <RefreshCw className="h-4 w-4"/>
+                   </Button>
+                )}
+              </div>
               <Input id="vs-slab-load" type="text" inputMode="decimal" value={slabLoad} onChange={(e) => handleInputChange(setSlabLoad, e.target.value)} placeholder="Ex: 450" />
             </div>
           </div>
@@ -382,11 +399,12 @@ function VigaSecundariaCalculator({ onAddToBudget }: { onAddToBudget: (item: Bud
   );
 }
 
-function SteelDeckCalculator() {
+function SteelDeckCalculator({ onCalculated }: { onCalculated: (load: number) => void}) {
     const [selectedDeckId, setSelectedDeckId] = React.useState<string>(steelDeckData[0].nome);
     const [concreteThickness, setConcreteThickness] = React.useState<string>("10");
     const [extraLoad, setExtraLoad] = React.useState<string>("250");
     const [totalLoad, setTotalLoad] = React.useState<number>(0);
+    const { toast } = useToast();
 
     const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -395,7 +413,7 @@ function SteelDeckCalculator() {
         }
     };
 
-    React.useEffect(() => {
+    const handleCalculate = () => {
         const deck = steelDeckData.find(d => d.nome === selectedDeckId);
         if (!deck) return;
 
@@ -406,10 +424,19 @@ function SteelDeckCalculator() {
             const concreteWeight = (h_cm / 100) * PESO_CONCRETO_KGF_M3;
             const finalLoad = deck.pesoProprio + concreteWeight + S_kgf;
             setTotalLoad(finalLoad);
+            onCalculated(finalLoad);
+            toast({
+              title: "Cálculo da Laje Concluído!",
+              description: `A carga total de ${finalLoad.toFixed(0)} kgf/m² foi calculada e está pronta para ser usada na aba de vigas secundárias.`,
+            })
         } else {
             setTotalLoad(0);
         }
+    };
 
+    React.useEffect(() => {
+        // Reset total load if inputs change before recalculating
+        setTotalLoad(0);
     }, [selectedDeckId, concreteThickness, extraLoad]);
 
     const selectedDeck = steelDeckData.find(d => d.nome === selectedDeckId);
@@ -450,6 +477,7 @@ function SteelDeckCalculator() {
                         <Input id="extra-load" type="text" inputMode="decimal" value={extraLoad} onChange={e => handleInputChange(setExtraLoad, e.target.value)} placeholder="Ex: 250"/>
                     </div>
                 </div>
+                 <Button onClick={handleCalculate} className="w-full md:w-auto">Calcular Carga da Laje</Button>
 
                 {totalLoad > 0 && selectedDeck && (
                      <Card className="mt-4 bg-primary/5 border-primary/20">
@@ -460,13 +488,13 @@ function SteelDeckCalculator() {
                             <div className="text-center py-2">
                                 <p className="text-sm text-muted-foreground">Carga Total da Laje (kgf/m²)</p>
                                 <p className="text-4xl font-bold text-primary">{formatNumber(totalLoad, 0)}</p>
-                                <p className="text-xs text-muted-foreground mt-1">Use este valor no campo "Carga Total da Laje" da calculadora de Vigas Secundárias.</p>
+                                <p className="text-xs text-muted-foreground mt-1">Agora, vá para a aba "Viga Secundária" e use este valor.</p>
                             </div>
                             <Separator />
-                            <div className="text-xs pt-2">
-                                <p><strong>Peso Próprio do Deck:</strong> {formatNumber(selectedDeck.pesoProprio)} kgf/m²</p>
-                                <p><strong>Peso do Concreto (h={concreteThickness}cm):</strong> {formatNumber((parseFloat(concreteThickness.replace(',','.'))/100) * PESO_CONCRETO_KGF_M3)} kgf/m²</p>
-                                <p><strong>Sobrecarga:</strong> {formatNumber(parseFloat(extraLoad.replace(',','.')))} kgf/m²</p>
+                            <div className="text-xs pt-2 grid grid-cols-3 gap-x-2">
+                                <p><strong>Peso Próprio:</strong><br/>{formatNumber(selectedDeck.pesoProprio)} kgf/m²</p>
+                                <p><strong>Peso do Concreto:</strong><br/>{formatNumber((parseFloat(concreteThickness.replace(',','.'))/100) * PESO_CONCRETO_KGF_M3)} kgf/m²</p>
+                                <p><strong>Sobrecarga:</strong><br/>{formatNumber(parseFloat(extraLoad.replace(',','.')))} kgf/m²</p>
                             </div>
                         </CardContent>
                     </Card>
@@ -478,6 +506,7 @@ function SteelDeckCalculator() {
 
 export default function Page() {
   const [budgetItems, setBudgetItems] = React.useState<BudgetItem[]>([]);
+  const [lastSlabLoad, setLastSlabLoad] = React.useState(0);
   const { toast } = useToast();
 
   const handleAddToBudget = (item: BudgetItem) => {
@@ -519,23 +548,23 @@ export default function Page() {
         <div className="container mx-auto p-4 space-y-4">
             <Tabs defaultValue="viga-principal" className="w-full">
                 <TabsList className="grid w-full grid-cols-5">
-                    <TabsTrigger value="viga-principal">Viga Principal (W)</TabsTrigger>
-                    <TabsTrigger value="viga-secundaria">Viga Secundária (IPE)</TabsTrigger>
+                    <TabsTrigger value="laje-deck">1. Laje Steel Deck</TabsTrigger>
+                    <TabsTrigger value="viga-secundaria">2. Viga Secundária (IPE)</TabsTrigger>
+                    <TabsTrigger value="viga-principal">3. Viga Principal (W)</TabsTrigger>
                     <TabsTrigger value="tercas" disabled>Terças (U, C, Z)</TabsTrigger>
-                    <TabsTrigger value="laje-deck">Laje Steel Deck</TabsTrigger>
                     <TabsTrigger value="tirantes" disabled>Tirantes</TabsTrigger>
                 </TabsList>
-                <TabsContent value="viga-principal">
-                    <VigaPrincipalCalculator onAddToBudget={handleAddToBudget} />
+                <TabsContent value="laje-deck">
+                    <SteelDeckCalculator onCalculated={setLastSlabLoad} />
                 </TabsContent>
                 <TabsContent value="viga-secundaria">
-                    <VigaSecundariaCalculator onAddToBudget={handleAddToBudget} />
+                    <VigaSecundariaCalculator onAddToBudget={handleAddToBudget} lastSlabLoad={lastSlabLoad}/>
+                </TabsContent>
+                 <TabsContent value="viga-principal">
+                    <VigaPrincipalCalculator onAddToBudget={handleAddToBudget} />
                 </TabsContent>
                  <TabsContent value="tercas">
                      <Card><CardHeader><CardTitle>Em Breve</CardTitle><CardDescription>A calculadora para terças e perfis formados a frio está em desenvolvimento.</CardDescription></CardHeader></Card>
-                </TabsContent>
-                 <TabsContent value="laje-deck">
-                    <SteelDeckCalculator />
                 </TabsContent>
                  <TabsContent value="tirantes">
                     <Card><CardHeader><CardTitle>Em Breve</CardTitle><CardDescription>A calculadora para tirantes e elementos de tração está em desenvolvimento.</CardDescription></CardHeader></Card>
@@ -610,5 +639,3 @@ export default function Page() {
       </Dashboard>
   );
 }
-
-    

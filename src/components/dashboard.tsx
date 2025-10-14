@@ -17,7 +17,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
-import { Search, Warehouse, SlidersHorizontal, PlusCircle, Link as LinkIcon, Scissors, ClipboardList, Home, Sheet } from "lucide-react";
+import { Search, Warehouse, SlidersHorizontal, PlusCircle, Link as LinkIcon, Scissors, ClipboardList, Home, Sheet, Ruler, Variable, BookOpen, Calculator, Library } from "lucide-react";
 import { PriceControls } from "./price-controls";
 import { ItemTable } from "./item-table";
 import { Icon } from "./icons";
@@ -389,7 +389,7 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
           </Link>
         </SidebarHeader>
         <SidebarContent className="p-1">
-           <Accordion type="multiple" defaultValue={CATEGORY_GROUPS.map(g => g.title)} className="w-full flex flex-col gap-1">
+           <Accordion type="multiple" defaultValue={[...CATEGORY_GROUPS.map(g => g.title), 'Perfis de Aço']} className="w-full flex flex-col gap-1">
             {CATEGORY_GROUPS.map((group) => (
                <AccordionItem value={group.title} key={group.title} className="border-none rounded-lg bg-sidebar-accent/10 p-1">
                  <AccordionTrigger className="p-2 text-sm font-semibold text-sidebar-primary hover:no-underline [&[data-state=open]>svg]:-rotate-180">
@@ -447,6 +447,55 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
                  </AccordionContent>
                </AccordionItem>
             ))}
+             <AccordionItem value="Perfis de Aço" className="border-none rounded-lg bg-sidebar-accent/10 p-1">
+                <AccordionTrigger className="p-2 text-sm font-semibold text-sidebar-primary hover:no-underline [&[data-state=open]>svg]:-rotate-180">
+                    Perfis de Aço
+                </AccordionTrigger>
+                <AccordionContent className="pt-1">
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <Link href="/perfis/variaveis" passHref>
+                                <SidebarMenuButton className="w-full justify-start h-8">
+                                    <Variable />
+                                    <span>Variáveis dos Perfis</span>
+                                </SidebarMenuButton>
+                            </Link>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <Link href="/perfis/tabela" passHref>
+                                <SidebarMenuButton className="w-full justify-start h-8">
+                                    <Ruler />
+                                    <span>Tabela de Perfis</span>
+                                </SidebarMenuButton>
+                            </Link>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <Link href="/perfis/informacoes" passHref>
+                                <SidebarMenuButton className="w-full justify-start h-8">
+                                    <BookOpen />
+                                    <span>Informações Técnicas</span>
+                                </SidebarMenuButton>
+                            </Link>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <Link href="/perfis/calculadora" passHref>
+                                <SidebarMenuButton className="w-full justify-start h-8">
+                                    <Calculator />
+                                    <span>Calculadora</span>
+                                </SidebarMenuButton>
+                            </Link>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <Link href="/perfis/parametros-vigas-i" passHref>
+                                <SidebarMenuButton className="w-full justify-start h-8">
+                                    <Library />
+                                    <span>Parâmetros Vigas I</span>
+                                </SidebarMenuButton>
+                            </Link>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </AccordionContent>
+            </AccordionItem>
           </Accordion>
         </SidebarContent>
       </Sidebar>
@@ -585,5 +634,6 @@ export function Dashboard({ initialCategoryId }: { initialCategoryId?: string })
   )
 }
  
+    
 
     

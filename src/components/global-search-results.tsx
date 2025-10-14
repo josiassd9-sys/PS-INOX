@@ -191,22 +191,10 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
       const integerPart = parts[0];
       const decimalPart = parts[1];
 
-      let thousandsPart = '';
-      let hundredsPart = '';
-
-      if (integerPart.includes('.')) {
-        const integerSplits = integerPart.split('.');
-        thousandsPart = integerSplits.slice(0, -1).join('.') + '.';
-        hundredsPart = integerSplits.slice(-1)[0];
-      } else {
-        hundredsPart = integerPart;
-      }
-
       return (
         <div className="flex items-baseline justify-end tabular-nums font-sans">
-          <span className="text-[15px] font-semibold">{thousandsPart}</span>
-          <span className="text-[12px] font-semibold">{hundredsPart}</span>
-          <span className="text-[9px] self-start mt-px">,{decimalPart}</span>
+          <span className="text-sm font-semibold">{integerPart}</span>
+          <span className="text-[10px] self-start mt-px">,{decimalPart}</span>
         </div>
       );
     };
@@ -218,9 +206,9 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
       const decimalPart = parts[1];
       
       return (
-          <div className="flex items-baseline justify-center tabular-nums font-sans text-[hsl(var(--text-item-red))]">
-              <span className="text-[11px] font-semibold">{integerPart}</span>
-              <span className="text-[8px] self-start mt-px">,{decimalPart}</span>
+          <div className="flex items-baseline justify-center tabular-nums font-sans text-destructive">
+              <span className="text-xs font-semibold">{integerPart}</span>
+              <span className="text-[9px] self-start mt-px">,{decimalPart}</span>
           </div>
       )
     }
@@ -240,23 +228,23 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
 
                     return (
                         <AccordionItem value={category.id} key={category.id} className="border rounded-lg overflow-hidden bg-card">
-                             <AccordionTrigger className="px-1 py-1 hover:bg-primary/10 text-lg font-semibold">
+                             <AccordionTrigger className="px-2 py-2 hover:bg-primary/10 text-base font-semibold">
                                 {category.name} ({connectionGroups.reduce((acc, g) => acc + g.items.length, 0)})
                             </AccordionTrigger>
                             <AccordionContent>
                                 {connectionGroups.map(group => (
                                      <Accordion type="single" collapsible key={group.id} className="w-full" >
                                         <AccordionItem value={group.id} className="border-t">
-                                            <AccordionTrigger className="px-1 py-1 bg-primary/5 hover:bg-primary/10 text-base font-semibold">
+                                            <AccordionTrigger className="px-2 py-1 bg-primary/5 hover:bg-primary/10 text-sm font-semibold">
                                                 {group.name} ({group.items.length})
                                             </AccordionTrigger>
                                             <AccordionContent className="p-0">
                                                 <Table>
                                                     <TableHeader>
                                                         <TableRow className="hover:bg-transparent flex">
-                                                            <TableHead className="flex-1 p-1 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Descrição</TableHead>
-                                                            <TableHead className="text-center p-1 w-[80px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Peso</TableHead>
-                                                            <TableHead className="text-center p-1 w-[80px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Preço</TableHead>
+                                                            <TableHead className="flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
+                                                            <TableHead className="text-center p-1 w-[80px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Peso</TableHead>
+                                                            <TableHead className="text-center p-1 w-[80px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Preço</TableHead>
                                                         </TableRow>
                                                     </TableHeader>
                                                     <TableBody>
@@ -270,16 +258,16 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
                                                                     onClick={() => handleItemSelection(item as any, category as any)}
                                                                     className={cn(
                                                                         "flex items-stretch cursor-pointer",
-                                                                        !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-even-bg))]",
+                                                                        !isEven ? "bg-row-odd-bg" : "bg-row-even-bg",
                                                                         isSelected && "bg-primary/20"
                                                                     )}
                                                                 >
-                                                                    <TableCell className="font-medium text-[hsl(var(--text-item-pink))] text-[11px] flex-1 p-1">{item.description}</TableCell>
-                                                                    <TableCell className={cn("text-center p-1 w-[80px]", !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}>
+                                                                    <TableCell className="font-medium text-text-item-pink text-xs flex-1 p-1">{item.description}</TableCell>
+                                                                    <TableCell className={cn("text-center p-1 w-[80px]", !isEven ? "bg-row-odd-bg" : "bg-row-pmq-bg")}>
                                                                         <div className="h-full flex items-center justify-center">{formatWeight(item.weight)}</div>
                                                                     </TableCell>
-                                                                    <TableCell className={cn("text-right font-semibold p-1 w-[80px]", !isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}>
-                                                                        <div className="h-full flex items-center justify-end text-[hsl(var(--sheet-total-price-fg))]">{formatCurrency(itemPrice)}</div>
+                                                                    <TableCell className={cn("text-right font-semibold p-1 w-[80px]", !isEven ? "bg-row-even-bg" : "bg-row-pmq-bg")}>
+                                                                        <div className="h-full flex items-center justify-end text-sheet-total-price-fg">{formatCurrency(itemPrice)}</div>
                                                                     </TableCell>
                                                                 </TableRow>
                                                                 {isSelected && (
@@ -313,7 +301,7 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
 
                 return (
                     <AccordionItem value={category.id} key={category.id} className="border rounded-lg overflow-hidden bg-card">
-                        <AccordionTrigger className="px-1 py-1 hover:bg-primary/10 text-lg font-semibold">
+                        <AccordionTrigger className="px-2 py-2 hover:bg-primary/10 text-base font-semibold">
                             {category.name} ({category.items.length})
                         </AccordionTrigger>
                         <AccordionContent className="p-0">
@@ -321,9 +309,9 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
                                 <Table>
                                     <TableHeader>
                                     <TableRow className="hover:bg-transparent flex">
-                                        <TableHead className="flex-1 p-1 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Descrição</TableHead>
-                                        <TableHead className="text-center p-1 w-[120px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Peso (kg/{(category as Category).unit})</TableHead>
-                                        <TableHead className="text-center p-1 w-[120px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Preço (R$/{(category as Category).unit})</TableHead>
+                                        <TableHead className="flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
+                                        <TableHead className="text-center p-1 w-[120px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Peso (kg/{(category as Category).unit})</TableHead>
+                                        <TableHead className="text-center p-1 w-[120px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Preço (R$/{(category as Category).unit})</TableHead>
                                     </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -343,26 +331,26 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
                                                         onClick={() => handleItemSelection(item as SteelItem, category as Category)}
                                                         className={cn(
                                                             "flex items-stretch cursor-pointer",
-                                                            !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-even-bg))]",
+                                                            !isEven ? "bg-row-odd-bg" : "bg-row-even-bg",
                                                             isSelected && "bg-primary/20"
                                                         )}
                                                     >
                                                         <TableCell 
                                                           onDoubleClick={() => handleCostAdjustmentClick(item as SteelItem, category as Category)}
-                                                          className="font-medium text-[hsl(var(--text-item-pink))] text-[11px] flex-1 p-1 flex items-center gap-1"
+                                                          className="font-medium text-text-item-pink text-xs flex-1 p-1 flex items-center gap-1"
                                                         >
                                                            {hasAdjustment && <Tag className="h-3 w-3 text-accent-price" />}
                                                             {item.description}
                                                         </TableCell>
-                                                        <TableCell className={cn("text-center p-1 w-[120px]", !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}>
+                                                        <TableCell className={cn("text-center p-1 w-[120px]", !isEven ? "bg-row-odd-bg" : "bg-row-pmq-bg")}>
                                                             <div className="h-full flex items-center justify-center">{formatWeight(item.weight)}</div>
                                                         </TableCell>
-                                                        <TableCell className={cn("text-right font-semibold p-1 w-[120px]", !isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}>
-                                                            <div className="h-full flex flex-col items-end justify-center text-[hsl(var(--sheet-total-price-fg))]">
+                                                        <TableCell className={cn("text-right font-semibold p-1 w-[120px]", !isEven ? "bg-row-even-bg" : "bg-row-pmq-bg")}>
+                                                            <div className="h-full flex flex-col items-end justify-center text-sheet-total-price-fg">
                                                                 {formatCurrency(itemPrice)}
                                                                 {(category as Category).unit === 'm' && (
                                                                     <div className="text-xs text-muted-foreground font-normal">
-                                                                        por barra: {formatCurrency(itemPrice * 6)}
+                                                                        / barra: {formatCurrency(itemPrice * 6)}
                                                                     </div>
                                                                 )}
                                                             </div>

@@ -56,22 +56,10 @@ export function ConnectionsTable({
     const integerPart = parts[0];
     const decimalPart = parts[1];
 
-    let thousandsPart = '';
-    let hundredsPart = '';
-
-    if (integerPart.includes('.')) {
-      const integerSplits = integerPart.split('.');
-      thousandsPart = integerSplits.slice(0, -1).join('.') + '.';
-      hundredsPart = integerSplits.slice(-1)[0];
-    } else {
-      hundredsPart = integerPart;
-    }
-
     return (
       <div className="flex items-baseline justify-end tabular-nums font-sans">
-        <span className="text-[15px] font-semibold">{thousandsPart}</span>
-        <span className="text-[12px] font-semibold">{hundredsPart}</span>
-        <span className="text-[9px] self-start mt-px">,{decimalPart}</span>
+        <span className="text-sm font-semibold">{integerPart}</span>
+        <span className="text-[10px] self-start mt-px">,{decimalPart}</span>
       </div>
     );
   };
@@ -83,9 +71,9 @@ export function ConnectionsTable({
     const decimalPart = parts[1];
     
     return (
-        <div className="flex items-baseline justify-center tabular-nums font-sans text-[hsl(var(--text-item-red))]">
-            <span className="text-[11px] font-semibold">{integerPart}</span>
-            <span className="text-[8px] self-start mt-px">,{decimalPart} kg</span>
+        <div className="flex items-baseline justify-center tabular-nums font-sans text-destructive">
+            <span className="text-xs font-semibold">{integerPart}</span>
+            <span className="text-[9px] self-start mt-px">,{decimalPart} kg</span>
         </div>
     )
   }
@@ -122,7 +110,7 @@ export function ConnectionsTable({
           key={group.id}
           className="border rounded-lg overflow-hidden bg-card"
         >
-          <AccordionTrigger className="px-1 py-1 hover:bg-primary/10 text-lg font-semibold">
+          <AccordionTrigger className="px-2 py-2 hover:bg-primary/10 text-base font-semibold">
             {group.name} ({group.items.length})
           </AccordionTrigger>
           <AccordionContent className="p-0">
@@ -130,9 +118,9 @@ export function ConnectionsTable({
               <Table>
                 <TableHeader>
                   <TableRow className="hover:bg-transparent flex">
-                      <TableHead className="flex-1 p-1 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Descrição</TableHead>
-                      <TableHead className="text-center p-1 w-[120px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Peso (kg/un)</TableHead>
-                      <TableHead className="text-center p-1 w-[120px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Preço (R$/un)</TableHead>
+                      <TableHead className="flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
+                      <TableHead className="text-center p-1 w-[120px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Peso (kg/un)</TableHead>
+                      <TableHead className="text-center p-1 w-[120px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Preço (R$/un)</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -146,12 +134,12 @@ export function ConnectionsTable({
                         key={item.id}
                         className={cn(
                             "flex items-stretch",
-                            !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-even-bg))]"
+                            !isEven ? "bg-row-odd-bg" : "bg-row-even-bg"
                         )}
                       >
-                        <TableCell className="font-medium text-[hsl(var(--text-item-pink))] text-[11px] flex-1 p-1">{item.description}</TableCell>
+                        <TableCell className="font-medium text-text-item-pink text-xs flex-1 p-1">{item.description}</TableCell>
                         <TableCell className={cn("text-center p-1 w-[120px]",
-                            !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-pmq-bg))]"
+                            !isEven ? "bg-row-odd-bg" : "bg-row-pmq-bg"
                           )}>
                            <Button
                               variant="outline"
@@ -165,9 +153,9 @@ export function ConnectionsTable({
                         </TableCell>
                         <TableCell className={cn(
                               "text-right font-semibold p-1 w-[120px]",
-                               !isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-pmq-bg))]"
+                               !isEven ? "bg-row-even-bg" : "bg-row-pmq-bg"
                           )}>
-                          <div className="h-full flex items-center justify-end text-[hsl(var(--sheet-total-price-fg))]">
+                          <div className="h-full flex items-center justify-end text-sheet-total-price-fg">
                             {formatCurrency(itemPrice)}
                           </div>
                         </TableCell>

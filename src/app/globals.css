@@ -43,21 +43,20 @@
     --sidebar-ring: 0 0% 60%;
 
     /* Cores para o padrão de planilha 'Lista de Materiais' */
-    --sheet-header-bg: 211 51% 34%; /* Azul escuro #2C5484 */
-    --sheet-header-fg: 0 0% 100%; /* Branco #FFFFFF */
-    --sheet-table-header-bg: 207 43% 41%; /* Azul médio #4578AA */
-    --sheet-table-header-fg: 0 0% 100%; /* Branco #FFFFFF */
+    --sheet-header-bg: 211 51% 34%;
+    --sheet-header-fg: 0 0% 100%;
+    --sheet-table-header-bg: 207 43% 41%;
+    --sheet-table-header-fg: 0 0% 100%;
 
-    --row-odd-bg: 0 0% 100%; /* Branco #FFFFFF */
-    --row-even-bg: 209 67% 95%; /* Azul muito claro #EAF4FA */
-    --row-pmq-bg: 202 81% 90%; /* Azul claro #D1ECF9 */
+    --row-odd-bg: 0 0% 100%;
+    --row-even-bg: 209 67% 95%;
+    --row-pmq-bg: 202 81% 90%;
     
-    --text-item-pink: 300 100% 38%; /* Rosa/roxo claro #C000C0 */
-    --text-item-red: 0 100% 50%; /* Vermelho vivo #FF0000 */
-
-    --sheet-total-bg: 211 51% 34%; /* Azul escuro #2C5484 */
-    --sheet-total-price-bg: 114 78% 90%; /* Verde claro #D9F5D6 */
-    --sheet-total-price-fg: 145 100% 34%; /* Verde escuro #00B050 */
+    --text-item-pink: 300 100% 38%;
+    
+    --sheet-total-bg: 211 51% 34%;
+    --sheet-total-price-bg: 114 78% 90%;
+    --sheet-total-price-fg: 145 100% 34%;
   }
   
 
@@ -109,7 +108,6 @@
     --row-pmq-bg: 205 20% 35%;
     
     --text-item-pink: 300 100% 78%;
-    --text-item-red: 0 100% 70%;
 
     --sheet-total-bg: 211 51% 34%;
     --sheet-total-price-bg: 114 30% 30%;
@@ -124,6 +122,21 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@layer utilities {
+    .bg-sheet-header-bg { @apply bg-[hsl(var(--sheet-header-bg))]; }
+    .text-sheet-header-fg { @apply text-[hsl(var(--sheet-header-fg))]; }
+    .bg-sheet-table-header-bg { @apply bg-[hsl(var(--sheet-table-header-bg))]; }
+    .text-sheet-table-header-fg { @apply text-[hsl(var(--sheet-table-header-fg))]; }
+    .bg-row-odd-bg { @apply bg-[hsl(var(--row-odd-bg))]; }
+    .bg-row-even-bg { @apply bg-[hsl(var(--row-even-bg))]; }
+    .bg-row-pmq-bg { @apply bg-[hsl(var(--row-pmq-bg))]; }
+    .text-text-item-pink { @apply text-[hsl(var(--text-item-pink))]; }
+    .bg-sheet-total-bg { @apply bg-[hsl(var(--sheet-total-bg))]; }
+    .border-sheet-header-bg { @apply border-[hsl(var(--sheet-header-bg))]; }
+    .bg-sheet-total-price-bg { @apply bg-[hsl(var(--sheet-total-price-bg))]; }
+    .text-sheet-total-price-fg { @apply text-[hsl(var(--sheet-total-price-fg))]; }
 }
 
 
@@ -155,7 +168,6 @@
   }
 
   .sidebar,
-  .sidebar > *,
   .sidebar-inset > .p-1 > .bg-background > header,
   div[role="tablist"], /* Hides the calculator tabs */
   div[role="tabpanel"] > .space-y-4 > .space-y-4 > .space-y-4:not(:last-child), /* Hides the calculator cards */
@@ -316,7 +328,3 @@
     height: auto !important;
    }
 }
-
-
-    
-    

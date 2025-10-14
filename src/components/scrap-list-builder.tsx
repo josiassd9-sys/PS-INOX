@@ -4,7 +4,6 @@
 
 import * as React from "react";
 import { Menu, Printer, Save, Search } from "lucide-react";
-import { PsInoxLogo } from "./ps-inox-logo";
 import { Input } from "./ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { v4 as uuidv4 } from "uuid";
@@ -19,7 +18,6 @@ import { ScrapCalculator } from "./scrap-calculator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "./ui/dialog";
 
 const SCRAP_LIST_KEY = "scrapBuilderList";
-const PRICE_PARAMS_LOCAL_STORAGE_KEY = "priceParamsState";
 
 
 interface ListItem extends SteelItem {
@@ -265,22 +263,10 @@ export function ScrapListBuilder() {
     const integerPart = parts[0];
     const decimalPart = parts[1];
 
-    let thousandsPart = '';
-    let hundredsPart = '';
-
-    if (integerPart.includes('.')) {
-      const integerSplits = integerPart.split('.');
-      thousandsPart = integerSplits.slice(0, -1).join('.') + '.';
-      hundredsPart = integerSplits.slice(-1)[0];
-    } else {
-      hundredsPart = integerPart;
-    }
-
     return (
       <div className="flex items-baseline justify-end tabular-nums font-sans">
-        <span className="text-[15px] font-semibold">{thousandsPart}</span>
-        <span className="text-[12px] font-semibold">{hundredsPart}</span>
-        <span className="text-[9px] self-start mt-px">,{decimalPart}</span>
+        <span className="text-sm font-semibold">{integerPart}</span>
+        <span className="text-[10px] self-start mt-px">,{decimalPart}</span>
       </div>
     );
   };
@@ -292,9 +278,9 @@ export function ScrapListBuilder() {
     const decimalPart = parts[1];
     
     return (
-        <div className="flex items-baseline justify-center tabular-nums font-sans text-[hsl(var(--text-item-red))]">
-            <span className="text-[11px] font-semibold">{integerPart}</span>
-            <span className="text-[8px] self-start mt-px">,{decimalPart} kg</span>
+        <div className="flex items-baseline justify-center tabular-nums font-sans text-destructive">
+            <span className="text-xs font-semibold">{integerPart}</span>
+            <span className="text-[9px] self-start mt-px">,{decimalPart} kg</span>
         </div>
     )
   }
@@ -306,7 +292,7 @@ export function ScrapListBuilder() {
     const decimalPart = parts[1];
     
     return (
-        <div className="flex items-baseline justify-center tabular-nums font-sans text-[hsl(var(--sheet-header-fg))]">
+        <div className="flex items-baseline justify-center tabular-nums font-sans text-sheet-header-fg">
             <span className="text-base font-bold">{integerPart}</span>
             <span className="text-sm self-start mt-px">,{decimalPart} kg</span>
         </div>
@@ -356,8 +342,8 @@ export function ScrapListBuilder() {
                     <Table>
                          <TableHeader>
                            <TableRow className="hover:bg-transparent flex">
-                               <TableHead className="flex-1 p-1 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Material (Composição)</TableHead>
-                               <TableHead className="text-center p-1 w-32 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Preço (R$/kg)</TableHead>
+                               <TableHead className="flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Material (Composição)</TableHead>
+                               <TableHead className="text-center p-1 w-32 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Preço (R$/kg)</TableHead>
                            </TableRow>
                        </TableHeader>
                        <TableBody>
@@ -367,15 +353,15 @@ export function ScrapListBuilder() {
                                 <TableRow 
                                     key={item.id}
                                     onClick={() => handleScrapItemClick(item)}
-                                    className={cn("flex items-stretch cursor-pointer", !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-even-bg))]")}
+                                    className={cn("flex items-stretch cursor-pointer", !isEven ? "bg-row-odd-bg" : "bg-row-even-bg")}
                                 >
-                                    <TableCell className="font-medium text-[hsl(var(--text-item-pink))] text-[11px] flex-1 p-1">
+                                    <TableCell className="font-medium text-text-item-pink text-xs flex-1 p-1">
                                         <div>{item.material}</div>
                                         <div className="text-xs text-muted-foreground">{item.composition}</div>
                                     </TableCell>
                                     <TableCell className={cn(
                                         "text-right font-semibold p-1 w-32 relative", 
-                                        !isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}
+                                        !isEven ? "bg-row-even-bg" : "bg-row-pmq-bg")}
                                     >
                                        {formatCurrency(item.price)}/kg
                                     </TableCell>
@@ -396,9 +382,9 @@ export function ScrapListBuilder() {
                    <Table>
                        <TableHeader>
                            <TableRow className="hover:bg-transparent flex">
-                               <TableHead className="flex-1 p-1 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Descrição</TableHead>
-                               <TableHead className="text-center p-1 w-[80px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">PMQ</TableHead>
-                               <TableHead className="text-center p-1 w-[80px] bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">VALOR</TableHead>
+                               <TableHead className="flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
+                               <TableHead className="text-center p-1 w-[80px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">PMQ</TableHead>
+                               <TableHead className="text-center p-1 w-[80px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">VALOR</TableHead>
                            </TableRow>
                        </TableHeader>
                        <TableBody>
@@ -410,24 +396,24 @@ export function ScrapListBuilder() {
                                     onClick={() => handleRowClick(item.listItemId)}
                                     className={cn(
                                         "flex items-stretch cursor-pointer",
-                                        !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-even-bg))]",
+                                        !isEven ? "bg-row-odd-bg" : "bg-row-even-bg",
                                         editingItemId === item.listItemId && "bg-primary/20"
                                     )}
                                 >
-                                  <TableCell className="font-medium text-[hsl(var(--text-item-pink))] text-[11px] flex-1 p-1">
+                                  <TableCell className="font-medium text-text-item-pink text-xs flex-1 p-1">
                                     {item.description}
                                   </TableCell>
                                   <TableCell className={cn("text-center p-1 w-[80px]",
-                                    !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}>
-                                      <div className="flex flex-col items-center justify-center h-full text-[hsl(var(--text-item-red))]">
-                                        <span className="text-xs">{item.unit === 'un' ? `${item.quantity} pç` : ''}</span>
+                                    !isEven ? "bg-row-odd-bg" : "bg-row-pmq-bg")}>
+                                      <div className="flex flex-col items-center justify-center h-full text-destructive">
+                                        <span className="text-[10px]">{item.unit === 'un' ? `${item.quantity} pç` : ''}</span>
                                         {formatWeight(item.weight)}
                                       </div>
                                   </TableCell>
                                   <TableCell className={cn(
                                       "text-right font-semibold p-1 w-[80px]",
-                                       !isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}>
-                                    <div className="h-full flex items-center justify-end text-[hsl(var(--sheet-total-price-fg))]">
+                                       !isEven ? "bg-row-even-bg" : "bg-row-pmq-bg")}>
+                                    <div className="h-full flex items-center justify-end text-sheet-total-price-fg">
                                       {formatPrice(item.price)}
                                     </div>
                                   </TableCell>
@@ -485,7 +471,7 @@ export function ScrapListBuilder() {
         </div>
 
         {scrapList.length > 0 && !searchTerm && (
-             <div id="material-list-footer" className="shrink-0 border-t-2 border-[hsl(var(--sheet-header-bg))] flex items-center" style={{backgroundColor: 'hsl(var(--sheet-total-bg))'}}>
+             <div id="material-list-footer" className="shrink-0 border-t-2 border-sheet-header-bg flex items-center bg-sheet-total-bg">
                 <div className="p-2 flex items-center gap-2">
                     <Link href="/calculator/package-checker" passHref className="print:hidden">
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10">
@@ -501,15 +487,15 @@ export function ScrapListBuilder() {
                 </div>
                 <div className="flex-1 p-2 flex flex-col items-end">
                     <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-[hsl(var(--sheet-header-fg))]">Peso Total</span>
+                        <span className="text-sm font-bold text-sheet-header-fg">Peso Total</span>
                         <div className="min-w-[120px] text-right">
                            {formatTotalWeight(totalListWeight)}
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold text-[hsl(var(--sheet-header-fg))]">Total</span>
-                         <div style={{backgroundColor: 'hsl(var(--sheet-total-price-bg))'}} className="p-2 min-w-[150px]">
-                            <span style={{color: 'hsl(var(--sheet-total-price-fg))'}} className="text-right text-lg font-bold block">{formatCurrency(totalListPrice)}</span>
+                        <span className="text-lg font-bold text-sheet-header-fg">Total</span>
+                         <div className="p-2 min-w-[150px] bg-sheet-total-price-bg">
+                            <span className="text-right text-lg font-bold block text-sheet-total-price-fg">{formatCurrency(totalListPrice)}</span>
                         </div>
                     </div>
                 </div>

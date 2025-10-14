@@ -82,7 +82,7 @@ function TableComponent() {
             <CardContent className="overflow-x-auto">
                 <Table>
                     <TableHeader>
-                        <TableRow>
+                        <TableRow className="text-xs">
                             <TableHead className="font-bold">Perfil</TableHead>
                             <TableHead>Peso (kg/m)</TableHead>
                             <TableHead>h (mm)</TableHead>
@@ -99,7 +99,7 @@ function TableComponent() {
                     </TableHeader>
                     <TableBody>
                         {filteredData.map((perfil) => (
-                            <TableRow key={perfil.nome}>
+                            <TableRow key={perfil.nome} className="text-xs">
                                 <TableCell className="font-medium">{perfil.nome}</TableCell>
                                 <TableCell>{perfil.peso.toFixed(1)}</TableCell>
                                 <TableCell>{perfil.h}</TableCell>

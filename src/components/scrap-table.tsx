@@ -123,10 +123,10 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
     }
   };
 
-  const handleFieldChange = (id: string, field: 'material' | 'composition' | 'price', value: string) => {
+  const handleFieldChange = (id: string, field: 'material' | 'composition' | 'price', value: string | number) => {
     const newItems = allItems.map(item => {
       if (item.id === id) {
-        if (field === 'price') {
+        if (field === 'price' && typeof value === 'string') {
           const priceAsNumber = parseFloat(value.replace(",", ".")) || 0;
           return { ...item, price: priceAsNumber };
         }
@@ -144,22 +144,7 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
   }
 
   const formatCurrency = (value: number) => {
-      const formatter = new Intl.NumberFormat('pt-BR', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-      });
-      const formatted = formatter.format(value); 
-
-      const parts = formatted.split(',');
-      const integerPart = parts[0];
-      const decimalPart = parts[1];
-
-      return (
-      <div className="flex items-baseline justify-end tabular-nums font-sans text-[hsl(var(--sheet-total-price-fg))]">
-          <span className="text-[12px] font-semibold">{integerPart}</span>
-          <span className="text-[9px] self-start mt-px">,{decimalPart}</span>
-      </div>
-      );
+      return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
   };
 
   const filteredAndVisibleItems = React.useMemo(() => {
@@ -249,8 +234,8 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
         <Table>
           <TableHeader className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
              <TableRow className="hover:bg-transparent flex">
-                <TableHead className="flex-1 p-1 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Material (Composição)</TableHead>
-                <TableHead className="text-center p-1 w-40 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Preço (R$/kg)</TableHead>
+                <TableHead className="flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Material (Composição)</TableHead>
+                <TableHead className="text-center p-1 w-40 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Preço (R$/kg)</TableHead>
               </TableRow>
           </TableHeader>
           <TableBody>
@@ -258,22 +243,22 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
                 filteredAndVisibleItems.map((item, index) => {
                     const isEven = index % 2 === 1;
                     return (
-                    <TableRow key={item.id} className={cn("flex items-stretch group", !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-even-bg))]")}>
-                        <TableCell className="font-medium text-[hsl(var(--text-item-pink))] text-[11px] flex-1 p-1">
+                    <TableRow key={item.id} className={cn("flex items-stretch group", !isEven ? "bg-row-odd-bg" : "bg-row-even-bg")}>
+                        <TableCell className="font-medium text-text-item-pink text-xs flex-1 p-1">
                             <Input
                                 value={item.material}
                                 onChange={(e) => handleFieldChange(item.id, 'material', e.target.value)}
-                                className="h-auto p-0 border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 font-medium"
+                                className="h-auto p-0 border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 font-medium text-text-item-pink text-xs"
                             />
                              <Input
                                 value={item.composition}
                                 onChange={(e) => handleFieldChange(item.id, 'composition', e.target.value)}
-                                className="h-auto p-0 border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-xs text-muted-foreground"
+                                className="h-auto p-0 border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-[10px] text-muted-foreground"
                             />
                         </TableCell>
                         <TableCell className={cn(
                             "text-right font-semibold p-1 w-40 relative flex items-center", 
-                            !isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}
+                            !isEven ? "bg-row-even-bg" : "bg-row-pmq-bg")}
                         >
                             <Input
                                 type="text"
@@ -284,8 +269,7 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
                                     const value = e.target.value;
                                     setAllItems(prevItems => prevItems.map(i => i.id === item.id ? {...i, price: parseFloat(value.replace(',', '.')) || 0} : i))
                                 }}
-                                className="h-8 w-24 text-right bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 pr-1"
-                                style={{color: 'hsl(var(--sheet-total-price-fg))'}}
+                                className="h-8 flex-1 text-right bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 pr-1 text-sm text-sheet-total-price-fg font-semibold"
                             />
                              <Button variant="ghost" size="icon" className="absolute right-8 top-1/2 -translate-y-1/2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => toggleItemVisibility(item.id)}>
                                 <Icon name="EyeOff" className="h-4 w-4 text-muted-foreground" />
@@ -315,5 +299,3 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
       </>
   );
 }
-
-    

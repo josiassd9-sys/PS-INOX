@@ -311,6 +311,14 @@ const CATEGORIES: Category[] = [
     items: [],
   },
   {
+    id: 'perfis/guia',
+    name: 'Guia da Calculadora',
+    description: 'Aprenda a usar a calculadora de estruturas passo a passo.',
+    icon: 'BookOpen',
+    unit: 'calc',
+    items: [],
+  },
+  {
     id: 'lista-materiais',
     name: 'Lista de Materiais',
     description: 'Crie e gerencie listas de materiais para projetos.',
@@ -378,12 +386,13 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
     {
         title: 'Perfis de Aço',
         items: [
+            CATEGORIES.find(c => c.id === 'perfis/guia')!,
+            CATEGORIES.find(c => c.id === 'perfis/calculadora')!,
             CATEGORIES.find(c => c.id === 'perfis/tabela-w')!,
             CATEGORIES.find(c => c.id === 'perfis/tabela-ipe')!,
             CATEGORIES.find(c => c.id === 'perfis/tabela-steel-deck')!,
             CATEGORIES.find(c => c.id === 'perfis/parametros-vigas-i')!,
             CATEGORIES.find(c => c.id === 'perfis/informacoes')!,
-            CATEGORIES.find(c => c.id === 'perfis/calculadora')!,
         ]
     },
 ];

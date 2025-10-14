@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import type { Category, ScrapItem } from "@/lib/data";
 import { Button } from "./ui/button";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +25,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Icon } from "./icons";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 interface ScrapTableProps {
   category: Category;
@@ -33,36 +34,53 @@ interface ScrapTableProps {
   searchTerm: string;
 }
 
+const LOCAL_STORAGE_ITEMS_KEY = "scrapTableCustomItems";
 const LOCAL_STORAGE_HIDDEN_KEY = "scrapTableHiddenItems";
 
 export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm }: ScrapTableProps) {
-  const [allItems, setAllItems] = React.useState<ScrapItem[]>(category.items as ScrapItem[]);
+  const { toast } = useToast();
+  const [allItems, setAllItems] = React.useState<ScrapItem[]>([]);
   const [hiddenItemIds, setHiddenItemIds] = React.useState<Set<string>>(new Set());
   
   const [newMaterial, setNewMaterial] = React.useState("");
   const [newComposition, setNewComposition] = React.useState("");
   const [newPrice, setNewPrice] = React.useState<string>("");
 
-  // Load hidden items from localStorage on initial render
   React.useEffect(() => {
     try {
+      const savedItems = localStorage.getItem(LOCAL_STORAGE_ITEMS_KEY);
+      if (savedItems) {
+        setAllItems(JSON.parse(savedItems));
+      } else {
+        setAllItems(category.items as ScrapItem[]);
+      }
       const savedHiddenIds = localStorage.getItem(LOCAL_STORAGE_HIDDEN_KEY);
       if (savedHiddenIds) {
         setHiddenItemIds(new Set(JSON.parse(savedHiddenIds)));
       }
     } catch (error) {
-      console.error("Failed to load hidden items from localStorage", error);
+      console.error("Failed to load data from localStorage", error);
+      setAllItems(category.items as ScrapItem[]);
     }
-  }, []);
+  }, [category.items]);
 
-  // Update localStorage when hidden items change
+  const saveData = (items: ScrapItem[], hiddenIds: Set<string>) => {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_ITEMS_KEY, JSON.stringify(items));
+      localStorage.setItem(LOCAL_STORAGE_HIDDEN_KEY, JSON.stringify(Array.from(hiddenIds)));
+    } catch (error) {
+      console.error("Failed to save data to localStorage", error);
+    }
+  };
+
+  const updateItems = (newItems: ScrapItem[]) => {
+    setAllItems(newItems);
+    saveData(newItems, hiddenItemIds);
+  };
+  
   const updateHiddenItems = (newHiddenIds: Set<string>) => {
     setHiddenItemIds(newHiddenIds);
-    try {
-      localStorage.setItem(LOCAL_STORAGE_HIDDEN_KEY, JSON.stringify(Array.from(newHiddenIds)));
-    } catch (error) {
-      console.error("Failed to save hidden items to localStorage", error);
-    }
+    saveData(allItems, newHiddenIds);
   };
 
   const toggleItemVisibility = (id: string) => {
@@ -78,10 +96,6 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
   const showAllItems = () => {
     updateHiddenItems(new Set());
   }
-
-  React.useEffect(() => {
-    setAllItems(category.items as ScrapItem[]);
-  }, [category]);
   
   const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -97,46 +111,56 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
         id: `custom-scrap-${Date.now()}`,
         material: newMaterial,
         composition: newComposition,
-        price: parseFloat(newPrice.replace(",", ".")),
+        price: parseFloat(newPrice.replace(",", ".")) || 0,
       };
-      setAllItems([...allItems, newItem]);
+      const newItems = [...allItems, newItem];
+      updateItems(newItems);
       setNewMaterial("");
       setNewComposition("");
       setNewPrice("");
       setIsDialogOpen(false);
+      toast({ title: "Item Adicionado!", description: `${newItem.material} foi adicionado à tabela.` });
     }
   };
 
-  const handlePriceChange = (id: string, newPriceValue: string) => {
-    const sanitizedValue = newPriceValue.replace(",", ".");
-    const priceAsNumber = parseFloat(sanitizedValue);
-    
-    setAllItems(prevItems => prevItems.map(item => {
-        if (item.id === id) {
-            return { ...item, price: isNaN(priceAsNumber) ? item.price : priceAsNumber };
+  const handleFieldChange = (id: string, field: 'material' | 'composition' | 'price', value: string) => {
+    const newItems = allItems.map(item => {
+      if (item.id === id) {
+        if (field === 'price') {
+          const priceAsNumber = parseFloat(value.replace(",", ".")) || 0;
+          return { ...item, price: priceAsNumber };
         }
-        return item;
-    }));
+        return { ...item, [field]: value };
+      }
+      return item;
+    });
+    updateItems(newItems);
+  };
+  
+  const handleDeleteItem = (id: string) => {
+    const newItems = allItems.filter(item => item.id !== id);
+    updateItems(newItems);
+    toast({ title: "Item Removido", description: "O item foi removido da tabela." });
   }
 
-    const formatCurrency = (value: number) => {
-        const formatter = new Intl.NumberFormat('pt-BR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-        });
-        const formatted = formatter.format(value); 
+  const formatCurrency = (value: number) => {
+      const formatter = new Intl.NumberFormat('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+      });
+      const formatted = formatter.format(value); 
 
-        const parts = formatted.split(',');
-        const integerPart = parts[0];
-        const decimalPart = parts[1];
+      const parts = formatted.split(',');
+      const integerPart = parts[0];
+      const decimalPart = parts[1];
 
-        return (
-        <div className="flex items-baseline justify-end tabular-nums font-sans text-[hsl(var(--sheet-total-price-fg))]">
-            <span className="text-[12px] font-semibold">{integerPart}</span>
-            <span className="text-[9px] self-start mt-px">,{decimalPart}</span>
-        </div>
-        );
-    };
+      return (
+      <div className="flex items-baseline justify-end tabular-nums font-sans text-[hsl(var(--sheet-total-price-fg))]">
+          <span className="text-[12px] font-semibold">{integerPart}</span>
+          <span className="text-[9px] self-start mt-px">,{decimalPart}</span>
+      </div>
+      );
+  };
 
   const filteredAndVisibleItems = React.useMemo(() => {
     const visibleItems = allItems.filter(item => !hiddenItemIds.has(item.id));
@@ -226,7 +250,7 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
           <TableHeader className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
              <TableRow className="hover:bg-transparent flex">
                 <TableHead className="flex-1 p-1 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Material (Composição)</TableHead>
-                <TableHead className="text-center p-1 w-32 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Preço (R$/kg)</TableHead>
+                <TableHead className="text-center p-1 w-40 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Preço (R$/kg)</TableHead>
               </TableRow>
           </TableHeader>
           <TableBody>
@@ -236,27 +260,38 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
                     return (
                     <TableRow key={item.id} className={cn("flex items-stretch group", !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-even-bg))]")}>
                         <TableCell className="font-medium text-[hsl(var(--text-item-pink))] text-[11px] flex-1 p-1">
-                            <div>{item.material}</div>
-                            <div className="text-xs text-muted-foreground">{item.composition}</div>
+                            <Input
+                                value={item.material}
+                                onChange={(e) => handleFieldChange(item.id, 'material', e.target.value)}
+                                className="h-auto p-0 border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 font-medium"
+                            />
+                             <Input
+                                value={item.composition}
+                                onChange={(e) => handleFieldChange(item.id, 'composition', e.target.value)}
+                                className="h-auto p-0 border-none bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-xs text-muted-foreground"
+                            />
                         </TableCell>
                         <TableCell className={cn(
-                            "text-right font-semibold p-1 w-32 relative", 
+                            "text-right font-semibold p-1 w-40 relative flex items-center", 
                             !isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}
                         >
                             <Input
                                 type="text"
                                 inputMode="decimal"
                                 value={item.price.toFixed(2).replace('.', ',')}
-                                onBlur={(e) => handlePriceChange(item.id, e.target.value)}
+                                onBlur={(e) => handleFieldChange(item.id, 'price', e.target.value)}
                                 onChange={(e) => {
                                     const value = e.target.value;
                                     setAllItems(prevItems => prevItems.map(i => i.id === item.id ? {...i, price: parseFloat(value.replace(',', '.')) || 0} : i))
                                 }}
-                                className="h-8 text-right bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 pr-8"
+                                className="h-8 w-24 text-right bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 pr-1"
                                 style={{color: 'hsl(var(--sheet-total-price-fg))'}}
                             />
-                             <Button variant="ghost" size="icon" className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => toggleItemVisibility(item.id)}>
+                             <Button variant="ghost" size="icon" className="absolute right-8 top-1/2 -translate-y-1/2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => toggleItemVisibility(item.id)}>
                                 <Icon name="EyeOff" className="h-4 w-4 text-muted-foreground" />
+                            </Button>
+                             <Button variant="ghost" size="icon" className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleDeleteItem(item.id)}>
+                                <Trash2 className="h-4 w-4 text-destructive" />
                             </Button>
                         </TableCell>
                     </TableRow>
@@ -280,3 +315,5 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
       </>
   );
 }
+
+    

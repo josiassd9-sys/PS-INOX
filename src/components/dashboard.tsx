@@ -287,7 +287,7 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
 
   const showCustomHeader = !searchTerm && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isConnectionsCategory && !isGaugeCategory;
   
-  const showTableHeader = selectedCategory && !isGaugeCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isPackageCheckerCategory && !isScaleCategory;
+  const showTableHeader = selectedCategory && !isGaugeCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isPackageCheckerCategory && !isScaleCategory;
 
 
   const renderContent = () => {
@@ -574,3 +574,4 @@ export function Dashboard({ initialCategoryId }: { initialCategoryId?: string })
     </SidebarProvider>
   )
 }
+ 

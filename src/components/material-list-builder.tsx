@@ -45,12 +45,14 @@ const initializePriceParams = (): Record<string, PriceParams> => {
   };
 
   try {
-    const savedParams = localStorage.getItem(PRICE_PARAMS_LOCAL_STORAGE_KEY);
-    if (savedParams) {
-      const parsed = JSON.parse(savedParams);
-      if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
-          params = parsed;
-      }
+    if (typeof window !== 'undefined') {
+        const savedParams = localStorage.getItem(PRICE_PARAMS_LOCAL_STORAGE_KEY);
+        if (savedParams) {
+          const parsed = JSON.parse(savedParams);
+          if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+              params = parsed;
+          }
+        }
     }
   } catch (error) {
     console.error("Failed to load price params from localStorage", error);
@@ -115,16 +117,18 @@ export function MaterialListBuilder() {
   
   React.useEffect(() => {
     try {
-        const savedList = localStorage.getItem(MATERIAL_LIST_KEY);
-        if (savedList) {
-            setMaterialList(JSON.parse(savedList));
-        }
+        if (typeof window !== 'undefined') {
+            const savedList = localStorage.getItem(MATERIAL_LIST_KEY);
+            if (savedList) {
+                setMaterialList(JSON.parse(savedList));
+            }
 
-        setPriceParams(initializePriceParams());
+            setPriceParams(initializePriceParams());
 
-        const savedAdjustments = localStorage.getItem(COST_ADJUSTMENTS_LOCAL_STORAGE_KEY);
-        if (savedAdjustments) {
-          setCostAdjustments(JSON.parse(savedAdjustments));
+            const savedAdjustments = localStorage.getItem(COST_ADJUSTMENTS_LOCAL_STORAGE_KEY);
+            if (savedAdjustments) {
+              setCostAdjustments(JSON.parse(savedAdjustments));
+            }
         }
 
     } catch(error) {

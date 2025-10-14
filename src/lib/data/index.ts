@@ -17,6 +17,8 @@ import { cantoneirasItems } from './cantoneiras';
 import { barrasChatasItems } from './barras-chatas';
 import { metalonQuadradoItems } from './metalon-quadrado';
 import { metalonRetangularItems } from './metalon-retangular';
+import { perfisIpeData } from './perfis-ipe';
+import { steelDeckData } from './steel-deck';
 
 const CATEGORIES: Category[] = [
   {
@@ -285,8 +287,8 @@ const CATEGORIES: Category[] = [
   },
   {
     id: 'perfis/calculadora',
-    name: 'Calculadora de Resistência',
-    description: 'Pré-dimensione o perfil de aço (W) mais leve para uma viga biapoiada com carga distribuída.',
+    name: 'Calculadora de Estruturas',
+    description: 'Dimensione vigas, vigas secundárias e lajes steel deck.',
     icon: 'Calculator',
     unit: 'calc',
     items: [],
@@ -369,3 +371,6 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
 
 export const ALL_CATEGORIES = CATEGORIES;
 export * from './types';
+export { perfisIpeData, steelDeckData };
+
+    

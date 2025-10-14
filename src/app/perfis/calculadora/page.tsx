@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const tiposAco = [
     { nome: "ASTM A36", fy: 250 },
@@ -31,7 +32,7 @@ type BudgetItem = {
   totalCost: number;
 };
 
-function CalculatorComponent() {
+function VigaPrincipalCalculator() {
   const [span, setSpan] = React.useState("5");
   const [load, setLoad] = React.useState("300");
   const [steelType, setSteelType] = React.useState(tiposAco[0].nome);
@@ -172,10 +173,10 @@ function CalculatorComponent() {
   const totalBudgetWeight = budgetItems.reduce((acc, item) => acc + item.totalWeight, 0);
 
   return (
-    <div className="container mx-auto p-4 space-y-4">
+    <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>Calculadora e Orçamento de Vigas</CardTitle>
+          <CardTitle>Calculadora de Viga Principal (Perfil W)</CardTitle>
           <CardDescription>
             Pré-dimensione o perfil W e adicione-o à lista para montar seu orçamento.
           </CardDescription>
@@ -312,7 +313,36 @@ function CalculatorComponent() {
 export default function Page() {
   return (
       <Dashboard initialCategoryId="perfis/calculadora">
-        <CalculatorComponent />
+        <div className="container mx-auto p-4">
+            <Tabs defaultValue="viga-principal" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="viga-principal">Vigas Principais (W)</TabsTrigger>
+                    <TabsTrigger value="viga-secundaria" disabled>Vigas Secundárias (IPE, U)</TabsTrigger>
+                    <TabsTrigger value="laje-deck" disabled>Laje Steel Deck</TabsTrigger>
+                </TabsList>
+                <TabsContent value="viga-principal">
+                    <VigaPrincipalCalculator />
+                </TabsContent>
+                <TabsContent value="viga-secundaria">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Em Breve</CardTitle>
+                            <CardDescription>A calculadora para vigas secundárias está em desenvolvimento.</CardDescription>
+                        </CardHeader>
+                    </Card>
+                </TabsContent>
+                 <TabsContent value="laje-deck">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Em Breve</CardTitle>
+                            <CardDescription>A calculadora para lajes steel deck está em desenvolvimento.</CardDescription>
+                        </CardHeader>
+                    </Card>
+                </TabsContent>
+            </Tabs>
+        </div>
       </Dashboard>
   );
 }
+
+    

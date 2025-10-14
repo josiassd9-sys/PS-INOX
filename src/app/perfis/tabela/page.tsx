@@ -127,7 +127,7 @@ function TableComponent() {
 
 export default function Page() {
   return (
-      <Dashboard initialCategoryId="perfis/tabela">
+      <Dashboard initialCategoryId="perfis/tabela-w">
           <TableComponent />
       </Dashboard>
   )

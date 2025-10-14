@@ -270,9 +270,25 @@ const CATEGORIES: Category[] = [
     items: [],
   },
   {
-    id: 'perfis/tabela',
-    name: 'Tabela de Perfis',
-    description: 'Consulte as propriedades geométricas e físicas dos perfis de aço padrão W (Gerdau/Açominas).',
+    id: 'perfis/tabela-w',
+    name: 'Tabela Perfis W',
+    description: 'Consulte as propriedades dos perfis de aço padrão W (Gerdau/Açominas).',
+    icon: 'Ruler',
+    unit: 'calc',
+    items: [],
+  },
+    {
+    id: 'perfis/tabela-ipe',
+    name: 'Tabela Perfis IPE',
+    description: 'Consulte as propriedades dos perfis de aço padrão IPE.',
+    icon: 'Ruler',
+    unit: 'calc',
+    items: [],
+  },
+  {
+    id: 'perfis/tabela-steel-deck',
+    name: 'Tabela Steel Deck',
+    description: 'Consulte as propriedades das chapas de Steel Deck.',
     icon: 'Ruler',
     unit: 'calc',
     items: [],
@@ -361,8 +377,10 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
     {
         title: 'Perfis de Aço',
         items: [
+            CATEGORIES.find(c => c.id === 'perfis/tabela-w')!,
+            CATEGORIES.find(c => c.id === 'perfis/tabela-ipe')!,
+            CATEGORIES.find(c => c.id === 'perfis/tabela-steel-deck')!,
             CATEGORIES.find(c => c.id === 'perfis/parametros-vigas-i')!,
-            CATEGORIES.find(c => c.id === 'perfis/tabela')!,
             CATEGORIES.find(c => c.id === 'perfis/informacoes')!,
             CATEGORIES.find(c => c.id === 'perfis/calculadora')!,
         ]
@@ -372,5 +390,3 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
 export const ALL_CATEGORIES = CATEGORIES;
 export * from './types';
 export { perfisIpeData, steelDeckData };
-
-    

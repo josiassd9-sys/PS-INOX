@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle, Calculator, PlusCircle, Trash2, Save, Printer, RefreshCw } from "lucide-react";
+import { CheckCircle, Calculator, PlusCircle, Trash2, Save, Printer, RefreshCw, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -27,16 +27,23 @@ const E_ACO_MPA = 200000; // Módulo de Elasticidade do Aço em MPa
 type BudgetItem = {
   id: string;
   perfil: Perfil | PerfilIpe | SteelDeck;
-  span?: number; // Opcional para itens como Steel Deck
+  span?: number; 
+  height?: number; 
   quantity: number;
-  weightPerBeam: number;
+  weightPerUnit: number;
   totalWeight: number;
-  costPerBeam: number;
+  costPerUnit: number;
   totalCost: number;
-  type: 'Viga Principal' | 'Viga Secundária' | 'Steel Deck';
+  type: 'Viga Principal' | 'Viga Secundária' | 'Steel Deck' | 'Pilar';
 };
 
-function VigaPrincipalCalculator({ onAddToBudget }: { onAddToBudget: (item: BudgetItem) => void }) {
+type SupportReaction = {
+  vigaPrincipal: number;
+  vigaSecundaria: number;
+};
+
+
+function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }: { onAddToBudget: (item: BudgetItem) => void, onReactionCalculated: (reaction: number) => void }) {
   const [span, setSpan] = React.useState("5");
   const [load, setLoad] = React.useState("300");
   const [steelType, setSteelType] = React.useState(tiposAco[0].nome);
@@ -45,6 +52,7 @@ function VigaPrincipalCalculator({ onAddToBudget }: { onAddToBudget: (item: Budg
   
   const [recommendedProfile, setRecommendedProfile] = React.useState<Perfil | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const [reaction, setReaction] = React.useState(0);
   const { toast } = useToast();
 
   const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
@@ -59,6 +67,7 @@ function VigaPrincipalCalculator({ onAddToBudget }: { onAddToBudget: (item: Budg
     const q_kgf_m = parseFloat(load.replace(",", "."));
     setError(null);
     setRecommendedProfile(null);
+    setReaction(0);
 
     if (isNaN(L_m) || isNaN(q_kgf_m) || L_m <= 0 || q_kgf_m <= 0) {
       setError("Por favor, insira valores válidos e positivos para o vão e a carga.");
@@ -71,7 +80,6 @@ function VigaPrincipalCalculator({ onAddToBudget }: { onAddToBudget: (item: Budg
         return;
     }
 
-    // --- Verificação de Resistência (Momento Fletor) ---
     const fy_MPa = selectedSteel.fy;
     const fy_kN_cm2 = fy_MPa / 10;
     const q_kN_m = q_kgf_m * 0.009807;
@@ -79,15 +87,12 @@ function VigaPrincipalCalculator({ onAddToBudget }: { onAddToBudget: (item: Budg
     const maxMoment_kNcm = maxMoment_kNm * 100;
     const requiredWx_cm3 = maxMoment_kNcm / fy_kN_cm2;
     
-    // --- Verificação de Deformação (Flecha) ---
     const L_cm = L_m * 100;
-    const allowedDeflection_cm = L_cm / 360; // L/360
+    const allowedDeflection_cm = L_cm / 360;
     const q_kN_cm = q_kN_m / 100;
     const E_kN_cm2 = E_ACO_MPA / 10;
-    // requiredIx = (5 * q * L^4) / (384 * E * delta_max)
     const requiredIx_cm4 = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * allowedDeflection_cm);
 
-    // Filtrar perfis que atendem a AMBOS os critérios
     const suitableProfiles = perfisData.filter(p => p.Wx >= requiredWx_cm3 && p.Ix >= requiredIx_cm4);
     
     if (suitableProfiles.length === 0) {
@@ -98,6 +103,13 @@ function VigaPrincipalCalculator({ onAddToBudget }: { onAddToBudget: (item: Budg
     const lightestProfile = suitableProfiles.reduce((lightest, current) => {
       return current.peso < lightest.peso ? current : lightest;
     });
+
+    // Calcular reação de apoio (viga biapoiada) = (q * L) / 2
+    const reaction_kN = (q_kN_m * L_m) / 2;
+    const reaction_kgf = reaction_kN / 0.009807;
+    setReaction(reaction_kgf);
+    onReactionCalculated(reaction_kgf);
+
 
     setRecommendedProfile(lightestProfile);
     toast({
@@ -129,9 +141,9 @@ function VigaPrincipalCalculator({ onAddToBudget }: { onAddToBudget: (item: Budg
         return;
     }
 
-    const weightPerBeam = recommendedProfile.peso * L;
-    const totalWeight = weightPerBeam * qty;
-    const costPerBeam = weightPerBeam * price;
+    const weightPerUnit = recommendedProfile.peso * L;
+    const totalWeight = weightPerUnit * qty;
+    const costPerUnit = weightPerUnit * price;
     const totalCost = totalWeight * price;
 
     const newItem: BudgetItem = {
@@ -139,15 +151,16 @@ function VigaPrincipalCalculator({ onAddToBudget }: { onAddToBudget: (item: Budg
         perfil: recommendedProfile,
         span: L,
         quantity: qty,
-        weightPerBeam,
+        weightPerUnit,
         totalWeight,
-        costPerBeam,
+        costPerUnit,
         totalCost,
         type: 'Viga Principal',
     };
 
     onAddToBudget(newItem);
-    setRecommendedProfile(null); // Reset for next calculation
+    setRecommendedProfile(null); 
+    setReaction(0);
     toast({
         title: "Item Adicionado!",
         description: `${qty}x viga(s) ${recommendedProfile.nome} adicionada(s) ao orçamento.`,
@@ -201,7 +214,7 @@ function VigaPrincipalCalculator({ onAddToBudget }: { onAddToBudget: (item: Budg
                 <CardHeader>
                     <AlertTitle className="text-primary font-bold flex items-center gap-2"><CheckCircle className="h-5 w-5"/> Perfil Recomendado</AlertTitle>
                     <AlertDescription className="space-y-2 pt-2">
-                        <p>Para um vão de <span className="font-semibold">{span}m</span> e carga de <span className="font-semibold">{load}kgf/m</span> com aço <span className="font-semibold">{steelType}</span>, o perfil mais leve que atende aos critérios de resistência e deformação (flecha L/360) é:</p>
+                        <p>Para um vão de <span className="font-semibold">{span}m</span> e carga de <span className="font-semibold">{load}kgf/m</span> com aço <span className="font-semibold">{steelType}</span>, o perfil mais leve que atende aos critérios é:</p>
                         <div className="text-2xl font-bold text-center py-2 text-primary">{recommendedProfile.nome}</div>
                          <p className="text-xs text-muted-foreground pt-1">
                             Agora, defina a quantidade e o preço para adicionar ao orçamento.
@@ -219,6 +232,9 @@ function VigaPrincipalCalculator({ onAddToBudget }: { onAddToBudget: (item: Budg
                             <Input id="pricePerKg" type="text" inputMode="decimal" value={pricePerKg} onChange={(e) => handleInputChange(setPricePerKg, e.target.value)} placeholder="Ex: 8,50" />
                         </div>
                     </div>
+                    {reaction > 0 && (
+                        <div className="text-sm text-center text-muted-foreground">Reação de apoio por extremidade: <span className="font-bold text-foreground">{reaction.toFixed(0)} kgf</span></div>
+                    )}
                     <Button onClick={handleAddToBudget} className="w-full gap-2"><PlusCircle/> Adicionar ao Orçamento</Button>
                 </CardContent>
             </Card>
@@ -230,7 +246,7 @@ function VigaPrincipalCalculator({ onAddToBudget }: { onAddToBudget: (item: Budg
 }
 
 
-function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudget: (item: BudgetItem) => void, lastSlabLoad: number }) {
+function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReactionCalculated }: { onAddToBudget: (item: BudgetItem) => void, lastSlabLoad: number, onReactionCalculated: (reaction: number) => void }) {
   const [span, setSpan] = React.useState("4");
   const [spacing, setSpacing] = React.useState("1.5");
   const [slabLoad, setSlabLoad] = React.useState("450");
@@ -241,6 +257,7 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
 
   const [recommendedProfile, setRecommendedProfile] = React.useState<PerfilIpe | null>(null);
   const [error, setError] = React.useState<string | null>(null);
+  const [reaction, setReaction] = React.useState(0);
   const { toast } = useToast();
   
   React.useEffect(() => {
@@ -275,6 +292,7 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
 
     setError(null);
     setRecommendedProfile(null);
+    setReaction(0);
 
     if (isNaN(L_m) || isNaN(q_dist_kgf_m) || L_m <= 0 || q_dist_kgf_m <= 0) {
       setError("Por favor, insira valores válidos e positivos para todos os campos.");
@@ -287,7 +305,6 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
         return;
     }
 
-    // --- Verificação de Resistência (Momento Fletor) ---
     const fy_MPa = selectedSteel.fy;
     const fy_kN_cm2 = fy_MPa / 10;
     const q_kN_m = q_dist_kgf_m * 0.009807;
@@ -295,14 +312,12 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
     const maxMoment_kNcm = maxMoment_kNm * 100;
     const requiredWx_cm3 = maxMoment_kNcm / fy_kN_cm2;
     
-    // --- Verificação de Deformação (Flecha) ---
     const L_cm = L_m * 100;
     const allowedDeflection_cm = L_cm / 360;
     const q_kN_cm = q_kN_m / 100;
     const E_kN_cm2 = E_ACO_MPA / 10;
     const requiredIx_cm4 = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * allowedDeflection_cm);
 
-    // Filtrar perfis que atendem a AMBOS os critérios
     const suitableProfiles = perfisIpeData.filter(p => p.Wx >= requiredWx_cm3 && p.Ix >= requiredIx_cm4);
     
     if (suitableProfiles.length === 0) {
@@ -313,6 +328,11 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
     const lightestProfile = suitableProfiles.reduce((lightest, current) => {
       return current.peso < lightest.peso ? current : lightest;
     });
+
+    const reaction_kN = (q_kN_m * L_m) / 2;
+    const reaction_kgf = reaction_kN / 0.009807;
+    setReaction(reaction_kgf);
+    onReactionCalculated(reaction_kgf);
 
     setRecommendedProfile(lightestProfile);
     toast({
@@ -335,9 +355,9 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
         return;
     }
 
-    const weightPerBeam = recommendedProfile.peso * L;
-    const totalWeight = weightPerBeam * qty;
-    const costPerBeam = weightPerBeam * price;
+    const weightPerUnit = recommendedProfile.peso * L;
+    const totalWeight = weightPerUnit * qty;
+    const costPerUnit = weightPerUnit * price;
     const totalCost = totalWeight * price;
 
     const newItem: BudgetItem = {
@@ -345,15 +365,16 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
         perfil: recommendedProfile,
         span: L,
         quantity: qty,
-        weightPerBeam,
+        weightPerUnit,
         totalWeight,
-        costPerBeam,
+        costPerUnit,
         totalCost,
         type: 'Viga Secundária',
     };
 
     onAddToBudget(newItem);
     setRecommendedProfile(null);
+    setReaction(0);
     toast({ title: "Item Adicionado!", description: `${qty}x viga(s) ${recommendedProfile.nome} adicionada(s).`})
   }
 
@@ -416,7 +437,7 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
                 <CardHeader>
                     <AlertTitle className="text-primary font-bold flex items-center gap-2"><CheckCircle className="h-5 w-5"/> Perfil IPE Recomendado</AlertTitle>
                     <AlertDescription className="space-y-2 pt-2">
-                        <p>Carga linear calculada na viga: <span className="font-semibold">{parseFloat(distributedLoad.replace(',','.')).toFixed(2)} kgf/m</span>. O perfil mais leve que atende aos critérios de resistência e deformação é:</p>
+                        <p>Carga linear calculada na viga: <span className="font-semibold">{parseFloat(distributedLoad.replace(',','.')).toFixed(2)} kgf/m</span>. O perfil mais leve que atende aos critérios é:</p>
                         <div className="text-2xl font-bold text-center py-2 text-primary">{recommendedProfile.nome}</div>
                     </AlertDescription>
                 </CardHeader>
@@ -431,6 +452,9 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
                             <Input id="vs-pricePerKg" type="text" inputMode="decimal" value={pricePerKg} onChange={(e) => handleInputChange(setPricePerKg, e.target.value)} placeholder="Ex: 8,50" />
                         </div>
                     </div>
+                     {reaction > 0 && (
+                        <div className="text-sm text-center text-muted-foreground">Reação de apoio por extremidade: <span className="font-bold text-foreground">{reaction.toFixed(0)} kgf</span></div>
+                    )}
                     <Button onClick={handleAddToBudget} className="w-full gap-2"><PlusCircle/> Adicionar ao Orçamento</Button>
                 </CardContent>
             </Card>
@@ -448,9 +472,8 @@ function SteelDeckCalculator({ onCalculated, onAddToBudget }: { onCalculated: (l
     const [totalLoad, setTotalLoad] = React.useState<number>(0);
     const { toast } = useToast();
 
-    // Budget fields
     const [quantity, setQuantity] = React.useState("1");
-    const [pricePerKg, setPricePerKg] = React.useState("7.80"); // Galvanized steel price
+    const [pricePerKg, setPricePerKg] = React.useState("7.80"); 
 
     const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -492,9 +515,8 @@ function SteelDeckCalculator({ onCalculated, onAddToBudget }: { onCalculated: (l
             return;
         }
 
-        // Assuming the deck is sold per square meter, we use its weight per m²
         const weightPerUnit = deck.pesoProprio; // weight in kg/m²
-        const totalWeight = weightPerUnit * qty; // Here quantity is treated as m²
+        const totalWeight = weightPerUnit * qty; 
         const costPerUnit = weightPerUnit * price;
         const totalCost = totalWeight * price;
 
@@ -502,9 +524,9 @@ function SteelDeckCalculator({ onCalculated, onAddToBudget }: { onCalculated: (l
             id: `${deck.nome}-${Date.now()}`,
             perfil: deck,
             quantity: qty,
-            weightPerBeam: weightPerUnit,
+            weightPerUnit: weightPerUnit,
             totalWeight,
-            costPerBeam: costPerUnit,
+            costPerUnit,
             totalCost,
             type: 'Steel Deck',
         };
@@ -514,7 +536,6 @@ function SteelDeckCalculator({ onCalculated, onAddToBudget }: { onCalculated: (l
     };
 
     React.useEffect(() => {
-        // Reset total load if inputs change before recalculating
         setTotalLoad(0);
     }, [selectedDeckId, concreteThickness, extraLoad]);
 
@@ -590,14 +611,220 @@ function SteelDeckCalculator({ onCalculated, onAddToBudget }: { onCalculated: (l
     );
 }
 
+function PilarCalculator({ onAddToBudget, supportReactions }: { onAddToBudget: (item: BudgetItem) => void, supportReactions: SupportReaction }) {
+    const [height, setHeight] = React.useState("3");
+    const [axialLoad, setAxialLoad] = React.useState("5000");
+    const [steelType, setSteelType] = React.useState(tiposAco[0].nome);
+    const [quantity, setQuantity] = React.useState("1");
+    const [pricePerKg, setPricePerKg] = React.useState("8.50");
+
+    const [recommendedProfile, setRecommendedProfile] = React.useState<Perfil | null>(null);
+    const [error, setError] = React.useState<string | null>(null);
+    const { toast } = useToast();
+
+    const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
+        const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
+        if (/^\d*[,.]?\d*$/.test(sanitizedValue)) {
+            setter(sanitizedValue);
+        }
+    };
+    
+    const handleApplyReaction = (reaction: number) => {
+        if (reaction > 0) {
+            const currentLoad = parseFloat(axialLoad.replace(',', '.')) || 0;
+            const newLoad = currentLoad + reaction;
+            setAxialLoad(newLoad.toFixed(0));
+            toast({
+                title: "Reação da Viga Aplicada!",
+                description: `A carga de ${reaction.toFixed(0)} kgf foi somada à carga axial do pilar.`
+            });
+        }
+    }
+
+    const handleCalculate = () => {
+        const H_m = parseFloat(height.replace(",", "."));
+        const P_kgf = parseFloat(axialLoad.replace(",", "."));
+        setError(null);
+        setRecommendedProfile(null);
+
+        if (isNaN(H_m) || isNaN(P_kgf) || H_m <= 0 || P_kgf <= 0) {
+            setError("Por favor, insira valores válidos para altura e carga axial.");
+            return;
+        }
+
+        const selectedSteel = tiposAco.find(s => s.nome === steelType);
+        if (!selectedSteel) {
+            setError("Tipo de aço inválido selecionado.");
+            return;
+        }
+        
+        // Verificação Simplificada por Compressão Axial
+        // Tensão = Força / Área -> Área_necessária = Força / Tensão_admissível
+        // Considera um fator de segurança e um fator redutor para flambagem simplificado.
+        const fy_MPa = selectedSteel.fy;
+        const FATOR_SEGURANCA_COMPRESSAO = 1.67;
+        const FATOR_REDUTOR_FLAMBAGEM_SIMPLIFICADO = 0.5;
+        
+        const tensao_admissivel_MPa = (fy_MPa / FATOR_SEGURANCA_COMPRESSAO) * FATOR_REDUTOR_FLAMBAGEM_SIMPLIFICADO;
+        const P_N = P_kgf * 9.807; // Converte kgf para Newtons
+        const requiredArea_mm2 = P_N / tensao_admissivel_MPa;
+        const requiredArea_cm2 = requiredArea_mm2 / 100;
+
+        const suitableProfiles = perfisData.filter(p => p.area >= requiredArea_cm2);
+        
+        if (suitableProfiles.length === 0) {
+            setError("Nenhum perfil W atende à área necessária para a carga especificada (considerando fatores de segurança simplificados). A carga pode ser muito alta.");
+            return;
+        }
+
+        const lightestProfile = suitableProfiles.reduce((lightest, current) => 
+            current.peso < lightest.peso ? current : lightest
+        );
+
+        setRecommendedProfile(lightestProfile);
+        toast({
+            title: "Cálculo do Pilar Concluído",
+            description: `O perfil recomendado é ${lightestProfile.nome}.`,
+        });
+    };
+
+    const handleAddToBudget = () => {
+        if (!recommendedProfile) {
+            toast({ variant: "destructive", title: "Nenhum Perfil Calculado" });
+            return;
+        }
+        const H = parseFloat(height.replace(",", "."));
+        const qty = parseInt(quantity);
+        const price = parseFloat(pricePerKg.replace(",", "."));
+
+        if (isNaN(H) || isNaN(qty) || isNaN(price) || H <= 0 || qty <= 0 || price <= 0) {
+            toast({ variant: "destructive", title: "Valores Inválidos" });
+            return;
+        }
+
+        const weightPerUnit = recommendedProfile.peso * H;
+        const totalWeight = weightPerUnit * qty;
+        const costPerUnit = weightPerUnit * price;
+        const totalCost = totalWeight * price;
+
+        const newItem: BudgetItem = {
+            id: `${recommendedProfile.nome}-pilar-${Date.now()}`,
+            perfil: recommendedProfile,
+            height: H,
+            quantity: qty,
+            weightPerUnit,
+            totalWeight,
+            costPerUnit,
+            totalCost,
+            type: 'Pilar',
+        };
+
+        onAddToBudget(newItem);
+        setRecommendedProfile(null);
+        toast({ title: "Pilar Adicionado!", description: `${qty}x pilar(es) ${recommendedProfile.nome} adicionado(s).` });
+    };
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Calculadora de Pilar (Coluna)</CardTitle>
+                <CardDescription>
+                    Dimensione um perfil W para um pilar submetido à carga axial.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="pilar-height">Altura do Pilar (m)</Label>
+                        <Input id="pilar-height" type="text" inputMode="decimal" value={height} onChange={e => handleInputChange(setHeight, e.target.value)} placeholder="Ex: 3,0" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="pilar-load">Carga Axial (kgf)</Label>
+                        <Input id="pilar-load" type="text" inputMode="decimal" value={axialLoad} onChange={e => handleInputChange(setAxialLoad, e.target.value)} placeholder="Ex: 5000" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="pilar-steel-type">Tipo de Aço</Label>
+                        <Select value={steelType} onValueChange={setSteelType}>
+                            <SelectTrigger id="pilar-steel-type">
+                                <SelectValue placeholder="Selecione o aço" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {tiposAco.map(aco => (
+                                    <SelectItem key={aco.nome} value={aco.nome}>{aco.nome}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </div>
+
+                {(supportReactions.vigaPrincipal > 0 || supportReactions.vigaSecundaria > 0) && (
+                     <div className="space-y-2 rounded-md border p-2">
+                        <p className="text-sm font-medium">Reações de Apoio Calculadas</p>
+                        <div className="flex gap-2">
+                             {supportReactions.vigaPrincipal > 0 && (
+                                <Button variant="outline" size="sm" onClick={() => handleApplyReaction(supportReactions.vigaPrincipal)} className="flex-1 gap-1">
+                                    <Send size={16}/> Enviar {supportReactions.vigaPrincipal.toFixed(0)} kgf (Viga Princ.)
+                                </Button>
+                            )}
+                            {supportReactions.vigaSecundaria > 0 && (
+                                <Button variant="outline" size="sm" onClick={() => handleApplyReaction(supportReactions.vigaSecundaria)} className="flex-1 gap-1">
+                                    <Send size={16}/> Enviar {supportReactions.vigaSecundaria.toFixed(0)} kgf (Viga Sec.)
+                                </Button>
+                            )}
+                        </div>
+                    </div>
+                )}
+                
+
+                <Button onClick={handleCalculate} className="w-full md:w-auto">Calcular Pilar</Button>
+
+                {error && <Alert variant="destructive"><AlertTitle>Erro</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
+                
+                {recommendedProfile && (
+                     <Card className="mt-4 bg-primary/5 border-primary/20">
+                        <CardHeader>
+                            <AlertTitle className="text-primary font-bold flex items-center gap-2"><CheckCircle className="h-5 w-5"/> Perfil Recomendado para Pilar</AlertTitle>
+                            <AlertDescription className="space-y-2 pt-2">
+                                <p>O perfil mais leve que atende à carga axial de <span className="font-semibold">{axialLoad} kgf</span> é:</p>
+                                <div className="text-2xl font-bold text-center py-2 text-primary">{recommendedProfile.nome}</div>
+                            </AlertDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4 border-t pt-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="pilar-quantity">Quantidade</Label>
+                                    <Input id="pilar-quantity" type="text" inputMode="numeric" value={quantity} onChange={e => handleInputChange(setQuantity, e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="pilar-pricePerKg">Preço Aço (R$/kg)</Label>
+                                    <Input id="pilar-pricePerKg" type="text" inputMode="decimal" value={pricePerKg} onChange={e => handleInputChange(setPricePerKg, e.target.value)} />
+                                </div>
+                            </div>
+                            <Button onClick={handleAddToBudget} className="w-full gap-2"><PlusCircle/> Adicionar ao Orçamento</Button>
+                        </CardContent>
+                    </Card>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
+
 export default function Page() {
   const [budgetItems, setBudgetItems] = React.useState<BudgetItem[]>([]);
   const [lastSlabLoad, setLastSlabLoad] = React.useState(0);
+  const [supportReactions, setSupportReactions] = React.useState<SupportReaction>({ vigaPrincipal: 0, vigaSecundaria: 0 });
   const { toast } = useToast();
 
   const handleAddToBudget = (item: BudgetItem) => {
     setBudgetItems(prev => [...prev, item]);
   };
+  
+  const handleVigaPrincipalReaction = (reaction: number) => {
+    setSupportReactions(prev => ({...prev, vigaPrincipal: reaction}));
+  }
+  const handleVigaSecundariaReaction = (reaction: number) => {
+    setSupportReactions(prev => ({...prev, vigaSecundaria: reaction}));
+  }
 
   const handleClearBudget = () => {
       setBudgetItems([]);
@@ -633,19 +860,23 @@ export default function Page() {
       <Dashboard initialCategoryId="perfis/calculadora">
         <div className="container mx-auto p-4 space-y-4 print:p-0">
             <Tabs defaultValue="laje-deck" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="laje-deck">1. Laje Steel Deck</TabsTrigger>
-                    <TabsTrigger value="viga-secundaria">2. Viga Secundária (IPE)</TabsTrigger>
-                    <TabsTrigger value="viga-principal">3. Viga Principal (W)</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-4">
+                    <TabsTrigger value="laje-deck">1. Laje</TabsTrigger>
+                    <TabsTrigger value="viga-secundaria">2. Viga Sec.</TabsTrigger>
+                    <TabsTrigger value="viga-principal">3. Viga Princ.</TabsTrigger>
+                    <TabsTrigger value="pilar">4. Pilar</TabsTrigger>
                 </TabsList>
                 <TabsContent value="laje-deck">
                     <SteelDeckCalculator onCalculated={setLastSlabLoad} onAddToBudget={handleAddToBudget} />
                 </TabsContent>
                 <TabsContent value="viga-secundaria">
-                    <VigaSecundariaCalculator onAddToBudget={handleAddToBudget} lastSlabLoad={lastSlabLoad}/>
+                    <VigaSecundariaCalculator onAddToBudget={handleAddToBudget} lastSlabLoad={lastSlabLoad} onReactionCalculated={handleVigaSecundariaReaction}/>
                 </TabsContent>
                  <TabsContent value="viga-principal">
-                    <VigaPrincipalCalculator onAddToBudget={handleAddToBudget} />
+                    <VigaPrincipalCalculator onAddToBudget={handleAddToBudget} onReactionCalculated={handleVigaPrincipalReaction} />
+                </TabsContent>
+                 <TabsContent value="pilar">
+                    <PilarCalculator onAddToBudget={handleAddToBudget} supportReactions={supportReactions} />
                 </TabsContent>
             </Tabs>
             
@@ -677,7 +908,7 @@ export default function Page() {
                                     <TableHead>Item</TableHead>
                                     <TableHead>Perfil/Descrição</TableHead>
                                     <TableHead className="text-center">Qtd.</TableHead>
-                                    <TableHead className="text-center">Vão/Área</TableHead>
+                                    <TableHead className="text-center">Vão/Área/Alt.</TableHead>
                                     <TableHead className="text-center">Peso/Unid. (kg)</TableHead>
                                     <TableHead className="text-center">Peso Total (kg)</TableHead>
                                     <TableHead className="text-right">Custo/Unid. (R$)</TableHead>
@@ -690,10 +921,12 @@ export default function Page() {
                                         <TableCell className="font-medium">{item.type}</TableCell>
                                         <TableCell>{(item.perfil as any).nome}</TableCell>
                                         <TableCell className="text-center">{item.quantity}</TableCell>
-                                        <TableCell className="text-center">{item.type === 'Steel Deck' ? `${item.quantity} m²` : `${formatNumber(item.span || 0)} m`}</TableCell>
-                                        <TableCell className="text-center">{formatNumber(item.weightPerBeam)}</TableCell>
+                                        <TableCell className="text-center">
+                                            {item.type === 'Steel Deck' ? `${item.quantity} m²` : item.type === 'Pilar' ? `${formatNumber(item.height || 0)} m` : `${formatNumber(item.span || 0)} m`}
+                                        </TableCell>
+                                        <TableCell className="text-center">{formatNumber(item.weightPerUnit)}</TableCell>
                                         <TableCell className="text-center font-semibold">{formatNumber(item.totalWeight)}</TableCell>
-                                        <TableCell className="text-right">{formatCurrency(item.costPerBeam)}</TableCell>
+                                        <TableCell className="text-right">{formatCurrency(item.costPerUnit)}</TableCell>
                                         <TableCell className="text-right font-semibold">{formatCurrency(item.totalCost)}</TableCell>
                                     </TableRow>
                                 ))}
@@ -717,5 +950,7 @@ export default function Page() {
       </Dashboard>
   );
 }
+
+    
 
     

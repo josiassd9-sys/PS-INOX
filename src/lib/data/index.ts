@@ -305,7 +305,7 @@ const CATEGORIES: Category[] = [
   {
     id: 'perfis/calculadora',
     name: 'Calculadora de Estruturas',
-    description: 'Dimensione vigas, vigas secundárias e lajes steel deck.',
+    description: 'Dimensione vigas, pilares e lajes steel deck.',
     icon: 'Calculator',
     unit: 'calc',
     items: [],
@@ -391,3 +391,5 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
 export const ALL_CATEGORIES = CATEGORIES;
 export * from './types';
 export { perfisData, perfisIpeData, steelDeckData };
+
+    

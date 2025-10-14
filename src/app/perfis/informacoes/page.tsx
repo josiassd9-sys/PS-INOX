@@ -10,14 +10,14 @@ import {
 } from "@/components/ui/accordion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "@/components/ui/table";
-import { Book, CheckCircle, Scale, PenRuler, Type, Layers, ZoomIn } from "lucide-react";
 import { Dashboard } from "@/components/dashboard";
+import { Icon } from "@/components/icons";
 
 const informacoes = [
     {
         id: "vistas",
         title: "Vistas Ortográficas: A Base de Tudo",
-        icon: PenRuler,
+        icon: "PenRuler",
         content: (
             <div>
                 <p className="mb-2">
@@ -37,7 +37,7 @@ const informacoes = [
     {
         id: "linhas",
         title: "O Alfabeto do Desenho: Tipos de Linhas",
-        icon: Type,
+        icon: "Type",
         content: (
             <Table>
                 <TableBody>
@@ -73,7 +73,7 @@ const informacoes = [
     {
         id: "cotagem",
         title: "Dimensionamento (Cotagem): As Medidas da Peça",
-        icon: Scale,
+        icon: "Scale",
         content: (
             <div>
                  <p className="mb-2">A cotagem é a parte do desenho que informa as dimensões e tolerâncias da peça. Elementos da cotagem:</p>
@@ -94,7 +94,7 @@ const informacoes = [
      {
         id: "simbologia",
         title: "Simbologia Essencial",
-        icon: CheckCircle,
+        icon: "CheckCircle",
         content: (
             <Table>
                 <TableBody>
@@ -125,7 +125,7 @@ const informacoes = [
     {
         id: "cortes",
         title: "Cortes e Seções: Vendo por Dentro",
-        icon: Layers,
+        icon: "Layers",
         content: (
              <div>
                 <p className="mb-2">
@@ -144,7 +144,7 @@ const informacoes = [
     {
         id: "escalas",
         title: "Escalas: A Proporção do Desenho",
-        icon: ZoomIn,
+        icon: "ZoomIn",
         content: (
             <div>
                 <p className="mb-2">A escala indica a relação entre o tamanho do desenho e o tamanho real da peça. É expressa como uma razão (ex: 1:2).</p>
@@ -162,7 +162,7 @@ const informacoes = [
     {
         id: "normas",
         title: "Principais Normas Técnicas de Estruturas",
-        icon: Book,
+        icon: "Book",
         content: (
             <div>
                 <p className="mb-2">
@@ -178,7 +178,7 @@ const informacoes = [
     {
         id: "tipos-aco",
         title: "Tipos de Aço Estrutural",
-        icon: CheckCircle,
+        icon: "CheckCircle",
         content: (
              <div>
                 <p className="mb-2">A resistência do perfil depende diretamente do tipo de aço utilizado. A propriedade mais importante é a tensão de escoamento (fy).</p>
@@ -214,7 +214,7 @@ const informacoes = [
     {
         id: "conceitos",
         title: "Conceitos Chave de Dimensionamento Estrutural",
-        icon: Scale,
+        icon: "Scale",
         content: (
             <div className="space-y-2">
                  <p>Para entender qual perfil escolher, é essencial conhecer dois conceitos:</p>
@@ -252,7 +252,7 @@ function InfoComponent() {
                 <AccordionItem value={info.id} key={info.id}>
                     <AccordionTrigger className="text-lg font-semibold hover:bg-primary/10 px-1">
                         <div className="flex items-center gap-2">
-                            <info.icon className="h-5 w-5 text-primary" />
+                            <Icon name={info.icon as any} className="h-5 w-5 text-primary" />
                             {info.title}
                         </div>
                     </AccordionTrigger>

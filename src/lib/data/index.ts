@@ -339,7 +339,7 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
     {
         title: 'OUTROS METAIS',
         items: [
-            CATEGORIES.find(c => c_id === 'tarugo-bronze')!,
+            CATEGORIES.find(c => c.id === 'tarugo-bronze')!,
             CATEGORIES.find(c => c.id === 'verg-aluminio')!,
             CATEGORIES.find(c => c.id === 'chapas-aluminio')!,
             CATEGORIES.find(c => c.id === 'verg-latao')!,

@@ -298,6 +298,20 @@ export function ScrapListBuilder() {
         </div>
     )
   }
+
+  const formatTotalWeight = (value: number) => {
+    const formatted = new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(value);
+    const parts = formatted.split(',');
+    const integerPart = parts[0];
+    const decimalPart = parts[1];
+    
+    return (
+        <div className="flex items-baseline justify-center tabular-nums font-sans text-[hsl(var(--sheet-header-fg))]">
+            <span className="text-base font-bold">{integerPart}</span>
+            <span className="text-sm self-start mt-px">,{decimalPart} kg</span>
+        </div>
+    )
+  }
   
   const totalListPrice = scrapList.reduce((acc, item) => acc + item.price, 0);
   const totalListWeight = scrapList.reduce((acc, item) => acc + item.weight, 0);
@@ -413,8 +427,7 @@ export function ScrapListBuilder() {
                                   </TableCell>
                                   <TableCell className={cn(
                                       "text-right font-semibold p-1 w-[80px]",
-                                       !isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-pmq-bg))]"
-                                  )}>
+                                       !isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}>
                                     <div className="h-full flex items-center justify-end text-[hsl(var(--sheet-total-price-fg))]">
                                       {formatPrice(item.price)}
                                     </div>
@@ -491,7 +504,7 @@ export function ScrapListBuilder() {
                     <div className="flex items-center gap-2">
                         <span className="text-sm font-bold text-[hsl(var(--sheet-header-fg))]">Peso Total</span>
                         <div className="min-w-[120px] text-right">
-                           <span className="text-right text-base font-bold block">{formatWeight(totalListWeight)}</span>
+                           {formatTotalWeight(totalListWeight)}
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -514,4 +527,3 @@ export function ScrapListBuilder() {
       </div>
   );
 }
-

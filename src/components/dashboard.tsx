@@ -96,7 +96,7 @@ const initializePriceParams = (): Record<string, PriceParams> => {
   return params;
 };
 
-function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }) {
+function DashboardComponent({ initialCategoryId, children }: { initialCategoryId: string, children?: React.ReactNode }) {
   const { toast } = useToast();
   const [priceParams, setPriceParams] = React.useState<Record<string, PriceParams>>({});
   
@@ -291,6 +291,8 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
 
 
   const renderContent = () => {
+    if (children) return children;
+
     if (!currentPriceParams) {
       return (
         <div className="flex items-center justify-center h-screen">
@@ -361,9 +363,9 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
     );
   }
   
-  const showPriceControls = selectedCategory && (selectedCategory.hasOwnPriceControls || (!isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isGaugeCategory));
+  const showPriceControls = selectedCategory && (selectedCategory.hasOwnPriceControls || (!isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isGaugeCategory && !children));
 
-  const showGlobalSearch = selectedCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isGaugeCategory;
+  const showGlobalSearch = selectedCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isGaugeCategory && !children;
 
   
   const priceControlTitle = () => {
@@ -398,13 +400,14 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
                  <AccordionContent className="pt-1">
                     <SidebarMenu>
                       {group.items.map((category) => {
-                          const href = category.id === 'gauge' ? '/gauge' : `/calculator/${category.id}`;
+                          const href = category.id.startsWith('perfis/') ? `/${category.id}` : `/calculator/${category.id}`;
                           return (
                             <SidebarMenuItem key={category.id}>
                               <Link href={href} passHref>
                                 <SidebarMenuButton
                                   isActive={selectedCategoryId === category.id && !searchTerm}
                                   className="w-full justify-start h-8"
+                                  onClick={() => handleSelectCategory(category.id)}
                                 >
                                   <Icon name={category.icon as any} />
                                   <span>{category.name}</span>
@@ -415,14 +418,6 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
                       })}
                        {group.title === 'FERRAMENTAS' && (
                         <>
-                          <SidebarMenuItem>
-                            <Link href="/retalho-inox" passHref>
-                              <SidebarMenuButton className="w-full justify-start h-8">
-                                  <Scissors />
-                                  <span>Retalho Inox</span>
-                              </SidebarMenuButton>
-                            </Link>
-                          </SidebarMenuItem>
                           <SidebarMenuItem>
                             <Link href="/lista-sucatas" passHref>
                               <SidebarMenuButton className="w-full justify-start h-8">
@@ -455,15 +450,15 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
                     <SidebarMenu>
                         <SidebarMenuItem>
                             <Link href="/perfis/parametros-vigas-i" passHref>
-                                <SidebarMenuButton className="w-full justify-start h-8">
+                                <SidebarMenuButton className="w-full justify-start h-8" isActive={selectedCategoryId === 'perfis/parametros-vigas-i'} onClick={() => handleSelectCategory('perfis/parametros-vigas-i')}>
                                     <Variable />
-                                    <span>Variáveis dos Perfis</span>
+                                    <span>Parâmetros Vigas I</span>
                                 </SidebarMenuButton>
                             </Link>
                         </SidebarMenuItem>
                         <SidebarMenuItem>
                             <Link href="/perfis/tabela" passHref>
-                                <SidebarMenuButton className="w-full justify-start h-8">
+                                <SidebarMenuButton className="w-full justify-start h-8" isActive={selectedCategoryId === 'perfis/tabela'} onClick={() => handleSelectCategory('perfis/tabela')}>
                                     <Ruler />
                                     <span>Tabela de Perfis</span>
                                 </SidebarMenuButton>
@@ -471,7 +466,7 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
                         </SidebarMenuItem>
                         <SidebarMenuItem>
                             <Link href="/perfis/informacoes" passHref>
-                                <SidebarMenuButton className="w-full justify-start h-8">
+                                <SidebarMenuButton className="w-full justify-start h-8" isActive={selectedCategoryId === 'perfis/informacoes'} onClick={() => handleSelectCategory('perfis/informacoes')}>
                                     <BookOpen />
                                     <span>Informações Técnicas</span>
                                 </SidebarMenuButton>
@@ -479,17 +474,9 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
                         </SidebarMenuItem>
                         <SidebarMenuItem>
                             <Link href="/perfis/calculadora" passHref>
-                                <SidebarMenuButton className="w-full justify-start h-8">
+                                <SidebarMenuButton className="w-full justify-start h-8" isActive={selectedCategoryId === 'perfis/calculadora'} onClick={() => handleSelectCategory('perfis/calculadora')}>
                                     <Calculator />
                                     <span>Calculadora</span>
-                                </SidebarMenuButton>
-                            </Link>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                            <Link href="/perfis/parametros-vigas-i" passHref>
-                                <SidebarMenuButton className="w-full justify-start h-8">
-                                    <Library />
-                                    <span>Parâmetros Vigas I</span>
                                 </SidebarMenuButton>
                             </Link>
                         </SidebarMenuItem>
@@ -508,8 +495,8 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
               <div className="flex items-center gap-1">
                 <SidebarTrigger className="md:hidden"/>
                 <div className="hidden md:block">
-                  <h2 className="text-lg font-semibold">{searchTerm ? 'Resultados da Busca' : selectedCategory?.name ?? 'Bem-vindo!'}</h2>
-                  <p className="text-sm text-muted-foreground">{searchTerm ? `Buscando por "${searchTerm}"` : selectedCategory?.description ?? 'Selecione uma categoria no menu para começar.'}</p>
+                  <h2 className="text-lg font-semibold">{children ? 'Perfis de Aço' : (searchTerm ? 'Resultados da Busca' : selectedCategory?.name ?? 'Bem-vindo!')}</h2>
+                  <p className="text-sm text-muted-foreground">{children ? '' : (searchTerm ? `Buscando por "${searchTerm}"` : selectedCategory?.description ?? 'Selecione uma categoria no menu para começar.')}</p>
                 </div>
               </div>
               
@@ -626,10 +613,10 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
   );
 }
 
-export function Dashboard({ initialCategoryId }: { initialCategoryId?: string }) {
+export function Dashboard({ initialCategoryId, children }: { initialCategoryId: string, children?: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <DashboardComponent initialCategoryId={initialCategoryId!} />
+      <DashboardComponent initialCategoryId={initialCategoryId} children={children} />
     </SidebarProvider>
   )
 }

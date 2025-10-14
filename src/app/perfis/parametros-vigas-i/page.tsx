@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Dashboard } from "@/components/dashboard";
 
 const parametros = [
     { variavel: "Altura total", simbolo: "h", unidade: "mm", explicacao: "Altura total da viga, da face externa de uma aba à outra." },
@@ -29,7 +30,7 @@ const parametros = [
     { variavel: "Número da bitola", simbolo: "-", unidade: "-", explicacao: "Nomenclatura comercial do perfil (ex: W200x21), indicando a série e o peso." },
 ];
 
-export default function Page() {
+function ParamsComponent() {
   return (
     <div className="container mx-auto p-4">
         <Card>
@@ -64,4 +65,14 @@ export default function Page() {
         </Card>
     </div>
   );
+}
+
+export default function Page() {
+  return (
+     <main className="min-h-screen bg-background">
+        <Dashboard initialCategoryId="perfis/parametros-vigas-i">
+            <ParamsComponent />
+        </Dashboard>
+    </main>
+  )
 }

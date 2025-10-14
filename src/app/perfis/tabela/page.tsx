@@ -12,8 +12,9 @@ import {
 } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { perfisData, Perfil } from "@/lib/data/perfis";
+import { Dashboard } from "@/components/dashboard";
 
-export default function Page() {
+function TableComponent() {
   return (
     <div className="container mx-auto p-4">
         <Card>
@@ -64,4 +65,14 @@ export default function Page() {
         </Card>
     </div>
   );
+}
+
+export default function Page() {
+  return (
+     <main className="min-h-screen bg-background">
+        <Dashboard initialCategoryId="perfis/tabela">
+            <TableComponent />
+        </Dashboard>
+    </main>
+  )
 }

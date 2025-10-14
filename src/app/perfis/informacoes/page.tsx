@@ -11,6 +11,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Book, CheckCircle, Scale } from "lucide-react";
+import { Dashboard } from "@/components/dashboard";
 
 const informacoes = [
     {
@@ -89,7 +90,7 @@ const informacoes = [
     }
 ]
 
-export default function Page() {
+function InfoComponent() {
   return (
     <div className="container mx-auto p-4">
         <Card className="mb-4">
@@ -117,5 +118,15 @@ export default function Page() {
             ))}
         </Accordion>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <main className="min-h-screen bg-background">
+        <Dashboard initialCategoryId="perfis/informacoes">
+            <InfoComponent />
+        </Dashboard>
+    </main>
   );
 }

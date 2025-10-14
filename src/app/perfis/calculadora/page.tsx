@@ -1,6 +1,7 @@
 
 "use client";
 
+import { Dashboard } from "@/components/dashboard";
 import * as React from "react";
 import { perfisData, Perfil } from "@/lib/data/perfis";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-export default function Page() {
+function CalculatorComponent() {
   const [span, setSpan] = React.useState("5"); // Vão em metros
   const [load, setLoad] = React.useState("300"); // Carga em kgf/m
   const [recommendedProfile, setRecommendedProfile] = React.useState<Perfil | null>(null);
@@ -128,6 +129,16 @@ export default function Page() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <main className="min-h-screen bg-background">
+      <Dashboard initialCategoryId="perfis/calculadora">
+        <CalculatorComponent />
+      </Dashboard>
+    </main>
   );
 }
     

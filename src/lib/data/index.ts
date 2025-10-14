@@ -250,7 +250,39 @@ const CATEGORIES: Category[] = [
     icon: 'Sheet',
     unit: 'calc',
     items: [],
-  }
+  },
+   {
+    id: 'perfis/parametros-vigas-i',
+    name: 'Parâmetros Vigas I',
+    description: 'Entenda o significado de cada propriedade geométrica e física que define um perfil de aço estrutural.',
+    icon: 'Variable',
+    unit: 'calc',
+    items: [],
+  },
+  {
+    id: 'perfis/tabela',
+    name: 'Tabela de Perfis',
+    description: 'Consulte as propriedades geométricas e físicas dos perfis de aço padrão W (Gerdau/Açominas).',
+    icon: 'Ruler',
+    unit: 'calc',
+    items: [],
+  },
+  {
+    id: 'perfis/informacoes',
+    name: 'Informações Técnicas',
+    description: 'Contexto e conceitos fundamentais para o uso e dimensionamento de perfis de aço estrutural.',
+    icon: 'BookOpen',
+    unit: 'calc',
+    items: [],
+  },
+  {
+    id: 'perfis/calculadora',
+    name: 'Calculadora de Resistência',
+    description: 'Pré-dimensione o perfil de aço (W) mais leve para uma viga biapoiada com carga distribuída.',
+    icon: 'Calculator',
+    unit: 'calc',
+    items: [],
+  },
 ];
 
 export const CATEGORY_GROUPS: CategoryGroup[] = [
@@ -296,11 +328,26 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
             CATEGORIES.find(c => c.id === 'desenho-tecnico')!,
             CATEGORIES.find(c => c.id === 'gauge')!,
         ]
-    }
-]
+    },
+];
 
-export const ALL_CATEGORIES = CATEGORY_GROUPS.flatMap(group => group.items);
+const perfisCategory = {
+    title: 'Perfis de Aço',
+    items: [
+        CATEGORIES.find(c => c.id === 'perfis/parametros-vigas-i')!,
+        CATEGORIES.find(c => c.id === 'perfis/tabela')!,
+        CATEGORIES.find(c => c.id === 'perfis/informacoes')!,
+        CATEGORIES.find(c => c.id === 'perfis/calculadora')!,
+    ]
+};
+
+// Adiciona o grupo de perfis à lista de grupos de categorias
+CATEGORY_GROUPS.push(perfisCategory);
+
+
+export const ALL_CATEGORIES = CATEGORIES;
 export * from './types';
+
 
 
 

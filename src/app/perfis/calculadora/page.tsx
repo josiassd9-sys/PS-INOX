@@ -234,15 +234,24 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
   const [span, setSpan] = React.useState("4");
   const [spacing, setSpacing] = React.useState("1.5");
   const [slabLoad, setSlabLoad] = React.useState("450");
+  const [distributedLoad, setDistributedLoad] = React.useState("");
   const [steelType, setSteelType] = React.useState(tiposAco[0].nome);
   const [quantity, setQuantity] = React.useState("1");
   const [pricePerKg, setPricePerKg] = React.useState("8.50");
 
   const [recommendedProfile, setRecommendedProfile] = React.useState<PerfilIpe | null>(null);
-  const [distributedLoad, setDistributedLoad] = React.useState(0);
   const [error, setError] = React.useState<string | null>(null);
   const { toast } = useToast();
   
+  React.useEffect(() => {
+    const E_m = parseFloat(spacing.replace(",", "."));
+    const S_kgf_m2 = parseFloat(slabLoad.replace(",", "."));
+    if (!isNaN(E_m) && !isNaN(S_kgf_m2) && E_m > 0 && S_kgf_m2 > 0) {
+      const q_dist_kgf_m = S_kgf_m2 * E_m;
+      setDistributedLoad(q_dist_kgf_m.toFixed(2).replace('.',','));
+    }
+  }, [slabLoad, spacing])
+
   const handleApplySlabLoad = () => {
     if (lastSlabLoad > 0) {
       setSlabLoad(lastSlabLoad.toFixed(0));
@@ -262,19 +271,15 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
 
   const handleCalculate = () => {
     const L_m = parseFloat(span.replace(",", "."));
-    const E_m = parseFloat(spacing.replace(",", "."));
-    const S_kgf_m2 = parseFloat(slabLoad.replace(",", "."));
+    const q_dist_kgf_m = parseFloat(distributedLoad.replace(",", "."));
+
     setError(null);
     setRecommendedProfile(null);
-    setDistributedLoad(0);
 
-    if (isNaN(L_m) || isNaN(E_m) || isNaN(S_kgf_m2) || L_m <= 0 || E_m <= 0 || S_kgf_m2 <= 0) {
+    if (isNaN(L_m) || isNaN(q_dist_kgf_m) || L_m <= 0 || q_dist_kgf_m <= 0) {
       setError("Por favor, insira valores válidos e positivos para todos os campos.");
       return;
     }
-
-    const q_dist_kgf_m = S_kgf_m2 * E_m; // Carga linear (kgf/m)
-    setDistributedLoad(q_dist_kgf_m);
     
     const selectedSteel = tiposAco.find(s => s.nome === steelType);
     if (!selectedSteel) {
@@ -362,27 +367,31 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
             <div className="space-y-2">
               <Label htmlFor="vs-span">Vão da Viga (m)</Label>
               <Input id="vs-span" type="text" inputMode="decimal" value={span} onChange={(e) => handleInputChange(setSpan, e.target.value)} placeholder="Ex: 4,0" />
+            </div>
+             <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                    <Label htmlFor="vs-slab-load">Carga da Laje (kgf/m²)</Label>
+                    {lastSlabLoad > 0 && (
+                    <Button variant="ghost" size="icon" className="h-6 w-6 text-primary" onClick={handleApplySlabLoad}>
+                        <RefreshCw className="h-4 w-4"/>
+                    </Button>
+                    )}
+                </div>
+                <Input id="vs-slab-load" type="text" inputMode="decimal" value={slabLoad} onChange={(e) => handleInputChange(setSlabLoad, e.target.value)} placeholder="Ex: 450" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="vs-spacing">Espaçamento entre Vigas (m)</Label>
               <Input id="vs-spacing" type="text" inputMode="decimal" value={spacing} onChange={(e) => handleInputChange(setSpacing, e.target.value)} placeholder="Ex: 1,5" />
             </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="vs-slab-load">Carga Total da Laje (kgf/m²)</Label>
-                {lastSlabLoad > 0 && (
-                   <Button variant="ghost" size="icon" className="h-6 w-6 text-primary" onClick={handleApplySlabLoad}>
-                     <RefreshCw className="h-4 w-4"/>
-                   </Button>
-                )}
-              </div>
-              <Input id="vs-slab-load" type="text" inputMode="decimal" value={slabLoad} onChange={(e) => handleInputChange(setSlabLoad, e.target.value)} placeholder="Ex: 450" />
+             <div className="space-y-2">
+              <Label htmlFor="vs-load">Carga na Viga (kgf/m)</Label>
+              <Input id="vs-load" type="text" inputMode="decimal" value={distributedLoad} onChange={(e) => handleInputChange(setDistributedLoad, e.target.value)} placeholder="Carga linear" />
             </div>
-            <div className="space-y-2">
+             <div className="space-y-2">
               <Label htmlFor="vs-steel-type">Tipo de Aço</Label>
                <Select value={steelType} onValueChange={setSteelType}>
                 <SelectTrigger id="vs-steel-type">
@@ -405,7 +414,7 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
                 <CardHeader>
                     <AlertTitle className="text-primary font-bold flex items-center gap-2"><CheckCircle className="h-5 w-5"/> Perfil IPE Recomendado</AlertTitle>
                     <AlertDescription className="space-y-2 pt-2">
-                        <p>Carga linear calculada na viga: <span className="font-semibold">{distributedLoad.toFixed(2)} kgf/m</span>. O perfil mais leve que atende aos critérios de resistência e deformação é:</p>
+                        <p>Carga linear calculada na viga: <span className="font-semibold">{parseFloat(distributedLoad.replace(',','.')).toFixed(2)} kgf/m</span>. O perfil mais leve que atende aos critérios de resistência e deformação é:</p>
                         <div className="text-2xl font-bold text-center py-2 text-primary">{recommendedProfile.nome}</div>
                     </AlertDescription>
                 </CardHeader>
@@ -577,7 +586,7 @@ export default function Page() {
   return (
       <Dashboard initialCategoryId="perfis/calculadora">
         <div className="container mx-auto p-4 space-y-4">
-            <Tabs defaultValue="viga-principal" className="w-full">
+            <Tabs defaultValue="laje-deck" className="w-full">
                 <TabsList className="grid w-full grid-cols-5">
                     <TabsTrigger value="laje-deck">1. Laje Steel Deck</TabsTrigger>
                     <TabsTrigger value="viga-secundaria">2. Viga Secundária (IPE)</TabsTrigger>

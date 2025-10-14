@@ -362,7 +362,7 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
               <Label htmlFor="vs-span">Vão da Viga (m)</Label>
               <Input id="vs-span" type="text" inputMode="decimal" value={span} onChange={(e) => handleInputChange(setSpan, e.target.value)} placeholder="Ex: 4,0" />
@@ -381,6 +381,19 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
                 )}
               </div>
               <Input id="vs-slab-load" type="text" inputMode="decimal" value={slabLoad} onChange={(e) => handleInputChange(setSlabLoad, e.target.value)} placeholder="Ex: 450" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="vs-steel-type">Tipo de Aço</Label>
+               <Select value={steelType} onValueChange={setSteelType}>
+                <SelectTrigger id="vs-steel-type">
+                  <SelectValue placeholder="Selecione o aço" />
+                </SelectTrigger>
+                <SelectContent>
+                  {tiposAco.map(aco => (
+                    <SelectItem key={aco.nome} value={aco.nome}>{aco.nome}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <Button onClick={handleCalculate} className="w-full md:w-auto">Calcular Viga Secundária</Button>
@@ -657,3 +670,5 @@ export default function Page() {
       </Dashboard>
   );
 }
+
+    

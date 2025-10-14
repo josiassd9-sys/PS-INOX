@@ -19,6 +19,24 @@ const AllianceRing = (props: LucideProps) => (
   </svg>
 );
 
+const ScrapClaw = (props: LucideProps) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M16.1 19.3L13 21l2-5.5-5-5-5 5L7 21l-3.1-1.7" />
+    <path d="M12 10.5V3" />
+    <path d="M5.1 4.2l-1.3 1.3" />
+    <path d="M18.9 4.2l1.3 1.3" />
+  </svg>
+);
+
 
 const customIcons = {
     RectangleHorizontal,
@@ -41,7 +59,8 @@ const customIcons = {
     AllianceRing,
     ClipboardList,
     Home,
-    Sheet
+    Sheet,
+    ScrapClaw
 }
 
 interface IconProps extends LucideProps {
@@ -56,3 +75,5 @@ export const Icon = ({ name, ...props }: IconProps) => {
   }
   return <LucideIcon {...props} />;
 };
+
+    

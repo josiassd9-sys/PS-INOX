@@ -426,7 +426,7 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
                           <SidebarMenuItem>
                             <Link href="/lista-sucatas" passHref>
                               <SidebarMenuButton className="w-full justify-start h-8">
-                                  <Icon name="Trash2" />
+                                  <Icon name="ScrapClaw" />
                                   <span>Lista de Sucatas</span>
                               </SidebarMenuButton>
                             </Link>
@@ -537,7 +537,7 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
             </header>
             
             <div className="flex-1 flex flex-col overflow-hidden">
-              {showTableHeader && (
+              {!searchTerm && showTableHeader && (
                 <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm -mx-1 px-1">
                     <div className="flex h-12 items-center border-b px-1 text-sm font-medium text-muted-foreground">
                         <div className="flex-1 px-1">Descrição</div>
@@ -585,3 +585,5 @@ export function Dashboard({ initialCategoryId }: { initialCategoryId?: string })
   )
 }
  
+
+    

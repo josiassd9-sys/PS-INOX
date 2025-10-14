@@ -9,7 +9,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "@/components/ui/table";
 import { Book, CheckCircle, Scale, PenRuler, Type, Layers, ZoomIn } from "lucide-react";
 import { Dashboard } from "@/components/dashboard";
 
@@ -273,3 +273,5 @@ export default function Page() {
       </Dashboard>
   );
 }
+
+    

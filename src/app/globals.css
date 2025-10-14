@@ -131,10 +131,101 @@
   body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+    background-color: white !important;
+    color: black !important;
   }
 
   .print\:hidden {
-    display: none;
+    display: none !important;
+  }
+  
+  .print\:block {
+    display: block !important;
+  }
+
+  .print\:text-black {
+    color: black !important;
+  }
+
+  .print\:bg-transparent {
+      background-color: transparent !important;
+  }
+  .print\:border-none {
+    border: none !important;
+  }
+
+  .sidebar,
+  .sidebar > *,
+  .sidebar-inset > .p-1 > .bg-background > header,
+  div[role="tablist"], /* Hides the calculator tabs */
+  div[role="tabpanel"] > .space-y-4 > .space-y-4 > .space-y-4:not(:last-child), /* Hides the calculator cards */
+  div[role="tabpanel"] > div > div:not(:last-child) { /* Hides calculator cards */
+    display: none !important;
+  }
+
+  .sidebar-inset {
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+  }
+
+  .sidebar-inset > .p-1 {
+    padding: 0 !important;
+    height: auto !important;
+  }
+  .sidebar-inset > .p-1 > .bg-background {
+    border: none !important;
+    height: auto !important;
+    padding: 0 !important;
+  }
+
+  .container {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+  
+  .container > .space-y-4 {
+    gap: 0 !important;
+  }
+  
+  div[role="tabpanel"] {
+    margin-top: 0 !important;
+  }
+
+  div[role="tabpanel"] > div > div > .overflow-x-auto {
+    overflow-x: visible !important;
+  }
+  
+  div[role="tabpanel"] > div > .overflow-x-auto {
+    overflow-x: visible !important;
+  }
+  
+  /* Make the budget card take full width */
+  div[role="tabpanel"] > .space-y-4 > .space-y-4 > .space-y-4:last-child {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+  }
+  
+  div[role="tabpanel"] > div > div:last-child {
+     position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+  }
+
+  table {
+    font-size: 10pt;
+  }
+  th, td {
+    color: black !important;
+    border: 1px solid #ddd !important;
+    padding: 4px !important;
+  }
+  th {
+     background-color: #eee !important;
   }
 
   #material-list-header {

@@ -631,7 +631,7 @@ export default function Page() {
 
   return (
       <Dashboard initialCategoryId="perfis/calculadora">
-        <div className="container mx-auto p-4 space-y-4">
+        <div className="container mx-auto p-4 space-y-4 print:p-0">
             <Tabs defaultValue="laje-deck" className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="laje-deck">1. Laje Steel Deck</TabsTrigger>
@@ -650,14 +650,14 @@ export default function Page() {
             </Tabs>
             
             {budgetItems.length > 0 && (
-                <Card>
+                <Card className="print:shadow-none print:border-none">
                     <CardHeader>
                         <div className="flex justify-between items-start">
                             <div className="space-y-1">
                                 <CardTitle className="flex items-center gap-2"><Calculator className="h-6 w-6"/> Orçamento de Perfis Estruturais</CardTitle>
                                 <CardDescription>Lista de itens calculados para o projeto.</CardDescription>
                             </div>
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-1 print:hidden">
                                 <Button variant="ghost" size="icon" onClick={handleSaveBudget} className="text-muted-foreground hover:text-primary">
                                     <Save className="h-5 w-5"/>
                                 </Button>

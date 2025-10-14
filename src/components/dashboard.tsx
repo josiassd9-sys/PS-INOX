@@ -366,7 +366,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
           </div>
         </SidebarHeader>
         <SidebarContent className="p-1">
-           <Accordion type="multiple" defaultValue={[...CATEGORY_GROUPS.map(g => g.title)]} className="w-full flex flex-col gap-1">
+           <Accordion type="multiple" className="w-full flex flex-col gap-1">
             {CATEGORY_GROUPS.map((group) => (
                <AccordionItem value={group.title} key={group.title} className="border-none rounded-lg bg-sidebar-accent/10 p-1">
                  <AccordionTrigger className="p-2 text-sm font-semibold text-sidebar-primary hover:no-underline [&[data-state=open]>svg]:-rotate-180">

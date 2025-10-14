@@ -275,6 +275,20 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
       })
       .filter((category): category is Category => category !== null && category.items.length > 0);
   }, [searchTerm]);
+  
+  const isPackageCheckerCategory = selectedCategoryId === 'package-checker';
+  const isScaleCategory = selectedCategoryId === 'balanca';
+  const isScrapTableCategory = selectedCategoryId === 'tabela-sucata';
+  const isAstmStandardsCategory = selectedCategoryId === 'normas-astm';
+  const isManufacturingProcessesCategory = selectedCategoryId === 'processos-fabricacao';
+  const isTechnicalDrawingCategory = selectedCategoryId === 'desenho-tecnico';
+  const isConnectionsCategory = selectedCategoryId === 'conexoes';
+  const isGaugeCategory = selectedCategoryId === 'gauge';
+
+  const showCustomHeader = !searchTerm && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isConnectionsCategory && !isGaugeCategory;
+  
+  const showTableHeader = selectedCategory && !isGaugeCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isPackageCheckerCategory && !isScaleCategory;
+
 
   const renderContent = () => {
     if (!currentPriceParams) {
@@ -300,15 +314,6 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
         />
       );
     }
-
-    const isPackageCheckerCategory = selectedCategoryId === 'package-checker';
-    const isScaleCategory = selectedCategoryId === 'balanca';
-    const isScrapTableCategory = selectedCategoryId === 'tabela-sucata';
-    const isAstmStandardsCategory = selectedCategoryId === 'normas-astm';
-    const isManufacturingProcessesCategory = selectedCategoryId === 'processos-fabricacao';
-    const isTechnicalDrawingCategory = selectedCategoryId === 'desenho-tecnico';
-    const isConnectionsCategory = selectedCategoryId === 'conexoes';
-    const isGaugeCategory = selectedCategoryId === 'gauge';
 
     if (isPackageCheckerCategory) {
       return <PackageChecker />;
@@ -345,8 +350,6 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
       return <GaugeStandards />;
     }
 
-    const showCustomHeader = !searchTerm && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isConnectionsCategory && !isGaugeCategory;
-
     return (
       <ItemTable 
         category={selectedCategory as any} 
@@ -357,14 +360,6 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
       />
     );
   }
-  
-  const isPackageCheckerCategory = selectedCategoryId === 'package-checker';
-  const isScaleCategory = selectedCategoryId === 'balanca';
-  const isScrapTableCategory = selectedCategoryId === 'tabela-sucata';
-  const isAstmStandardsCategory = selectedCategoryId === 'normas-astm';
-  const isManufacturingProcessesCategory = selectedCategoryId === 'processos-fabricacao';
-  const isTechnicalDrawingCategory = selectedCategoryId === 'desenho-tecnico';
-  const isGaugeCategory = selectedCategoryId === 'gauge';
   
   const showPriceControls = selectedCategory && (selectedCategory.hasOwnPriceControls || (!isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isGaugeCategory));
 
@@ -532,7 +527,7 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
             </header>
             
             <div className="flex-1 flex flex-col overflow-hidden">
-              {selectedCategory && (
+              {showTableHeader && !showCustomHeader && (
                 <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm -mx-1 px-1">
                     <div className="flex h-12 items-center border-b px-1 text-sm font-medium text-muted-foreground">
                         <div className="flex-1 px-1">Descrição</div>

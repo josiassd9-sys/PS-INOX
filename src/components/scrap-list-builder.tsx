@@ -12,13 +12,11 @@ import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from ".
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import { SteelItem, ALL_CATEGORIES, ConnectionGroup, ConnectionItem, Category, ScrapItem } from "../lib/data";
-import { GlobalSearchResults } from "./global-search-results";
-import { COST_ADJUSTMENTS_LOCAL_STORAGE_KEY, EDITED_CONNECTIONS_WEIGHTS_KEY } from "./dashboard";
+import { SteelItem, ALL_CATEGORIES, Category, ScrapItem } from "../lib/data";
 import { Label } from "./ui/label";
 import { cn } from "@/lib/utils";
 import { ScrapCalculator } from "./scrap-calculator";
-
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "./ui/dialog";
 
 const SCRAP_LIST_KEY = "scrapBuilderList";
 const PRICE_PARAMS_LOCAL_STORAGE_KEY = "priceParamsState";
@@ -28,35 +26,9 @@ interface ListItem extends SteelItem {
     listItemId: string;
     price: number;
     quantity: number;
-    length?: number;
-    basePrice: number; // Price for quantity 1
-    baseWeight: number; // Weight for quantity 1
+    basePrice: number; 
+    baseWeight: number;
 }
-
-interface PriceParams {
-  costPrice: number;
-  markup: number;
-  sellingPrice: number;
-}
-
-const initializePriceParams = (): Record<string, PriceParams> => {
-  let params: Record<string, PriceParams> = {
-    global: { costPrice: 30, markup: 50, sellingPrice: 45 },
-  };
-
-  try {
-    const savedParams = localStorage.getItem(PRICE_PARAMS_LOCAL_STORAGE_KEY);
-    if (savedParams) {
-      const parsed = JSON.parse(savedParams);
-      if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
-          params = parsed;
-      }
-    }
-  } catch (error) {
-    console.error("Failed to load price params from localStorage", error);
-  }
-  return params;
-};
 
 interface EditFormProps {
     item: ListItem;
@@ -103,6 +75,90 @@ function EditForm({ item, onUpdate, onDelete, onCancel }: EditFormProps) {
     );
 }
 
+interface AddScrapItemDialogProps {
+  item: ScrapItem;
+  isOpen: boolean;
+  onClose: () => void;
+  onAddItem: (itemData: any) => void;
+}
+
+function AddScrapItemDialog({ item, isOpen, onClose, onAddItem }: AddScrapItemDialogProps) {
+  const [weight, setWeight] = React.useState("");
+  const [pricePerKg, setPricePerKg] = React.useState(item.price.toFixed(2).replace('.', ','));
+
+  React.useEffect(() => {
+    setWeight("");
+    setPricePerKg(item.price.toFixed(2).replace('.', ','));
+  }, [item]);
+
+  const handleAdd = () => {
+    const weightNum = parseFloat(weight.replace(',', '.')) || 0;
+    const priceNum = parseFloat(pricePerKg.replace(',', '.')) || 0;
+    if (weightNum > 0 && priceNum > 0) {
+      onAddItem({
+        id: item.id,
+        description: item.material,
+        weight: weightNum,
+        price: weightNum * priceNum,
+        quantity: 1,
+        unit: 'kg',
+      });
+      onClose();
+    }
+  };
+
+  const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
+    const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
+    if (/^\d*\,?\d*$/.test(sanitizedValue)) {
+      setter(sanitizedValue);
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Adicionar Sucata: {item.material}</DialogTitle>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="weight" className="text-right">
+              Peso (kg)
+            </Label>
+            <Input
+              id="weight"
+              value={weight}
+              onChange={(e) => handleInputChange(setWeight, e.target.value)}
+              className="col-span-3"
+              type="text"
+              inputMode="decimal"
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="price" className="text-right">
+              Preço (R$/kg)
+            </Label>
+            <Input
+              id="price"
+              value={pricePerKg}
+              onChange={(e) => handleInputChange(setPricePerKg, e.target.value)}
+              className="col-span-3"
+              type="text"
+              inputMode="decimal"
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline">Cancelar</Button>
+          </DialogClose>
+          <Button onClick={handleAdd}>Adicionar à Lista</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 
 export function ScrapListBuilder() {
   const { toast } = useToast();
@@ -110,8 +166,8 @@ export function ScrapListBuilder() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [editingItemId, setEditingItemId] = React.useState<string | null>(null);
 
-  const [priceParams, setPriceParams] = React.useState<Record<string, PriceParams>>({});
-  const [costAdjustments, setCostAdjustments] = React.useState<Record<string, number>>({});
+  const [selectedScrapItem, setSelectedScrapItem] = React.useState<ScrapItem | null>(null);
+  const [isScrapDialogOpen, setIsScrapDialogOpen] = React.useState(false);
   
   React.useEffect(() => {
     try {
@@ -119,14 +175,6 @@ export function ScrapListBuilder() {
         if (savedList) {
             setScrapList(JSON.parse(savedList));
         }
-
-        setPriceParams(initializePriceParams());
-
-        const savedAdjustments = localStorage.getItem(COST_ADJUSTMENTS_LOCAL_STORAGE_KEY);
-        if (savedAdjustments) {
-          setCostAdjustments(JSON.parse(savedAdjustments));
-        }
-
     } catch(error) {
         console.error("Failed to load data from localStorage", error);
     }
@@ -193,6 +241,11 @@ export function ScrapListBuilder() {
           setEditingItemId(listItemId);
       }
   }
+
+  const handleScrapItemClick = (item: ScrapItem) => {
+    setSelectedScrapItem(item);
+    setIsScrapDialogOpen(true);
+  }
   
  const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -239,9 +292,9 @@ export function ScrapListBuilder() {
     const decimalPart = parts[1];
     
     return (
-        <div className="flex items-baseline justify-center tabular-nums font-sans text-[hsl(var(--text-item-red))]">
-            <span className="text-[11px] font-semibold">{integerPart}</span>
-            <span className="text-[8px] self-start mt-px">,{decimalPart} kg</span>
+        <div className="flex items-baseline justify-center tabular-nums font-sans">
+            <span className="text-[11px] font-semibold text-primary">{integerPart}</span>
+            <span className="text-[8px] self-start mt-px text-primary">,{decimalPart} kg</span>
         </div>
     )
   }
@@ -249,35 +302,32 @@ export function ScrapListBuilder() {
   const totalListPrice = scrapList.reduce((acc, item) => acc + item.price, 0);
   const totalListWeight = scrapList.reduce((acc, item) => acc + item.weight, 0);
 
+  const isCalculatorActive = searchTerm.trim().length > 0 && ('retalho'.startsWith(searchTerm.toLowerCase()) || 'ret'.startsWith(searchTerm.toLowerCase()) || 'chapa'.startsWith(searchTerm.toLowerCase()));
 
-  const isScrapCalculatorActive = searchTerm.trim().length > 0 && ('retalho'.startsWith(searchTerm.toLowerCase()) || 'ret'.startsWith(searchTerm.toLowerCase()) || 'sucata'.startsWith(searchTerm.toLowerCase()));
-
-
-  const filteredCategories = React.useMemo(() => {
-    if (isScrapCalculatorActive || !searchTerm) {
-      return [];
+  const filteredScrapCategory = React.useMemo(() => {
+    if (isCalculatorActive || !searchTerm) {
+      return null;
     }
   
     const safeSearchTerm = searchTerm.replace(",", ".").toLowerCase();
-  
-    return ALL_CATEGORIES.map((category) => {
-        if (category.id === 'tabela-sucata') {
-            const scrapItems = (category.items as ScrapItem[]).filter(
-                (item) => item.material.toLowerCase().replace(",", ".").includes(safeSearchTerm)
-            );
-            if (scrapItems.length > 0) {
-                 return { ...category, items: scrapItems };
-            }
-        }
-        return null;
-        
-      })
-      .filter((category): category is Category => category !== null);
-  }, [searchTerm, isScrapCalculatorActive]);
+    
+    const scrapCategory = ALL_CATEGORIES.find(c => c.id === 'tabela-sucata');
+    if (!scrapCategory) return null;
+
+    const filteredItems = (scrapCategory.items as ScrapItem[]).filter(
+        (item) => item.material.toLowerCase().replace(",", ".").includes(safeSearchTerm)
+    );
+
+    if (filteredItems.length > 0) {
+        return { ...scrapCategory, items: filteredItems };
+    }
+    
+    return null;
+  }, [searchTerm, isCalculatorActive]);
 
   const renderContent = () => {
     if (searchTerm) {
-        if (isScrapCalculatorActive) {
+        if (isCalculatorActive) {
             return (
                 <div className="p-2 bg-card rounded-lg border">
                 <h2 className="text-lg font-semibold text-center mb-1 text-foreground">Calculadora de Retalhos</h2>
@@ -285,11 +335,10 @@ export function ScrapListBuilder() {
                 </div>
             );
         }
-      return (
-        <div>
-            {filteredCategories.map(category => (
-                <div key={category.id}>
-                    <h3 className="text-lg font-semibold mb-1">{category.name}</h3>
+        if (filteredScrapCategory) {
+            return (
+                <div>
+                    <h3 className="text-lg font-semibold mb-1">{filteredScrapCategory.name}</h3>
                     <Table>
                          <TableHeader>
                            <TableRow className="hover:bg-transparent flex">
@@ -298,29 +347,12 @@ export function ScrapListBuilder() {
                            </TableRow>
                        </TableHeader>
                        <TableBody>
-                           {(category.items as ScrapItem[]).map((item, index) => {
+                           {(filteredScrapCategory.items as ScrapItem[]).map((item, index) => {
                                 const isEven = index % 2 === 1;
                                 return (
                                 <TableRow 
                                     key={item.id}
-                                    onClick={() => {
-                                        // Open a modal to enter weight
-                                        const weight = prompt(`Digite o peso para "${item.material}":`);
-                                        if (weight) {
-                                            const weightNum = parseFloat(weight.replace(',', '.'));
-                                            if (!isNaN(weightNum)) {
-                                                handleAddItemToList({
-                                                    ...item,
-                                                    id: item.id,
-                                                    description: item.material,
-                                                    weight: weightNum,
-                                                    price: weightNum * item.price,
-                                                    quantity: 1,
-                                                    unit: 'kg',
-                                                });
-                                            }
-                                        }
-                                    }}
+                                    onClick={() => handleScrapItemClick(item)}
                                     className={cn("flex items-stretch cursor-pointer", !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-even-bg))]")}
                                 >
                                     <TableCell className="font-medium text-[hsl(var(--text-item-pink))] text-[11px] flex-1 p-1">
@@ -338,9 +370,8 @@ export function ScrapListBuilder() {
                        </TableBody>
                     </Table>
                 </div>
-            ))}
-        </div>
-      );
+            );
+        }
     }
     
     if (scrapList.length > 0) {
@@ -375,8 +406,8 @@ export function ScrapListBuilder() {
                                   <TableCell className={cn("text-center p-1 w-[80px]",
                                     !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-pmq-bg))]"
                                   )}>
-                                      <div className="flex flex-col items-center justify-center h-full">
-                                        <span className="text-xs">{item.unit === 'm' ? 'M' : item.unit?.toUpperCase()}</span>
+                                      <div className="flex flex-col items-center justify-center h-full text-[hsl(var(--text-item-red))]">
+                                        <span className="text-xs">{item.unit === 'un' ? `${item.quantity} pç` : ''}</span>
                                         {formatWeight(item.weight)}
                                       </div>
                                   </TableCell>
@@ -411,7 +442,7 @@ export function ScrapListBuilder() {
       <div className="text-center text-muted-foreground py-10">
           <p>Sua lista de sucatas está vazia.</p>
           <p>Use a busca acima para adicionar itens.</p>
-          <p>Digite 'retalho' para abrir a calculadora de chapas.</p>
+          <p>Digite 'retalho' ou 'chapa' para abrir a calculadora.</p>
       </div>
     );
   };
@@ -460,7 +491,7 @@ export function ScrapListBuilder() {
                     <div className="flex items-center gap-2">
                         <span className="text-sm font-bold text-[hsl(var(--sheet-header-fg))]">Peso Total</span>
                         <div className="min-w-[120px] text-right">
-                           <span className="text-right text-base font-bold block text-white">{formatWeight(totalListWeight)}</span>
+                           <span className="text-right text-base font-bold block">{formatWeight(totalListWeight)}</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -472,6 +503,14 @@ export function ScrapListBuilder() {
                 </div>
             </div>
         )}
+      {selectedScrapItem && (
+        <AddScrapItemDialog 
+          item={selectedScrapItem}
+          isOpen={isScrapDialogOpen}
+          onClose={() => setIsScrapDialogOpen(false)}
+          onAddItem={handleAddItemToList}
+        />
+      )}
       </div>
   );
 }

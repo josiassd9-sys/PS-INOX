@@ -227,7 +227,6 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
              <TableRow className="hover:bg-transparent flex">
                 <TableHead className="flex-1 p-1 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Material (Composição)</TableHead>
                 <TableHead className="text-center p-1 w-32 bg-[hsl(var(--sheet-table-header-bg))] text-[hsl(var(--sheet-table-header-fg))] font-bold">Preço (R$/kg)</TableHead>
-                 <TableHead className="w-12 p-1 bg-[hsl(var(--sheet-table-header-bg))]"></TableHead>
               </TableRow>
           </TableHeader>
           <TableBody>
@@ -235,12 +234,15 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
                 filteredAndVisibleItems.map((item, index) => {
                     const isEven = index % 2 === 1;
                     return (
-                    <TableRow key={item.id} className={cn("flex items-stretch", !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-even-bg))]")}>
+                    <TableRow key={item.id} className={cn("flex items-stretch group", !isEven ? "bg-[hsl(var(--row-odd-bg))]" : "bg-[hsl(var(--row-even-bg))]")}>
                         <TableCell className="font-medium text-[hsl(var(--text-item-pink))] text-[11px] flex-1 p-1">
                             <div>{item.material}</div>
                             <div className="text-xs text-muted-foreground">{item.composition}</div>
                         </TableCell>
-                        <TableCell className={cn("text-right font-semibold p-1 w-32", !isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}>
+                        <TableCell className={cn(
+                            "text-right font-semibold p-1 w-32 relative", 
+                            !isEven ? "bg-[hsl(var(--row-even-bg))]" : "bg-[hsl(var(--row-pmq-bg))]")}
+                        >
                             <Input
                                 type="text"
                                 inputMode="decimal"
@@ -250,13 +252,11 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
                                     const value = e.target.value;
                                     setAllItems(prevItems => prevItems.map(i => i.id === item.id ? {...i, price: parseFloat(value.replace(',', '.')) || 0} : i))
                                 }}
-                                className="h-8 text-right bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                                className="h-8 text-right bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0 pr-8"
                                 style={{color: 'hsl(var(--sheet-total-price-fg))'}}
                             />
-                        </TableCell>
-                        <TableCell className="w-12 px-1">
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => toggleItemVisibility(item.id)}>
-                                <Icon name={hiddenItemIds.has(item.id) ? "EyeOff" : "Eye"} className="h-4 w-4 text-muted-foreground" />
+                             <Button variant="ghost" size="icon" className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => toggleItemVisibility(item.id)}>
+                                <Icon name="EyeOff" className="h-4 w-4 text-muted-foreground" />
                             </Button>
                         </TableCell>
                     </TableRow>

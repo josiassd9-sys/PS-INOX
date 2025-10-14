@@ -31,7 +31,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "./ui/dialog";
 import { Button } from "./ui/button";
 import { PackageChecker } from "./package-checker";
 import { ScaleCalculator } from "./scale-calculator";
@@ -454,7 +454,7 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
                 <AccordionContent className="pt-1">
                     <SidebarMenu>
                         <SidebarMenuItem>
-                            <Link href="/perfis/variaveis" passHref>
+                            <Link href="/perfis/parametros-vigas-i" passHref>
                                 <SidebarMenuButton className="w-full justify-start h-8">
                                     <Variable />
                                     <span>Variáveis dos Perfis</span>
@@ -634,6 +634,8 @@ export function Dashboard({ initialCategoryId }: { initialCategoryId?: string })
   )
 }
  
+    
+
     
 
     

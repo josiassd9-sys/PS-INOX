@@ -67,13 +67,15 @@ const initializePriceParams = (): Record<string, PriceParams> => {
   };
 
   try {
-    const savedParams = localStorage.getItem(PRICE_PARAMS_LOCAL_STORAGE_KEY);
-    if (savedParams) {
-      const parsed = JSON.parse(savedParams);
-      // Basic validation
-      if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
-          params = parsed;
-      }
+    if (typeof window !== 'undefined') {
+        const savedParams = localStorage.getItem(PRICE_PARAMS_LOCAL_STORAGE_KEY);
+        if (savedParams) {
+          const parsed = JSON.parse(savedParams);
+          // Basic validation
+          if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+              params = parsed;
+          }
+        }
     }
   } catch (error) {
     console.error("Failed to load price params from localStorage", error);
@@ -189,11 +191,13 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
 
   const selectedCategory = ALL_CATEGORIES.find((c) => c.id === selectedCategoryId);
   const currentPriceParamsKey = selectedCategory?.hasOwnPriceControls ? selectedCategoryId : 'global';
-  const currentPriceParams = priceParams[currentPriceParamsKey!];
+  const currentPriceParams = currentPriceParamsKey ? priceParams[currentPriceParamsKey] : undefined;
 
   const handlePriceChange = (key: keyof PriceParams, value: number | null) => {
     const numericValue = value ?? 0;
-    const currentParams = priceParams[currentPriceParamsKey!];
+    if (!currentPriceParamsKey) return;
+    
+    const currentParams = priceParams[currentPriceParamsKey];
     let newParams = { ...currentParams };
 
     if (key === 'costPrice') {
@@ -211,7 +215,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
 
     setPriceParams(prev => ({
       ...prev,
-      [currentPriceParamsKey!]: newParams,
+      [currentPriceParamsKey]: newParams,
     }));
   };
 
@@ -286,6 +290,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                          selectedCategoryId === 'conexoes' ||
                          selectedCategoryId === 'gauge' ||
                          selectedCategoryId === 'ai-assistant' ||
+                         selectedCategoryId === 'lista-materiais' ||
                          selectedCategoryId?.startsWith('perfis/');
 
   const renderContent = () => {
@@ -329,6 +334,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
       case 'desenho-tecnico': return <TechnicalDrawingGuide />;
       case 'conexoes': return <ConnectionsTable category={selectedCategory as any} sellingPrice={currentPriceParams.sellingPrice} editedWeights={editedWeights} onWeightChange={handleWeightChange} />;
       case 'gauge': return <GaugeStandards />;
+      case 'lista-materiais': return <div/>;
       default:
         if (selectedCategory) {
           return <ItemTable category={selectedCategory as any} priceParams={currentPriceParams} costAdjustments={costAdjustments} onItemClick={handleItemClickForAdjustment} />;
@@ -426,7 +432,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
               </div>
               
               <div className="flex items-center gap-1">
-                {showPriceControls && (
+                {showPriceControls && currentPriceParams && (
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm" className="gap-1">
@@ -496,3 +502,5 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
 export function Dashboard({ initialCategoryId, children }: { initialCategoryId: string | null, children?: React.ReactNode }) {
   return <DashboardComponent initialCategoryId={initialCategoryId} children={children} />
 }
+
+    

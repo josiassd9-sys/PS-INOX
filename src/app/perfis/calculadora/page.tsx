@@ -530,7 +530,7 @@ function SteelDeckCalculator({ onCalculated }: { onCalculated: (load: number) =>
                             <div className="text-center py-2">
                                 <p className="text-sm text-muted-foreground">Carga Total da Laje (kgf/m²)</p>
                                 <p className="text-4xl font-bold text-primary">{formatNumber(totalLoad, 0)}</p>
-                                <p className="text-xs text-muted-foreground mt-1">Agora, vá para a aba "Viga Secundária" e use este valor.</p>
+                                <p className="text-xs text-muted-foreground mt-1">Agora, vá para a aba "Viga Secundária (IPE)" e use este valor.</p>
                             </div>
                             <Separator />
                             <div className="text-xs pt-2 grid grid-cols-3 gap-x-2">
@@ -681,9 +681,3 @@ export default function Page() {
       </Dashboard>
   );
 }
-
-    
-
-    
-
-    

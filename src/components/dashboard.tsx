@@ -414,14 +414,24 @@ function DashboardComponent({ initialCategoryId }: { initialCategoryId: string }
                           );
                       })}
                        {group.title === 'FERRAMENTAS' && (
-                        <SidebarMenuItem>
-                          <Link href="/retalho-inox" passHref>
-                            <SidebarMenuButton className="w-full justify-start h-8">
-                                <Scissors />
-                                <span>Retalho Inox</span>
-                            </SidebarMenuButton>
-                          </Link>
-                        </SidebarMenuItem>
+                        <>
+                          <SidebarMenuItem>
+                            <Link href="/retalho-inox" passHref>
+                              <SidebarMenuButton className="w-full justify-start h-8">
+                                  <Scissors />
+                                  <span>Retalho Inox</span>
+                              </SidebarMenuButton>
+                            </Link>
+                          </SidebarMenuItem>
+                          <SidebarMenuItem>
+                            <Link href="/lista-sucatas" passHref>
+                              <SidebarMenuButton className="w-full justify-start h-8">
+                                  <Icon name="Trash2" />
+                                  <span>Lista de Sucatas</span>
+                              </SidebarMenuButton>
+                            </Link>
+                          </SidebarMenuItem>
+                        </>
                       )}
                       {group.title === 'INFORMATIVOS' && (
                         <SidebarMenuItem>

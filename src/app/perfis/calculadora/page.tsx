@@ -11,10 +11,18 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+const tiposAco = [
+    { nome: "ASTM A36", fy: 250 },
+    { nome: "ASTM A572 G50", fy: 345 },
+];
+
 
 function CalculatorComponent() {
   const [span, setSpan] = React.useState("5"); // Vão em metros
   const [load, setLoad] = React.useState("300"); // Carga em kgf/m
+  const [steelType, setSteelType] = React.useState(tiposAco[0].nome);
   const [recommendedProfile, setRecommendedProfile] = React.useState<Perfil | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const { toast } = useToast();
@@ -30,23 +38,22 @@ function CalculatorComponent() {
       return;
     }
 
-    // Tensão de escoamento do aço (fy) para ASTM A36 em MPa (N/mm²)
-    const fy_MPa = 250; 
-    // Convertendo para kN/cm² para compatibilizar com unidades de momento e Wx
+    const selectedSteel = tiposAco.find(s => s.nome === steelType);
+    if (!selectedSteel) {
+        setError("Tipo de aço inválido selecionado.");
+        return;
+    }
+
+    const fy_MPa = selectedSteel.fy;
     const fy_kN_cm2 = fy_MPa / 10;
     
-    // Momento fletor máximo para viga biapoiada com carga distribuída (M = q * L² / 8)
-    // Carga q de kgf/m para kN/m (1 kgf ≈ 0.009807 kN)
     const q_kN_m = q * 0.009807;
     const maxMoment_kNm = (q_kN_m * Math.pow(L, 2)) / 8;
     
-    // Momento em kN.cm
     const maxMoment_kNcm = maxMoment_kNm * 100;
     
-    // Módulo de resistência mínimo necessário (Wx = M / fy)
     const requiredWx = maxMoment_kNcm / fy_kN_cm2;
     
-    // Encontrar o perfil mais leve (menor peso) que satisfaz o Wx necessário
     const suitableProfiles = perfisData.filter(p => p.Wx >= requiredWx);
     
     if (suitableProfiles.length === 0) {
@@ -75,7 +82,7 @@ function CalculatorComponent() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="span">Comprimento do Vão (m)</Label>
               <Input
@@ -88,7 +95,7 @@ function CalculatorComponent() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="load">Carga Uniformemente Distribuída (kgf/m)</Label>
+              <Label htmlFor="load">Carga Distribuída (kgf/m)</Label>
               <Input
                 id="load"
                 type="text"
@@ -97,6 +104,19 @@ function CalculatorComponent() {
                 onChange={(e) => setLoad(e.target.value)}
                 placeholder="Ex: 300"
               />
+            </div>
+             <div className="space-y-2">
+              <Label htmlFor="steel-type">Tipo de Aço</Label>
+               <Select value={steelType} onValueChange={setSteelType}>
+                <SelectTrigger id="steel-type">
+                  <SelectValue placeholder="Selecione o aço" />
+                </SelectTrigger>
+                <SelectContent>
+                  {tiposAco.map(aco => (
+                    <SelectItem key={aco.nome} value={aco.nome}>{aco.nome}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <Button onClick={handleCalculate} className="w-full md:w-auto">Calcular Perfil Recomendado</Button>
@@ -113,7 +133,7 @@ function CalculatorComponent() {
                  <CheckCircle className="h-4 w-4 text-primary" />
                 <AlertTitle className="text-primary font-bold">Perfil Recomendado</AlertTitle>
                 <AlertDescription className="space-y-2">
-                    <p>O perfil mais leve que atende aos requisitos de resistência é:</p>
+                    <p>Considerando um aço <span className="font-semibold">{steelType}</span>, o perfil mais leve que atende aos requisitos de resistência é:</p>
                     <div className="text-2xl font-bold text-center py-4 text-primary">{recommendedProfile.nome}</div>
                     <ul className="text-sm text-muted-foreground list-disc pl-5">
                         <li><strong>Peso:</strong> {recommendedProfile.peso} kg/m</li>

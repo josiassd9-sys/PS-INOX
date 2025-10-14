@@ -357,6 +357,8 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
     toast({ title: "Item Adicionado!", description: `${qty}x viga(s) ${recommendedProfile.nome} adicionada(s).`})
   }
 
+  const isSlabLoadSynced = lastSlabLoad > 0 && lastSlabLoad.toFixed(0) === slabLoad;
+
   return (
     <div className="space-y-4">
       <Card>
@@ -376,8 +378,8 @@ function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad }: { onAddToBudg
                 <div className="flex items-center justify-between">
                     <Label htmlFor="vs-slab-load">Carga da Laje (kgf/m²)</Label>
                     {lastSlabLoad > 0 && (
-                    <Button variant="ghost" size="icon" className="h-6 w-6 text-primary" onClick={handleApplySlabLoad}>
-                        <RefreshCw className="h-4 w-4"/>
+                    <Button variant="ghost" size="icon" className="h-6 w-6 text-primary" onClick={handleApplySlabLoad} title="Aplicar carga calculada na aba de laje">
+                        <RefreshCw className={`h-4 w-4 ${isSlabLoadSynced ? 'text-green-500' : 'animate-pulse'}`}/>
                     </Button>
                     )}
                 </div>
@@ -679,6 +681,8 @@ export default function Page() {
       </Dashboard>
   );
 }
+
+    
 
     
 

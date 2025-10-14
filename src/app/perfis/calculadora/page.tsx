@@ -134,11 +134,8 @@ function CalculatorComponent() {
 
 export default function Page() {
   return (
-    <main className="min-h-screen bg-background">
       <Dashboard initialCategoryId="perfis/calculadora">
         <CalculatorComponent />
       </Dashboard>
-    </main>
   );
 }
-    

@@ -6,10 +6,6 @@ import * as React from "react";
 
 export default function CalculatorPage({ params }: { params: { id: string } }) {
   return (
-    <>
-      <main className="min-h-screen bg-background">
-          <Dashboard initialCategoryId={params.id} />
-      </main>
-    </>
+      <Dashboard initialCategoryId={params.id} />
   );
 }

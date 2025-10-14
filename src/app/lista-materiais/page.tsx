@@ -1,16 +1,13 @@
 "use client";
 
 import * as React from "react";
+import { Dashboard } from "@/components/dashboard";
 import { MaterialListBuilder } from "@/components/material-list-builder";
 
 export default function MaterialListPage() {
-  const mainContent = <MaterialListBuilder />;
-
   return (
-    <>
-      <main className="h-screen bg-background">
-        <div className="h-full">{mainContent}</div>
-      </main>
-    </>
+    <Dashboard initialCategoryId="lista-materiais">
+        <MaterialListBuilder />
+    </Dashboard>
   );
 }

@@ -283,6 +283,22 @@ const CATEGORIES: Category[] = [
     unit: 'calc',
     items: [],
   },
+  {
+    id: 'lista-materiais',
+    name: 'Lista de Materiais',
+    description: 'Crie e gerencie listas de materiais para projetos.',
+    icon: 'ClipboardList',
+    unit: 'calc',
+    items: [],
+  },
+    {
+    id: 'lista-sucatas',
+    name: 'Lista de Sucatas',
+    description: 'Crie e gerencie listas de sucatas.',
+    icon: 'ScrapClaw',
+    unit: 'calc',
+    items: [],
+  }
 ];
 
 export const CATEGORY_GROUPS: CategoryGroup[] = [
@@ -292,6 +308,7 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
             CATEGORIES.find(c => c.id === 'package-checker')!,
             CATEGORIES.find(c => c.id === 'balanca')!,
             CATEGORIES.find(c => c.id === 'tabela-sucata')!,
+            CATEGORIES.find(c => c.id === 'lista-sucatas')!,
         ]
     },
     {
@@ -323,32 +340,23 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
     {
         title: 'INFORMATIVOS',
         items: [
+            CATEGORIES.find(c => c.id === 'lista-materiais')!,
             CATEGORIES.find(c => c.id === 'normas-astm')!,
             CATEGORIES.find(c => c.id === 'processos-fabricacao')!,
             CATEGORIES.find(c => c.id === 'desenho-tecnico')!,
             CATEGORIES.find(c => c.id === 'gauge')!,
         ]
     },
+    {
+        title: 'Perfis de Aço',
+        items: [
+            CATEGORIES.find(c => c.id === 'perfis/parametros-vigas-i')!,
+            CATEGORIES.find(c => c.id === 'perfis/tabela')!,
+            CATEGORIES.find(c => c.id === 'perfis/informacoes')!,
+            CATEGORIES.find(c => c.id === 'perfis/calculadora')!,
+        ]
+    },
 ];
-
-const perfisCategory = {
-    title: 'Perfis de Aço',
-    items: [
-        CATEGORIES.find(c => c.id === 'perfis/parametros-vigas-i')!,
-        CATEGORIES.find(c => c.id === 'perfis/tabela')!,
-        CATEGORIES.find(c => c.id === 'perfis/informacoes')!,
-        CATEGORIES.find(c => c.id === 'perfis/calculadora')!,
-    ]
-};
-
-// Adiciona o grupo de perfis à lista de grupos de categorias
-CATEGORY_GROUPS.push(perfisCategory);
-
 
 export const ALL_CATEGORIES = CATEGORIES;
 export * from './types';
-
-
-
-
-

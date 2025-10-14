@@ -69,10 +69,8 @@ function TableComponent() {
 
 export default function Page() {
   return (
-     <main className="min-h-screen bg-background">
-        <Dashboard initialCategoryId="perfis/tabela">
-            <TableComponent />
-        </Dashboard>
-    </main>
+      <Dashboard initialCategoryId="perfis/tabela">
+          <TableComponent />
+      </Dashboard>
   )
 }

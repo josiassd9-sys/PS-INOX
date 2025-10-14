@@ -4,7 +4,6 @@
 import * as React from "react";
 import { ALL_CATEGORIES, CATEGORY_GROUPS, type Category, type ScrapItem, SteelItem, ConnectionGroup, ConnectionItem } from "@/lib/data";
 import {
-  SidebarProvider,
   Sidebar,
   SidebarHeader,
   SidebarContent,
@@ -15,9 +14,8 @@ import {
   SidebarTrigger,
   useSidebar,
   SidebarGroup,
-  SidebarGroupLabel,
 } from "@/components/ui/sidebar";
-import { Search, Warehouse, SlidersHorizontal, PlusCircle, Link as LinkIcon, Scissors, ClipboardList, Home, Sheet, Ruler, Variable, BookOpen, Calculator, Library } from "lucide-react";
+import { Search, SlidersHorizontal, PlusCircle, Calculator, BookOpen, Ruler, Variable } from "lucide-react";
 import { PriceControls } from "./price-controls";
 import { ItemTable } from "./item-table";
 import { Icon } from "./icons";
@@ -96,7 +94,7 @@ const initializePriceParams = (): Record<string, PriceParams> => {
   return params;
 };
 
-function DashboardComponent({ initialCategoryId, children }: { initialCategoryId: string, children?: React.ReactNode }) {
+function DashboardComponent({ initialCategoryId, children }: { initialCategoryId: string | null, children?: React.ReactNode }) {
   const { toast } = useToast();
   const [priceParams, setPriceParams] = React.useState<Record<string, PriceParams>>({});
   
@@ -109,6 +107,12 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
   const [costAdjustments, setCostAdjustments] = React.useState<Record<string, number>>({});
   const [selectedItemForAdjustment, setSelectedItemForAdjustment] = React.useState<SteelItem | null>(null);
 
+  React.useEffect(() => {
+    // Navigate to initial category on load
+    if (initialCategoryId) {
+      setSelectedCategoryId(initialCategoryId);
+    }
+  }, [initialCategoryId]);
 
   React.useEffect(() => {
     setPriceParams(initializePriceParams());
@@ -182,7 +186,6 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
     setSelectedItemForAdjustment(null);
   };
 
-
   const selectedCategory = ALL_CATEGORIES.find((c) => c.id === selectedCategoryId);
   const currentPriceParamsKey = selectedCategory?.hasOwnPriceControls ? selectedCategoryId : 'global';
   const currentPriceParams = priceParams[currentPriceParamsKey!];
@@ -226,7 +229,6 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
   
   const filteredCategories = React.useMemo(() => {
     if (!searchTerm) return [];
-  
     const safeSearchTerm = searchTerm.replace(",", ".").toLowerCase();
   
     return ALL_CATEGORIES.map((category) => {
@@ -269,33 +271,32 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
         if (filteredItems.length > 0) {
             return { ...category, items: filteredItems };
         }
-        
         return null;
-        
       })
       .filter((category): category is Category => category !== null && category.items.length > 0);
   }, [searchTerm]);
   
-  const isPackageCheckerCategory = selectedCategoryId === 'package-checker';
-  const isScaleCategory = selectedCategoryId === 'balanca';
-  const isScrapTableCategory = selectedCategoryId === 'tabela-sucata';
-  const isAstmStandardsCategory = selectedCategoryId === 'normas-astm';
-  const isManufacturingProcessesCategory = selectedCategoryId === 'processos-fabricacao';
-  const isTechnicalDrawingCategory = selectedCategoryId === 'desenho-tecnico';
-  const isConnectionsCategory = selectedCategoryId === 'conexoes';
-  const isGaugeCategory = selectedCategoryId === 'gauge';
-
-  const showCustomHeader = !searchTerm && !isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isConnectionsCategory && !isGaugeCategory;
-  
-  const showTableHeader = selectedCategory && !isScrapTableCategory && !isGaugeCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isPackageCheckerCategory && !isScaleCategory;
-
+  const isSpecialPage = selectedCategoryId === 'package-checker' ||
+                         selectedCategoryId === 'balanca' ||
+                         selectedCategoryId === 'tabela-sucata' ||
+                         selectedCategoryId === 'normas-astm' ||
+                         selectedCategoryId === 'processos-fabricacao' ||
+                         selectedCategoryId === 'desenho-tecnico' ||
+                         selectedCategoryId === 'conexoes' ||
+                         selectedCategoryId === 'gauge' ||
+                         selectedCategoryId?.startsWith('perfis/');
 
   const renderContent = () => {
     if (children) return children;
+  
+    if (!selectedCategory) {
+      // Fallback for when no category is selected, e.g., on the homepage
+      return <PackageChecker />;
+    }
 
     if (!currentPriceParams) {
       return (
-        <div className="flex items-center justify-center h-screen">
+        <div className="flex items-center justify-center h-full">
           <p>Carregando...</p>
         </div>
       );
@@ -316,82 +317,56 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
         />
       );
     }
-
-    if (isPackageCheckerCategory) {
-      return <PackageChecker />;
+    
+    switch (selectedCategoryId) {
+      case 'package-checker': return <PackageChecker />;
+      case 'balanca': return <ScaleCalculator customerName={customerName} onCustomerNameChange={setCustomerName} />;
+      case 'tabela-sucata': return <ScrapTable category={selectedCategory as any} isDialogOpen={isScrapItemDialogOpen} setIsDialogOpen={setIsScrapItemDialogOpen} searchTerm={searchTerm} />;
+      case 'normas-astm': return <AstmStandards />;
+      case 'processos-fabricacao': return <ManufacturingProcesses />;
+      case 'desenho-tecnico': return <TechnicalDrawingGuide />;
+      case 'conexoes': return <ConnectionsTable category={selectedCategory as any} sellingPrice={currentPriceParams.sellingPrice} editedWeights={editedWeights} onWeightChange={handleWeightChange} />;
+      case 'gauge': return <GaugeStandards />;
+      default:
+        if (selectedCategory) {
+          return <ItemTable category={selectedCategory as any} priceParams={currentPriceParams} costAdjustments={costAdjustments} onItemClick={handleItemClickForAdjustment} />;
+        }
+        return <div className="p-4 text-center text-muted-foreground">Selecione uma categoria para começar.</div>;
     }
-    if (isScaleCategory) {
-      return <ScaleCalculator customerName={customerName} onCustomerNameChange={setCustomerName} />;
-    }
-    if (isScrapTableCategory) {
-        return <ScrapTable 
-          category={selectedCategory as any}
-          isDialogOpen={isScrapItemDialogOpen}
-          setIsDialogOpen={setIsScrapItemDialogOpen}
-          searchTerm={searchTerm}
-         />;
-    }
-    if (isAstmStandardsCategory) {
-        return <AstmStandards />;
-    }
-    if (isManufacturingProcessesCategory) {
-        return <ManufacturingProcesses />;
-    }
-    if (isTechnicalDrawingCategory) {
-        return <TechnicalDrawingGuide />;
-    }
-    if (isConnectionsCategory) {
-        return <ConnectionsTable
-            category={selectedCategory as any}
-            sellingPrice={currentPriceParams.sellingPrice}
-            editedWeights={editedWeights}
-            onWeightChange={handleWeightChange}
-        />;
-    }
-    if (isGaugeCategory) {
-      return <GaugeStandards />;
-    }
-
-    return (
-      <ItemTable 
-        category={selectedCategory as any} 
-        priceParams={currentPriceParams}
-        costAdjustments={costAdjustments}
-        onItemClick={handleItemClickForAdjustment}
-        showTableHeader={!showCustomHeader}
-      />
-    );
   }
   
-  const showPriceControls = selectedCategory && (selectedCategory.hasOwnPriceControls || (!isPackageCheckerCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isGaugeCategory && !children));
+  const showPriceControls = selectedCategory && !isSpecialPage;
+  const showGlobalSearch = selectedCategory && !isSpecialPage;
 
-  const showGlobalSearch = selectedCategory && !isScaleCategory && !isScrapTableCategory && !isAstmStandardsCategory && !isManufacturingProcessesCategory && !isTechnicalDrawingCategory && !isGaugeCategory && !children;
-
-  
-  const priceControlTitle = () => {
-    if (!selectedCategory) return 'Ajustar Preços - Global';
-    if (selectedCategory.hasOwnPriceControls) {
-      return `Ajustar Preços - ${selectedCategory.name}`;
+  const getPageTitle = () => {
+    if (children && selectedCategoryId?.startsWith('perfis/')) {
+        return selectedCategory?.name ?? "Perfis de Aço";
     }
-    return 'Ajustar Preços - Global';
+    if (searchTerm) return "Resultados da Busca";
+    if (selectedCategory) return selectedCategory.name;
+    return "Bem-vindo!";
   }
 
-  const unitLabel = selectedCategory ? (selectedCategory.unit === "m" ? "m" : selectedCategory.unit === 'm²' ? "m²" : "un") : "";
-  const weightUnitLabel = selectedCategory ? `Peso (kg/${unitLabel})` : "";
-  const priceUnitLabel = selectedCategory ? `Preço (R$/${unitLabel})` : "";
-
+  const getPageDescription = () => {
+      if (children && selectedCategoryId?.startsWith('perfis/')) {
+        return selectedCategory?.description ?? "";
+      }
+      if (searchTerm) return `Buscando por "${searchTerm}"`;
+      if (selectedCategory) return selectedCategory.description;
+      return "Selecione uma categoria no menu para começar.";
+  }
 
   return (
     <>
       <Sidebar>
         <SidebarHeader>
-          <Link href="/" className="flex items-center gap-1 cursor-pointer w-full text-left" aria-label="Voltar para a tela inicial">
-            <Home className="size-6 text-primary" />
+          <div className="flex items-center gap-1 w-full" aria-label="Voltar para a tela inicial">
+            <Icon name="Home" className="size-6 text-primary" />
             <h1 className="text-lg font-semibold">PS INOX</h1>
-          </Link>
+          </div>
         </SidebarHeader>
         <SidebarContent className="p-1">
-           <Accordion type="multiple" defaultValue={[...CATEGORY_GROUPS.map(g => g.title), 'Perfis de Aço']} className="w-full flex flex-col gap-1">
+           <Accordion type="multiple" defaultValue={[...CATEGORY_GROUPS.map(g => g.title)]} className="w-full flex flex-col gap-1">
             {CATEGORY_GROUPS.map((group) => (
                <AccordionItem value={group.title} key={group.title} className="border-none rounded-lg bg-sidebar-accent/10 p-1">
                  <AccordionTrigger className="p-2 text-sm font-semibold text-sidebar-primary hover:no-underline [&[data-state=open]>svg]:-rotate-180">
@@ -400,7 +375,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                  <AccordionContent className="pt-1">
                     <SidebarMenu>
                       {group.items.map((category) => {
-                          const href = category.id.startsWith('perfis/') ? `/${category.id}` : `/calculator/${category.id}`;
+                          const href = category.unit === 'calc' && !category.id.startsWith('perfis/') ? `/${category.id}` : category.id.startsWith('perfis/') ? `/${category.id}` : `/calculator/${category.id}`;
                           return (
                             <SidebarMenuItem key={category.id}>
                               <Link href={href} passHref>
@@ -416,73 +391,10 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                             </SidebarMenuItem>
                           );
                       })}
-                       {group.title === 'FERRAMENTAS' && (
-                        <>
-                          <SidebarMenuItem>
-                            <Link href="/lista-sucatas" passHref>
-                              <SidebarMenuButton className="w-full justify-start h-8">
-                                  <Icon name="ScrapClaw" />
-                                  <span>Lista de Sucatas</span>
-                              </SidebarMenuButton>
-                            </Link>
-                          </SidebarMenuItem>
-                        </>
-                      )}
-                      {group.title === 'INFORMATIVOS' && (
-                        <SidebarMenuItem>
-                          <Link href="/lista-materiais" passHref>
-                            <SidebarMenuButton className="w-full justify-start h-8">
-                                <ClipboardList />
-                                <span>Lista de Materiais</span>
-                            </SidebarMenuButton>
-                          </Link>
-                        </SidebarMenuItem>
-                      )}
                     </SidebarMenu>
                  </AccordionContent>
                </AccordionItem>
             ))}
-             <AccordionItem value="Perfis de Aço" className="border-none rounded-lg bg-sidebar-accent/10 p-1">
-                <AccordionTrigger className="p-2 text-sm font-semibold text-sidebar-primary hover:no-underline [&[data-state=open]>svg]:-rotate-180">
-                    Perfis de Aço
-                </AccordionTrigger>
-                <AccordionContent className="pt-1">
-                    <SidebarMenu>
-                        <SidebarMenuItem>
-                            <Link href="/perfis/parametros-vigas-i" passHref>
-                                <SidebarMenuButton className="w-full justify-start h-8" isActive={selectedCategoryId === 'perfis/parametros-vigas-i'} onClick={() => handleSelectCategory('perfis/parametros-vigas-i')}>
-                                    <Variable />
-                                    <span>Parâmetros Vigas I</span>
-                                </SidebarMenuButton>
-                            </Link>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                            <Link href="/perfis/tabela" passHref>
-                                <SidebarMenuButton className="w-full justify-start h-8" isActive={selectedCategoryId === 'perfis/tabela'} onClick={() => handleSelectCategory('perfis/tabela')}>
-                                    <Ruler />
-                                    <span>Tabela de Perfis</span>
-                                </SidebarMenuButton>
-                            </Link>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                            <Link href="/perfis/informacoes" passHref>
-                                <SidebarMenuButton className="w-full justify-start h-8" isActive={selectedCategoryId === 'perfis/informacoes'} onClick={() => handleSelectCategory('perfis/informacoes')}>
-                                    <BookOpen />
-                                    <span>Informações Técnicas</span>
-                                </SidebarMenuButton>
-                            </Link>
-                        </SidebarMenuItem>
-                        <SidebarMenuItem>
-                            <Link href="/perfis/calculadora" passHref>
-                                <SidebarMenuButton className="w-full justify-start h-8" isActive={selectedCategoryId === 'perfis/calculadora'} onClick={() => handleSelectCategory('perfis/calculadora')}>
-                                    <Calculator />
-                                    <span>Calculadora</span>
-                                </SidebarMenuButton>
-                            </Link>
-                        </SidebarMenuItem>
-                    </SidebarMenu>
-                </AccordionContent>
-            </AccordionItem>
           </Accordion>
         </SidebarContent>
       </Sidebar>
@@ -492,47 +404,24 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
             <header className={cn(
               "flex items-center justify-between gap-1 p-1 border-b"
             )}>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 flex-1 min-w-0">
                 <SidebarTrigger className="md:hidden"/>
-                <div className="hidden md:block">
-                  <h2 className="text-lg font-semibold">{children ? 'Perfis de Aço' : (searchTerm ? 'Resultados da Busca' : selectedCategory?.name ?? 'Bem-vindo!')}</h2>
-                  <p className="text-sm text-muted-foreground">{children ? '' : (searchTerm ? `Buscando por "${searchTerm}"` : selectedCategory?.description ?? 'Selecione uma categoria no menu para começar.')}</p>
+                <div className="hidden md:block overflow-hidden">
+                  <h2 className="text-lg font-semibold truncate">{getPageTitle()}</h2>
+                  <p className="text-sm text-muted-foreground truncate">{getPageDescription()}</p>
                 </div>
               </div>
               
-              {isScaleCategory ? (
-                 <div className="relative flex-1">
-                    <Input
-                        id="customer-name"
-                        value={customerName}
-                        onChange={(e) => setCustomerName(e.target.value)}
-                        placeholder="Digite o nome do cliente"
-                        className="w-full rounded-lg bg-background"
-                    />
-                </div>
-              ) : isScrapTableCategory ? (
-                <div className="relative flex-1">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                    type="search"
-                    placeholder="Buscar em sucatas..."
-                    className="w-full rounded-lg bg-background pl-8"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-              ) : showGlobalSearch ? (
-                <div className="relative flex-1">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                    type="search"
-                    placeholder="Buscar em todas as categorias..."
-                    className="w-full rounded-lg bg-background pl-8"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-              ) : null}
+              <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                  type="search"
+                  placeholder="Buscar..."
+                  className="w-full rounded-lg bg-background pl-8"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+              </div>
               
               <div className="flex items-center gap-1">
                 {showPriceControls && (
@@ -545,7 +434,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>{priceControlTitle()}</DialogTitle>
+                        <DialogTitle>{`Ajustar Preços - ${selectedCategory?.hasOwnPriceControls ? selectedCategory.name : 'Global'}`}</DialogTitle>
                       </DialogHeader>
                       <PriceControls
                         costPrice={currentPriceParams.costPrice}
@@ -563,7 +452,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                     </DialogContent>
                   </Dialog>
                 )}
-                 {isScrapTableCategory && (
+                 {selectedCategoryId === 'tabela-sucata' && (
                     <Button variant="outline" size="sm" className="gap-1" onClick={() => setIsScrapItemDialogOpen(true)}>
                       <PlusCircle className="h-4 w-4" />
                       <span className="hidden sm:inline">Adicionar</span>
@@ -573,19 +462,8 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
             </header>
             
             <div className="flex-1 flex flex-col overflow-hidden">
-              {!searchTerm && showTableHeader && (
-                <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm -mx-1 px-1">
-                    <div className="flex h-12 items-center border-b px-1 text-sm font-medium text-muted-foreground">
-                        <div className="flex-1 px-1">Descrição</div>
-                        <div className="w-1/3 px-1 text-center">{weightUnitLabel}</div>
-                        <div className="w-1/3 px-1 text-right font-semibold text-primary">{priceUnitLabel}</div>
-                    </div>
-                </div>
-              )}
-              <div className="flex-1 overflow-y-auto">
-                <div className={cn("p-1", (isScrapTableCategory || selectedCategoryId === 'conexoes') && "p-0 md:p-0")}>
+              <div className={cn("p-1 flex-1 overflow-y-auto", (selectedCategoryId === 'tabela-sucata' || selectedCategoryId === 'conexoes') && "p-0 md:p-0")}>
                  {renderContent()}
-                </div>
               </div>
             </div>
           </div>
@@ -613,16 +491,6 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
   );
 }
 
-export function Dashboard({ initialCategoryId, children }: { initialCategoryId: string, children?: React.ReactNode }) {
-  return (
-    <SidebarProvider>
-      <DashboardComponent initialCategoryId={initialCategoryId} children={children} />
-    </SidebarProvider>
-  )
+export function Dashboard({ initialCategoryId, children }: { initialCategoryId: string | null, children?: React.ReactNode }) {
+  return <DashboardComponent initialCategoryId={initialCategoryId} children={children} />
 }
- 
-    
-
-    
-
-    

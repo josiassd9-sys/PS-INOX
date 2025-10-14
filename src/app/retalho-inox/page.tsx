@@ -1,16 +1,20 @@
 "use client";
 
-import { ScrapListBuilder } from "@/components/scrap-list-builder";
 import * as React from "react";
+import { Dashboard } from "@/components/dashboard";
+import { ScrapCalculator } from "@/components/scrap-calculator";
 
 export default function RetalhoInoxPage() {
-  const mainContent = <ScrapListBuilder />;
+    // This component will be used inside the list builders, but we can have a page for it
+  const mainContent = (
+    <div className="p-4">
+        <ScrapCalculator onAddItem={() => {}} />
+    </div>
+  );
 
   return (
-    <>
-      <main className="h-screen bg-background">
-        <div className="h-full">{mainContent}</div>
-      </main>
-    </>
+    <Dashboard initialCategoryId="retalho-inox">
+      {mainContent}
+    </Dashboard>
   );
 }

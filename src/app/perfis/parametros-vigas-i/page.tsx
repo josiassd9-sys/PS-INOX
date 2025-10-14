@@ -69,10 +69,8 @@ function ParamsComponent() {
 
 export default function Page() {
   return (
-     <main className="min-h-screen bg-background">
-        <Dashboard initialCategoryId="perfis/parametros-vigas-i">
-            <ParamsComponent />
-        </Dashboard>
-    </main>
+      <Dashboard initialCategoryId="perfis/parametros-vigas-i">
+          <ParamsComponent />
+      </Dashboard>
   )
 }

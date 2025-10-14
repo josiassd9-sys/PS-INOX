@@ -1,9 +1,8 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
-import Link from 'next/link';
-import { Home } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { GlobalMenuTrigger } from '@/components/global-menu-trigger';
 
 export const metadata: Metadata = {
   manifest: "/manifest.json",
@@ -26,15 +25,10 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="font-body antialiased">
-        <div className="fixed top-2 left-2 z-50 print:hidden">
-            <Button asChild variant="outline" size="icon" className="h-8 w-8 bg-background/50 backdrop-blur-sm">
-                 <Link href="/">
-                    <Home className="h-4 w-4" />
-                    <span className="sr-only">Voltar ao início</span>
-                </Link>
-            </Button>
-        </div>
-        {children}
+        <SidebarProvider>
+          <GlobalMenuTrigger />
+          {children}
+        </SidebarProvider>
         <Toaster />
       </body>
     </html>

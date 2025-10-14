@@ -17,6 +17,7 @@ import { cantoneirasItems } from './cantoneiras';
 import { barrasChatasItems } from './barras-chatas';
 import { metalonQuadradoItems } from './metalon-quadrado';
 import { metalonRetangularItems } from './metalon-retangular';
+import { perfisData } from './perfis';
 import { perfisIpeData } from './perfis-ipe';
 import { steelDeckData } from './steel-deck';
 
@@ -389,4 +390,4 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
 
 export const ALL_CATEGORIES = CATEGORIES;
 export * from './types';
-export { perfisIpeData, steelDeckData };
+export { perfisData, perfisIpeData, steelDeckData };

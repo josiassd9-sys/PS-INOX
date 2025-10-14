@@ -633,12 +633,10 @@ export default function Page() {
       <Dashboard initialCategoryId="perfis/calculadora">
         <div className="container mx-auto p-4 space-y-4">
             <Tabs defaultValue="laje-deck" className="w-full">
-                <TabsList className="grid w-full grid-cols-5">
+                <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="laje-deck">1. Laje Steel Deck</TabsTrigger>
                     <TabsTrigger value="viga-secundaria">2. Viga Secundária (IPE)</TabsTrigger>
                     <TabsTrigger value="viga-principal">3. Viga Principal (W)</TabsTrigger>
-                    <TabsTrigger value="tercas" disabled>Terças (U, C, Z)</TabsTrigger>
-                    <TabsTrigger value="tirantes" disabled>Tirantes</TabsTrigger>
                 </TabsList>
                 <TabsContent value="laje-deck">
                     <SteelDeckCalculator onCalculated={setLastSlabLoad} onAddToBudget={handleAddToBudget} />
@@ -648,12 +646,6 @@ export default function Page() {
                 </TabsContent>
                  <TabsContent value="viga-principal">
                     <VigaPrincipalCalculator onAddToBudget={handleAddToBudget} />
-                </TabsContent>
-                 <TabsContent value="tercas">
-                     <Card><CardHeader><CardTitle>Em Breve</CardTitle><CardDescription>A calculadora para terças e perfis formados a frio está em desenvolvimento.</CardDescription></CardHeader></Card>
-                </TabsContent>
-                 <TabsContent value="tirantes">
-                    <Card><CardHeader><CardTitle>Em Breve</CardTitle><CardDescription>A calculadora para tirantes e elementos de tração está em desenvolvimento.</CardDescription></CardHeader></Card>
                 </TabsContent>
             </Tabs>
             

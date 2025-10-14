@@ -13,8 +13,22 @@ import {
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { perfisData, Perfil } from "@/lib/data/perfis";
 import { Dashboard } from "@/components/dashboard";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 function TableComponent() {
+  const [searchTerm, setSearchTerm] = React.useState("");
+
+  const filteredData = React.useMemo(() => {
+    if (!searchTerm) {
+      return perfisData;
+    }
+    const lowercasedFilter = searchTerm.toLowerCase();
+    return perfisData.filter((perfil) =>
+      perfil.nome.toLowerCase().includes(lowercasedFilter)
+    );
+  }, [searchTerm]);
+
   return (
     <div className="container mx-auto p-4">
         <Card>
@@ -23,6 +37,16 @@ function TableComponent() {
                 <CardDescription>
                     Consulte as propriedades geométricas e físicas dos perfis de aço padrão W (Gerdau/Açominas).
                 </CardDescription>
+                 <div className="relative pt-2">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Buscar perfil por nome..."
+                    className="w-full rounded-lg bg-background pl-8"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+              </div>
             </CardHeader>
             <CardContent className="overflow-x-auto">
                 <Table>
@@ -43,7 +67,7 @@ function TableComponent() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {perfisData.map((perfil) => (
+                        {filteredData.map((perfil) => (
                             <TableRow key={perfil.nome}>
                                 <TableCell className="font-medium">{perfil.nome}</TableCell>
                                 <TableCell>{perfil.peso.toFixed(1)}</TableCell>

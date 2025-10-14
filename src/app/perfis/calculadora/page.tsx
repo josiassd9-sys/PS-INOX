@@ -9,9 +9,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle, Calculator } from "lucide-react";
+import { CheckCircle, Calculator, PlusCircle, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 
 const tiposAco = [
@@ -19,16 +20,29 @@ const tiposAco = [
     { nome: "ASTM A572 G50", fy: 345 },
 ];
 
+type BudgetItem = {
+  id: string;
+  perfil: Perfil;
+  span: number;
+  quantity: number;
+  weightPerBeam: number;
+  totalWeight: number;
+  costPerBeam: number;
+  totalCost: number;
+};
 
 function CalculatorComponent() {
-  const [span, setSpan] = React.useState("5"); // Vão em metros
-  const [load, setLoad] = React.useState("300"); // Carga em kgf/m
+  const [span, setSpan] = React.useState("5");
+  const [load, setLoad] = React.useState("300");
   const [steelType, setSteelType] = React.useState(tiposAco[0].nome);
   const [quantity, setQuantity] = React.useState("1");
   const [pricePerKg, setPricePerKg] = React.useState("8.50");
+  
   const [recommendedProfile, setRecommendedProfile] = React.useState<Perfil | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const { toast } = useToast();
+
+  const [budgetItems, setBudgetItems] = React.useState<BudgetItem[]>([]);
 
   const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -59,9 +73,7 @@ function CalculatorComponent() {
     
     const q_kN_m = q * 0.009807;
     const maxMoment_kNm = (q_kN_m * Math.pow(L, 2)) / 8;
-    
     const maxMoment_kNcm = maxMoment_kNm * 100;
-    
     const requiredWx = maxMoment_kNcm / fy_kN_cm2;
     
     const suitableProfiles = perfisData.filter(p => p.Wx >= requiredWx);
@@ -78,26 +90,64 @@ function CalculatorComponent() {
     setRecommendedProfile(lightestProfile);
     toast({
         title: "Cálculo Concluído",
-        description: `O perfil recomendado é ${lightestProfile.nome}.`,
+        description: `O perfil recomendado é ${lightestProfile.nome}. Agora você pode adicioná-lo ao orçamento.`,
     })
   };
+  
+  const handleAddToBudget = () => {
+    if (!recommendedProfile) {
+        toast({
+            variant: "destructive",
+            title: "Nenhum Perfil Calculado",
+            description: "Primeiro, calcule um perfil recomendado.",
+        });
+        return;
+    }
 
-  const budgetResults = React.useMemo(() => {
-    if (!recommendedProfile) return null;
-    
-    const L = parseFloat(span.replace(",", ".")) || 0;
-    const qty = parseInt(quantity) || 0;
-    const price = parseFloat(pricePerKg.replace(",", ".")) || 0;
+    const L = parseFloat(span.replace(",", "."));
+    const qty = parseInt(quantity);
+    const price = parseFloat(pricePerKg.replace(",", "."));
 
-    if (L <= 0 || qty <= 0 || price <= 0) return null;
+    if (isNaN(L) || isNaN(qty) || isNaN(price) || L <= 0 || qty <= 0 || price <= 0) {
+        toast({
+            variant: "destructive",
+            title: "Valores Inválidos",
+            description: "Verifique o vão, quantidade e preço antes de adicionar.",
+        });
+        return;
+    }
 
     const weightPerBeam = recommendedProfile.peso * L;
     const totalWeight = weightPerBeam * qty;
     const costPerBeam = weightPerBeam * price;
     const totalCost = totalWeight * price;
 
-    return { weightPerBeam, totalWeight, costPerBeam, totalCost };
-  }, [recommendedProfile, span, quantity, pricePerKg]);
+    const newItem: BudgetItem = {
+        id: `${recommendedProfile.nome}-${Date.now()}`,
+        perfil: recommendedProfile,
+        span: L,
+        quantity: qty,
+        weightPerBeam,
+        totalWeight,
+        costPerBeam,
+        totalCost,
+    };
+
+    setBudgetItems(prev => [...prev, newItem]);
+    setRecommendedProfile(null); // Reset for next calculation
+    toast({
+        title: "Item Adicionado!",
+        description: `${qty}x viga(s) ${recommendedProfile.nome} adicionada(s) ao orçamento.`,
+    })
+  }
+
+  const handleClearBudget = () => {
+      setBudgetItems([]);
+      toast({
+          title: "Orçamento Limpo",
+          description: "A lista de itens foi removida.",
+      })
+  }
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -106,18 +156,21 @@ function CalculatorComponent() {
   const formatNumber = (value: number, decimals = 2) => {
     return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(value);
   }
+  
+  const totalBudgetCost = budgetItems.reduce((acc, item) => acc + item.totalCost, 0);
+  const totalBudgetWeight = budgetItems.reduce((acc, item) => acc + item.totalWeight, 0);
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>Calculadora de Vigas e Orçamento</CardTitle>
+          <CardTitle>Calculadora e Orçamento de Vigas</CardTitle>
           <CardDescription>
-            Pré-dimensione o perfil W e estime o custo do material para seu projeto.
+            Pré-dimensione o perfil W e adicione-o à lista para montar seu orçamento.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="span">Comprimento do Vão (m)</Label>
               <Input id="span" type="text" inputMode="decimal" value={span} onChange={(e) => handleInputChange(setSpan, e.target.value)} placeholder="Ex: 5,0" />
@@ -150,66 +203,86 @@ function CalculatorComponent() {
           )}
 
           {recommendedProfile && (
-             <Alert variant="default" className="bg-primary/5 border-primary/20">
-                 <CheckCircle className="h-4 w-4 text-primary" />
-                <AlertTitle className="text-primary font-bold">Perfil Recomendado</AlertTitle>
-                <AlertDescription className="space-y-2">
-                    <p>Considerando um aço <span className="font-semibold">{steelType}</span>, o perfil mais leve que atende aos requisitos é:</p>
-                    <div className="text-2xl font-bold text-center py-4 text-primary">{recommendedProfile.nome}</div>
-                    <ul className="text-sm text-muted-foreground list-disc pl-5">
-                        <li><strong>Peso:</strong> {recommendedProfile.peso} kg/m</li>
-                        <li><strong>Módulo de Resistência (Wx):</strong> {recommendedProfile.Wx} cm³</li>
-                    </ul>
-                     <p className="text-xs text-muted-foreground pt-2">
-                        <strong>Aviso:</strong> Este é um pré-dimensionamento. A escolha final deve ser validada por um engenheiro calculista.
-                    </p>
-                </AlertDescription>
-            </Alert>
+             <Card className="mt-4 bg-primary/5 border-primary/20">
+                <CardHeader>
+                    <AlertTitle className="text-primary font-bold flex items-center gap-2"><CheckCircle className="h-5 w-5"/> Perfil Recomendado</AlertTitle>
+                    <AlertDescription className="space-y-2 pt-2">
+                        <p>Para um vão de <span className="font-semibold">{span}m</span> e carga de <span className="font-semibold">{load}kgf/m</span> com aço <span className="font-semibold">{steelType}</span>, o perfil mais leve é:</p>
+                        <div className="text-2xl font-bold text-center py-2 text-primary">{recommendedProfile.nome}</div>
+                         <p className="text-xs text-muted-foreground pt-1">
+                            Agora, defina a quantidade e o preço para adicionar ao orçamento.
+                        </p>
+                    </AlertDescription>
+                </CardHeader>
+                 <CardContent className="space-y-4">
+                     <div className="grid grid-cols-2 gap-4 border-t pt-4">
+                         <div className="space-y-2">
+                            <Label htmlFor="quantity">Quantidade de Vigas</Label>
+                            <Input id="quantity" type="text" inputMode="numeric" value={quantity} onChange={(e) => handleInputChange(setQuantity, e.target.value)} placeholder="Ex: 1" />
+                        </div>
+                         <div className="space-y-2">
+                            <Label htmlFor="pricePerKg">Preço do Aço (R$/kg)</Label>
+                            <Input id="pricePerKg" type="text" inputMode="decimal" value={pricePerKg} onChange={(e) => handleInputChange(setPricePerKg, e.target.value)} placeholder="Ex: 8,50" />
+                        </div>
+                    </div>
+                    <Button onClick={handleAddToBudget} className="w-full gap-2"><PlusCircle/> Adicionar ao Orçamento</Button>
+                </CardContent>
+            </Card>
           )}
         </CardContent>
       </Card>
 
-      {recommendedProfile && (
-        <Card className="mt-4">
+      {budgetItems.length > 0 && (
+        <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Calculator className="h-6 w-6"/> Orçamento do Material</CardTitle>
-                <CardDescription>Insira a quantidade de vigas e o preço do aço para estimar o custo.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                     <div className="space-y-2">
-                        <Label htmlFor="quantity">Quantidade de Vigas</Label>
-                        <Input id="quantity" type="text" inputMode="numeric" value={quantity} onChange={(e) => handleInputChange(setQuantity, e.target.value)} placeholder="Ex: 1" />
+                <div className="flex justify-between items-center">
+                    <div className="space-y-1">
+                        <CardTitle className="flex items-center gap-2"><Calculator className="h-6 w-6"/> Orçamento de Vigas</CardTitle>
+                        <CardDescription>Lista de itens calculados para o projeto.</CardDescription>
                     </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="pricePerKg">Preço do Aço (R$/kg)</Label>
-                        <Input id="pricePerKg" type="text" inputMode="decimal" value={pricePerKg} onChange={(e) => handleInputChange(setPricePerKg, e.target.value)} placeholder="Ex: 8,50" />
+                     <Button variant="destructive" size="sm" onClick={handleClearBudget} className="gap-1">
+                        <Trash2 className="h-4 w-4"/> Limpar Orçamento
+                     </Button>
+                </div>
+            </CardHeader>
+            <CardContent className="overflow-x-auto">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Perfil</TableHead>
+                            <TableHead className="text-center">Qtd.</TableHead>
+                            <TableHead className="text-center">Vão (m)</TableHead>
+                            <TableHead className="text-center">Peso/Viga (kg)</TableHead>
+                            <TableHead className="text-center">Peso Total (kg)</TableHead>
+                            <TableHead className="text-right">Custo/Viga (R$)</TableHead>
+                            <TableHead className="text-right">Custo Total (R$)</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {budgetItems.map(item => (
+                            <TableRow key={item.id}>
+                                <TableCell className="font-medium">{item.perfil.nome}</TableCell>
+                                <TableCell className="text-center">{item.quantity}</TableCell>
+                                <TableCell className="text-center">{formatNumber(item.span)}</TableCell>
+                                <TableCell className="text-center">{formatNumber(item.weightPerBeam)}</TableCell>
+                                <TableCell className="text-center font-semibold">{formatNumber(item.totalWeight)}</TableCell>
+                                <TableCell className="text-right">{formatCurrency(item.costPerBeam)}</TableCell>
+                                <TableCell className="text-right font-semibold">{formatCurrency(item.totalCost)}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+                <Separator className="my-4"/>
+                <div className="flex justify-end items-center gap-8">
+                     <div className="text-right">
+                        <p className="text-sm text-muted-foreground">Peso Total do Orçamento</p>
+                        <p className="text-xl font-bold">{formatNumber(totalBudgetWeight, 2)} kg</p>
+                    </div>
+                     <div className="text-right rounded-lg bg-primary/10 p-2 border border-primary/20">
+                        <p className="text-sm text-primary">Custo Total do Orçamento</p>
+                        <p className="text-2xl font-bold text-primary">{formatCurrency(totalBudgetCost)}</p>
                     </div>
                 </div>
-                
-                {budgetResults && (
-                    <div className="pt-4 border-t">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                            <div className="space-y-1 rounded-lg bg-muted/50 p-2">
-                                <p className="text-sm text-muted-foreground">Peso / Viga</p>
-                                <p className="text-lg font-bold">{formatNumber(budgetResults.weightPerBeam)} kg</p>
-                            </div>
-                             <div className="space-y-1 rounded-lg bg-muted/50 p-2">
-                                <p className="text-sm text-muted-foreground">Peso Total</p>
-                                <p className="text-lg font-bold">{formatNumber(budgetResults.totalWeight)} kg</p>
-                            </div>
-                             <div className="space-y-1 rounded-lg bg-muted/50 p-2">
-                                <p className="text-sm text-muted-foreground">Custo / Viga</p>
-                                <p className="text-lg font-bold">{formatCurrency(budgetResults.costPerBeam)}</p>
-                            </div>
-                             <div className="space-y-1 rounded-lg bg-primary/10 p-2 border border-primary/20">
-                                <p className="text-sm text-primary">Custo Total</p>
-                                <p className="text-2xl font-bold text-primary">{formatCurrency(budgetResults.totalCost)}</p>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
             </CardContent>
         </Card>
       )}

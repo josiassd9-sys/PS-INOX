@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle, Calculator, PlusCircle, Trash2 } from "lucide-react";
+import { CheckCircle, Calculator, PlusCircle, Trash2, Save, Printer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -148,6 +148,17 @@ function CalculatorComponent() {
           description: "A lista de itens foi removida.",
       })
   }
+  
+  const handleSaveBudget = () => {
+    toast({
+        title: "Orçamento Salvo!",
+        description: "Seu orçamento foi salvo com sucesso (simulação).",
+    })
+  }
+
+  const handlePrintBudget = () => {
+      window.print();
+  }
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -235,14 +246,22 @@ function CalculatorComponent() {
       {budgetItems.length > 0 && (
         <Card>
             <CardHeader>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-start">
                     <div className="space-y-1">
                         <CardTitle className="flex items-center gap-2"><Calculator className="h-6 w-6"/> Orçamento de Vigas</CardTitle>
                         <CardDescription>Lista de itens calculados para o projeto.</CardDescription>
                     </div>
-                     <Button variant="destructive" size="sm" onClick={handleClearBudget} className="gap-1">
-                        <Trash2 className="h-4 w-4"/> Limpar Orçamento
-                     </Button>
+                     <div className="flex items-center gap-1">
+                         <Button variant="ghost" size="icon" onClick={handleSaveBudget} className="text-muted-foreground hover:text-primary">
+                            <Save className="h-5 w-5"/>
+                         </Button>
+                          <Button variant="ghost" size="icon" onClick={handlePrintBudget} className="text-muted-foreground hover:text-primary">
+                            <Printer className="h-5 w-5"/>
+                         </Button>
+                         <Button variant="ghost" size="icon" onClick={handleClearBudget} className="text-destructive/70 hover:text-destructive">
+                            <Trash2 className="h-5 w-5"/>
+                         </Button>
+                     </div>
                 </div>
             </CardHeader>
             <CardContent className="overflow-x-auto">
@@ -297,5 +316,3 @@ export default function Page() {
       </Dashboard>
   );
 }
-
-    

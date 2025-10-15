@@ -264,9 +264,9 @@ function ScaleCalculator() {
       <Card className="mb-4 print:border-none print:shadow-none print:p-0">
         <CardContent className="p-4 print:p-0">
           <div className="w-full space-y-2">
-             <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center">
                   <Label htmlFor="cliente" className="font-semibold text-sm md:text-base">Cliente</Label>
-                   <div className="flex items-center gap-1 rounded-full border bg-muted p-0.5">
+                   <div className="flex items-center gap-1 rounded-full border bg-muted p-0.5 print:hidden">
                       <TooltipProvider>
                           <Tooltip>
                               <TooltipTrigger asChild>
@@ -333,7 +333,7 @@ function ScaleCalculator() {
                     <TableHead className="w-[30%]">Material</TableHead>
                     <TableHead className="text-right w-[17.5%]">Bruto (kg)</TableHead>
                     <TableHead className="text-right w-[17.5%]">Tara (kg)</TableHead>
-                    <TableHead className="text-right w-[17.5%]">Descontos (kg)</TableHead>
+                    <TableHead className="text-right w-[17.5%]">A/L (kg)</TableHead>
                     <TableHead className="text-right font-semibold w-[17.5%]">Líquido (kg)</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -371,7 +371,7 @@ function ScaleCalculator() {
                             <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
                         </TableCell>
                         <TableCell className="p-0 sm:p-2 flex-1 sm:w-[17.5%]">
-                            <Label className="sm:hidden text-xs text-muted-foreground">Descontos (kg)</Label>
+                            <Label className="sm:hidden text-xs text-muted-foreground">A/L (kg)</Label>
                             <Input
                             type="text"
                             value={formatNumber(item.descontos)}
@@ -486,4 +486,5 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 }
 
 export default ScaleCalculator;
+
 

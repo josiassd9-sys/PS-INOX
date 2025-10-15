@@ -224,7 +224,7 @@ function ScaleCalculator() {
   }, 0);
 
   return (
-    <div className="p-4 bg-background max-w-7xl mx-auto" id="scale-calculator-printable-area">
+    <div className="p-1 bg-background max-w-7xl mx-auto" id="scale-calculator-printable-area">
       <div className="print:hidden flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold text-foreground">Balança</h1>
         <div className="flex items-center gap-1">

@@ -272,14 +272,14 @@ const ScaleCalculator = forwardRef((props, ref) => {
                     </div>
                     <div className="space-y-px">
                         <Label htmlFor="placa" className="text-xs sm:text-sm">Placa</Label>
-                        <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden text-sm w-28 text-center"/>
+                        <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden text-sm w-14 text-center"/>
                         <span className="hidden print:block">{headerData.plate || 'N/A'}</span>
                     </div>
                     <div className="space-y-px">
                         <Label htmlFor="initial-weight" className="text-xs sm:text-sm">
                           {operationType === 'loading' ? 'Bruto' : 'Tara'}
                         </Label>
-                        <Input id="initial-weight" type="text" inputMode="decimal" value={headerData.initialWeight} onChange={e => handleHeaderChange('initialWeight', e.target.value)} className="h-8 print:hidden text-sm w-24 text-right"/>
+                        <Input id="initial-weight" type="text" inputMode="decimal" value={headerData.initialWeight} onChange={e => handleHeaderChange('initialWeight', e.target.value)} className="h-8 print:hidden text-sm w-14 text-right"/>
                         <span className="hidden print:block">{headerData.initialWeight || 'N/A'}</span>
                     </div>
                 </div>
@@ -417,7 +417,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                              type="text"
                              value={formatNumber(set.descontoCacamba)}
                              onChange={(e) => handleCacambaDiscount(set.id, e.target.value)}
-                             className="h-8 text-right print:hidden flex-1 min-w-[90px] w-24"
+                             className="h-8 text-right print:hidden flex-1 min-w-[90px] w-14"
                           />
                           <span className="hidden print:block font-semibold">{formatNumber(set.descontoCacamba)}</span>
                      </div>

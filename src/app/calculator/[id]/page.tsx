@@ -1,11 +1,8 @@
-
-"use client";
-
-import { Dashboard } from "@/components/dashboard";
 import * as React from "react";
+import ClientPage from "./client-page";
 
 export default function CalculatorPage({ params }: { params: { id: string } }) {
   return (
-      <Dashboard initialCategoryId={params.id} />
+      <ClientPage id={params.id} />
   );
 }

@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import React, { useState, useEffect, useCallback, useImperativeHandle, forwardRef } from "react";
@@ -52,11 +51,15 @@ const ScaleCalculator = forwardRef((props, ref) => {
   const [operationType, setOperationType] = useState<OperationType>('loading');
 
   const handleHeaderChange = (field: keyof typeof headerData, value: string) => {
-    const sanitizedValue = value.replace(/[^0-9]/g, '');
-    if(field === 'initialWeight') {
-        if(/^\d*$/.test(sanitizedValue)) {
-             setHeaderData(prev => ({ ...prev, [field]: sanitizedValue }));
+    if (field === 'initialWeight') {
+        const sanitizedValue = value.replace(/\D/g, '');
+        setHeaderData(prev => ({ ...prev, [field]: sanitizedValue }));
+    } else if (field === 'plate') {
+        let formattedValue = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
+        if (formattedValue.length > 3 && /^\d$/.test(formattedValue[3])) {
+            formattedValue = `${formattedValue.slice(0, 3)}-${formattedValue.slice(3)}`;
         }
+        setHeaderData(prev => ({ ...prev, [field]: formattedValue }));
     } else {
         setHeaderData(prev => ({ ...prev, [field]: value }));
     }
@@ -219,10 +222,8 @@ const ScaleCalculator = forwardRef((props, ref) => {
   }));
 
   const formatNumber = (num: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(num);
+    if (isNaN(num)) return "0";
+    return new Intl.NumberFormat('pt-BR').format(num);
   }
   
   const grandTotalLiquido = weighingSets.reduce((total, set) => {
@@ -263,7 +264,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                 <Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/>
                 <span className="hidden print:block">{headerData.client || 'N/A'}</span>
                 
-                <div className="grid grid-cols-2 sm:grid-cols-[1fr_1fr_auto] gap-0.5 w-full text-xs sm:text-sm">
+                 <div className="grid grid-cols-2 sm:grid-cols-[1fr_auto_auto] gap-0.5 w-full text-xs sm:text-sm">
                     <div className="space-y-px">
                         <Label htmlFor="motorista" className="text-xs sm:text-sm">Motorista</Label>
                         <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden text-sm"/>
@@ -271,14 +272,14 @@ const ScaleCalculator = forwardRef((props, ref) => {
                     </div>
                     <div className="space-y-px">
                         <Label htmlFor="placa" className="text-xs sm:text-sm">Placa</Label>
-                        <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden text-sm"/>
+                        <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden text-sm w-28 text-center"/>
                         <span className="hidden print:block">{headerData.plate || 'N/A'}</span>
                     </div>
                     <div className="space-y-px">
                         <Label htmlFor="initial-weight" className="text-xs sm:text-sm">
                           {operationType === 'loading' ? 'Bruto' : 'Tara'}
                         </Label>
-                        <Input id="initial-weight" type="text" inputMode="decimal" value={headerData.initialWeight} onChange={e => handleHeaderChange('initialWeight', e.target.value)} className="h-8 print:hidden text-sm w-24"/>
+                        <Input id="initial-weight" type="text" inputMode="decimal" value={headerData.initialWeight} onChange={e => handleHeaderChange('initialWeight', e.target.value)} className="h-8 print:hidden text-sm w-24 text-right"/>
                         <span className="hidden print:block">{headerData.initialWeight || 'N/A'}</span>
                     </div>
                 </div>
@@ -325,17 +326,17 @@ const ScaleCalculator = forwardRef((props, ref) => {
                           <div className="grid grid-cols-4 gap-0.5">
                               <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">Bruto (kg)</Label>
-                                  <Input type="text" value={formatNumber(item.bruto)} onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)} className="text-right h-8 print:hidden" disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')} />
+                                  <Input type="text" value={formatNumber(item.bruto)} onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)} className="text-right h-8 print:hidden w-24" disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')} />
                                    <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
                               </div>
                                <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">Tara (kg)</Label>
-                                   <Input type="text" value={formatNumber(item.tara)} onChange={(e) => handleInputChange(set.id, item.id, 'tara', e.target.value)} className="text-right h-8 print:hidden" disabled={(setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading')} />
+                                   <Input type="text" value={formatNumber(item.tara)} onChange={(e) => handleInputChange(set.id, item.id, 'tara', e.target.value)} className="text-right h-8 print:hidden w-24" disabled={(setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading')} />
                                    <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
                               </div>
                                <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">A/L (kg)</Label>
-                                  <Input type="text" value={formatNumber(item.descontos)} onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)} className="text-right h-8 print:hidden" />
+                                  <Input type="text" value={formatNumber(item.descontos)} onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)} className="text-right h-8 print:hidden w-24" />
                                    <span className="hidden print:block text-right">{formatNumber(item.descontos)}</span>
                               </div>
                                <div className="space-y-px">
@@ -373,7 +374,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                             type="text"
                             value={formatNumber(item.bruto)}
                             onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)}
-                            className="text-right h-8 print:hidden"
+                            className="text-right h-8 print:hidden w-24"
                             disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')}
                             />
                             <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
@@ -383,7 +384,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                             type="text"
                             value={formatNumber(item.tara)}
                             onChange={(e) => handleInputChange(set.id, item.id, 'tara', e.target.value)}
-                            className="text-right h-8 print:hidden"
+                            className="text-right h-8 print:hidden w-24"
                             disabled={(setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading')}
                             />
                             <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
@@ -393,7 +394,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                             type="text"
                             value={formatNumber(item.descontos)}
                             onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)}
-                            className="text-right h-8 print:hidden"
+                            className="text-right h-8 print:hidden w-24"
                             />
                             <span className="hidden print:block text-right">{formatNumber(item.descontos)}</span>
                       </td>
@@ -497,3 +498,5 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 }
 
 export default ScaleCalculator;
+
+    

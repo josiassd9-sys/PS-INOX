@@ -1,4 +1,5 @@
 
+
 import type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction } from './types';
 import { perfisData, tiposAco, PESO_CONCRETO_KGF_M3, E_ACO_MPA } from './perfis';
 import { perfisIpeData } from './perfis-ipe';
@@ -22,6 +23,15 @@ import { metalonQuadradoItems } from './metalon-quadrado';
 import { metalonRetangularItems } from './metalon-retangular';
 
 const ALL_CATEGORIES: Category[] = [
+  {
+    id: 'lista-materiais',
+    name: 'Lista de Materiais',
+    description: 'Crie e gerencie listas de materiais para projetos.',
+    icon: 'ClipboardList',
+    unit: 'calc',
+    items: [],
+    path: '/lista-materiais'
+  },
   {
     id: 'package-checker',
     name: 'Conferência',
@@ -253,6 +263,7 @@ const ALL_CATEGORIES: Category[] = [
     icon: 'Sheet',
     unit: 'calc',
     items: [],
+    path: '/gauge',
   },
   {
     id: 'ai-assistant',
@@ -261,6 +272,7 @@ const ALL_CATEGORIES: Category[] = [
     icon: 'Sparkles',
     unit: 'calc',
     items: [],
+    path: '/ai-assistant'
   },
    {
     id: 'perfis/parametros-vigas-i',
@@ -269,6 +281,7 @@ const ALL_CATEGORIES: Category[] = [
     icon: 'Variable',
     unit: 'calc',
     items: [],
+    path: '/perfis/parametros-vigas-i'
   },
   {
     id: 'perfis/tabela-w',
@@ -277,6 +290,7 @@ const ALL_CATEGORIES: Category[] = [
     icon: 'Ruler',
     unit: 'calc',
     items: [],
+    path: '/perfis/tabela',
   },
     {
     id: 'perfis/tabela-ipe',
@@ -285,6 +299,7 @@ const ALL_CATEGORIES: Category[] = [
     icon: 'Ruler',
     unit: 'calc',
     items: [],
+    path: '/perfis/tabela-ipe'
   },
   {
     id: 'perfis/tabela-steel-deck',
@@ -293,6 +308,7 @@ const ALL_CATEGORIES: Category[] = [
     icon: 'Ruler',
     unit: 'calc',
     items: [],
+    path: '/perfis/tabela-steel-deck'
   },
   {
     id: 'perfis/informacoes',
@@ -301,6 +317,7 @@ const ALL_CATEGORIES: Category[] = [
     icon: 'BookOpen',
     unit: 'calc',
     items: [],
+    path: '/perfis/informacoes'
   },
   {
     id: 'perfis/calculadora',
@@ -309,6 +326,7 @@ const ALL_CATEGORIES: Category[] = [
     icon: 'Calculator',
     unit: 'calc',
     items: [],
+    path: '/perfis/calculadora'
   },
   {
     id: 'perfis/guia',
@@ -317,14 +335,7 @@ const ALL_CATEGORIES: Category[] = [
     icon: 'BookOpen',
     unit: 'calc',
     items: [],
-  },
-  {
-    id: 'lista-materiais',
-    name: 'Lista de Materiais',
-    description: 'Crie e gerencie listas de materiais para projetos.',
-    icon: 'ClipboardList',
-    unit: 'calc',
-    items: [],
+    path: '/perfis/guia'
   },
     {
     id: 'lista-sucatas',
@@ -333,6 +344,7 @@ const ALL_CATEGORIES: Category[] = [
     icon: 'ScrapClaw',
     unit: 'calc',
     items: [],
+    path: '/lista-sucatas'
   }
 ];
 

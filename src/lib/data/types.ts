@@ -1,4 +1,5 @@
 
+
 export type SteelItem = {
   id: string;
   description: string;
@@ -25,6 +26,7 @@ export type Category = {
   hasOwnPriceControls?: boolean;
   defaultCostPrice?: number;
   defaultMarkup?: number;
+  path?: string;
 };
 
 export type ConnectionGroup = {

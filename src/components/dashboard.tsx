@@ -115,7 +115,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
     if (initialCategoryId) {
       setSelectedCategoryId(initialCategoryId);
     } else {
-      setSelectedCategoryId('package-checker');
+      setSelectedCategoryId('lista-materiais');
     }
   }, [initialCategoryId]);
 
@@ -287,7 +287,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
       .filter((category): category is Category => category !== null && category.items.length > 0);
   }, [searchTerm]);
   
-  const isSpecialPage = children || selectedCategoryId === 'package-checker' ||
+  const isSpecialPage = children ||
                          selectedCategoryId === 'balanca' ||
                          selectedCategoryId === 'tabela-sucata' ||
                          selectedCategoryId === 'normas-astm' ||
@@ -304,7 +304,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
     if (children && selectedCategoryId) return children;
 
     if (!selectedCategory) {
-      return <PackageChecker />;
+      return <div/>;
     }
 
     if (!currentPriceParams) {
@@ -383,7 +383,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                  <AccordionContent className="pt-1">
                     <SidebarMenu>
                       {group.items.map((category) => {
-                          const href = category.unit === 'calc' ? `/${category.id}` : `/calculator/${category.id}`;
+                          const href = category.path || `/calculator/${category.id}`;
                           return (
                             <SidebarMenuItem key={category.id}>
                               <Link href={href} passHref>

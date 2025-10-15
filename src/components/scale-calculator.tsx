@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
@@ -224,10 +223,10 @@ function ScaleCalculator() {
   }, 0);
 
   return (
-    <div className="p-1 bg-background max-w-7xl mx-auto" id="scale-calculator-printable-area">
-      <div className="print:hidden flex justify-between items-center mb-4">
+    <div className="p-px bg-background max-w-7xl mx-auto" id="scale-calculator-printable-area">
+      <div className="print:hidden flex justify-between items-center mb-1">
         <h1 className="text-3xl font-bold text-foreground">Balança</h1>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-px">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -257,16 +256,16 @@ function ScaleCalculator() {
         </div>
       </div>
       
-      <div className="hidden print:block mb-4">
+      <div className="hidden print:block mb-1">
         <h1 className="text-4xl font-bold text-center">Balança</h1>
       </div>
 
-      <Card className="mb-4 print:border-none print:shadow-none print:p-0">
-        <CardContent className="p-4 print:p-0">
-          <div className="w-full space-y-2">
+      <Card className="mb-1 print:border-none print:shadow-none print:p-0">
+        <CardContent className="p-1 print:p-0">
+          <div className="w-full space-y-0.5">
             <div className="flex justify-between items-center">
                   <Label htmlFor="cliente" className="font-semibold text-sm md:text-base">Cliente</Label>
-                   <div className="flex items-center gap-1 rounded-full border bg-muted p-0.5 print:hidden">
+                   <div className="flex items-center gap-px rounded-full border bg-muted p-0.5 print:hidden">
                       <TooltipProvider>
                           <Tooltip>
                               <TooltipTrigger asChild>
@@ -287,22 +286,22 @@ function ScaleCalculator() {
                       </TooltipProvider>
                   </div>
               </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-0.5">
                 <Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/>
                 <span className="hidden print:block">{headerData.client || 'N/A'}</span>
                 
-                <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,1fr))] gap-2 w-full text-xs sm:text-sm">
-                    <div className="space-y-1">
+                <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,1fr))] gap-0.5 w-full text-xs sm:text-sm">
+                    <div className="space-y-px">
                         <Label htmlFor="motorista" className="text-xs sm:text-sm">Motorista</Label>
                         <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden text-sm"/>
                         <span className="hidden print:block">{headerData.driver || 'N/A'}</span>
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-px">
                         <Label htmlFor="placa" className="text-xs sm:text-sm">Placa</Label>
                         <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden text-sm"/>
                         <span className="hidden print:block">{headerData.plate || 'N/A'}</span>
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-px">
                         <Label htmlFor="initial-weight" className="text-xs sm:text-sm">
                           {operationType === 'loading' ? 'Bruto' : 'Tara'}
                         </Label>
@@ -320,8 +319,8 @@ function ScaleCalculator() {
          const totalLiquidoSet = subtotalLiquido - set.descontoCacamba;
 
          return (
-          <Card key={set.id} className="mb-4 print:border-none print:shadow-none print:p-0 print:mb-2">
-            <CardHeader className="p-4 flex flex-row items-center justify-between print:p-0 print:mb-2">
+          <Card key={set.id} className="mb-1 print:border-none print:shadow-none print:p-0 print:mb-0.5">
+            <CardHeader className="p-1 flex flex-row items-center justify-between print:p-0 print:mb-0.5">
               <CardTitle className="text-xl">
                 {setIndex === 0 ? "Caçamba 1" : "Bitrem / Caçamba 2"}
               </CardTitle>
@@ -342,31 +341,31 @@ function ScaleCalculator() {
               {/* Mobile Layout */}
               <div className="sm:hidden">
                   {set.items.map((item, itemIndex) => (
-                      <div key={item.id} className="border-b p-2 space-y-2">
-                          <div className="space-y-1">
+                      <div key={item.id} className="border-b p-0.5 space-y-0.5">
+                          <div className="space-y-px">
                             <Label className="text-xs text-muted-foreground">Material</Label>
                             <MaterialSearchInput
                               value={item.material}
                               onValueChange={(newMaterial) => handleMaterialChange(set.id, item.id, newMaterial)}
                             />
                           </div>
-                          <div className="grid grid-cols-2 gap-2">
-                              <div className="space-y-1">
+                          <div className="grid grid-cols-2 gap-0.5">
+                              <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">Bruto (kg)</Label>
                                   <Input type="text" value={formatNumber(item.bruto)} onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)} className="text-right h-8 print:hidden" disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')} />
                                    <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
                               </div>
-                               <div className="space-y-1">
+                               <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">Tara (kg)</Label>
                                    <Input type="text" value={formatNumber(item.tara)} onChange={(e) => handleInputChange(set.id, item.id, 'tara', e.target.value)} className="text-right h-8 print:hidden" disabled={(setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading')} />
                                    <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
                               </div>
-                               <div className="space-y-1">
+                               <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">A/L (kg)</Label>
                                   <Input type="text" value={formatNumber(item.descontos)} onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)} className="text-right h-8 print:hidden" />
                                    <span className="hidden print:block text-right">{formatNumber(item.descontos)}</span>
                               </div>
-                               <div className="space-y-1">
+                               <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">Líquido (kg)</Label>
                                   <div className="h-8 flex items-center justify-end font-semibold">
                                       <span className="print:text-black">{formatNumber(item.liquido)}</span>
@@ -435,9 +434,9 @@ function ScaleCalculator() {
                 </TableBody>
               </Table>
             </CardContent>
-            <CardContent className="p-4 border-t print:border-t print:border-border print:p-0 print:pt-2">
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-4">
-                     <div className="flex items-center gap-2">
+            <CardContent className="p-1 border-t print:border-t print:border-border print:p-0 print:pt-0.5">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-1">
+                     <div className="flex items-center gap-0.5">
                          <Label htmlFor={`desconto-cacamba-${set.id}`} className="shrink-0 text-sm md:text-base">Caçamba (kg)</Label>
                          <Input
                              id={`desconto-cacamba-${set.id}`}
@@ -463,15 +462,15 @@ function ScaleCalculator() {
       })}
 
       {weighingSets.length < 2 && (
-        <div className="flex justify-center my-4 print:hidden">
+        <div className="flex justify-center my-1 print:hidden">
           <Button variant="secondary" onClick={addBitrem} size="sm" className="h-8 px-2"><Tractor className="mr-2 h-4 w-4" /> + Bitrem / Caçamba 2</Button>
         </div>
       )}
 
-      <Card className="mt-4 bg-primary/10 border-primary/20 print:border print:border-accent-price print:shadow-none print:p-2">
-         <CardContent className="p-4 flex justify-end items-center">
+      <Card className="mt-1 bg-primary/10 border-primary/20 print:border print:border-accent-price print:shadow-none print:p-0.5">
+         <CardContent className="p-1 flex justify-end items-center">
              <div className="text-right">
-                <p className="text-lg font-semibold text-primary print:text-2xl print:mb-2">Peso Líquido Total</p>
+                <p className="text-lg font-semibold text-primary print:text-2xl print:mb-0.5">Peso Líquido Total</p>
                 <p className="text-4xl font-bold text-primary print:text-black">{formatNumber(grandTotalLiquido)} kg</p>
             </div>
          </CardContent>
@@ -523,3 +522,5 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 }
 
 export default ScaleCalculator;
+
+    

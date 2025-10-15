@@ -52,9 +52,9 @@ function ScaleCalculator() {
   const [operationType, setOperationType] = useState<OperationType>('loading');
 
   const handleHeaderChange = (field: keyof typeof headerData, value: string) => {
-    const sanitizedValue = value.replace(/[^0-9,]/g, '').replace('.', ',');
+    const sanitizedValue = value.replace(/[^0-9]/g, '');
     if(field === 'initialWeight') {
-        if(/^\d*\,?\d*$/.test(sanitizedValue)) {
+        if(/^\d*$/.test(sanitizedValue)) {
              setHeaderData(prev => ({ ...prev, [field]: sanitizedValue }));
         }
     } else {
@@ -63,7 +63,7 @@ function ScaleCalculator() {
   };
 
   useEffect(() => {
-    const initialWeightValue = parseFloat(headerData.initialWeight.replace(',', '.')) || 0;
+    const initialWeightValue = parseFloat(headerData.initialWeight) || 0;
     
     // Only proceed if there's an initial weight and at least one item
     if (initialWeightValue > 0 && weighingSets[0] && weighingSets[0].items.length > 0) {
@@ -91,7 +91,7 @@ function ScaleCalculator() {
 
 
   const handleInputChange = (setId: string, itemId: string, field: keyof WeighingItem, value: string) => {
-    const numValue = parseFloat(value.replace(',', '.')) || 0;
+    const numValue = parseInt(value.replace(/\D/g, ''), 10) || 0;
     setWeighingSets(prevSets =>
       prevSets.map(set => {
         if (set.id === setId) {
@@ -128,7 +128,7 @@ function ScaleCalculator() {
   };
 
   const handleCacambaDiscount = (setId: string, value: string) => {
-     const numValue = parseFloat(value.replace(',', '.')) || 0;
+     const numValue = parseInt(value.replace(/\D/g, ''), 10) || 0;
      setWeighingSets(prev => prev.map(set => set.id === setId ? {...set, descontoCacamba: numValue} : set));
   };
   
@@ -321,10 +321,22 @@ function ScaleCalculator() {
 
          return (
           <Card key={set.id} className="mb-4 print:border-none print:shadow-none print:p-0 print:mb-2">
-            <CardHeader className="p-4 print:p-0 print:mb-2">
+            <CardHeader className="p-4 flex flex-row items-center justify-between print:p-0 print:mb-2">
               <CardTitle className="text-xl">
                 {setIndex === 0 ? "Caçamba 1" : "Bitrem / Caçamba 2"}
               </CardTitle>
+              <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" onClick={() => addNewMaterial(set.id)} className="h-8 w-8 print:hidden">
+                            <PlusCircle className="h-5 w-5" />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Adicionar Material</p>
+                    </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </CardHeader>
             <CardContent className="p-0 overflow-x-auto">
               {/* Mobile Layout */}
@@ -422,12 +434,6 @@ function ScaleCalculator() {
                   ))}
                 </TableBody>
               </Table>
-              <div className="flex justify-start p-2 print:hidden">
-                  <Button size="sm" onClick={() => addNewMaterial(set.id)} className="h-8 px-2">
-                    <PlusCircle className="mr-1 h-4 w-4" />
-                    Adicionar Material
-                  </Button>
-              </div>
             </CardContent>
             <CardContent className="p-4 border-t print:border-t print:border-border print:p-0 print:pt-2">
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-4">

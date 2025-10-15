@@ -217,15 +217,15 @@ function ScaleCalculator() {
                   <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden"/>
                   <span className="hidden print:block">{headerData.driver || 'N/A'}</span>
               </div>
-              <div>
-                <Label htmlFor="placa">Placa</Label>
-                <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden"/>
-                <span className="hidden print:block">{headerData.plate || 'N/A'}</span>
-              </div>
                <div>
                   <Label htmlFor="cidade">Cidade</Label>
                   <Input id="cidade" value={headerData.city} onChange={e => handleHeaderChange('city', e.target.value)} className="h-8 print:hidden"/>
                   <span className="hidden print:block">{headerData.city || 'N/A'}</span>
+              </div>
+              <div>
+                <Label htmlFor="placa">Placa</Label>
+                <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden"/>
+                <span className="hidden print:block">{headerData.plate || 'N/A'}</span>
               </div>
             </div>
           </div>
@@ -303,7 +303,7 @@ function ScaleCalculator() {
               </div>
             </CardContent>
             <CardContent className="p-4 border-t print:border-t print:border-border print:p-0 print:pt-2">
-                 <div className="flex justify-end items-center gap-4">
+                 <div className="flex flex-col md:flex-row justify-end items-stretch md:items-center gap-4">
                      <div className="flex items-center gap-2">
                          <Label htmlFor={`desconto-cacamba-${set.id}`} className="shrink-0">Desconto Caçamba (kg)</Label>
                          <Input

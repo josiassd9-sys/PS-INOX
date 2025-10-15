@@ -401,3 +401,5 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
     </div>
   )
 }
+
+    

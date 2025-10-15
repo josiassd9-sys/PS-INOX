@@ -1,19 +1,5 @@
 
-export type PerfilIpe = {
-    nome: string;
-    h: number; // mm
-    b: number; // mm
-    tw: number; // mm
-    tf: number; // mm
-    area: number; // cm²
-    peso: number; // kg/m
-    Ix: number; // cm⁴
-    Wx: number; // cm³
-    rx: number; // cm
-    Iy: number; // cm⁴
-    Wy: number; // cm³
-    ry: number; // cm
-};
+import type { PerfilIpe } from './types';
 
 export const perfisIpeData: PerfilIpe[] = [
     { nome: "IPE 80", h: 80, b: 46, tw: 3.8, tf: 5.2, area: 7.64, peso: 6.0, Ix: 80.1, Wx: 20.0, rx: 3.24, Iy: 6.7, Wy: 2.9, ry: 0.94 },
@@ -28,5 +14,3 @@ export const perfisIpeData: PerfilIpe[] = [
     { nome: "IPE 270", h: 270, b: 135, tw: 6.6, tf: 10.2, area: 45.9, peso: 36.1, Ix: 5790, Wx: 429, rx: 11.2, Iy: 368, Wy: 54.5, ry: 2.83 },
     { nome: "IPE 300", h: 300, b: 150, tw: 7.1, tf: 10.7, area: 53.8, peso: 42.2, Ix: 8356, Wx: 557, rx: 12.5, Iy: 551, Wy: 73.4, ry: 3.20 },
 ];
-
-    

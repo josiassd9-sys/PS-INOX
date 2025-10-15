@@ -1,14 +1,5 @@
 
-export type SteelDeck = {
-    nome: string;
-    tipo: 'MD57' | 'MD75';
-    espessuraChapa: number; // mm
-    pesoProprio: number; // kg/m²
-    vaosMaximos: {
-        simples: { '150kgf': number, '250kgf': number, '400kgf': number };
-        duplo: { '150kgf': number, '250kgf': number, '400kgf': number };
-    };
-};
+import type { SteelDeck } from './types';
 
 export const steelDeckData: SteelDeck[] = [
     { 
@@ -52,5 +43,3 @@ export const steelDeckData: SteelDeck[] = [
         }
     },
 ];
-
-    

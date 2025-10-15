@@ -1,4 +1,6 @@
 
+import type { PerfilIpe, SteelDeck } from './types';
+
 export type Perfil = {
     nome: string;
     peso: number; // kg/m
@@ -32,33 +34,6 @@ export type BudgetItem = {
 export type SupportReaction = {
   vigaPrincipal: number;
   vigaSecundaria: number;
-};
-
-export type PerfilIpe = {
-    nome: string;
-    h: number; // mm
-    b: number; // mm
-    tw: number; // mm
-    tf: number; // mm
-    area: number; // cm²
-    peso: number; // kg/m
-    Ix: number; // cm⁴
-    Wx: number; // cm³
-    rx: number; // cm
-    Iy: number; // cm⁴
-    Wy: number; // cm³
-    ry: number; // cm
-};
-
-export type SteelDeck = {
-    nome: string;
-    tipo: 'MD57' | 'MD75';
-    espessuraChapa: number; // mm
-    pesoProprio: number; // kg/m²
-    vaosMaximos: {
-        simples: { '150kgf': number, '250kgf': number, '400kgf': number };
-        duplo: { '150kgf': number, '250kgf': number, '400kgf': number };
-    };
 };
 
 export const tiposAco = [

@@ -11,7 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { steelDeckData, SteelDeck } from "@/lib/data/steel-deck";
+import { steelDeckData } from "@/lib/data/steel-deck";
+import type { SteelDeck } from "@/lib/data/steel-deck";
 import { Dashboard } from "@/components/dashboard";
 import { Badge } from "@/components/ui/badge";
 

@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from ".
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import { SteelItem, ALL_CATEGORIES, ConnectionGroup, ConnectionItem, Category } from "../lib/data";
+import { SteelItem, ALL_CATEGORIES, ConnectionGroup, ConnectionItem, Category } from "@/lib/data";
 import { GlobalSearchResults } from "./global-search-results";
 import { COST_ADJUSTMENTS_LOCAL_STORAGE_KEY, EDITED_CONNECTIONS_WEIGHTS_KEY } from "./dashboard";
 import { Label } from "./ui/label";
@@ -442,3 +442,5 @@ export function MaterialListBuilder() {
       </div>
   );
 }
+
+    

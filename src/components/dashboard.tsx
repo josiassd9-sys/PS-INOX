@@ -3,7 +3,8 @@
 "use client";
 
 import * as React from "react";
-import { ALL_CATEGORIES, CATEGORY_GROUPS, type Category, type ScrapItem, SteelItem, ConnectionGroup, ConnectionItem } from "@/lib/data";
+import { ALL_CATEGORIES, CATEGORY_GROUPS } from "@/lib/data";
+import type { Category, ScrapItem, SteelItem, ConnectionGroup, ConnectionItem } from "@/lib/data/types";
 import {
   Sidebar,
   SidebarHeader,
@@ -189,7 +190,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
     setSelectedItemForAdjustment(null);
   };
 
-  const selectedCategory = ALL_CATEGORIES.find((c) => c.id === selectedCategoryId);
+  const selectedCategory = React.useMemo(() => ALL_CATEGORIES.find((c) => c.id === selectedCategoryId), [selectedCategoryId]);
   const currentPriceParamsKey = selectedCategory?.hasOwnPriceControls ? selectedCategoryId : 'global';
   const currentPriceParams = currentPriceParamsKey ? priceParams[currentPriceParamsKey] : undefined;
 
@@ -291,6 +292,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                          selectedCategoryId === 'gauge' ||
                          selectedCategoryId === 'ai-assistant' ||
                          selectedCategoryId === 'lista-materiais' ||
+                         selectedCategoryId === 'lista-sucatas' ||
                          selectedCategoryId?.startsWith('perfis/');
 
   const renderContent = () => {
@@ -335,6 +337,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
       case 'conexoes': return <ConnectionsTable category={selectedCategory as any} sellingPrice={currentPriceParams.sellingPrice} editedWeights={editedWeights} onWeightChange={handleWeightChange} />;
       case 'gauge': return <GaugeStandards />;
       case 'lista-materiais': return <div/>;
+      case 'lista-sucatas': return <div/>;
       default:
         if (selectedCategory) {
           return <ItemTable category={selectedCategory as any} priceParams={currentPriceParams} costAdjustments={costAdjustments} onItemClick={handleItemClickForAdjustment} />;

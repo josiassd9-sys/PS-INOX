@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "./ui/button";
-import { PlusCircle, Printer, Save, Download, Sparkles } from "lucide-react";
+import { PlusCircle, Printer, Save, Download, Sparkles, Trash2 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { Separator } from "./ui/separator";
 import { useToast } from "@/hooks/use-toast";
@@ -351,7 +351,7 @@ export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCal
 
 
   return (
-    <div id="scale-calculator-printable-area" className="space-y-1">
+    <div id="scale-calculator-printable-area" className="space-y-2 p-1">
         <div className="space-y-1">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
                 <div className="space-y-1">
@@ -366,7 +366,7 @@ export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCal
 
         {weighingSets.map((set, setIndex) => (
           <Card key={set.id} className="bg-card/50 pt-1 print:shadow-none print:border-border">
-            <CardHeader className="flex-row items-center justify-between p-1">
+            <CardHeader className="flex-row items-center justify-between p-2">
                 <div className="space-y-1 flex-1">
                     <CardTitle className="text-lg">Pesagem {setIndex + 1}</CardTitle>
                 </div>
@@ -376,8 +376,8 @@ export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCal
                 </Button>
               )}
             </CardHeader>
-            <CardContent className="space-y-1 p-1 pt-0">
-                <div className="grid grid-cols-3 gap-1">
+            <CardContent className="space-y-2 p-2 pt-0">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div className="space-y-1">
                         <Label htmlFor={`driver-name-${set.id}`} className="text-xs text-muted-foreground">Motorista</Label>
                         <Input
@@ -410,7 +410,7 @@ export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCal
                 </div>
 
               {set.boxes.map((box, boxIndex) => (
-                <div key={box.id} className="space-y-1 rounded-lg border bg-background p-1 relative print:border-border">
+                <div key={box.id} className="space-y-2 rounded-lg border bg-background p-2 relative print:border-border">
                   <div className="flex items-center justify-between">
                     <Input 
                       value={box.name}
@@ -423,7 +423,7 @@ export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCal
                       </Button>
                     )}
                   </div>
-                  <div className="grid grid-cols-3 gap-1">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       <div className="space-y-1">
                         <Label htmlFor={`weight-${box.id}`} className="text-xs text-muted-foreground">{boxWeightLabel}</Label>
                         <Input
@@ -457,41 +457,41 @@ export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCal
                           placeholder="Peso"
                         />
                       </div>
-                  </div>
-                  <div className="grid grid-cols-3 gap-1 items-end">
-                    <div className="space-y-1">
+                      <div className="space-y-1">
                         <Label className="text-accent-price font-semibold text-xs">Peso Líquido</Label>
                         <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-1 text-sm font-bold text-accent-price h-10 flex items-center print:bg-transparent print:border-accent-price">
                             {formatNumber(box.net)} kg
                         </div>
                     </div>
-                     <Button variant="outline" size="sm" onClick={() => addMaterialBox(set.id)} className="gap-1 print:hidden h-10">
-                        <PlusCircle className="h-4 w-4"/>
-                        Material
-                    </Button>
-                     {weighingSets.length < 2 && setIndex === weighingSets.length -1 && (
-                        <Button variant="secondary" onClick={addWeighingSet} className="gap-1 h-10 print:hidden">
-                            <PlusCircle className="h-4 w-4" />
-                            Bitrem
-                        </Button>
-                    )}
                   </div>
                 </div>
               ))}
+               <div className="flex gap-2">
+                 <Button variant="outline" size="sm" onClick={() => addMaterialBox(set.id)} className="gap-1 print:hidden h-10 flex-1">
+                    <PlusCircle className="h-4 w-4"/>
+                    Adicionar Material
+                </Button>
+                {weighingSets.length < 2 && setIndex === weighingSets.length -1 && (
+                    <Button variant="secondary" onClick={addWeighingSet} className="gap-1 h-10 print:hidden flex-1">
+                        <PlusCircle className="h-4 w-4" />
+                        Adicionar Bitrem
+                    </Button>
+                )}
+               </div>
             </CardContent>
           </Card>
         ))}
 
         <Separator />
 
-        <div className="flex justify-end items-center gap-1 pt-1">
+        <div className="flex justify-end items-center gap-2 pt-2">
             <h3 className="text-lg font-semibold">Total Geral Líquido:</h3>
             <div className="text-2xl font-bold text-primary min-w-[150px] text-right">
                 {formatNumber(grandTotalNet)} kg
             </div>
         </div>
 
-        <div className="flex justify-end pt-1 gap-1 print:hidden">
+        <div className="flex justify-end pt-2 gap-2 print:hidden">
             <AlertDialog>
                 <AlertDialogTrigger asChild>
                     <Button variant="destructive" className="gap-1">

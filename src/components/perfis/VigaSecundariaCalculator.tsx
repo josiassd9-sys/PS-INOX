@@ -10,7 +10,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckCircle, PlusCircle, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { perfisIpeData, tiposAco, E_ACO_MPA, BudgetItem, PerfilIpe } from "@/lib/data";
+import { perfisIpeData, tiposAco, E_ACO_MPA, BudgetItem, PerfilIpe } from "@/lib/data/index";
 
 interface VigaSecundariaCalculatorProps {
     onAddToBudget: (item: BudgetItem) => void;

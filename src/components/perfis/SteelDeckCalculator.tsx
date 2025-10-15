@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { CheckCircle, PlusCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { steelDeckData, PESO_CONCRETO_KGF_M3, BudgetItem } from "@/lib/data";
+import { steelDeckData, PESO_CONCRETO_KGF_M3, BudgetItem } from "@/lib/data/index";
 
 interface SteelDeckCalculatorProps {
     onCalculated: (load: number) => void;

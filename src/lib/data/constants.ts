@@ -1,7 +1,7 @@
 export const INCH_TO_MM = 25.4;
 
 // Densities
-export const STAINLESS_STEEL_DENSITY_KG_M3 = 7980;
+export const STAINLESS_STEEL_DENSITY_KG_M3 = 8000; // Ajustado para um valor redondo e comum
 export const BRONZE_TM23_DENSITY_KG_M3 = 8800;
 export const ALUMINUM_DENSITY_KG_M3 = 2710;
 export const BRASS_DENSITY_KG_M3 = 8500;

@@ -5,6 +5,6 @@ import { Dashboard } from "@/components/dashboard";
 
 export default function HomePage() {
   return (
-      <Dashboard initialCategoryId="package-checker" />
+      <Dashboard initialCategoryId={null} />
   );
 }

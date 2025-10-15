@@ -3,8 +3,7 @@
 "use client";
 
 import * as React from "react";
-import { ALL_CATEGORIES, CATEGORY_GROUPS } from "@/lib/data";
-import type { Category, ScrapItem, SteelItem, ConnectionGroup, ConnectionItem } from "@/lib/data/types";
+import { ALL_CATEGORIES, CATEGORY_GROUPS, SteelItem, ScrapItem, ConnectionGroup, ConnectionItem, Category } from "@/lib/data";
 import {
   Sidebar,
   SidebarHeader,
@@ -115,6 +114,8 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
     // Navigate to initial category on load
     if (initialCategoryId) {
       setSelectedCategoryId(initialCategoryId);
+    } else {
+      setSelectedCategoryId('package-checker');
     }
   }, [initialCategoryId]);
 
@@ -190,7 +191,11 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
     setSelectedItemForAdjustment(null);
   };
 
-  const selectedCategory = React.useMemo(() => ALL_CATEGORIES.find((c) => c.id === selectedCategoryId), [selectedCategoryId]);
+  const selectedCategory = React.useMemo(() => {
+    if (!selectedCategoryId) return null;
+    return ALL_CATEGORIES.find((c) => c.id === selectedCategoryId);
+  }, [selectedCategoryId]);
+
   const currentPriceParamsKey = selectedCategory?.hasOwnPriceControls ? selectedCategoryId : 'global';
   const currentPriceParams = currentPriceParamsKey ? priceParams[currentPriceParamsKey] : undefined;
 
@@ -282,7 +287,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
       .filter((category): category is Category => category !== null && category.items.length > 0);
   }, [searchTerm]);
   
-  const isSpecialPage = selectedCategoryId === 'package-checker' ||
+  const isSpecialPage = children || selectedCategoryId === 'package-checker' ||
                          selectedCategoryId === 'balanca' ||
                          selectedCategoryId === 'tabela-sucata' ||
                          selectedCategoryId === 'normas-astm' ||
@@ -296,10 +301,9 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                          selectedCategoryId?.startsWith('perfis/');
 
   const renderContent = () => {
-    if (children) return children;
-  
+    if (children && selectedCategoryId) return children;
+
     if (!selectedCategory) {
-      // Fallback for when no category is selected, e.g., on the homepage
       return <PackageChecker />;
     }
 
@@ -347,21 +351,14 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
   }
   
   const showPriceControls = selectedCategory && !isSpecialPage;
-  const showGlobalSearch = selectedCategory && !isSpecialPage;
 
   const getPageTitle = () => {
-    if (children && (selectedCategoryId?.startsWith('perfis/') || selectedCategoryId === 'ai-assistant')) {
-        return selectedCategory?.name ?? "Perfis de Aço";
-    }
     if (searchTerm) return "Resultados da Busca";
     if (selectedCategory) return selectedCategory.name;
     return "Bem-vindo!";
   }
 
   const getPageDescription = () => {
-      if (children && (selectedCategoryId?.startsWith('perfis/') || selectedCategoryId === 'ai-assistant')) {
-        return selectedCategory?.description ?? "";
-      }
       if (searchTerm) return `Buscando por "${searchTerm}"`;
       if (selectedCategory) return selectedCategory.description;
       return "Selecione uma categoria no menu para começar.";
@@ -505,5 +502,3 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
 export function Dashboard({ initialCategoryId, children }: { initialCategoryId: string | null, children?: React.ReactNode }) {
   return <DashboardComponent initialCategoryId={initialCategoryId} children={children} />
 }
-
-    

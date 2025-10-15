@@ -225,7 +225,29 @@ function ScaleCalculator() {
   return (
     <div className="p-4 bg-background max-w-7xl mx-auto" id="scale-calculator-printable-area">
       <div className="print:hidden flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold text-foreground">Balança</h1>
+        <div className="flex items-center gap-2">
+            <h1 className="text-3xl font-bold text-foreground">Balança</h1>
+            <TooltipProvider>
+                <div className="flex items-center gap-1 rounded-full border bg-muted p-0.5">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant={operationType === 'loading' ? 'default' : 'ghost'} size="icon" className="h-7 w-7 rounded-full" onClick={() => setOperationType('loading')}>
+                                <ArrowDownToLine className="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent><p>Carregamento (Entrada)</p></TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant={operationType === 'unloading' ? 'default' : 'ghost'} size="icon" className="h-7 w-7 rounded-full" onClick={() => setOperationType('unloading')}>
+                                <ArrowUpFromLine className="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent><p>Descarregamento (Saída)</p></TooltipContent>
+                    </Tooltip>
+                </div>
+            </TooltipProvider>
+        </div>
         <div className="flex items-center gap-1">
           <TooltipProvider>
             <Tooltip>
@@ -266,26 +288,6 @@ function ScaleCalculator() {
             <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-center">
                     <Label htmlFor="cliente" className="font-semibold text-sm md:text-base">Cliente</Label>
-                    <TooltipProvider>
-                        <div className="flex items-center gap-1 rounded-full border bg-muted p-0.5">
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button variant={operationType === 'loading' ? 'default' : 'ghost'} size="icon" className="h-7 w-7 rounded-full" onClick={() => setOperationType('loading')}>
-                                        <ArrowDownToLine className="h-4 w-4" />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent><p>Carregamento (Entrada)</p></TooltipContent>
-                            </Tooltip>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button variant={operationType === 'unloading' ? 'default' : 'ghost'} size="icon" className="h-7 w-7 rounded-full" onClick={() => setOperationType('unloading')}>
-                                        <ArrowUpFromLine className="h-4 w-4" />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent><p>Descarregamento (Saída)</p></TooltipContent>
-                            </Tooltip>
-                        </div>
-                    </TooltipProvider>
                 </div>
                 <Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/>
                 <span className="hidden print:block">{headerData.client || 'N/A'}</span>
@@ -303,7 +305,7 @@ function ScaleCalculator() {
                     </div>
                     <div className="space-y-1">
                         <Label htmlFor="initial-weight" className="text-xs sm:text-sm">
-                          Peso Inicial ({operationType === 'loading' ? 'Bruto' : 'Tara'})
+                          {operationType === 'loading' ? 'Bruto' : 'Tara'}
                         </Label>
                         <Input id="initial-weight" type="text" inputMode="decimal" value={headerData.initialWeight} onChange={e => handleHeaderChange('initialWeight', e.target.value)} className="h-8 print:hidden text-sm"/>
                         <span className="hidden print:block">{headerData.initialWeight || 'N/A'}</span>
@@ -476,3 +478,5 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 }
 
 export default ScaleCalculator;
+
+    

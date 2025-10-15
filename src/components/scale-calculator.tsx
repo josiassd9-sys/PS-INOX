@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
@@ -15,7 +16,7 @@ import { scrapItems } from "@/lib/data/sucata";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "./ui/command";
 import { ScrollArea } from "./ui/scroll-area";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "./ui/tooltip";
 import { cn } from "@/lib/utils";
 
 type WeighingItem = {
@@ -225,29 +226,7 @@ function ScaleCalculator() {
   return (
     <div className="p-4 bg-background max-w-7xl mx-auto" id="scale-calculator-printable-area">
       <div className="print:hidden flex justify-between items-center mb-4">
-        <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold text-foreground">Balança</h1>
-            <TooltipProvider>
-                <div className="flex items-center gap-1 rounded-full border bg-muted p-0.5">
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button variant={operationType === 'loading' ? 'default' : 'ghost'} size="icon" className="h-7 w-7 rounded-full" onClick={() => setOperationType('loading')}>
-                                <ArrowDownToLine className="h-4 w-4" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent><p>Carregamento (Entrada)</p></TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button variant={operationType === 'unloading' ? 'default' : 'ghost'} size="icon" className="h-7 w-7 rounded-full" onClick={() => setOperationType('unloading')}>
-                                <ArrowUpFromLine className="h-4 w-4" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent><p>Descarregamento (Saída)</p></TooltipContent>
-                    </Tooltip>
-                </div>
-            </TooltipProvider>
-        </div>
+        <h1 className="text-3xl font-bold text-foreground">Balança</h1>
         <div className="flex items-center gap-1">
           <TooltipProvider>
             <Tooltip>
@@ -285,10 +264,30 @@ function ScaleCalculator() {
       <Card className="mb-4 print:border-none print:shadow-none print:p-0">
         <CardContent className="p-4 print:p-0">
           <div className="w-full space-y-2">
+             <div className="flex justify-between items-center">
+                  <Label htmlFor="cliente" className="font-semibold text-sm md:text-base">Cliente</Label>
+                   <div className="flex items-center gap-1 rounded-full border bg-muted p-0.5">
+                      <TooltipProvider>
+                          <Tooltip>
+                              <TooltipTrigger asChild>
+                                  <Button variant={operationType === 'loading' ? 'default' : 'ghost'} size="icon" className="h-7 w-7 rounded-full" onClick={() => setOperationType('loading')}>
+                                      <ArrowDownToLine className="h-4 w-4" />
+                                  </Button>
+                              </TooltipTrigger>
+                              <TooltipContent><p>Carregamento (Entrada)</p></TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                              <TooltipTrigger asChild>
+                                  <Button variant={operationType === 'unloading' ? 'default' : 'ghost'} size="icon" className="h-7 w-7 rounded-full" onClick={() => setOperationType('unloading')}>
+                                      <ArrowUpFromLine className="h-4 w-4" />
+                                  </Button>
+                              </TooltipTrigger>
+                              <TooltipContent><p>Descarregamento (Saída)</p></TooltipContent>
+                          </Tooltip>
+                      </TooltipProvider>
+                  </div>
+              </div>
             <div className="flex flex-col gap-2">
-                <div className="flex justify-between items-center">
-                    <Label htmlFor="cliente" className="font-semibold text-sm md:text-base">Cliente</Label>
-                </div>
                 <Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/>
                 <span className="hidden print:block">{headerData.client || 'N/A'}</span>
                 
@@ -329,7 +328,7 @@ function ScaleCalculator() {
             </CardHeader>
             <CardContent className="p-0 overflow-x-auto">
               <Table>
-                <TableHeader>
+                <TableHeader className="hidden sm:table-header-group">
                    <TableRow className="print:text-black">
                     <TableHead className="w-[30%]">Material</TableHead>
                     <TableHead className="text-right w-[17.5%]">Bruto (kg)</TableHead>
@@ -340,45 +339,54 @@ function ScaleCalculator() {
                 </TableHeader>
                 <TableBody>
                   {set.items.map((item, itemIndex) => (
-                    <TableRow key={item.id} className="print:text-black">
-                      <TableCell>
+                    <TableRow key={item.id} className="print:text-black flex flex-col sm:table-row gap-1 p-2 sm:p-0 border-b sm:border-b-0">
+                      <TableCell className="p-0 sm:p-2 sm:w-[30%] font-medium">
+                          <Label className="sm:hidden text-xs text-muted-foreground">Material</Label>
                           <MaterialSearchInput
                             value={item.material}
                             onValueChange={(newMaterial) => handleMaterialChange(set.id, item.id, newMaterial)}
                           />
                       </TableCell>
-                      <TableCell>
-                        <Input
-                          type="text"
-                          value={formatNumber(item.bruto)}
-                          onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)}
-                          className="text-right h-8 print:hidden"
-                          disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')}
-                        />
-                         <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
-                      </TableCell>
-                       <TableCell>
-                        <Input
-                          type="text"
-                          value={formatNumber(item.tara)}
-                          onChange={(e) => handleInputChange(set.id, item.id, 'tara', e.target.value)}
-                          className="text-right h-8 print:hidden"
-                          disabled={setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading'}
-                        />
-                         <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="text"
-                          value={formatNumber(item.descontos)}
-                          onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)}
-                          className="text-right h-8 print:hidden"
-                        />
-                         <span className="hidden print:block text-right">{formatNumber(item.descontos)}</span>
-                      </TableCell>
-                       <TableCell className="text-right font-semibold">
-                           <span className="print:text-black">{formatNumber(item.liquido)}</span>
-                       </TableCell>
+                      <div className="flex gap-1 w-full">
+                        <TableCell className="p-0 sm:p-2 flex-1 sm:w-[17.5%]">
+                            <Label className="sm:hidden text-xs text-muted-foreground">Bruto (kg)</Label>
+                            <Input
+                            type="text"
+                            value={formatNumber(item.bruto)}
+                            onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)}
+                            className="text-right h-8 print:hidden"
+                            disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')}
+                            />
+                            <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
+                        </TableCell>
+                        <TableCell className="p-0 sm:p-2 flex-1 sm:w-[17.5%]">
+                            <Label className="sm:hidden text-xs text-muted-foreground">Tara (kg)</Label>
+                            <Input
+                            type="text"
+                            value={formatNumber(item.tara)}
+                            onChange={(e) => handleInputChange(set.id, item.id, 'tara', e.target.value)}
+                            className="text-right h-8 print:hidden"
+                            disabled={(setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading')}
+                            />
+                            <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
+                        </TableCell>
+                        <TableCell className="p-0 sm:p-2 flex-1 sm:w-[17.5%]">
+                            <Label className="sm:hidden text-xs text-muted-foreground">Descontos (kg)</Label>
+                            <Input
+                            type="text"
+                            value={formatNumber(item.descontos)}
+                            onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)}
+                            className="text-right h-8 print:hidden"
+                            />
+                            <span className="hidden print:block text-right">{formatNumber(item.descontos)}</span>
+                        </TableCell>
+                        <TableCell className="p-0 sm:p-2 flex-1 sm:w-[17.5%] text-right font-semibold">
+                            <Label className="sm:hidden text-xs text-muted-foreground">Líquido (kg)</Label>
+                            <div className="h-8 sm:h-full flex items-center justify-end">
+                                <span className="print:text-black">{formatNumber(item.liquido)}</span>
+                            </div>
+                        </TableCell>
+                      </div>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -479,4 +487,3 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 
 export default ScaleCalculator;
 
-    

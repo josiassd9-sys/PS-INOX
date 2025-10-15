@@ -16,7 +16,7 @@ import {
   useSidebar,
   SidebarGroup,
 } from "@/components/ui/sidebar";
-import { Search, SlidersHorizontal, PlusCircle, Calculator, BookOpen, Ruler, Variable } from "lucide-react";
+import { Search, SlidersHorizontal, PlusCircle, Calculator, BookOpen, Ruler, Variable, X } from "lucide-react";
 import { PriceControls } from "./price-controls";
 import { ItemTable } from "./item-table";
 import { Icon } from "./icons";
@@ -105,7 +105,6 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
   const [searchTerm, setSearchTerm] = React.useState("");
   const { setOpenMobile, isMobile } = useSidebar();
   const [isScrapItemDialogOpen, setIsScrapItemDialogOpen] = React.useState(false);
-  const [customerName, setCustomerName] = React.useState("");
   const [editedWeights, setEditedWeights] = React.useState<Record<string, number>>({});
   const [costAdjustments, setCostAdjustments] = React.useState<Record<string, number>>({});
   const [selectedItemForAdjustment, setSelectedItemForAdjustment] = React.useState<SteelItem | null>(null);
@@ -323,17 +322,17 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
           categories={filteredCategories as any}
           priceParams={priceParams}
           searchTerm={searchTerm}
-          isScrapCalculatorActive={false}
           costAdjustments={costAdjustments}
           onItemClick={handleItemClickForAdjustment}
           onAddItem={() => {}}
+          isScrapCalculatorActive={false}
         />
       );
     }
     
     switch (selectedCategoryId) {
       case 'package-checker': return <PackageChecker />;
-      case 'balanca': return <ScaleCalculator customerName={customerName} onCustomerNameChange={setCustomerName} />;
+      case 'balanca': return <ScaleCalculator />;
       case 'tabela-sucata': return <ScrapTable category={selectedCategory as any} isDialogOpen={isScrapItemDialogOpen} setIsDialogOpen={setIsScrapItemDialogOpen} searchTerm={searchTerm} />;
       case 'normas-astm': return <AstmStandards />;
       case 'processos-fabricacao': return <ManufacturingProcesses />;
@@ -429,6 +428,11 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   />
+                 {searchTerm && (
+                    <Button variant="ghost" size="icon" className="absolute right-0 top-0 h-full" onClick={() => setSearchTerm("")}>
+                       <X className="h-4 w-4" />
+                    </Button>
+                 )}
               </div>
               
               <div className="flex items-center gap-1">
@@ -502,3 +506,5 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
 export function Dashboard({ initialCategoryId, children }: { initialCategoryId: string | null, children?: React.ReactNode }) {
   return <DashboardComponent initialCategoryId={initialCategoryId} children={children} />
 }
+
+    

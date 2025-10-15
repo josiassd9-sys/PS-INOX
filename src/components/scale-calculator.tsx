@@ -13,476 +13,256 @@ import { Label } from "@/components/ui/label";
 import { Button } from "./ui/button";
 import { PlusCircle, Printer, Save, Download, Sparkles, Trash2 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
-import { Separator } from "./ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
 import { cn } from "@/lib/utils";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
 import { Icon } from "./icons";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { Separator } from "./ui/separator";
 
-interface MaterialBox {
+interface MaterialItem {
   id: string;
   name: string;
-  weight: string; // Can be tare or gross depending on mode
-  discount: string;
+  gross: string;
+  waste: string;
   container: string;
+  tare: string;
   net: number;
 }
 
 interface WeighingSet {
-  id: string;
-  driverName: string;
-  plate: string;
-  initialWeight: string; // Gross for unloading, Tare for loading
-  boxes: MaterialBox[];
+  id:string;
+  items: MaterialItem[];
   totalNet: number;
 }
 
-type WeighingMode = "unloading" | "loading";
+const LOCAL_STORAGE_KEY = "scaleCalculatorState_v2";
 
-const LOCAL_STORAGE_KEY = "scaleCalculatorState";
+const createNewItem = (): MaterialItem => ({
+  id: uuidv4(),
+  name: "",
+  gross: "",
+  waste: "",
+  container: "",
+  tare: "",
+  net: 0,
+});
 
-const getInitialWeighingSet = (): WeighingSet[] => ([
-    {
-      id: uuidv4(),
-      driverName: "",
-      plate: "",
-      initialWeight: "",
-      boxes: [{ id: uuidv4(), name: "Material 1", weight: "", discount: "", container: "", net: 0 }],
-      totalNet: 0,
-    },
-]);
+const createNewWeighingSet = (): WeighingSet => ({
+  id: uuidv4(),
+  items: [createNewItem()],
+  totalNet: 0,
+});
 
-const sanitizeWeighingSets = (sets: any): WeighingSet[] => {
-  if (!Array.isArray(sets)) return getInitialWeighingSet();
-  const sanitized = sets.map(set => ({
-    id: set.id || uuidv4(),
-    driverName: set.driverName || "",
-    plate: set.plate || "",
-    initialWeight: set.initialWeight || "",
-    totalNet: set.totalNet || 0,
-    boxes: Array.isArray(set.boxes) && set.boxes.length > 0 ? set.boxes.map((box: any) => ({
-      id: box.id || uuidv4(),
-      name: box.name || "",
-      weight: box.weight || "",
-      discount: box.discount || "",
-      container: box.container || "",
-      net: box.net || 0,
-    })) : [{ id: uuidv4(), name: "Material 1", weight: "", discount: "", container: "", net: 0 }],
-  }));
-  return sanitized.length > 0 ? sanitized : getInitialWeighingSet();
+const sanitizeState = (state: any): { weighingSets: WeighingSet[] } => {
+    if (!state || !Array.isArray(state.weighingSets)) {
+        return { weighingSets: [createNewWeighingSet()] };
+    }
+    const sanitizedSets = state.weighingSets.map((set: any) => {
+        if (!set || !set.id || !Array.isArray(set.items)) {
+            return createNewWeighingSet();
+        }
+        const sanitizedItems = set.items.map((item: any) => ({
+            id: item.id || uuidv4(),
+            name: item.name || "",
+            gross: item.gross || "",
+            waste: item.waste || "",
+            container: item.container || "",
+            tare: item.tare || "",
+            net: typeof item.net === 'number' ? item.net : 0,
+        }));
+        return {
+            id: set.id,
+            items: sanitizedItems.length > 0 ? sanitizedItems : [createNewItem()],
+            totalNet: typeof set.totalNet === 'number' ? set.totalNet : 0,
+        };
+    });
+
+    return {
+        weighingSets: sanitizedSets.length > 0 ? sanitizedSets : [createNewWeighingSet()],
+    };
 };
 
-interface ScaleCalculatorProps {
-    customerName: string;
-    onCustomerNameChange: (name: string) => void;
-}
 
-
-export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCalculatorProps) {
+export function ScaleCalculator() {
   const { toast } = useToast();
-  const [weighingMode, setWeighingMode] = React.useState<WeighingMode>("unloading");
-  const [weighingSets, setWeighingSets] = React.useState<WeighingSet[]>(getInitialWeighingSet());
-
-  const saveStateToLocalStorage = () => {
-    try {
-      const stateToSave = {
-        customerName,
-        weighingSets,
-        weighingMode,
-      };
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stateToSave));
-      toast({
-        title: "Progresso Salvo!",
-        description: "Sua pesagem foi salva localmente no seu dispositivo.",
-      });
-    } catch (error) {
-      console.error("Failed to save state to localStorage", error);
-      toast({
-        variant: "destructive",
-        title: "Erro ao Salvar",
-        description: "Não foi possível salvar os dados. O armazenamento local pode estar cheio ou indisponível.",
-      });
-    }
-  };
-
-  const loadStateFromLocalStorage = () => {
-    try {
-      const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (savedState) {
-        const parsedState = JSON.parse(savedState);
-        
-        if (parsedState && typeof parsedState === 'object') {
-            const { customerName, weighingSets, weighingMode } = parsedState;
-            onCustomerNameChange(customerName || "");
-            
-            const sanitizedSets = sanitizeWeighingSets(weighingSets);
-
-            if (sanitizedSets.length > 0) {
-              setWeighingSets(sanitizedSets);
-            } else {
-               setWeighingSets(getInitialWeighingSet());
-            }
-            setWeighingMode(weighingMode || "unloading");
-            toast({
-                title: "Dados Carregados",
-                description: "A última pesagem salva foi carregada.",
-            });
-        } else {
-             throw new Error("Invalid data format in localStorage");
-        }
-
-      } else {
-        toast({
-            variant: "default",
-            title: "Nenhum dado salvo",
-            description: "Não há nenhuma pesagem salva para carregar.",
-        });
-      }
-    } catch (error) {
-      console.error("Failed to load state from localStorage", error);
-       toast({
-        variant: "destructive",
-        title: "Erro ao Carregar",
-        description: "Não foi possível carregar os dados salvos. O formato pode ser inválido.",
-      });
-      // Reset to a clean state if loading fails
-      handleClearAll();
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
-    }
-  };
-  
-  const handleClearAll = () => {
-    onCustomerNameChange("");
-    setWeighingSets(getInitialWeighingSet());
-    setWeighingMode("unloading");
-    toast({
-        title: "Campos Limpos",
-        description: "Você pode iniciar uma nova pesagem.",
-    });
-  }
+  const [weighingSets, setWeighingSets] = React.useState<WeighingSet[]>([createNewWeighingSet()]);
+  const [isClient, setIsClient] = React.useState(false);
 
   React.useEffect(() => {
+    setIsClient(true);
     try {
-      const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (savedState) {
-        const parsedState = JSON.parse(savedState);
-         if (parsedState && typeof parsedState === 'object') {
-            const { customerName, weighingSets, weighingMode } = parsedState;
-            if(customerName) onCustomerNameChange(customerName);
-            const sanitizedSets = sanitizeWeighingSets(weighingSets);
-            if (sanitizedSets.length > 0) {
-              setWeighingSets(sanitizedSets);
-            }
-            if(weighingMode) setWeighingMode(weighingMode);
-        }
+      const savedStateJSON = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedStateJSON) {
+        const savedState = JSON.parse(savedStateJSON);
+        const sanitized = sanitizeState(savedState);
+        setWeighingSets(sanitized.weighingSets);
       }
     } catch (error) {
-       console.error("Failed to auto-load state from localStorage", error);
-       localStorage.removeItem(LOCAL_STORAGE_KEY);
+      console.error("Failed to load from localStorage", error);
+      setWeighingSets([createNewWeighingSet()]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  
+  React.useEffect(() => {
+    if (isClient) {
+      try {
+        const stateToSave = { weighingSets };
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stateToSave));
+      } catch (error) {
+        console.error("Failed to save to localStorage", error);
+      }
+    }
+  }, [weighingSets, isClient]);
 
 
-  const handleSetTextChange = (
-    value: string,
-    setId: string,
-    field: keyof Omit<WeighingSet, "boxes" | "totalNet" | "id" | "initialWeight">
-  ) => {
-    setWeighingSets((prevSets) =>
-      prevSets.map((set) => {
+  const handleItemChange = (setId: string, itemId: string, field: keyof Omit<MaterialItem, 'id' | 'net'>, value: string) => {
+    setWeighingSets(prev =>
+      prev.map(set => {
         if (set.id !== setId) return set;
-        return { ...set, [field]: value };
+        const newItems = set.items.map(item => {
+          if (item.id !== itemId) return item;
+          
+          if (field !== 'name') {
+            const sanitizedValue = value.replace(/[^0-9,.]/g, "").replace(".", ",");
+             if (!/^\d*\,?\d*$/.test(sanitizedValue)) return item;
+             return { ...item, [field]: sanitizedValue };
+          }
+          return { ...item, [field]: value };
+        });
+        return { ...set, items: newItems };
       })
     );
   };
   
-  const handleInputChange = (
-    value: string,
-    setId: string,
-    field: keyof Omit<WeighingSet, "boxes" | "totalNet" | "id" | "driverName" | "plate">,
-  ) => {
-    const sanitizedValue = value.replace(/[^0-9,.]/g, "").replace(".", ",");
-    if (/^\d*\,?\d*$/.test(sanitizedValue)) {
-      setWeighingSets((prevSets) =>
-        prevSets.map((set) => {
-          if (set.id !== setId) return set;
-          return { ...set, [field]: sanitizedValue };
-        })
-      );
-    }
-  };
-  
-  const handleBoxInputChange = (value: string, setId: string, boxId: string, field: keyof Omit<MaterialBox, 'id' | 'net'>) => {
-    if (field === 'name') {
-      setWeighingSets(prevSets => prevSets.map(set => {
-        if (set.id !== setId) return set;
-        const updatedBoxes = set.boxes.map(box => 
-          box.id === boxId ? { ...box, name: value } : box
-        );
-        return { ...set, boxes: updatedBoxes };
-      }));
-      return;
-    }
-    
-    const sanitizedValue = value.replace(/[^0-9,.]/g, "").replace(".", ",");
-    if (/^\d*\,?\d*$/.test(sanitizedValue)) {
-      setWeighingSets(prevSets => prevSets.map(set => {
-        if (set.id !== setId) return set;
-        const updatedBoxes = set.boxes.map(box => 
-          box.id === boxId ? { ...box, [field]: sanitizedValue } : box
-        );
-        return { ...set, boxes: updatedBoxes };
-      }));
-    }
-  };
-
-  const calculateWeighingSets = (sets: WeighingSet[], mode: WeighingMode): WeighingSet[] => {
-    return sets.map((set) => {
-      let cumulativeWeight = parseFloat((set.initialWeight || "0").replace(",", ".")) || 0;
-      
-      const updatedBoxes = set.boxes.map((box) => {
-        const boxWeight = parseFloat((box.weight || "0").replace(",", ".")) || 0;
-        const discount = parseFloat((box.discount || "0").replace(",", ".")) || 0;
-        const container = parseFloat((box.container || "0").replace(",", ".")) || 0;
-        
-        let net = 0;
-        if (mode === 'unloading') { // Descarregamento
-          if (cumulativeWeight > 0 && boxWeight > 0) {
-            net = cumulativeWeight - boxWeight - discount - container;
-          }
-          cumulativeWeight = boxWeight;
-        } else { // Carregamento
-          if (cumulativeWeight >= 0 && boxWeight > 0) {
-            net = boxWeight - cumulativeWeight - discount - container;
-          }
-          cumulativeWeight = boxWeight;
-        }
-
-        return { ...box, net: net > 0 ? net : 0 };
-      });
-
-      const totalNet = updatedBoxes.reduce((acc, box) => acc + box.net, 0);
-      return { ...set, boxes: updatedBoxes, totalNet };
-    });
-  };
-
   React.useEffect(() => {
-    const newWeighingSets = calculateWeighingSets(weighingSets, weighingMode);
-    // Deep comparison to avoid infinite loops
-    if (JSON.stringify(newWeighingSets) !== JSON.stringify(weighingSets)) {
-        setWeighingSets(newWeighingSets);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [weighingSets, weighingMode]);
+    setWeighingSets(prev =>
+      prev.map(set => {
+        const newItems = set.items.map(item => {
+          const gross = parseFloat(item.gross.replace(',', '.')) || 0;
+          const waste = parseFloat(item.waste.replace(',', '.')) || 0;
+          const container = parseFloat(item.container.replace(',', '.')) || 0;
+          const tare = parseFloat(item.tare.replace(',', '.')) || 0;
+          const net = gross - waste - container - tare;
+          return { ...item, net: net > 0 ? net : 0 };
+        });
+        const totalNet = newItems.reduce((acc, item) => acc + item.net, 0);
+        return { ...set, items: newItems, totalNet };
+      })
+    );
+  }, [weighingSets.map(s => s.items.map(i => `${i.gross}${i.waste}${i.container}${i.tare}`).join()).join()]);
 
 
-  const addMaterialBox = (setId: string) => {
-    setWeighingSets((prevSets) =>
-      prevSets.map((set) =>
-        set.id === setId
-          ? {
-              ...set,
-              boxes: [
-                ...set.boxes,
-                { id: uuidv4(), name: `Material ${set.boxes.length + 1}`, weight: "", discount: "", container: "", net: 0 },
-              ],
-            }
-          : set
+  const addItem = (setId: string) => {
+    setWeighingSets(prev =>
+      prev.map(set =>
+        set.id === setId ? { ...set, items: [...set.items, createNewItem()] } : set
       )
     );
   };
 
-  const removeMaterialBox = (setId: string, boxId: string) => {
-    setWeighingSets((prevSets) =>
-      prevSets.map((set) => {
+  const removeItem = (setId: string, itemId: string) => {
+    setWeighingSets(prev =>
+      prev.map(set => {
         if (set.id !== setId) return set;
-        const updatedBoxes = set.boxes.filter((box) => box.id !== boxId);
-        if (updatedBoxes.length === 0) {
-          return { ...set, boxes: [{ id: uuidv4(), name: "Material 1", weight: "", discount: "", container: "", net: 0 }] };
+        const newItems = set.items.filter(item => item.id !== itemId);
+        if (newItems.length === 0) {
+            return {...set, items: [createNewItem()]}
         }
-        return { ...set, boxes: updatedBoxes };
+        return { ...set, items: newItems };
       })
     );
   };
-
+  
   const addWeighingSet = () => {
-    setWeighingSets((prevSets) => [
-      ...prevSets,
-      {
-        id: uuidv4(),
-        driverName: "",
-        plate: "",
-        initialWeight: "",
-        boxes: [{ id: uuidv4(), name: "Material 1", weight: "", discount: "", container: "", net: 0 }],
-        totalNet: 0,
-      },
-    ]);
+    setWeighingSets(prev => [...prev, createNewWeighingSet()]);
   };
-
+  
   const removeWeighingSet = (setId: string) => {
-    setWeighingSets(prevSets => {
-        const updatedSets = prevSets.filter(set => set.id !== setId);
-        if (updatedSets.length === 0) {
-            return [getInitialWeighingSet()[0]];
-        }
-        return updatedSets;
+    setWeighingSets(prev => {
+      const newSets = prev.filter(set => set.id !== setId);
+      if (newSets.length === 0) return [createNewWeighingSet()];
+      return newSets;
     });
   };
-
+  
+  const handleClearAll = () => {
+    setWeighingSets([createNewWeighingSet()]);
+    toast({ title: "Tudo limpo!", description: "Você pode iniciar uma nova pesagem." });
+  };
+  
   const grandTotalNet = weighingSets.reduce((acc, set) => acc + set.totalNet, 0);
-
+  
   const formatNumber = (value: number) => {
+    if (isNaN(value)) return "0,00";
     return new Intl.NumberFormat("pt-BR", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(value);
   };
-  
-  const handleModeChange = (mode: WeighingMode | "") => {
-    if (mode) {
-        setWeighingMode(mode);
-    }
-  }
-
-  const initialWeightLabel = weighingMode === 'unloading' ? 'Bruto (Saída)' : 'Tara (Entrada)';
-  const boxWeightLabel = weighingMode === 'unloading' ? 'Tara (kg)' : 'Bruto (kg)';
-
 
   return (
-    <div id="scale-calculator-printable-area" className="space-y-2 p-1">
-        <div className="space-y-1">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                <div className="space-y-1">
-                    <Label>Modo de Pesagem</Label>
-                    <ToggleGroup type="single" value={weighingMode} onValueChange={handleModeChange} className="w-full grid grid-cols-2">
-                        <ToggleGroupItem value="unloading" aria-label="Descarregamento" className="h-10">Descarregamento</ToggleGroupItem>
-                        <ToggleGroupItem value="loading" aria-label="Carregamento" className="h-10">Carregamento</ToggleGroupItem>
-                    </ToggleGroup>
-                </div>
-            </div>
-        </div>
-
+    <div className="space-y-2 p-1" id="scale-calculator-printable-area">
         {weighingSets.map((set, setIndex) => (
-          <Card key={set.id} className="bg-card/50 pt-1 print:shadow-none print:border-border">
-            <CardHeader className="flex-row items-center justify-between p-2">
-                <div className="space-y-1 flex-1">
-                    <CardTitle className="text-lg">Pesagem {setIndex + 1}</CardTitle>
-                </div>
-              {weighingSets.length > 1 && (
-                <Button variant="ghost" size="icon" onClick={() => removeWeighingSet(set.id)} className="print:hidden h-8 w-8">
-                  <Icon name="Trash2" className="text-destructive"/>
-                </Button>
-              )}
-            </CardHeader>
-            <CardContent className="space-y-2 p-2 pt-0">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                    <div className="space-y-1">
-                        <Label htmlFor={`driver-name-${set.id}`} className="text-xs text-muted-foreground">Motorista</Label>
-                        <Input
-                            id={`driver-name-${set.id}`}
-                            value={set.driverName}
-                            onChange={(e) => handleSetTextChange(e.target.value, set.id, "driverName")}
-                            placeholder="Nome"
-                        />
-                    </div>
-                    <div className="space-y-1">
-                        <Label htmlFor={`plate-${set.id}`} className="text-xs text-muted-foreground">Placa</Label>
-                        <Input
-                            id={`plate-${set.id}`}
-                            value={set.plate}
-                            onChange={(e) => handleSetTextChange(e.target.value, set.id, "plate")}
-                            placeholder="Placa"
-                        />
-                    </div>
-                     <div className="space-y-1">
-                        <Label htmlFor={`initialWeight-${set.id}`} className="text-xs text-muted-foreground">{initialWeightLabel}</Label>
-                        <Input
-                            id={`initialWeight-${set.id}`}
-                            type="text"
-                            inputMode="decimal"
-                            value={set.initialWeight}
-                            onChange={(e) => handleInputChange(e.target.value, set.id, "initialWeight")}
-                            placeholder="Peso inicial"
-                        />
-                    </div>
-                </div>
-
-              {set.boxes.map((box, boxIndex) => (
-                <div key={box.id} className="space-y-2 rounded-lg border bg-background p-2 relative print:border-border">
-                  <div className="flex items-center justify-between">
-                    <Input 
-                      value={box.name}
-                      onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'name')}
-                      className="text-base font-semibold border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 h-auto bg-transparent w-full"
-                    />
-                    {set.boxes.length > 1 && (
-                      <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 print:hidden" onClick={() => removeMaterialBox(set.id, box.id)}>
-                          <Icon name="Trash2" className="text-destructive h-4 w-4"/>
-                      </Button>
+            <Card key={set.id} className="bg-card/50 print:shadow-none print:border-border">
+                 <CardHeader className="flex-row items-center justify-between p-2">
+                    <CardTitle className="text-lg">Caçamba {setIndex + 1}</CardTitle>
+                    {weighingSets.length > 1 && (
+                        <Button variant="ghost" size="icon" onClick={() => removeWeighingSet(set.id)} className="print:hidden h-7 w-7 text-destructive/80 hover:text-destructive">
+                           <Icon name="Trash2" />
+                        </Button>
                     )}
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                      <div className="space-y-1">
-                        <Label htmlFor={`weight-${box.id}`} className="text-xs text-muted-foreground">{boxWeightLabel}</Label>
-                        <Input
-                          id={`weight-${box.id}`}
-                          type="text"
-                          inputMode="decimal"
-                          value={box.weight}
-                          onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'weight')}
-                          placeholder="Peso"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label htmlFor={`discount-${box.id}`} className="text-xs text-muted-foreground">Desconto (kg)</Label>
-                        <Input
-                          id={`discount-${box.id}`}
-                          type="text"
-                          inputMode="decimal"
-                          value={box.discount}
-                          onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'discount')}
-                          placeholder="Lixo, outros"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label htmlFor={`container-${box.id}`} className="text-xs text-muted-foreground">Caçamba (kg)</Label>
-                        <Input
-                          id={`container-${box.id}`}
-                          type="text"
-                          inputMode="decimal"
-                          value={box.container}
-                          onChange={(e) => handleBoxInputChange(e.target.value, set.id, box.id, 'container')}
-                          placeholder="Peso"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-accent-price font-semibold text-xs">Peso Líquido</Label>
-                        <div className="w-full rounded-md border border-accent-price/50 bg-accent-price/10 px-3 py-1 text-sm font-bold text-accent-price h-10 flex items-center print:bg-transparent print:border-accent-price">
-                            {formatNumber(box.net)} kg
+                 </CardHeader>
+                 <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                        <Table>
+                             <TableHeader>
+                                <TableRow className="text-xs">
+                                    <TableHead className="min-w-[150px] p-1">Material</TableHead>
+                                    <TableHead className="min-w-[100px] p-1">Bruto (kg)</TableHead>
+                                    <TableHead className="min-w-[100px] p-1">Lixo (kg)</TableHead>
+                                    <TableHead className="min-w-[100px] p-1">Caçamba (kg)</TableHead>
+                                    <TableHead className="min-w-[100px] p-1">Tara (kg)</TableHead>
+                                    <TableHead className="min-w-[110px] p-1 font-bold text-accent-price text-center">Líquido (kg)</TableHead>
+                                    <TableHead className="w-[40px] p-1 print:hidden"></TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {set.items.map(item => (
+                                    <TableRow key={item.id}>
+                                        <TableCell className="p-1"><Input value={item.name} onChange={e => handleItemChange(set.id, item.id, 'name', e.target.value)} placeholder="Nome" className="h-8"/></TableCell>
+                                        <TableCell className="p-1"><Input value={item.gross} onChange={e => handleItemChange(set.id, item.id, 'gross', e.target.value)} placeholder="0,00" className="h-8"/></TableCell>
+                                        <TableCell className="p-1"><Input value={item.waste} onChange={e => handleItemChange(set.id, item.id, 'waste', e.target.value)} placeholder="0,00" className="h-8"/></TableCell>
+                                        <TableCell className="p-1"><Input value={item.container} onChange={e => handleItemChange(set.id, item.id, 'container', e.target.value)} placeholder="0,00" className="h-8"/></TableCell>
+                                        <TableCell className="p-1"><Input value={item.tare} onChange={e => handleItemChange(set.id, item.id, 'tare', e.target.value)} placeholder="0,00" className="h-8"/></TableCell>
+                                        <TableCell className="p-1 text-center font-bold text-accent-price align-middle">{formatNumber(item.net)}</TableCell>
+                                        <TableCell className="p-1 print:hidden">
+                                          {set.items.length > 1 && <Button variant="ghost" size="icon" onClick={() => removeItem(set.id, item.id)} className="h-8 w-8 text-destructive/70 hover:text-destructive"><Icon name="X" className="h-4 w-4"/></Button>}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                    <div className="p-2 flex justify-between items-center">
+                        <Button variant="outline" size="sm" onClick={() => addItem(set.id)} className="print:hidden">
+                            <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Material
+                        </Button>
+                         <div className="flex items-center gap-4">
+                            <span className="font-semibold">Subtotal Líquido:</span>
+                            <span className="font-bold text-lg text-primary">{formatNumber(set.totalNet)} kg</span>
                         </div>
                     </div>
-                  </div>
-                </div>
-              ))}
-               <div className="flex gap-2">
-                 <Button variant="outline" size="sm" onClick={() => addMaterialBox(set.id)} className="gap-1 print:hidden h-10 flex-1">
-                    <PlusCircle className="h-4 w-4"/>
-                    Adicionar Material
-                </Button>
-                {weighingSets.length < 2 && setIndex === weighingSets.length -1 && (
-                    <Button variant="secondary" onClick={addWeighingSet} className="gap-1 h-10 print:hidden flex-1">
-                        <PlusCircle className="h-4 w-4" />
-                        Adicionar Bitrem
-                    </Button>
-                )}
-               </div>
-            </CardContent>
-          </Card>
+                 </CardContent>
+            </Card>
         ))}
+         <div className="flex flex-col sm:flex-row gap-2 print:hidden">
+            <Button variant="secondary" onClick={addWeighingSet} className="flex-1">
+                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Bitrem
+            </Button>
+        </div>
 
-        <Separator />
+        <Separator className="my-2"/>
 
         <div className="flex justify-end items-center gap-2 pt-2">
             <h3 className="text-lg font-semibold">Total Geral Líquido:</h3>
@@ -512,14 +292,6 @@ export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCal
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-            <Button onClick={saveStateToLocalStorage} className="gap-1" variant="outline">
-                <Save />
-                <span className="hidden sm:inline">Salvar</span>
-            </Button>
-             <Button onClick={loadStateFromLocalStorage} className="gap-1" variant="outline">
-                <Download />
-                <span className="hidden sm:inline">Carregar</span>
-            </Button>
             <Button onClick={() => window.print()} className="gap-1">
                 <Printer />
                 <span className="hidden sm:inline">Imprimir</span>

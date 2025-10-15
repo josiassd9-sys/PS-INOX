@@ -178,19 +178,19 @@ function ScaleCalculator() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button onClick={handleClear} variant="outline" size="icon" className="h-8 w-8"><Trash2 /></Button>
+                <Button onClick={handleClear} variant="outline" size="icon" className="h-8 w-8"><Trash2 className="h-4 w-4" /></Button>
               </TooltipTrigger>
               <TooltipContent><p>Limpar Tudo</p></TooltipContent>
             </Tooltip>
              <Tooltip>
               <TooltipTrigger asChild>
-                <Button onClick={handleSave} variant="outline" size="icon" className="h-8 w-8"><Save/></Button>
+                <Button onClick={handleSave} variant="outline" size="icon" className="h-8 w-8"><Save className="h-4 w-4"/></Button>
               </TooltipTrigger>
               <TooltipContent><p>Salvar Pesagem</p></TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button onClick={handlePrint} variant="outline" size="icon" className="h-8 w-8"><Printer /></Button>
+                <Button onClick={handlePrint} variant="outline" size="icon" className="h-8 w-8"><Printer className="h-4 w-4" /></Button>
               </TooltipTrigger>
               <TooltipContent><p>Imprimir</p></TooltipContent>
             </Tooltip>
@@ -205,25 +205,25 @@ function ScaleCalculator() {
       <Card className="mb-4 print:border-none print:shadow-none print:p-0">
         <CardContent className="p-4 print:p-0">
           <div className="grid grid-cols-1 gap-4">
-            <div>
+            <div className="space-y-1">
                 <Label htmlFor="cliente">Cliente</Label>
                 <Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/>
                 <span className="hidden print:block">{headerData.client || 'N/A'}</span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="motorista">Motorista</Label>
-                <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden"/>
+            <div className="flex flex-wrap gap-2 w-full">
+              <div className="flex-1 min-w-[120px] space-y-1">
+                <Label htmlFor="motorista" className="text-sm md:text-base">Motorista</Label>
+                <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden text-sm"/>
                 <span className="hidden print:block">{headerData.driver || 'N/A'}</span>
               </div>
-               <div>
-                <Label htmlFor="cidade">Cidade</Label>
-                <Input id="cidade" value={headerData.city} onChange={e => handleHeaderChange('city', e.target.value)} className="h-8 print:hidden"/>
+               <div className="flex-1 min-w-[120px] space-y-1">
+                <Label htmlFor="cidade" className="text-sm md:text-base">Cidade</Label>
+                <Input id="cidade" value={headerData.city} onChange={e => handleHeaderChange('city', e.target.value)} className="h-8 print:hidden text-sm"/>
                 <span className="hidden print:block">{headerData.city || 'N/A'}</span>
               </div>
-              <div>
-                <Label htmlFor="placa">Placa</Label>
-                <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden"/>
+              <div className="flex-1 min-w-[120px] space-y-1">
+                <Label htmlFor="placa" className="text-sm md:text-base">Placa</Label>
+                <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden text-sm"/>
                 <span className="hidden print:block">{headerData.plate || 'N/A'}</span>
               </div>
             </div>
@@ -301,28 +301,29 @@ function ScaleCalculator() {
                   <Button size="sm" onClick={() => addNewMaterial(set.id)} className="h-8">
                     <PlusCircle className="mr-2 h-4 w-4 sm:hidden" />
                     <span className="hidden sm:inline"><PlusCircle className="mr-2 h-4 w-4" /></span>
+                    <span className="sm:hidden">Material</span>
                     <span className="hidden sm:inline">Adicionar Material</span>
                   </Button>
               </div>
             </CardContent>
             <CardContent className="p-4 border-t print:border-t print:border-border print:p-0 print:pt-2">
-                <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-end">
-                     <div className="flex items-center gap-2">
-                         <Label htmlFor={`desconto-cacamba-${set.id}`} className="shrink-0">Desconto Caçamba (kg)</Label>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-end gap-4">
+                     <div className="flex flex-wrap items-center gap-2">
+                         <Label htmlFor={`desconto-cacamba-${set.id}`} className="shrink-0 text-sm md:text-base">Desconto Caçamba (kg)</Label>
                          <Input
                              id={`desconto-cacamba-${set.id}`}
                              type="text"
                              value={formatNumber(set.descontoCacamba)}
                              onChange={(e) => handleCacambaDiscount(set.id, e.target.value)}
-                             className="w-32 h-8 text-right print:hidden"
+                             className="h-8 text-right print:hidden flex-1 min-w-[90px]"
                           />
                           <span className="hidden print:block font-semibold">{formatNumber(set.descontoCacamba)}</span>
                      </div>
-                     <div className="text-right">
+                     <div className="text-right flex-shrink-0">
                          <p className="text-sm text-muted-foreground">Subtotal Líquido</p>
                          <p className="text-lg font-bold print:text-black">{formatNumber(subtotalLiquido)} kg</p>
                      </div>
-                      <div className="text-right">
+                      <div className="text-right flex-shrink-0">
                          <p className="text-sm text-muted-foreground">Total Líquido ({setIndex === 0 ? "Caçamba 1" : "Bitrem"})</p>
                          <p className="text-xl font-bold text-primary print:text-black">{formatNumber(totalLiquidoSet)} kg</p>
                      </div>

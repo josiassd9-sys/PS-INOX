@@ -8,7 +8,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "@/components/ui/table";
 import { Dashboard } from "@/components/dashboard";
 import { Icon } from "@/components/icons";
@@ -169,8 +169,9 @@ const informacoes = [
                     Projetos estruturais em aço são guiados por normas rigorosas que garantem segurança e desempenho. As mais importantes no nosso contexto são:
                 </p>
                 <ul className="list-disc pl-5 space-y-1">
-                    <li><strong>ABNT NBR 8800 (Brasil):</strong> Norma brasileira para o projeto de estruturas de aço e de estruturas mistas de aço e concreto de edifícios. Ela define os critérios de dimensionamento, resistência, estabilidade e segurança.</li>
-                    <li><strong>AISC (American Institute of Steel Construction):</strong> As especificações do AISC são a referência principal nos Estados Unidos e influenciam normas no mundo todo. Elas cobrem desde o projeto até a fabricação e montagem de estruturas de aço.</li>
+                    <li><strong>ABNT NBR 8800:</strong> Norma brasileira para o projeto de estruturas de aço e de estruturas mistas de aço e concreto de edifícios. Ela define os critérios de dimensionamento, resistência, estabilidade e segurança.</li>
+                    <li><strong>ABNT NBR 14323:</strong> Norma para lajes mistas (steel deck), definindo requisitos para a chapa-forma e conectores de cisalhamento.</li>
+                    <li><strong>AISC (American Institute of Steel Construction):</strong> As especificações do AISC são a referência principal nos Estados Unidos e influenciam normas no mundo todo, cobrindo todo o ciclo do projeto.</li>
                 </ul>
             </div>
         )
@@ -232,7 +233,63 @@ const informacoes = [
                 </div>
             </div>
         )
-    }
+    },
+    {
+        id: "ltb",
+        title: "Travamento Lateral-Torcional (LTB)",
+        icon: "Link",
+        content: (
+            <div className="space-y-2">
+                 <p>
+                    A Flambagem Lateral-Torcional (LTB) é um fenômeno que reduz a capacidade de uma viga quando sua mesa comprimida não é adequadamente travada lateralmente. A calculadora considera essa verificação de forma simplificada.
+                </p>
+                <div>
+                    <h4 className="font-semibold">Critério de Verificação</h4>
+                    <p className="text-muted-foreground">
+                        A segurança é garantida quando o Momento Solicitante (Msd) é menor ou igual ao Momento Resistente (Mrd). O Mrd leva em conta a redução de capacidade devido ao LTB. Se a verificação falha, é necessário adicionar travamentos laterais para reduzir o comprimento não-travado (Lb) ou escolher um perfil mais robusto.
+                    </p>
+                </div>
+            </div>
+        )
+    },
+    {
+        id: "conexoes-geral",
+        title: "Ligações e Conexões",
+        icon: "Workflow",
+        content: (
+            <div className="space-y-2">
+                 <p>As ligações são responsáveis por transmitir os esforços entre os elementos estruturais (viga-viga, viga-pilar). O dimensionamento delas é uma etapa crítica do projeto.</p>
+                 <div>
+                    <h4 className="font-semibold">Parafusos</h4>
+                    <p className="text-muted-foreground">
+                        Verifica-se a resistência ao cisalhamento do parafuso e a resistência à pressão de contato (bearing) no material ao redor do furo. Espaçamentos mínimos e distâncias de borda devem ser respeitados conforme a NBR 8800.
+                    </p>
+                </div>
+                 <div>
+                    <h4 className="font-semibold">Soldas</h4>
+                    <p className="text-muted-foreground">
+                        O cordão de solda deve ser dimensionado para resistir às forças transmitidas. O tamanho da "garganta" da solda e seu comprimento eficaz são os parâmetros chave no cálculo.
+                    </p>
+                </div>
+            </div>
+        )
+    },
+    {
+        id: "conexoes-deck",
+        title: "Conectores de Cisalhamento (Steel Deck)",
+        icon: "Layers",
+        content: (
+             <div className="space-y-2">
+                 <p>Para que a laje de concreto e a viga de aço trabalhem juntas (ação composta), são necessários conectores de cisalhamento. Eles transferem a força de cisalhamento horizontal entre os dois materiais.</p>
+                  <div>
+                    <h4 className="font-semibold">Dimensionamento</h4>
+                    <p className="text-muted-foreground">
+                       Calcula-se a força de cisalhamento total na interface aço-concreto e divide-se pela resistência de um único conector (Qconector) para obter a quantidade necessária. A norma ABNT NBR 14323 fornece as diretrizes para este cálculo. A calculadora pode recomendar um número de conectores por metro.
+                    </p>
+                </div>
+            </div>
+        )
+    },
 ]
 
 function InfoComponent() {
@@ -240,9 +297,9 @@ function InfoComponent() {
     <div className="container mx-auto p-4">
         <Card className="mb-4">
             <CardHeader>
-                <CardTitle>Informações Técnicas Essenciais</CardTitle>
+                <CardTitle>Arcabouço Técnico Estrutural</CardTitle>
                 <CardDescription>
-                    Contexto e conceitos fundamentais para o uso e dimensionamento de perfis de aço estrutural.
+                    Conceitos, normas e guias fundamentais para o dimensionamento e detalhamento de perfis e ligações de aço.
                 </CardDescription>
             </CardHeader>
         </Card>
@@ -273,3 +330,6 @@ export default function Page() {
       </Dashboard>
   );
 }
+
+
+    

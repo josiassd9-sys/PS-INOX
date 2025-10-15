@@ -306,7 +306,7 @@ function ScaleCalculator() {
               </div>
             </CardContent>
             <CardContent className="p-4 border-t print:border-t print:border-border print:p-0 print:pt-2">
-                 <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-end">
+                <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-end">
                      <div className="flex items-center gap-2">
                          <Label htmlFor={`desconto-cacamba-${set.id}`} className="shrink-0">Desconto Caçamba (kg)</Label>
                          <Input

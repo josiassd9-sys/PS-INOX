@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { Category, SteelItem } from "@/lib/data";
+import type { Category, SteelItem } from "@/lib/data/index";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { PlusCircle, Tag } from "lucide-react";
@@ -263,3 +263,5 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
       </>
   );
 }
+
+    

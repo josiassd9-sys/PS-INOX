@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -10,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { SteelItem } from "@/lib/data";
+import type { SteelItem } from "@/lib/data/index";
 import { Button } from "./ui/button";
 
 interface CostAdjustmentCalculatorProps {

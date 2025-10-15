@@ -21,6 +21,7 @@ import {
   DialogTitle,
   DialogFooter,
   DialogClose,
+  DialogTrigger,
 } from "./ui/dialog";
 import { Label } from "./ui/label";
 import { cn } from "@/lib/utils";

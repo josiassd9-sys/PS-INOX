@@ -205,28 +205,30 @@ function ScaleCalculator() {
       <Card className="mb-4 print:border-none print:shadow-none print:p-0">
         <CardContent className="p-4 print:p-0">
           <div className="w-full space-y-2">
-              <div className="space-y-1">
-                  <Label htmlFor="cliente">Cliente</Label>
-                  <Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/>
-                  <span className="hidden print:block">{headerData.client || 'N/A'}</span>
-              </div>
-              <div className="flex flex-wrap gap-2 w-full">
-                  <div className="flex-1 min-w-[90px] space-y-1">
-                      <Label htmlFor="motorista" className="text-xs sm:text-sm">Motorista</Label>
-                      <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden text-sm"/>
-                      <span className="hidden print:block">{headerData.driver || 'N/A'}</span>
-                  </div>
-                  <div className="flex-1 min-w-[90px] space-y-1">
-                      <Label htmlFor="placa" className="text-xs sm:text-sm">Placa</Label>
-                      <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden text-sm"/>
-                      <span className="hidden print:block">{headerData.plate || 'N/A'}</span>
-                  </div>
-                  <div className="flex-1 min-w-[90px] space-y-1">
-                      <Label htmlFor="cidade" className="text-xs sm:text-sm">Cidade</Label>
-                      <Input id="cidade" value={headerData.city} onChange={e => handleHeaderChange('city', e.target.value)} className="h-8 print:hidden text-sm"/>
-                      <span className="hidden print:block">{headerData.city || 'N/A'}</span>
-                  </div>
-              </div>
+            <div className="flex flex-col gap-2">
+                <div className="space-y-1">
+                    <Label htmlFor="cliente">Cliente</Label>
+                    <Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/>
+                    <span className="hidden print:block">{headerData.client || 'N/A'}</span>
+                </div>
+                <div className="flex flex-wrap gap-2 w-full">
+                    <div className="flex-1 min-w-[90px] space-y-1">
+                        <Label htmlFor="motorista" className="text-xs sm:text-sm">Motorista</Label>
+                        <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden text-sm"/>
+                        <span className="hidden print:block">{headerData.driver || 'N/A'}</span>
+                    </div>
+                    <div className="flex-1 min-w-[90px] space-y-1">
+                        <Label htmlFor="placa" className="text-xs sm:text-sm">Placa</Label>
+                        <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden text-sm"/>
+                        <span className="hidden print:block">{headerData.plate || 'N/A'}</span>
+                    </div>
+                    <div className="flex-1 min-w-[90px] space-y-1">
+                        <Label htmlFor="cidade" className="text-xs sm:text-sm">Cidade</Label>
+                        <Input id="cidade" value={headerData.city} onChange={e => handleHeaderChange('city', e.target.value)} className="h-8 print:hidden text-sm"/>
+                        <span className="hidden print:block">{headerData.city || 'N/A'}</span>
+                    </div>
+                </div>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -298,11 +300,9 @@ function ScaleCalculator() {
                 </TableBody>
               </Table>
               <div className="flex justify-start p-2 print:hidden">
-                  <Button size="sm" onClick={() => addNewMaterial(set.id)} className="h-8">
-                    <PlusCircle className="mr-2 h-4 w-4 sm:hidden" />
-                    <span className="hidden sm:inline"><PlusCircle className="mr-2 h-4 w-4" /></span>
-                    <span className="sm:hidden">Material</span>
-                    <span className="hidden sm:inline">Adicionar Material</span>
+                  <Button size="sm" onClick={() => addNewMaterial(set.id)} className="h-8 px-2">
+                    <PlusCircle className="mr-1 h-4 w-4" />
+                    Adicionar Material
                   </Button>
               </div>
             </CardContent>
@@ -335,7 +335,7 @@ function ScaleCalculator() {
 
       {weighingSets.length < 2 && (
         <div className="flex justify-center my-4 print:hidden">
-          <Button variant="secondary" onClick={addBitrem}><Tractor className="mr-2 h-4 w-4" /> Adicionar Bitrem / Caçamba 2</Button>
+          <Button variant="secondary" onClick={addBitrem} size="sm" className="h-8 px-2"><Tractor className="mr-2 h-4 w-4" /> + Bitrem / Caçamba 2</Button>
         </div>
       )}
 

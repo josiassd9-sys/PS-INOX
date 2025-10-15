@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import React, { useState, useEffect, useCallback, useImperativeHandle, forwardRef } from "react";
@@ -272,7 +273,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                     </div>
                     <div className="space-y-px">
                         <Label htmlFor="placa" className="text-xs sm:text-sm">Placa</Label>
-                        <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden text-sm w-14 text-center"/>
+                        <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden text-sm w-18 text-center"/>
                         <span className="hidden print:block">{headerData.plate || 'N/A'}</span>
                     </div>
                     <div className="space-y-px">

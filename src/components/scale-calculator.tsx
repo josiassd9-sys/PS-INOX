@@ -211,18 +211,18 @@ function ScaleCalculator() {
                     <Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/>
                     <span className="hidden print:block">{headerData.client || 'N/A'}</span>
                 </div>
-                <div className="flex flex-wrap gap-2 w-full">
-                    <div className="flex-1 min-w-[90px] space-y-1">
+                <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,1fr))] gap-2 w-full text-xs sm:text-sm">
+                    <div className="space-y-1">
                         <Label htmlFor="motorista" className="text-xs sm:text-sm">Motorista</Label>
                         <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden text-sm"/>
                         <span className="hidden print:block">{headerData.driver || 'N/A'}</span>
                     </div>
-                    <div className="flex-1 min-w-[90px] space-y-1">
+                    <div className="space-y-1">
                         <Label htmlFor="placa" className="text-xs sm:text-sm">Placa</Label>
                         <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden text-sm"/>
                         <span className="hidden print:block">{headerData.plate || 'N/A'}</span>
                     </div>
-                    <div className="flex-1 min-w-[90px] space-y-1">
+                    <div className="space-y-1">
                         <Label htmlFor="cidade" className="text-xs sm:text-sm">Cidade</Label>
                         <Input id="cidade" value={headerData.city} onChange={e => handleHeaderChange('city', e.target.value)} className="h-8 print:hidden text-sm"/>
                         <span className="hidden print:block">{headerData.city || 'N/A'}</span>
@@ -394,3 +394,5 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 }
 
 export default ScaleCalculator;
+
+    

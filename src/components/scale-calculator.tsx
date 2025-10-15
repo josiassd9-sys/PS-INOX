@@ -1,7 +1,8 @@
 
+
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useImperativeHandle, forwardRef } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "./ui/button";
@@ -10,7 +11,7 @@ import { Label } from "./ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "./ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
-import { PlusCircle, Trash, Tractor, Printer, Save, Trash2, ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
+import { PlusCircle, Tractor, ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
 import { scrapItems } from "@/lib/data/sucata";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "./ui/command";
@@ -38,7 +39,7 @@ type OperationType = 'loading' | 'unloading';
 const initialItem: WeighingItem = { id: '', material: '', bruto: 0, tara: 0, descontos: 0, liquido: 0 };
 const initialWeighingSet: WeighingSet = { id: uuidv4(), items: [], descontoCacamba: 0 };
 
-function ScaleCalculator() {
+const ScaleCalculator = forwardRef((props, ref) => {
   const [headerData, setHeaderData] = useState({
     client: "",
     plate: "",
@@ -210,6 +211,13 @@ function ScaleCalculator() {
     window.print();
   }
 
+  useImperativeHandle(ref, () => ({
+    handleClear,
+    handleSave,
+    handleLoad,
+    handlePrint,
+  }));
+
   const formatNumber = (num: number, decimals = 0) => {
     return new Intl.NumberFormat('pt-BR', {
       minimumFractionDigits: decimals,
@@ -224,37 +232,6 @@ function ScaleCalculator() {
 
   return (
     <div className="p-px bg-background max-w-7xl mx-auto" id="scale-calculator-printable-area">
-      <div className="print:hidden flex justify-between items-center mb-1">
-        <h1 className="text-3xl font-bold text-foreground">Balança</h1>
-        <div className="flex items-center gap-px">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button onClick={handleClear} variant="outline" size="icon" className="h-8 w-8"><Trash2 className="h-4 w-4" /></Button>
-              </TooltipTrigger>
-              <TooltipContent><p>Limpar Tudo</p></TooltipContent>
-            </Tooltip>
-             <Tooltip>
-              <TooltipTrigger asChild>
-                <Button onClick={handleSave} variant="outline" size="icon" className="h-8 w-8"><Save className="h-4 w-4"/></Button>
-              </TooltipTrigger>
-              <TooltipContent><p>Salvar Pesagem</p></TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button onClick={handleLoad} variant="outline" size="icon" className="h-8 w-8"><ArrowUpFromLine className="h-4 w-4"/></Button>
-              </TooltipTrigger>
-              <TooltipContent><p>Carregar Última Pesagem</p></TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button onClick={handlePrint} variant="outline" size="icon" className="h-8 w-8"><Printer className="h-4 w-4" /></Button>
-              </TooltipTrigger>
-              <TooltipContent><p>Imprimir</p></TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-      </div>
       
       <div className="hidden print:block mb-1">
         <h1 className="text-4xl font-bold text-center">Balança</h1>
@@ -388,14 +365,14 @@ function ScaleCalculator() {
                 </TableHeader>
                 <TableBody>
                   {set.items.map((item, itemIndex) => (
-                    <TableRow key={item.id} className="print:text-black">
-                      <TableCell className="w-[30%] font-medium">
+                    <tr key={item.id} className="print:text-black flex-col sm:table-row">
+                      <td className="w-full sm:w-[30%] font-medium p-0 sm:p-2">
                           <MaterialSearchInput
                             value={item.material}
                             onValueChange={(newMaterial) => handleMaterialChange(set.id, item.id, newMaterial)}
                           />
-                      </TableCell>
-                      <TableCell className="w-[17.5%]">
+                      </td>
+                      <td className="sm:w-[17.5%] p-0 sm:p-2">
                             <Input
                             type="text"
                             value={formatNumber(item.bruto)}
@@ -404,8 +381,8 @@ function ScaleCalculator() {
                             disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')}
                             />
                             <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
-                      </TableCell>
-                      <TableCell className="w-[17.5%]">
+                      </td>
+                      <td className="sm:w-[17.5%] p-0 sm:p-2">
                             <Input
                             type="text"
                             value={formatNumber(item.tara)}
@@ -414,8 +391,8 @@ function ScaleCalculator() {
                             disabled={(setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading')}
                             />
                             <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
-                      </TableCell>
-                      <TableCell className="w-[17.5%]">
+                      </td>
+                      <td className="sm:w-[17.5%] p-0 sm:p-2">
                             <Input
                             type="text"
                             value={formatNumber(item.descontos)}
@@ -423,13 +400,13 @@ function ScaleCalculator() {
                             className="text-right h-8 print:hidden"
                             />
                             <span className="hidden print:block text-right">{formatNumber(item.descontos)}</span>
-                      </TableCell>
-                      <TableCell className="w-[17.5%] text-right font-semibold">
+                      </td>
+                      <td className="sm:w-[17.5%] text-right font-semibold p-0 sm:p-2">
                             <div className="h-8 sm:h-full flex items-center justify-end">
                                 <span className="print:text-black">{formatNumber(item.liquido)}</span>
                             </div>
-                      </TableCell>
-                    </TableRow>
+                      </td>
+                    </tr>
                   ))}
                 </TableBody>
               </Table>
@@ -477,7 +454,9 @@ function ScaleCalculator() {
       </Card>
     </div>
   );
-}
+});
+ScaleCalculator.displayName = 'ScaleCalculator';
+
 
 function MaterialSearchInput({ value, onValueChange }: { value: string, onValueChange: (value: string) => void }) {
   const [open, setOpen] = useState(false)
@@ -522,5 +501,3 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 }
 
 export default ScaleCalculator;
-
-    

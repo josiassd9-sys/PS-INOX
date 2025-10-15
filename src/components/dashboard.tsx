@@ -17,7 +17,7 @@ import {
   useSidebar,
   SidebarGroup,
 } from "@/components/ui/sidebar";
-import { Search, SlidersHorizontal, PlusCircle, Calculator, BookOpen, Ruler, Variable, X } from "lucide-react";
+import { Search, SlidersHorizontal, PlusCircle, Calculator, BookOpen, Ruler, Variable, X, Trash2, Save, ArrowUpFromLine, Printer } from "lucide-react";
 import { PriceControls } from "./price-controls";
 import { ItemTable } from "./item-table";
 import { Icon } from "./icons";
@@ -51,6 +51,7 @@ import { ConnectionsTable } from "./connections-table";
 import { CostAdjustmentCalculator } from "./cost-adjustment-calculator";
 import Link from "next/link";
 import { GaugeStandards } from "./gauge-standards";
+import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "./ui/tooltip";
 
 interface PriceParams {
   costPrice: number;
@@ -109,6 +110,10 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
   const [editedWeights, setEditedWeights] = React.useState<Record<string, number>>({});
   const [costAdjustments, setCostAdjustments] = React.useState<Record<string, number>>({});
   const [selectedItemForAdjustment, setSelectedItemForAdjustment] = React.useState<SteelItem | null>(null);
+
+  // Expose scale calculator actions
+  const scaleCalculatorRef = React.useRef<{ handleClear: () => void; handleSave: () => void; handleLoad: () => void; handlePrint: () => void; }>(null);
+
 
   React.useEffect(() => {
     // Navigate to initial category on load
@@ -333,7 +338,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
     
     switch (selectedCategoryId) {
       case 'package-checker': return <PackageChecker />;
-      case 'balanca': return <ScaleCalculator />;
+      case 'balanca': return <ScaleCalculator ref={scaleCalculatorRef} />;
       case 'tabela-sucata': return <ScrapTable category={selectedCategory as any} isDialogOpen={isScrapItemDialogOpen} setIsDialogOpen={setIsScrapItemDialogOpen} searchTerm={searchTerm} />;
       case 'normas-astm': return <AstmStandards />;
       case 'processos-fabricacao': return <ManufacturingProcesses />;
@@ -420,23 +425,55 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                 </div>
               </div>
               
-              <div className="relative flex-1 max-w-sm">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                  type="search"
-                  placeholder="Buscar..."
-                  className="w-full rounded-lg bg-background pl-8"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                 {searchTerm && (
-                    <Button variant="ghost" size="icon" className="absolute right-0 top-0 h-full" onClick={() => setSearchTerm("")}>
-                       <X className="h-4 w-4" />
-                    </Button>
-                 )}
-              </div>
+             {selectedCategoryId !== 'balanca' && (
+                <div className="relative flex-1 max-w-sm">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                    type="search"
+                    placeholder="Buscar..."
+                    className="w-full rounded-lg bg-background pl-8"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                   {searchTerm && (
+                      <Button variant="ghost" size="icon" className="absolute right-0 top-0 h-full" onClick={() => setSearchTerm("")}>
+                         <X className="h-4 w-4" />
+                      </Button>
+                   )}
+                </div>
+              )}
               
               <div className="flex items-center gap-1">
+                {selectedCategoryId === 'balanca' && scaleCalculatorRef.current && (
+                  <div className="flex items-center gap-px">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button onClick={scaleCalculatorRef.current.handleClear} variant="outline" size="icon" className="h-8 w-8"><Trash2 className="h-4 w-4" /></Button>
+                          </TooltipTrigger>
+                          <TooltipContent><p>Limpar Tudo</p></TooltipContent>
+                        </Tooltip>
+                         <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button onClick={scaleCalculatorRef.current.handleSave} variant="outline" size="icon" className="h-8 w-8"><Save className="h-4 w-4"/></Button>
+                          </TooltipTrigger>
+                          <TooltipContent><p>Salvar Pesagem</p></TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button onClick={scaleCalculatorRef.current.handleLoad} variant="outline" size="icon" className="h-8 w-8"><ArrowUpFromLine className="h-4 w-4"/></Button>
+                          </TooltipTrigger>
+                          <TooltipContent><p>Carregar Última Pesagem</p></TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button onClick={scaleCalculatorRef.current.handlePrint} variant="outline" size="icon" className="h-8 w-8"><Printer className="h-4 w-4" /></Button>
+                          </TooltipTrigger>
+                          <TooltipContent><p>Imprimir</p></TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                )}
                 {showPriceControls && currentPriceParams && (
                   <Dialog>
                     <DialogTrigger asChild>

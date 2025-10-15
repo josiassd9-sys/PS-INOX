@@ -3,7 +3,7 @@
 
 import { Dashboard } from "@/components/dashboard";
 import * as React from "react";
-import { perfisData, Perfil, perfisIpeData, PerfilIpe, steelDeckData, SteelDeck, BudgetItem, SupportReaction } from "@/lib/data";
+import { perfisData, Perfil, perfisIpeData, PerfilIpe, steelDeckData, SteelDeck, BudgetItem, SupportReaction } from "@/lib/data/index";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SteelDeckCalculator } from "@/components/perfis/SteelDeckCalculator";
 import { VigaSecundariaCalculator } from "@/components/perfis/VigaSecundariaCalculator";

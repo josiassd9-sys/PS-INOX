@@ -63,21 +63,31 @@ function ScaleCalculator() {
 
   useEffect(() => {
     const initialWeightValue = parseFloat(headerData.initialWeight.replace(',', '.')) || 0;
-    if (initialWeightValue > 0) {
+    
+    // Only proceed if there's an initial weight and at least one item
+    if (initialWeightValue > 0 && weighingSets[0] && weighingSets[0].items.length > 0) {
       setWeighingSets(prevSets => {
-        return prevSets.map((set, index) => {
-          if (index === 0 && set.items.length > 0) {
-            const newItems = [...set.items];
-            const firstItem = { ...newItems[0], bruto: initialWeightValue };
-            firstItem.liquido = firstItem.bruto - firstItem.tara - firstItem.descontos;
-            newItems[0] = firstItem;
-            return { ...set, items: newItems };
-          }
-          return set;
-        });
+        const newSets = [...prevSets];
+        const firstSet = { ...newSets[0] };
+        const firstItem = { ...firstSet.items[0] };
+        
+        if (operationType === 'loading') {
+          firstItem.bruto = initialWeightValue;
+        } else { // unloading
+          firstItem.tara = initialWeightValue;
+        }
+
+        // Recalculate liquido for the first item
+        firstItem.liquido = firstItem.bruto - firstItem.tara - firstItem.descontos;
+        
+        firstSet.items = [firstItem, ...firstSet.items.slice(1)];
+        newSets[0] = firstSet;
+        
+        return newSets;
       });
     }
-  }, [headerData.initialWeight]);
+  }, [headerData.initialWeight, operationType]);
+
 
   const handleInputChange = (setId: string, itemId: string, field: keyof WeighingItem, value: string) => {
     const numValue = parseFloat(value.replace(',', '.')) || 0;
@@ -126,18 +136,24 @@ function ScaleCalculator() {
       prevSets.map((set, setIndex) => {
         if (set.id === setId) {
           const lastItem = set.items[set.items.length - 1];
-          let newBruto = lastItem ? lastItem.tara : 0;
+          
+          let newBruto = 0;
+          let newTara = 0;
 
-          // If this is the very first item being added, use the initial weight
-          if (setIndex === 0 && set.items.length === 0) {
-              newBruto = parseFloat(headerData.initialWeight.replace(',', '.')) || 0;
+          if (operationType === 'loading') {
+            newBruto = lastItem ? lastItem.tara : 0;
+          } else { // unloading
+             // If there's a last item, the new tara is its bruto.
+             if (lastItem) {
+              newTara = lastItem.bruto;
+             }
           }
-
+           
           const newItem: WeighingItem = {
             id: uuidv4(),
             material: "Sucata Inox",
             bruto: newBruto,
-            tara: 0,
+            tara: newTara,
             descontos: 0,
             liquido: 0,
           };
@@ -165,7 +181,7 @@ function ScaleCalculator() {
 
   const handleSave = () => {
       try {
-        localStorage.setItem("scaleData", JSON.stringify({weighingSets, headerData}));
+        localStorage.setItem("scaleData", JSON.stringify({weighingSets, headerData, operationType}));
         toast({ title: "Pesagem Salva!", description: "Os dados da pesagem foram salvos localmente." });
       } catch (e) {
         toast({ variant: "destructive", title: "Erro ao Salvar", description: "Não foi possível salvar os dados." });
@@ -176,9 +192,10 @@ function ScaleCalculator() {
       try {
           const savedData = localStorage.getItem("scaleData");
           if (savedData) {
-              const { weighingSets, headerData } = JSON.parse(savedData);
+              const { weighingSets, headerData, operationType } = JSON.parse(savedData);
               setWeighingSets(weighingSets);
               setHeaderData(headerData || { client: "", plate: "", driver: "", initialWeight: "" });
+              setOperationType(operationType || 'loading');
               setActiveSetId(weighingSets[0]?.id || initialWeighingSet.id);
               toast({ title: "Dados Carregados", description: "A última pesagem salva foi carregada." });
           } else {
@@ -208,29 +225,7 @@ function ScaleCalculator() {
   return (
     <div className="p-4 bg-background max-w-7xl mx-auto" id="scale-calculator-printable-area">
       <div className="print:hidden flex justify-between items-center mb-4">
-        <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold text-foreground">Balança</h1>
-            <TooltipProvider>
-                <div className="flex items-center gap-1 rounded-full border bg-muted p-0.5">
-                     <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button variant={operationType === 'loading' ? 'default' : 'ghost'} size="icon" className="h-7 w-7 rounded-full" onClick={() => setOperationType('loading')}>
-                                <ArrowDownToLine className="h-4 w-4" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent><p>Carregamento (Entrada)</p></TooltipContent>
-                    </Tooltip>
-                     <Tooltip>
-                        <TooltipTrigger asChild>
-                             <Button variant={operationType === 'unloading' ? 'default' : 'ghost'} size="icon" className="h-7 w-7 rounded-full" onClick={() => setOperationType('unloading')}>
-                                <ArrowUpFromLine className="h-4 w-4" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent><p>Descarregamento (Saída)</p></TooltipContent>
-                    </Tooltip>
-                </div>
-            </TooltipProvider>
-        </div>
+        <h1 className="text-3xl font-bold text-foreground">Balança</h1>
         <div className="flex items-center gap-1">
           <TooltipProvider>
             <Tooltip>
@@ -244,6 +239,12 @@ function ScaleCalculator() {
                 <Button onClick={handleSave} variant="outline" size="icon" className="h-8 w-8"><Save className="h-4 w-4"/></Button>
               </TooltipTrigger>
               <TooltipContent><p>Salvar Pesagem</p></TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={handleLoad} variant="outline" size="icon" className="h-8 w-8"><ArrowUpFromLine className="h-4 w-4"/></Button>
+              </TooltipTrigger>
+              <TooltipContent><p>Carregar Última Pesagem</p></TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -263,12 +264,33 @@ function ScaleCalculator() {
         <CardContent className="p-4 print:p-0">
           <div className="w-full space-y-2">
             <div className="flex flex-col gap-2">
-                <div className="space-y-1">
-                    <Label htmlFor="cliente">Cliente</Label>
-                    <Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/>
-                    <span className="hidden print:block">{headerData.client || 'N/A'}</span>
+                <div className="flex justify-between items-center">
+                    <Label htmlFor="cliente" className="font-semibold text-sm md:text-base">Cliente</Label>
+                    <TooltipProvider>
+                        <div className="flex items-center gap-1 rounded-full border bg-muted p-0.5">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button variant={operationType === 'loading' ? 'default' : 'ghost'} size="icon" className="h-7 w-7 rounded-full" onClick={() => setOperationType('loading')}>
+                                        <ArrowDownToLine className="h-4 w-4" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent><p>Carregamento (Entrada)</p></TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button variant={operationType === 'unloading' ? 'default' : 'ghost'} size="icon" className="h-7 w-7 rounded-full" onClick={() => setOperationType('unloading')}>
+                                        <ArrowUpFromLine className="h-4 w-4" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent><p>Descarregamento (Saída)</p></TooltipContent>
+                            </Tooltip>
+                        </div>
+                    </TooltipProvider>
                 </div>
-                 <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,1fr))] gap-2 w-full text-xs sm:text-sm">
+                <Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/>
+                <span className="hidden print:block">{headerData.client || 'N/A'}</span>
+                
+                <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,1fr))] gap-2 w-full text-xs sm:text-sm">
                     <div className="space-y-1">
                         <Label htmlFor="motorista" className="text-xs sm:text-sm">Motorista</Label>
                         <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden text-sm"/>
@@ -280,7 +302,9 @@ function ScaleCalculator() {
                         <span className="hidden print:block">{headerData.plate || 'N/A'}</span>
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="initial-weight" className="text-xs sm:text-sm">Peso Inicial (kg)</Label>
+                        <Label htmlFor="initial-weight" className="text-xs sm:text-sm">
+                          Peso Inicial ({operationType === 'loading' ? 'Bruto' : 'Tara'})
+                        </Label>
                         <Input id="initial-weight" type="text" inputMode="decimal" value={headerData.initialWeight} onChange={e => handleHeaderChange('initialWeight', e.target.value)} className="h-8 print:hidden text-sm"/>
                         <span className="hidden print:block">{headerData.initialWeight || 'N/A'}</span>
                     </div>
@@ -327,7 +351,7 @@ function ScaleCalculator() {
                           value={formatNumber(item.bruto)}
                           onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)}
                           className="text-right h-8 print:hidden"
-                          disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight)}
+                          disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')}
                         />
                          <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
                       </TableCell>
@@ -337,6 +361,7 @@ function ScaleCalculator() {
                           value={formatNumber(item.tara)}
                           onChange={(e) => handleInputChange(set.id, item.id, 'tara', e.target.value)}
                           className="text-right h-8 print:hidden"
+                          disabled={setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading'}
                         />
                          <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
                       </TableCell>
@@ -451,5 +476,3 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 }
 
 export default ScaleCalculator;
-
-    

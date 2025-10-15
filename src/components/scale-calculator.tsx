@@ -248,11 +248,11 @@ function ScaleCalculator() {
               <Table>
                 <TableHeader>
                   <TableRow className="print:text-black">
-                    <TableHead className="min-w-[200px]">Material</TableHead>
-                    <TableHead className="text-right min-w-[120px]">Bruto (kg)</TableHead>
-                    <TableHead className="text-right min-w-[120px]">Tara (kg)</TableHead>
-                    <TableHead className="text-right min-w-[120px]">Descontos (kg)</TableHead>
-                    <TableHead className="text-right font-semibold min-w-[120px]">Líquido (kg)</TableHead>
+                    <TableHead className="w-[30%]">Material</TableHead>
+                    <TableHead className="text-right w-[17.5%]">Bruto (kg)</TableHead>
+                    <TableHead className="text-right w-[17.5%]">Tara (kg)</TableHead>
+                    <TableHead className="text-right w-[17.5%]">Descontos (kg)</TableHead>
+                    <TableHead className="text-right font-semibold w-[17.5%]">Líquido (kg)</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

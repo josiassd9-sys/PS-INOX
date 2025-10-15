@@ -265,18 +265,18 @@ const ScaleCalculator = forwardRef((props, ref) => {
                 <Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/>
                 <span className="hidden print:block">{headerData.client || 'N/A'}</span>
                 
-                 <div className="grid grid-cols-2 sm:grid-cols-[1fr_auto_auto] gap-0.5 w-full text-xs sm:text-sm">
-                    <div className="space-y-px">
+                 <div className="flex w-full items-end gap-0.5 text-xs sm:text-sm flex-nowrap">
+                    <div className="space-y-px flex-1">
                         <Label htmlFor="motorista" className="text-xs sm:text-sm">Motorista</Label>
                         <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden text-sm"/>
                         <span className="hidden print:block">{headerData.driver || 'N/A'}</span>
                     </div>
-                    <div className="space-y-px">
+                    <div className="space-y-px flex-none">
                         <Label htmlFor="placa" className="text-xs sm:text-sm">Placa</Label>
                         <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden text-sm text-center w-24"/>
                         <span className="hidden print:block">{headerData.plate || 'N/A'}</span>
                     </div>
-                    <div className="space-y-px">
+                    <div className="space-y-px flex-none">
                         <Label htmlFor="initial-weight" className="text-xs sm:text-sm">
                           {operationType === 'loading' ? 'Bruto' : 'Tara'}
                         </Label>
@@ -327,17 +327,17 @@ const ScaleCalculator = forwardRef((props, ref) => {
                           <div className="grid grid-cols-4 gap-0.5">
                               <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">Bruto (kg)</Label>
-                                  <Input type="text" value={formatNumber(item.bruto)} onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)} className="text-right h-8 print:hidden w-24" disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')} />
+                                  <Input type="text" value={formatNumber(item.bruto)} onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)} className="text-right h-8 print:hidden w-full" disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')} />
                                    <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
                               </div>
                                <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">Tara (kg)</Label>
-                                   <Input type="text" value={formatNumber(item.tara)} onChange={(e) => handleInputChange(set.id, item.id, 'tara', e.target.value)} className="text-right h-8 print:hidden w-24" disabled={(setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading')} />
+                                   <Input type="text" value={formatNumber(item.tara)} onChange={(e) => handleInputChange(set.id, item.id, 'tara', e.target.value)} className="text-right h-8 print:hidden w-full" disabled={(setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading')} />
                                    <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
                               </div>
                                <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">A/L (kg)</Label>
-                                  <Input type="text" value={formatNumber(item.descontos)} onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)} className="text-right h-8 print:hidden w-24" />
+                                  <Input type="text" value={formatNumber(item.descontos)} onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)} className="text-right h-8 print:hidden w-full" />
                                    <span className="hidden print:block text-right">{formatNumber(item.descontos)}</span>
                               </div>
                                <div className="space-y-px">
@@ -499,5 +499,3 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 }
 
 export default ScaleCalculator;
-
-    

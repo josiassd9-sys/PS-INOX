@@ -216,7 +216,7 @@ function ScaleCalculator() {
                 <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden"/>
                 <span className="hidden print:block">{headerData.driver || 'N/A'}</span>
               </div>
-              <div>
+               <div>
                 <Label htmlFor="cidade">Cidade</Label>
                 <Input id="cidade" value={headerData.city} onChange={e => handleHeaderChange('city', e.target.value)} className="h-8 print:hidden"/>
                 <span className="hidden print:block">{headerData.city || 'N/A'}</span>
@@ -298,9 +298,9 @@ function ScaleCalculator() {
                 </TableBody>
               </Table>
               <div className="flex justify-start p-2 print:hidden">
-                  <Button size="sm" onClick={() => addNewMaterial(set.id)}>
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    <span className="sm:hidden"><PlusCircle className="h-4 w-4"/></span>
+                  <Button size="sm" onClick={() => addNewMaterial(set.id)} className="h-8">
+                    <PlusCircle className="mr-2 h-4 w-4 sm:hidden" />
+                    <span className="hidden sm:inline"><PlusCircle className="mr-2 h-4 w-4" /></span>
                     <span className="hidden sm:inline">Adicionar Material</span>
                   </Button>
               </div>

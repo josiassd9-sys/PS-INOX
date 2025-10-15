@@ -208,7 +208,9 @@ export function ScaleCalculator() {
 
   return (
     <div className="space-y-2 p-1" id="scale-calculator-printable-area">
-        {weighingSets.map((set, setIndex) => (
+        {weighingSets.map((set, setIndex) => {
+            const containerValueUsed = set.items.some(item => (parseFloat(item.container.replace(',', '.')) || 0) > 0);
+            return (
             <Card key={set.id} className="bg-card/50 print:shadow-none print:border-border">
                  <CardHeader className="flex-row items-center justify-between p-2">
                     <CardTitle className="text-lg">Caçamba {setIndex + 1}</CardTitle>
@@ -235,12 +237,14 @@ export function ScaleCalculator() {
                             <TableBody>
                                 {set.items.map((item, itemIndex) => {
                                     const isGrossDisabled = itemIndex > 0 && set.items[itemIndex - 1]?.tare !== "";
+                                    const isContainerDisabled = containerValueUsed && (parseFloat(item.container.replace(',', '.')) || 0) === 0;
+
                                     return (
                                     <TableRow key={item.id}>
                                         <TableCell className="p-1"><Input value={item.name} onChange={e => handleItemChange(set.id, item.id, 'name', e.target.value)} placeholder="Nome" className="h-8"/></TableCell>
                                         <TableCell className="p-1"><Input value={item.gross} onChange={e => handleItemChange(set.id, item.id, 'gross', e.target.value)} placeholder="0,00" className="h-8" disabled={isGrossDisabled} /></TableCell>
                                         <TableCell className="p-1"><Input value={item.waste} onChange={e => handleItemChange(set.id, item.id, 'waste', e.target.value)} placeholder="0,00" className="h-8"/></TableCell>
-                                        <TableCell className="p-1"><Input value={item.container} onChange={e => handleItemChange(set.id, item.id, 'container', e.target.value)} placeholder="0,00" className="h-8"/></TableCell>
+                                        <TableCell className="p-1"><Input value={item.container} onChange={e => handleItemChange(set.id, item.id, 'container', e.target.value)} placeholder="0,00" className="h-8" disabled={isContainerDisabled} /></TableCell>
                                         <TableCell className="p-1"><Input value={item.tare} onChange={e => handleItemChange(set.id, item.id, 'tare', e.target.value)} placeholder="0,00" className="h-8"/></TableCell>
                                         <TableCell className="p-1 text-center font-bold text-accent-price align-middle">{formatNumber(item.net)}</TableCell>
                                         <TableCell className="p-1 print:hidden">
@@ -262,7 +266,7 @@ export function ScaleCalculator() {
                     </div>
                  </CardContent>
             </Card>
-        ))}
+        )})}
          <div className="flex flex-col sm:flex-row gap-2 print:hidden">
             <Button variant="secondary" onClick={addWeighingSet} className="flex-1">
                 <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Bitrem
@@ -308,4 +312,3 @@ export function ScaleCalculator() {
   );
 }
 
-    

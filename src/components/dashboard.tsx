@@ -34,7 +34,7 @@ import {
 } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { PackageChecker } from "./package-checker";
-import { ScaleCalculator } from "./scale-calculator";
+import ScaleCalculator from "./scale-calculator";
 import { ScrapTable } from "./scrap-table";
 import { cn } from "@/lib/utils";
 import { AstmStandards } from "./astm-standards";

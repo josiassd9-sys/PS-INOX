@@ -39,6 +39,7 @@ const ALL_CATEGORIES: Category[] = [
     icon: 'PackageCheck',
     unit: 'calc',
     items: [],
+     path: '/calculator/package-checker',
   },
   {
     id: 'balanca',
@@ -47,6 +48,7 @@ const ALL_CATEGORIES: Category[] = [
     icon: 'Weight',
     unit: 'calc',
     items: [],
+    path: '/calculator/balanca',
   },
   {
     id: 'tabela-sucata',
@@ -55,6 +57,7 @@ const ALL_CATEGORIES: Category[] = [
     icon: 'Trash2',
     unit: 'kg',
     items: scrapItems,
+    path: '/calculator/tabela-sucata',
   },
   {
     id: 'tubos-od',
@@ -88,6 +91,7 @@ const ALL_CATEGORIES: Category[] = [
     hasOwnPriceControls: true,
     defaultCostPrice: 40,
     defaultMarkup: 50,
+    path: '/calculator/conexoes',
   },
   {
     id: 'chapas',
@@ -239,6 +243,7 @@ const ALL_CATEGORIES: Category[] = [
     icon: 'Book',
     unit: 'calc',
     items: [],
+    path: '/calculator/normas-astm',
   },
   {
     id: 'processos-fabricacao',
@@ -247,6 +252,7 @@ const ALL_CATEGORIES: Category[] = [
     icon: 'Factory',
     unit: 'calc',
     items: [],
+    path: '/calculator/processos-fabricacao',
   },
   {
     id: 'desenho-tecnico',
@@ -255,6 +261,7 @@ const ALL_CATEGORIES: Category[] = [
     icon: 'DraftingCompass',
     unit: 'calc',
     items: [],
+    path: '/calculator/desenho-tecnico',
   },
    {
     id: 'gauge',

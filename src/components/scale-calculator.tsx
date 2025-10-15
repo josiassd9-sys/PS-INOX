@@ -211,7 +211,7 @@ function ScaleCalculator() {
                 <Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/>
                 <span className="hidden print:block">{headerData.client || 'N/A'}</span>
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                <div>
                   <Label htmlFor="motorista">Motorista</Label>
                   <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden"/>
@@ -390,5 +390,3 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 }
 
 export default ScaleCalculator;
-
-    

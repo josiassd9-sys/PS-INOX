@@ -376,11 +376,11 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
         title: 'INFORMATIVOS',
         items: [
             CATEGORIES.find(c => c.id === 'lista-materiais')!,
+            CATEGORIES.find(c => c.id === 'ai-assistant')!,
             CATEGORIES.find(c => c.id === 'normas-astm')!,
             CATEGORIES.find(c => c.id === 'processos-fabricacao')!,
             CATEGORIES.find(c => c.id === 'desenho-tecnico')!,
             CATEGORIES.find(c => c.id === 'gauge')!,
-            CATEGORIES.find(c => c.id === 'ai-assistant')!,
         ]
     },
     {

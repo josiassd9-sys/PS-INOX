@@ -44,3 +44,53 @@ export type CategoryGroup = {
     title: string;
     items: Category[];
 };
+
+
+export type Perfil = {
+    nome: string;
+    peso: number; // kg/m
+    area: number; // cm²
+    h: number; // mm
+    b: number; // mm
+    tw: number; // mm
+    tf: number; // mm
+    d: number; // mm
+    Ix: number; // cm⁴
+    Wx: number; // cm³
+    rx: number; // cm
+    Iy: number; // cm⁴
+    Wy: number; // cm³
+    ry: number; // cm
+};
+
+export type PerfilIpe = Omit<Perfil, 'd'>;
+
+
+export type SteelDeck = {
+    nome: string;
+    tipo: 'MD57' | 'MD75';
+    espessuraChapa: number; // mm
+    pesoProprio: number; // kg/m²
+    vaosMaximos: {
+        simples: { [key: string]: number };
+        duplo: { [key: string]: number };
+    };
+};
+
+export type BudgetItem = {
+  id: string;
+  perfil: Perfil | PerfilIpe | SteelDeck;
+  span?: number; 
+  height?: number; 
+  quantity: number;
+  weightPerUnit: number;
+  totalWeight: number;
+  costPerUnit: number;
+  totalCost: number;
+  type: 'Viga Principal' | 'Viga Secundária' | 'Steel Deck' | 'Pilar';
+};
+
+export type SupportReaction = {
+  vigaPrincipal: number;
+  vigaSecundaria: number;
+};

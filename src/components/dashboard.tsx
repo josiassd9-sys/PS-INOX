@@ -3,7 +3,7 @@
 "use client";
 
 import * as React from "react";
-import { ALL_CATEGORIES, CATEGORY_GROUPS, SteelItem, ScrapItem, ConnectionGroup, ConnectionItem, Category } from "@/lib/data";
+import { ALL_CATEGORIES, CATEGORY_GROUPS, SteelItem, ScrapItem, ConnectionGroup, ConnectionItem, Category } from "@/lib/data/index";
 import {
   Sidebar,
   SidebarHeader,

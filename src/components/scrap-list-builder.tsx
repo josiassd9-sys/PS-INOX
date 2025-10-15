@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from ".
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import { SteelItem, ALL_CATEGORIES, Category, ScrapItem } from "../lib/data";
+import { SteelItem, ALL_CATEGORIES, Category, ScrapItem } from "@/lib/data/index";
 import { Label } from "./ui/label";
 import { cn } from "@/lib/utils";
 import { ScrapCalculator } from "./scrap-calculator";
@@ -309,7 +309,7 @@ export function ScrapListBuilder() {
       return null;
     }
   
-    const safeSearchTerm = searchTerm.replace(",", ".").toLowerCase();
+    const safeSearchTerm = searchTerm.toLowerCase().replace(",", ".");
     
     const scrapCategory = ALL_CATEGORIES.find(c => c.id === 'tabela-sucata');
     if (!scrapCategory) return null;

@@ -1,5 +1,8 @@
-import type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup } from './types';
-import { perfisData, perfisIpeData, steelDeckData, tiposAco, PESO_CONCRETO_KGF_M3, E_ACO_MPA, BudgetItem, SupportReaction } from './perfis';
+
+import type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction } from './types';
+import { perfisData, tiposAco, PESO_CONCRETO_KGF_M3, E_ACO_MPA } from './perfis';
+import { perfisIpeData } from './perfis-ipe';
+import { steelDeckData } from './steel-deck';
 import { scrapItems } from './sucata';
 import { tubosOdItems } from './tubos-od';
 import { tubosAliancaItems } from './tubos-alianca';
@@ -404,4 +407,4 @@ export {
     PESO_CONCRETO_KGF_M3,
     E_ACO_MPA
 };
-export type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, BudgetItem, SupportReaction };
+export type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction };

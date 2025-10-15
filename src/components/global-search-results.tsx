@@ -3,7 +3,7 @@
 "use client";
 
 import * as React from "react";
-import type { Category, ConnectionGroup, SteelItem, ScrapItem } from "@/lib/data";
+import type { Category, ConnectionGroup, SteelItem, ScrapItem } from "@/lib/data/index";
 import {
     Accordion,
     AccordionContent,
@@ -401,5 +401,3 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
     </div>
   )
 }
-
-    

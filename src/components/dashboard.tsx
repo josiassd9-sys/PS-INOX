@@ -3,7 +3,8 @@
 "use client";
 
 import * as React from "react";
-import { ALL_CATEGORIES, CATEGORY_GROUPS, SteelItem, ScrapItem, ConnectionGroup, ConnectionItem, Category } from "@/lib/data/index";
+import { ALL_CATEGORIES, CATEGORY_GROUPS, SteelItem, ScrapItem, ConnectionGroup, Category } from "@/lib/data/index";
+import type { ConnectionItem } from "@/lib/data/types";
 import {
   Sidebar,
   SidebarHeader,
@@ -506,5 +507,3 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
 export function Dashboard({ initialCategoryId, children }: { initialCategoryId: string | null, children?: React.ReactNode }) {
   return <DashboardComponent initialCategoryId={initialCategoryId} children={children} />
 }
-
-    

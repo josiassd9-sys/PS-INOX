@@ -124,21 +124,6 @@
   }
 }
 
-@layer utilities {
-    .bg-sheet-header-bg { @apply bg-[hsl(var(--sheet-header-bg))]; }
-    .text-sheet-header-fg { @apply text-[hsl(var(--sheet-header-fg))]; }
-    .bg-sheet-table-header-bg { @apply bg-[hsl(var(--sheet-table-header-bg))]; }
-    .text-sheet-table-header-fg { @apply text-[hsl(var(--sheet-table-header-fg))]; }
-    .bg-row-odd-bg { @apply bg-[hsl(var(--row-odd-bg))]; }
-    .bg-row-even-bg { @apply bg-[hsl(var(--row-even-bg))]; }
-    .bg-row-pmq-bg { @apply bg-[hsl(var(--row-pmq-bg))]; }
-    .text-text-item-pink { @apply text-[hsl(var(--text-item-pink))]; }
-    .bg-sheet-total-bg { @apply bg-[hsl(var(--sheet-total-bg))]; }
-    .border-sheet-header-bg { @apply border-[hsl(var(--sheet-header-bg))]; }
-    .bg-sheet-total-price-bg { @apply bg-[hsl(var(--sheet-total-price-bg))]; }
-    .text-sheet-total-price-fg { @apply text-[hsl(var(--sheet-total-price-fg))]; }
-}
-
 
 @media print {
   body {
@@ -345,5 +330,3 @@
     height: auto !important;
    }
 }
-
-    

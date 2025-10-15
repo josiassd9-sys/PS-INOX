@@ -4,6 +4,7 @@
 
 import * as React from "react";
 import type { Category, ConnectionGroup, SteelItem, ScrapItem } from "@/lib/data/index";
+import type { ConnectionItem } from "@/lib/data/types";
 import {
     Accordion,
     AccordionContent,

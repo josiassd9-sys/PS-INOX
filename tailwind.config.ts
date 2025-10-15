@@ -1,5 +1,7 @@
 import type {Config} from 'tailwindcss';
 
+const plugin = require('tailwindcss/plugin')
+
 export default {
   darkMode: ['class'],
   content: [
@@ -66,6 +68,33 @@ export default {
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
         },
+        'sheet-header': {
+          bg: 'hsl(var(--sheet-header-bg))',
+          fg: 'hsl(var(--sheet-header-fg))',
+        },
+        'sheet-table-header': {
+            bg: 'hsl(var(--sheet-table-header-bg))',
+            fg: 'hsl(var(--sheet-table-header-fg))',
+        },
+        'row-odd': {
+            bg: 'hsl(var(--row-odd-bg))',
+        },
+        'row-even': {
+            bg: 'hsl(var(--row-even-bg))',
+        },
+        'row-pmq': {
+            bg: 'hsl(var(--row-pmq-bg))',
+        },
+        'text-item': {
+            pink: 'hsl(var(--text-item-pink))',
+        },
+        'sheet-total': {
+            bg: 'hsl(var(--sheet-total-bg))',
+        },
+        'sheet-total-price': {
+            bg: 'hsl(var(--sheet-total-price-bg))',
+            fg: 'hsl(var(--sheet-total-price-fg))',
+        }
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -99,5 +128,23 @@ to: {
       }
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [
+    require('tailwindcss-animate'),
+    plugin(function({ addUtilities }: { addUtilities: any }) {
+      addUtilities({
+        '.bg-sheet-header-bg': { backgroundColor: 'hsl(var(--sheet-header-bg))' },
+        '.text-sheet-header-fg': { color: 'hsl(var(--sheet-header-fg))' },
+        '.bg-sheet-table-header-bg': { backgroundColor: 'hsl(var(--sheet-table-header-bg))' },
+        '.text-sheet-table-header-fg': { color: 'hsl(var(--sheet-table-header-fg))' },
+        '.bg-row-odd-bg': { backgroundColor: 'hsl(var(--row-odd-bg))' },
+        '.bg-row-even-bg': { backgroundColor: 'hsl(var(--row-even-bg))' },
+        '.bg-row-pmq-bg': { backgroundColor: 'hsl(var(--row-pmq-bg))' },
+        '.text-text-item-pink': { color: 'hsl(var(--text-item-pink))' },
+        '.bg-sheet-total-bg': { backgroundColor: 'hsl(var(--sheet-total-bg))' },
+        '.border-sheet-header-bg': { borderColor: 'hsl(var(--sheet-header-bg))' },
+        '.bg-sheet-total-price-bg': { backgroundColor: 'hsl(var(--sheet-total-price-bg))' },
+        '.text-sheet-total-price-fg': { color: 'hsl(var(--sheet-total-price-fg))' },
+      })
+    })
+  ],
 } satisfies Config;

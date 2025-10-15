@@ -205,22 +205,22 @@ function ScaleCalculator() {
 
       <Card className="mb-4 print:border-none print:shadow-none print:p-0">
         <CardContent className="p-4 print:p-0">
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div>
                 <Label htmlFor="cliente">Cliente</Label>
                 <Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/>
                 <span className="hidden print:block">{headerData.client || 'N/A'}</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-               <div>
-                  <Label htmlFor="motorista">Motorista</Label>
-                  <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden"/>
-                  <span className="hidden print:block">{headerData.driver || 'N/A'}</span>
+              <div>
+                <Label htmlFor="motorista">Motorista</Label>
+                <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden"/>
+                <span className="hidden print:block">{headerData.driver || 'N/A'}</span>
               </div>
-               <div>
-                  <Label htmlFor="cidade">Cidade</Label>
-                  <Input id="cidade" value={headerData.city} onChange={e => handleHeaderChange('city', e.target.value)} className="h-8 print:hidden"/>
-                  <span className="hidden print:block">{headerData.city || 'N/A'}</span>
+              <div>
+                <Label htmlFor="cidade">Cidade</Label>
+                <Input id="cidade" value={headerData.city} onChange={e => handleHeaderChange('city', e.target.value)} className="h-8 print:hidden"/>
+                <span className="hidden print:block">{headerData.city || 'N/A'}</span>
               </div>
               <div>
                 <Label htmlFor="placa">Placa</Label>

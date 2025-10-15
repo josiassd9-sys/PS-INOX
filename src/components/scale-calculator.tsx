@@ -10,7 +10,7 @@ import { Label } from "./ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "./ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
-import { PlusCircle, Trash, Tractor, Printer, Save, Trash2 } from "lucide-react";
+import { PlusCircle, Trash, Tractor, Printer, Save, Trash2, ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
 import { scrapItems } from "@/lib/data/sucata";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "./ui/command";
@@ -33,6 +33,8 @@ type WeighingSet = {
   descontoCacamba: number;
 };
 
+type OperationType = 'loading' | 'unloading';
+
 const initialItem: WeighingItem = { id: '', material: '', bruto: 0, tara: 0, descontos: 0, liquido: 0 };
 const initialWeighingSet: WeighingSet = { id: uuidv4(), items: [], descontoCacamba: 0 };
 
@@ -46,6 +48,7 @@ function ScaleCalculator() {
   const [weighingSets, setWeighingSets] = useState<WeighingSet[]>([initialWeighingSet]);
   const [activeSetId, setActiveSetId] = useState<string>(initialWeighingSet.id);
   const { toast } = useToast();
+  const [operationType, setOperationType] = useState<OperationType>('loading');
 
   const handleHeaderChange = (field: keyof typeof headerData, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,]/g, '').replace('.', ',');
@@ -205,7 +208,29 @@ function ScaleCalculator() {
   return (
     <div className="p-4 bg-background max-w-7xl mx-auto" id="scale-calculator-printable-area">
       <div className="print:hidden flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold text-foreground">Balança</h1>
+        <div className="flex items-center gap-2">
+            <h1 className="text-3xl font-bold text-foreground">Balança</h1>
+            <TooltipProvider>
+                <div className="flex items-center gap-1 rounded-full border bg-muted p-0.5">
+                     <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button variant={operationType === 'loading' ? 'default' : 'ghost'} size="icon" className="h-7 w-7 rounded-full" onClick={() => setOperationType('loading')}>
+                                <ArrowDownToLine className="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent><p>Carregamento (Entrada)</p></TooltipContent>
+                    </Tooltip>
+                     <Tooltip>
+                        <TooltipTrigger asChild>
+                             <Button variant={operationType === 'unloading' ? 'default' : 'ghost'} size="icon" className="h-7 w-7 rounded-full" onClick={() => setOperationType('unloading')}>
+                                <ArrowUpFromLine className="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent><p>Descarregamento (Saída)</p></TooltipContent>
+                    </Tooltip>
+                </div>
+            </TooltipProvider>
+        </div>
         <div className="flex items-center gap-1">
           <TooltipProvider>
             <Tooltip>

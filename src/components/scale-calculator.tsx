@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "./ui/button";
-import { PlusCircle, Printer, Save, Download, Sparkles, Trash2 } from "lucide-react";
+import { PlusCircle, Printer, Sparkles, Trash2 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -38,15 +38,18 @@ interface WeighingSet {
 
 const LOCAL_STORAGE_KEY = "scaleCalculatorState_v2";
 
-const createNewItem = (): MaterialItem => ({
-  id: uuidv4(),
-  name: "",
-  gross: "",
-  waste: "",
-  container: "",
-  tare: "",
-  net: 0,
-});
+const createNewItem = (previousItem?: MaterialItem): MaterialItem => {
+    const grossValue = previousItem ? previousItem.tare : "";
+    return {
+        id: uuidv4(),
+        name: "",
+        gross: grossValue,
+        waste: "",
+        container: "",
+        tare: "",
+        net: 0,
+    };
+};
 
 const createNewWeighingSet = (): WeighingSet => ({
   id: uuidv4(),
@@ -155,9 +158,11 @@ export function ScaleCalculator() {
 
   const addItem = (setId: string) => {
     setWeighingSets(prev =>
-      prev.map(set =>
-        set.id === setId ? { ...set, items: [...set.items, createNewItem()] } : set
-      )
+      prev.map(set => {
+        if (set.id !== setId) return set;
+        const lastItem = set.items[set.items.length - 1];
+        return { ...set, items: [...set.items, createNewItem(lastItem)] };
+      })
     );
   };
 
@@ -228,10 +233,12 @@ export function ScaleCalculator() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {set.items.map(item => (
+                                {set.items.map((item, itemIndex) => {
+                                    const isGrossDisabled = itemIndex > 0 && set.items[itemIndex - 1]?.tare !== "";
+                                    return (
                                     <TableRow key={item.id}>
                                         <TableCell className="p-1"><Input value={item.name} onChange={e => handleItemChange(set.id, item.id, 'name', e.target.value)} placeholder="Nome" className="h-8"/></TableCell>
-                                        <TableCell className="p-1"><Input value={item.gross} onChange={e => handleItemChange(set.id, item.id, 'gross', e.target.value)} placeholder="0,00" className="h-8"/></TableCell>
+                                        <TableCell className="p-1"><Input value={item.gross} onChange={e => handleItemChange(set.id, item.id, 'gross', e.target.value)} placeholder="0,00" className="h-8" disabled={isGrossDisabled} /></TableCell>
                                         <TableCell className="p-1"><Input value={item.waste} onChange={e => handleItemChange(set.id, item.id, 'waste', e.target.value)} placeholder="0,00" className="h-8"/></TableCell>
                                         <TableCell className="p-1"><Input value={item.container} onChange={e => handleItemChange(set.id, item.id, 'container', e.target.value)} placeholder="0,00" className="h-8"/></TableCell>
                                         <TableCell className="p-1"><Input value={item.tare} onChange={e => handleItemChange(set.id, item.id, 'tare', e.target.value)} placeholder="0,00" className="h-8"/></TableCell>
@@ -240,7 +247,7 @@ export function ScaleCalculator() {
                                           {set.items.length > 1 && <Button variant="ghost" size="icon" onClick={() => removeItem(set.id, item.id)} className="h-8 w-8 text-destructive/70 hover:text-destructive"><Icon name="X" className="h-4 w-4"/></Button>}
                                         </TableCell>
                                     </TableRow>
-                                ))}
+                                )})}
                             </TableBody>
                         </Table>
                     </div>

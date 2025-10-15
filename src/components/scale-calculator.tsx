@@ -528,3 +528,5 @@ export function ScaleCalculator({ customerName, onCustomerNameChange }: ScaleCal
     </div>
   );
 }
+
+    

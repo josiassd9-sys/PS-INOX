@@ -178,19 +178,19 @@ function ScaleCalculator() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button onClick={handleClear} variant="outline" size="icon"><Trash2 /></Button>
+                <Button onClick={handleClear} variant="outline" size="icon" className="h-8 w-8"><Trash2 /></Button>
               </TooltipTrigger>
               <TooltipContent><p>Limpar Tudo</p></TooltipContent>
             </Tooltip>
              <Tooltip>
               <TooltipTrigger asChild>
-                <Button onClick={handleSave} variant="outline" size="icon"><Save/></Button>
+                <Button onClick={handleSave} variant="outline" size="icon" className="h-8 w-8"><Save/></Button>
               </TooltipTrigger>
               <TooltipContent><p>Salvar Pesagem</p></TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button onClick={handlePrint} variant="outline" size="icon"><Printer /></Button>
+                <Button onClick={handlePrint} variant="outline" size="icon" className="h-8 w-8"><Printer /></Button>
               </TooltipTrigger>
               <TooltipContent><p>Imprimir</p></TooltipContent>
             </Tooltip>
@@ -198,7 +198,6 @@ function ScaleCalculator() {
         </div>
       </div>
       
-      {/* Cabeçalho para impressão */}
       <div className="hidden print:block mb-4">
         <h1 className="text-4xl font-bold text-center">Balança</h1>
       </div>
@@ -248,10 +247,10 @@ function ScaleCalculator() {
                 <TableHeader>
                   <TableRow className="print:text-black">
                     <TableHead className="min-w-[200px]">Material</TableHead>
-                    <TableHead className="text-right">Bruto (kg)</TableHead>
-                    <TableHead className="text-right">Tara (kg)</TableHead>
-                    <TableHead className="text-right">Descontos (kg)</TableHead>
-                    <TableHead className="text-right font-semibold">Líquido (kg)</TableHead>
+                    <TableHead className="text-right min-w-[120px]">Bruto (kg)</TableHead>
+                    <TableHead className="text-right min-w-[120px]">Tara (kg)</TableHead>
+                    <TableHead className="text-right min-w-[120px]">Descontos (kg)</TableHead>
+                    <TableHead className="text-right font-semibold min-w-[120px]">Líquido (kg)</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -299,7 +298,11 @@ function ScaleCalculator() {
                 </TableBody>
               </Table>
               <div className="flex justify-start p-2 print:hidden">
-                  <Button size="sm" onClick={() => addNewMaterial(set.id)}><PlusCircle className="mr-2 h-4 w-4" />Adicionar Material</Button>
+                  <Button size="sm" onClick={() => addNewMaterial(set.id)}>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    <span className="sm:hidden"><PlusCircle className="h-4 w-4"/></span>
+                    <span className="hidden sm:inline">Adicionar Material</span>
+                  </Button>
               </div>
             </CardContent>
             <CardContent className="p-4 border-t print:border-t print:border-border print:p-0 print:pt-2">
@@ -390,3 +393,5 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 }
 
 export default ScaleCalculator;
+
+    

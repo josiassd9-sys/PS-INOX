@@ -236,7 +236,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
     <div className="p-px bg-background max-w-7xl mx-auto" id="scale-calculator-printable-area">
       
       <Card className="mb-px print:border-none print:shadow-none print:p-0">
-        <CardContent className="p-1 print:p-0">
+        <CardContent className="p-px print:p-0">
           <div className="w-full space-y-0.5">
             <div className="flex justify-between items-center">
                   <Label htmlFor="cliente" className="font-semibold text-sm md:text-base">Cliente</Label>
@@ -280,7 +280,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                         <Label htmlFor="initial-weight" className="text-xs sm:text-sm">
                           {operationType === 'loading' ? 'Bruto' : 'Tara'}
                         </Label>
-                        <Input id="initial-weight" type="text" inputMode="decimal" value={headerData.initialWeight} onChange={e => handleHeaderChange('initialWeight', e.target.value)} className="h-8 print:hidden text-sm text-right w-24"/>
+                        <Input id="initial-weight" type="text" inputMode="decimal" value={headerData.initialWeight} onChange={e => handleHeaderChange('initialWeight', e.target.value)} className="h-8 print:hidden text-sm text-right w-14"/>
                         <span className="hidden print:block">{headerData.initialWeight || 'N/A'}</span>
                     </div>
                 </div>
@@ -295,7 +295,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
 
          return (
           <Card key={set.id} className="mb-px print:border-none print:shadow-none print:p-0 print:mb-0.5">
-            <CardHeader className="p-1 flex flex-row items-center justify-between print:p-0 print:mb-0.5">
+            <CardHeader className="p-px flex flex-row items-center justify-between print:p-0 print:mb-0.5">
               <CardTitle className="text-xl">
                 {setIndex === 0 ? "Caçamba 1" : "Bitrem / Caçamba 2"}
               </CardTitle>
@@ -409,7 +409,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                 </TableBody>
               </Table>
             </CardContent>
-            <CardContent className="p-1 border-t print:border-t print:border-border print:p-0 print:pt-0.5">
+            <CardContent className="p-px border-t print:border-t print:border-border print:p-0 print:pt-0.5">
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-1">
                      <div className="flex items-center gap-0.5">
                          <Label htmlFor={`desconto-cacamba-${set.id}`} className="shrink-0 text-sm md:text-base">Caçamba (kg)</Label>
@@ -443,7 +443,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
       )}
 
       <Card className="mt-px bg-primary/10 border-primary/20 print:border print:border-accent-price print:shadow-none print:p-0.5">
-         <CardContent className="p-1 flex justify-end items-center">
+         <CardContent className="p-px flex justify-end items-center">
              <div className="text-right">
                 <p className="text-lg font-semibold text-primary print:text-2xl print:mb-0.5">Peso Líquido Total</p>
                 <p className="text-4xl font-bold text-primary print:text-black">{formatNumber(grandTotalLiquido)} kg</p>

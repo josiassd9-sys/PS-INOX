@@ -211,7 +211,7 @@ function ScaleCalculator() {
     window.print();
   }
 
-  const formatNumber = (num: number, decimals = 2) => {
+  const formatNumber = (num: number, decimals = 0) => {
     return new Intl.NumberFormat('pt-BR', {
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals,
@@ -327,8 +327,46 @@ function ScaleCalculator() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0 overflow-x-auto">
-              <Table>
-                <TableHeader className="hidden sm:table-header-group">
+              {/* Mobile Layout */}
+              <div className="sm:hidden">
+                  {set.items.map((item, itemIndex) => (
+                      <div key={item.id} className="border-b p-2 space-y-2">
+                          <div className="space-y-1">
+                            <Label className="text-xs text-muted-foreground">Material</Label>
+                            <MaterialSearchInput
+                              value={item.material}
+                              onValueChange={(newMaterial) => handleMaterialChange(set.id, item.id, newMaterial)}
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                              <div className="space-y-1">
+                                  <Label className="text-xs text-muted-foreground">Bruto (kg)</Label>
+                                  <Input type="text" value={formatNumber(item.bruto)} onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)} className="text-right h-8 print:hidden" disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')} />
+                                   <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
+                              </div>
+                               <div className="space-y-1">
+                                  <Label className="text-xs text-muted-foreground">Tara (kg)</Label>
+                                   <Input type="text" value={formatNumber(item.tara)} onChange={(e) => handleInputChange(set.id, item.id, 'tara', e.target.value)} className="text-right h-8 print:hidden" disabled={(setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading')} />
+                                   <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
+                              </div>
+                               <div className="space-y-1">
+                                  <Label className="text-xs text-muted-foreground">A/L (kg)</Label>
+                                  <Input type="text" value={formatNumber(item.descontos)} onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)} className="text-right h-8 print:hidden" />
+                                   <span className="hidden print:block text-right">{formatNumber(item.descontos)}</span>
+                              </div>
+                               <div className="space-y-1">
+                                  <Label className="text-xs text-muted-foreground">Líquido (kg)</Label>
+                                  <div className="h-8 flex items-center justify-end font-semibold">
+                                      <span className="print:text-black">{formatNumber(item.liquido)}</span>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  ))}
+              </div>
+              {/* Desktop Layout */}
+              <Table className="hidden sm:table">
+                <TableHeader>
                    <TableRow className="print:text-black">
                     <TableHead className="w-[30%]">Material</TableHead>
                     <TableHead className="text-right w-[17.5%]">Bruto (kg)</TableHead>
@@ -339,17 +377,14 @@ function ScaleCalculator() {
                 </TableHeader>
                 <TableBody>
                   {set.items.map((item, itemIndex) => (
-                    <TableRow key={item.id} className="print:text-black flex flex-col sm:table-row gap-1 p-2 sm:p-0 border-b sm:border-b-0">
-                      <TableCell className="p-0 sm:p-2 sm:w-[30%] font-medium">
-                          <Label className="sm:hidden text-xs text-muted-foreground">Material</Label>
+                    <TableRow key={item.id} className="print:text-black">
+                      <TableCell className="w-[30%] font-medium">
                           <MaterialSearchInput
                             value={item.material}
                             onValueChange={(newMaterial) => handleMaterialChange(set.id, item.id, newMaterial)}
                           />
                       </TableCell>
-                      <div className="flex gap-1 w-full">
-                        <TableCell className="p-0 sm:p-2 flex-1 sm:w-[17.5%]">
-                            <Label className="sm:hidden text-xs text-muted-foreground">Bruto (kg)</Label>
+                      <TableCell className="w-[17.5%]">
                             <Input
                             type="text"
                             value={formatNumber(item.bruto)}
@@ -358,9 +393,8 @@ function ScaleCalculator() {
                             disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')}
                             />
                             <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
-                        </TableCell>
-                        <TableCell className="p-0 sm:p-2 flex-1 sm:w-[17.5%]">
-                            <Label className="sm:hidden text-xs text-muted-foreground">Tara (kg)</Label>
+                      </TableCell>
+                      <TableCell className="w-[17.5%]">
                             <Input
                             type="text"
                             value={formatNumber(item.tara)}
@@ -369,9 +403,8 @@ function ScaleCalculator() {
                             disabled={(setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading')}
                             />
                             <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
-                        </TableCell>
-                        <TableCell className="p-0 sm:p-2 flex-1 sm:w-[17.5%]">
-                            <Label className="sm:hidden text-xs text-muted-foreground">A/L (kg)</Label>
+                      </TableCell>
+                      <TableCell className="w-[17.5%]">
                             <Input
                             type="text"
                             value={formatNumber(item.descontos)}
@@ -379,14 +412,12 @@ function ScaleCalculator() {
                             className="text-right h-8 print:hidden"
                             />
                             <span className="hidden print:block text-right">{formatNumber(item.descontos)}</span>
-                        </TableCell>
-                        <TableCell className="p-0 sm:p-2 flex-1 sm:w-[17.5%] text-right font-semibold">
-                            <Label className="sm:hidden text-xs text-muted-foreground">Líquido (kg)</Label>
+                      </TableCell>
+                      <TableCell className="w-[17.5%] text-right font-semibold">
                             <div className="h-8 sm:h-full flex items-center justify-end">
                                 <span className="print:text-black">{formatNumber(item.liquido)}</span>
                             </div>
-                        </TableCell>
-                      </div>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -401,7 +432,7 @@ function ScaleCalculator() {
             <CardContent className="p-4 border-t print:border-t print:border-border print:p-0 print:pt-2">
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-4">
                      <div className="flex items-center gap-2">
-                         <Label htmlFor={`desconto-cacamba-${set.id}`} className="shrink-0 text-sm md:text-base">Desconto Caçamba (kg)</Label>
+                         <Label htmlFor={`desconto-cacamba-${set.id}`} className="shrink-0 text-sm md:text-base">Caçamba (kg)</Label>
                          <Input
                              id={`desconto-cacamba-${set.id}`}
                              type="text"
@@ -486,5 +517,3 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 }
 
 export default ScaleCalculator;
-
-

@@ -223,7 +223,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
 
   const formatNumber = (num: number) => {
     if (isNaN(num)) return "0";
-    return new Intl.NumberFormat('pt-BR').format(num);
+    return new Intl.NumberFormat('pt-BR', {useGrouping: false}).format(num);
   }
   
   const grandTotalLiquido = weighingSets.reduce((total, set) => {
@@ -362,14 +362,14 @@ const ScaleCalculator = forwardRef((props, ref) => {
                 </TableHeader>
                 <TableBody>
                   {set.items.map((item, itemIndex) => (
-                    <tr key={item.id} className="print:text-black flex-col sm:table-row">
-                      <td className="w-full sm:w-[30%] font-medium p-0 sm:p-px">
+                    <TableRow key={item.id} className="print:text-black">
+                      <TableCell className="w-[30%] font-medium p-0 sm:p-px">
                           <MaterialSearchInput
                             value={item.material}
                             onValueChange={(newMaterial) => handleMaterialChange(set.id, item.id, newMaterial)}
                           />
-                      </td>
-                      <td className="sm:w-[17.5%] p-0 sm:p-px">
+                      </TableCell>
+                      <TableCell className="w-[17.5%] p-0 sm:p-px">
                             <Input
                             type="text"
                             value={formatNumber(item.bruto)}
@@ -378,8 +378,8 @@ const ScaleCalculator = forwardRef((props, ref) => {
                             disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')}
                             />
                             <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
-                      </td>
-                      <td className="sm:w-[17.5%] p-0 sm:p-px">
+                      </TableCell>
+                      <TableCell className="w-[17.5%] p-0 sm:p-px">
                             <Input
                             type="text"
                             value={formatNumber(item.tara)}
@@ -388,8 +388,8 @@ const ScaleCalculator = forwardRef((props, ref) => {
                             disabled={(setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading')}
                             />
                             <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
-                      </td>
-                      <td className="sm:w-[17.5%] p-0 sm:p-px">
+                      </TableCell>
+                      <TableCell className="w-[17.5%] p-0 sm:p-px">
                             <Input
                             type="text"
                             value={formatNumber(item.descontos)}
@@ -397,13 +397,13 @@ const ScaleCalculator = forwardRef((props, ref) => {
                             className="text-right h-8 print:hidden w-24"
                             />
                             <span className="hidden print:block text-right">{formatNumber(item.descontos)}</span>
-                      </td>
-                      <td className="sm:w-[17.5%] text-right font-semibold p-0 sm:p-px">
+                      </TableCell>
+                      <TableCell className="w-[17.5%] text-right font-semibold p-0 sm:p-px">
                             <div className="h-8 sm:h-full flex items-center justify-end">
                                 <span className="print:text-black">{formatNumber(item.liquido)}</span>
                             </div>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
                 </TableBody>
               </Table>
@@ -498,5 +498,3 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 }
 
 export default ScaleCalculator;
-
-    

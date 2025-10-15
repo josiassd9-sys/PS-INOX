@@ -3,3 +3,4 @@ config();
 
 import '@/ai/flows/suggest-optimal-markup.ts';
 import '@/ai/flows/material-cost-forecaster.ts';
+import '@/ai/flows/interpret-profile-selection.ts';

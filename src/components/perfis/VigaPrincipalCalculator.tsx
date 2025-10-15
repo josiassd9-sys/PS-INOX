@@ -8,9 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle, PlusCircle } from "lucide-react";
+import { CheckCircle, PlusCircle, Sparkles, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { perfisData, tiposAco, E_ACO_MPA, BudgetItem, Perfil } from "@/lib/data";
+import { interpretProfileSelection, InterpretProfileSelectionInput, InterpretProfileSelectionOutput } from "@/ai/flows/interpret-profile-selection";
 
 interface VigaPrincipalCalculatorProps {
     onAddToBudget: (item: BudgetItem) => void;
@@ -29,6 +30,9 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
   const [reaction, setReaction] = React.useState(0);
   const { toast } = useToast();
 
+  const [isAnalyzing, setIsAnalyzing] = React.useState(false);
+  const [analysisResult, setAnalysisResult] = React.useState<InterpretProfileSelectionOutput | null>(null);
+
   const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
     if (/^\d*[,.]?\d*$/.test(sanitizedValue)) {
@@ -36,12 +40,13 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
     }
   };
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     const L_m = parseFloat(span.replace(",", "."));
     const q_kgf_m = parseFloat(load.replace(",", "."));
     setError(null);
     setRecommendedProfile(null);
     setReaction(0);
+    setAnalysisResult(null);
 
     if (isNaN(L_m) || isNaN(q_kgf_m) || L_m <= 0 || q_kgf_m <= 0) {
       setError("Por favor, insira valores válidos e positivos para o vão e a carga.");
@@ -78,18 +83,41 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
       return current.peso < lightest.peso ? current : lightest;
     });
 
-    // Calcular reação de apoio (viga biapoiada) = (q * L) / 2
     const reaction_kN = (q_kN_m * L_m) / 2;
     const reaction_kgf = reaction_kN / 0.009807;
     setReaction(reaction_kgf);
     onReactionCalculated(reaction_kgf);
 
-
     setRecommendedProfile(lightestProfile);
     toast({
         title: "Cálculo Concluído",
-        description: `O perfil recomendado é ${lightestProfile.nome}. Agora você pode adicioná-lo ao orçamento.`,
-    })
+        description: `O perfil recomendado é ${lightestProfile.nome}. Iniciando análise da IA.`,
+    });
+
+    // AI Analysis
+    setIsAnalyzing(true);
+    try {
+        const aiInput: InterpretProfileSelectionInput = {
+            span: L_m,
+            load: q_kgf_m,
+            steelType: selectedSteel.nome,
+            recommendedProfile: {
+                nome: lightestProfile.nome,
+                peso: lightestProfile.peso,
+                Wx: lightestProfile.Wx,
+                Ix: lightestProfile.Ix,
+            },
+            requiredWx: requiredWx_cm3,
+            requiredIx: requiredIx_cm4,
+        };
+        const analysis = await interpretProfileSelection(aiInput);
+        setAnalysisResult(analysis);
+    } catch (e) {
+        console.error("AI analysis failed:", e);
+        setAnalysisResult({ analysis: "A análise da IA não pôde ser concluída no momento." });
+    } finally {
+        setIsAnalyzing(false);
+    }
   };
   
   const handleAddToBudget = () => {
@@ -135,6 +163,7 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
     onAddToBudget(newItem);
     setRecommendedProfile(null); 
     setReaction(0);
+    setAnalysisResult(null);
     toast({
         title: "Item Adicionado!",
         description: `${qty}x viga(s) ${recommendedProfile.nome} adicionada(s) ao orçamento.`,
@@ -174,7 +203,9 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
               </Select>
             </div>
           </div>
-          <Button onClick={handleCalculate} className="w-full md:w-auto">Calcular Perfil Recomendado</Button>
+          <Button onClick={handleCalculate} className="w-full md:w-auto" disabled={isAnalyzing}>
+            {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : "Calcular Perfil"}
+          </Button>
 
           {error && (
              <Alert variant="destructive">
@@ -190,12 +221,24 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
                     <AlertDescription className="space-y-2 pt-2">
                         <p>Para um vão de <span className="font-semibold">{span}m</span> e carga de <span className="font-semibold">{load}kgf/m</span> com aço <span className="font-semibold">{steelType}</span>, o perfil mais leve que atende aos critérios é:</p>
                         <div className="text-2xl font-bold text-center py-2 text-primary">{recommendedProfile.nome}</div>
-                         <p className="text-xs text-muted-foreground pt-1">
-                            Agora, defina a quantidade e o preço para adicionar ao orçamento.
-                        </p>
                     </AlertDescription>
                 </CardHeader>
                  <CardContent className="space-y-4">
+                     {isAnalyzing && (
+                         <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-4">
+                             <Loader className="animate-spin h-4 w-4" />
+                             IA está analisando o resultado...
+                         </div>
+                     )}
+                     {analysisResult && (
+                        <Alert variant="default">
+                            <Sparkles className="h-4 w-4" />
+                            <AlertTitle className="font-semibold">Análise da IA</AlertTitle>
+                            <AlertDescription>
+                                {analysisResult.analysis}
+                            </AlertDescription>
+                        </Alert>
+                     )}
                      <div className="grid grid-cols-2 gap-4 border-t pt-4">
                          <div className="space-y-2">
                             <Label htmlFor="quantity">Quantidade de Vigas</Label>

@@ -1,162 +1,376 @@
-import React, { useState, useEffect } from "react";
 
-export default function ScaleCalculator() {
-  const [ticketNumber, setTicketNumber] = useState(1);
+"use client";
+
+import React, { useState, useEffect, useCallback } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Card, CardContent } from "./ui/card";
+import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "./ui/table";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
+import { PlusCircle, Trash, Tractor, Printer, Save, Trash2 } from "lucide-react";
+import { scrapItems } from "@/lib/data/sucata";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "./ui/command";
+import { ScrollArea } from "./ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+import { cn } from "@/lib/utils";
+
+type WeighingItem = {
+  id: string;
+  material: string;
+  bruto: number;
+  tara: number;
+  descontos: number;
+  liquido: number;
+};
+
+type WeighingSet = {
+  id: string;
+  items: WeighingItem[];
+  descontoCacamba: number;
+};
+
+const initialItem: WeighingItem = { id: '', material: '', bruto: 0, tara: 0, descontos: 0, liquido: 0 };
+const initialWeighingSet: WeighingSet = { id: uuidv4(), items: [], descontoCacamba: 0 };
+
+function ScaleCalculator() {
   const [headerData, setHeaderData] = useState({
-    logoUrl: "",
     client: "",
-    driver: "",
     plate: "",
+    driver: "",
     city: "",
   });
-  const [items, setItems] = useState([
-    { product: "Sucata 304", bruto: 28540, descKg: 0, tara: 15680, liquido: 12860, caçamba: 3000, subtotal: 12860 },
-  ]);
+  const [weighingSets, setWeighingSets] = useState<WeighingSet[]>([initialWeighingSet]);
+  const [activeSetId, setActiveSetId] = useState<string>(initialWeighingSet.id);
+  const { toast } = useToast();
 
-  useEffect(() => {
-    const storedNumber = localStorage.getItem("ticketNumber");
-    if (storedNumber) setTicketNumber(parseInt(storedNumber));
-  }, []);
-
-  const handleNewTicket = () => {
-    const next = ticketNumber + 1;
-    setTicketNumber(next);
-    localStorage.setItem("ticketNumber", next);
+  const handleHeaderChange = (field: keyof typeof headerData, value: string) => {
+    setHeaderData(prev => ({ ...prev, [field]: value }));
   };
 
-  const totalLiquido = items.reduce((acc, i) => acc + i.liquido, 0);
+  const handleInputChange = (setId: string, itemId: string, field: keyof WeighingItem, value: string) => {
+    const numValue = parseFloat(value.replace(',', '.')) || 0;
+    setWeighingSets(prevSets =>
+      prevSets.map(set => {
+        if (set.id === setId) {
+          const newItems = set.items.map(item => {
+            if (item.id === itemId) {
+              const updatedItem = { ...item, [field]: numValue };
+              const bruto = updatedItem.bruto;
+              const tara = updatedItem.tara;
+              const descontos = updatedItem.descontos;
+              updatedItem.liquido = bruto - tara - descontos;
+              return updatedItem;
+            }
+            return item;
+          });
+          return { ...set, items: newItems };
+        }
+        return set;
+      })
+    );
+  };
+  
+  const handleMaterialChange = (setId: string, itemId: string, newMaterial: string) => {
+    setWeighingSets(prevSets =>
+      prevSets.map(set => {
+        if (set.id === setId) {
+          const newItems = set.items.map(item =>
+            item.id === itemId ? { ...item, material: newMaterial } : item
+          );
+          return { ...set, items: newItems };
+        }
+        return set;
+      })
+    );
+  };
+
+  const handleCacambaDiscount = (setId: string, value: string) => {
+     const numValue = parseFloat(value.replace(',', '.')) || 0;
+     setWeighingSets(prev => prev.map(set => set.id === setId ? {...set, descontoCacamba: numValue} : set));
+  };
+  
+  const addNewMaterial = (setId: string) => {
+    setWeighingSets(prevSets =>
+      prevSets.map(set => {
+        if (set.id === setId) {
+          const lastItem = set.items[set.items.length - 1];
+          const newBruto = lastItem ? lastItem.tara : 0;
+          const newItem: WeighingItem = {
+            id: uuidv4(),
+            material: "Sucata Inox",
+            bruto: newBruto,
+            tara: 0,
+            descontos: 0,
+            liquido: 0,
+          };
+          return { ...set, items: [...set.items, newItem] };
+        }
+        return set;
+      })
+    );
+  };
+  
+  const addBitrem = () => {
+    if (weighingSets.length < 2) {
+      const newSet: WeighingSet = { id: uuidv4(), items: [], descontoCacamba: 0 };
+      setWeighingSets(prev => [...prev, newSet]);
+      setActiveSetId(newSet.id);
+    }
+  };
+
+  const handleClear = () => {
+    setWeighingSets([initialWeighingSet]);
+    setActiveSetId(initialWeighingSet.id);
+    setHeaderData({ client: "", plate: "", driver: "", city: "" });
+  }
+
+  const handleSave = () => {
+      try {
+        localStorage.setItem("scaleData", JSON.stringify({weighingSets, headerData}));
+        toast({ title: "Pesagem Salva!", description: "Os dados da pesagem foram salvos localmente." });
+      } catch (e) {
+        toast({ variant: "destructive", title: "Erro ao Salvar", description: "Não foi possível salvar os dados." });
+      }
+  }
+
+  const handleLoad = () => {
+      try {
+          const savedData = localStorage.getItem("scaleData");
+          if (savedData) {
+              const { weighingSets, headerData } = JSON.parse(savedData);
+              setWeighingSets(weighingSets);
+              setHeaderData(headerData);
+              setActiveSetId(weighingSets[0]?.id || initialWeighingSet.id);
+              toast({ title: "Dados Carregados", description: "A última pesagem salva foi carregada." });
+          } else {
+              toast({ variant: "destructive", title: "Nenhum Dado Salvo", description: "Não há dados de pesagem salvos para carregar." });
+          }
+      } catch (e) {
+          toast({ variant: "destructive", title: "Erro ao Carregar", description: "Não foi possível carregar os dados." });
+      }
+  }
 
   const handlePrint = () => {
     window.print();
-  };
+  }
+
+  const formatNumber = (num: number, decimals = 2) => {
+    return new Intl.NumberFormat('pt-BR', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    }).format(num);
+  }
+  
+  const grandTotalLiquido = weighingSets.reduce((total, set) => {
+    const setItemsTotal = set.items.reduce((acc, item) => acc + item.liquido, 0);
+    return total + (setItemsTotal - set.descontoCacamba);
+  }, 0);
 
   return (
-    <div className="w-full flex flex-col items-center p-4">
-      {/* ==== VISUALIZAÇÃO NORMAL (NÃO IMPRIMIR) ==== */}
-      <div className="w-full max-w-4xl bg-white shadow-md rounded-xl p-4 mb-6 print:hidden">
-        <h2 className="text-xl font-bold mb-4 text-center">Ticket de Pesagem</h2>
-
-        <div className="flex flex-col gap-2 mb-4">
-          <input
-            type="text"
-            placeholder="Nome do Cliente"
-            className="border p-2 rounded"
-            value={headerData.client}
-            onChange={(e) => setHeaderData({ ...headerData, client: e.target.value })}
-          />
-          <div className="grid grid-cols-3 gap-2">
-            <input
-              type="text"
-              placeholder="Motorista"
-              className="border p-2 rounded"
-              value={headerData.driver}
-              onChange={(e) => setHeaderData({ ...headerData, driver: e.target.value })}
-            />
-            <input
-              type="text"
-              placeholder="Placa"
-              className="border p-2 rounded"
-              value={headerData.plate}
-              onChange={(e) => setHeaderData({ ...headerData, plate: e.target.value })}
-            />
-            <input
-              type="text"
-              placeholder="Cidade"
-              className="border p-2 rounded"
-              value={headerData.city}
-              onChange={(e) => setHeaderData({ ...headerData, city: e.target.value })}
-            />
-          </div>
-        </div>
-
-        <button
-          onClick={handleNewTicket}
-          className="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 transition mb-2"
-        >
-          Novo Ticket
-        </button>
-
-        <button
-          onClick={handlePrint}
-          className="bg-green-600 text-white rounded-lg px-4 py-2 hover:bg-green-700 transition"
-        >
-          Imprimir Ticket
-        </button>
-      </div>
-
-      {/* ==== LAYOUT DE IMPRESSÃO (SOMENTE PRINT) ==== */}
-      <div className="hidden print:block w-full max-w-3xl mx-auto text-sm text-gray-900">
-        {/* Cabeçalho */}
-        <div className="border border-black p-3">
-          <div className="flex items-center justify-between border-b border-black pb-2 mb-2">
-            <img
-              src={headerData.logoUrl || "https://via.placeholder.com/100x40?text=LOGO"}
-              alt="Logo"
-              className="h-10 object-contain"
-            />
-            <h1 className="font-bold text-lg text-center flex-1">PS INOX</h1>
-            <div className="text-right text-xs">
-              <p className="font-semibold">TICKET DE PESAGEM Nº: {ticketNumber.toString().padStart(4, "0")}</p>
-            </div>
-          </div>
-
-          <div className="mb-2">
-            <div className="flex items-center mb-1">
-              <span className="font-semibold mr-2">Nome:</span>
-              <span className="flex-1 border-b border-black">{headerData.client || " "}</span>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              <div className="flex items-center">
-                <span className="font-semibold mr-1">Motorista:</span>
-                <span className="border-b border-black flex-1">{headerData.driver || " "}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="font-semibold mr-1">Placa:</span>
-                <span className="border-b border-black flex-1">{headerData.plate || " "}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="font-semibold mr-1">Cidade:</span>
-                <span className="border-b border-black flex-1">{headerData.city || " "}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Corpo da Tabela */}
-        <div className="border border-black border-t-0">
-          <div className="grid grid-cols-7 font-bold text-xs border-b border-black bg-gray-100 text-center">
-            <div className="p-1 border-r border-black">PRODUTO</div>
-            <div className="p-1 border-r border-black">BRUTO</div>
-            <div className="p-1 border-r border-black">DESC KG</div>
-            <div className="p-1 border-r border-black">TARA</div>
-            <div className="p-1 border-r border-black">LÍQUIDO</div>
-            <div className="p-1 border-r border-black">CAÇAMBA</div>
-            <div className="p-1">SUBTOTAL</div>
-          </div>
-
-          {items.map((item, idx) => (
-            <div key={idx} className="grid grid-cols-7 text-xs text-center border-b border-black">
-              <div className="p-1 border-r border-black">{item.product}</div>
-              <div className="p-1 border-r border-black">{item.bruto.toLocaleString()}</div>
-              <div className="p-1 border-r border-black">{item.descKg.toLocaleString()}</div>
-              <div className="p-1 border-r border-black">{item.tara.toLocaleString()}</div>
-              <div className="p-1 border-r border-black">{item.liquido.toLocaleString()}</div>
-              <div className="p-1 border-r border-black">{item.caçamba.toLocaleString()}</div>
-              <div className="p-1">{item.subtotal.toLocaleString()}</div>
-            </div>
-          ))}
-
-          {/* Subtotal por grupo */}
-          <div className="flex justify-end pr-4 py-1 text-xs font-semibold">
-            <span>Subtotal Materiais (Subtotal): {totalLiquido.toLocaleString()} KG</span>
-          </div>
-
-          {/* Total final */}
-          <div className="border-t border-black text-right pr-4 py-2 font-bold text-sm">
-            TOTAL LÍQUIDO QTD: {totalLiquido.toLocaleString()} KG
-          </div>
+    <div className="p-4 bg-background max-w-7xl mx-auto" id="scale-calculator-printable-area">
+      <div className="print:hidden flex justify-between items-center mb-4">
+        <h1 className="text-3xl font-bold text-foreground">Balança</h1>
+        <div className="flex items-center gap-1">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={handleClear} variant="outline" size="icon"><Trash2 /></Button>
+              </TooltipTrigger>
+              <TooltipContent><p>Limpar Tudo</p></TooltipContent>
+            </Tooltip>
+             <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={handleSave} variant="outline" size="icon"><Save/></Button>
+              </TooltipTrigger>
+              <TooltipContent><p>Salvar Pesagem</p></TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={handlePrint} variant="outline" size="icon"><Printer /></Button>
+              </TooltipTrigger>
+              <TooltipContent><p>Imprimir</p></TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
+      
+      {/* Cabeçalho para impressão */}
+      <div className="hidden print:block mb-4">
+        <h1 className="text-4xl font-bold text-center">Balança</h1>
+      </div>
+
+      <Card className="mb-4 print:border-none print:shadow-none print:p-0">
+        <CardContent className="p-4 print:p-0">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div><Label htmlFor="cliente">Cliente</Label><Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/><span className="hidden print:block">{headerData.client || 'N/A'}</span></div>
+            <div><Label htmlFor="placa">Placa</Label><Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden"/><span className="hidden print:block">{headerData.plate || 'N/A'}</span></div>
+            <div><Label htmlFor="motorista">Motorista</Label><Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden"/><span className="hidden print:block">{headerData.driver || 'N/A'}</span></div>
+            <div><Label htmlFor="cidade">Cidade</Label><Input id="cidade" value={headerData.city} onChange={e => handleHeaderChange('city', e.target.value)} className="h-8 print:hidden"/><span className="hidden print:block">{headerData.city || 'N/A'}</span></div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {weighingSets.map((set, setIndex) => {
+         const subtotalLiquido = set.items.reduce((acc, item) => acc + item.liquido, 0);
+         const totalLiquidoSet = subtotalLiquido - set.descontoCacamba;
+
+         return (
+          <Card key={set.id} className="mb-4 print:border-none print:shadow-none print:p-0 print:mb-2">
+            <CardHeader className="p-4 print:p-0 print:mb-2">
+              <CardTitle className="text-xl">
+                {setIndex === 0 ? "Caçamba 1" : "Bitrem / Caçamba 2"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0 overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="print:text-black">
+                    <TableHead className="min-w-[200px]">Material</TableHead>
+                    <TableHead className="text-right">Bruto (kg)</TableHead>
+                    <TableHead className="text-right">Tara (kg)</TableHead>
+                    <TableHead className="text-right">Descontos (kg)</TableHead>
+                    <TableHead className="text-right font-semibold">Líquido (kg)</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {set.items.map((item, itemIndex) => (
+                    <TableRow key={item.id} className="print:text-black">
+                      <TableCell>
+                          <MaterialSearchInput
+                            value={item.material}
+                            onValueChange={(newMaterial) => handleMaterialChange(set.id, item.id, newMaterial)}
+                          />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type="text"
+                          value={formatNumber(item.bruto)}
+                          onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)}
+                          className="text-right h-8 print:hidden"
+                          disabled={itemIndex > 0}
+                        />
+                         <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
+                      </TableCell>
+                       <TableCell>
+                        <Input
+                          type="text"
+                          value={formatNumber(item.tara)}
+                          onChange={(e) => handleInputChange(set.id, item.id, 'tara', e.target.value)}
+                          className="text-right h-8 print:hidden"
+                        />
+                         <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type="text"
+                          value={formatNumber(item.descontos)}
+                          onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)}
+                          className="text-right h-8 print:hidden"
+                        />
+                         <span className="hidden print:block text-right">{formatNumber(item.descontos)}</span>
+                      </TableCell>
+                       <TableCell className="text-right font-semibold">
+                           <span className="print:text-black">{formatNumber(item.liquido)}</span>
+                       </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <div className="flex justify-start p-2 print:hidden">
+                  <Button size="sm" onClick={() => addNewMaterial(set.id)}><PlusCircle className="mr-2 h-4 w-4" />Adicionar Material</Button>
+              </div>
+            </CardContent>
+            <CardContent className="p-4 border-t print:border-t print:border-border print:p-0 print:pt-2">
+                 <div className="flex justify-end items-center gap-4">
+                     <div className="flex items-center gap-2">
+                         <Label htmlFor={`desconto-cacamba-${set.id}`} className="shrink-0">Desconto Caçamba (kg)</Label>
+                         <Input
+                             id={`desconto-cacamba-${set.id}`}
+                             type="text"
+                             value={formatNumber(set.descontoCacamba)}
+                             onChange={(e) => handleCacambaDiscount(set.id, e.target.value)}
+                             className="w-32 h-8 text-right print:hidden"
+                          />
+                          <span className="hidden print:block font-semibold">{formatNumber(set.descontoCacamba)}</span>
+                     </div>
+                     <div className="text-right">
+                         <p className="text-sm text-muted-foreground">Subtotal Líquido</p>
+                         <p className="text-lg font-bold print:text-black">{formatNumber(subtotalLiquido)} kg</p>
+                     </div>
+                      <div className="text-right">
+                         <p className="text-sm text-muted-foreground">Total Líquido ({setIndex === 0 ? "Caçamba 1" : "Bitrem"})</p>
+                         <p className="text-xl font-bold text-primary print:text-black">{formatNumber(totalLiquidoSet)} kg</p>
+                     </div>
+                 </div>
+            </CardContent>
+          </Card>
+        );
+      })}
+
+      {weighingSets.length < 2 && (
+        <div className="flex justify-center my-4 print:hidden">
+          <Button variant="secondary" onClick={addBitrem}><Tractor className="mr-2 h-4 w-4" /> Adicionar Bitrem / Caçamba 2</Button>
+        </div>
+      )}
+
+      <Card className="mt-4 bg-primary/10 border-primary/20 print:border print:border-accent-price print:shadow-none print:p-2">
+         <CardContent className="p-4 flex justify-end items-center">
+             <div className="text-right">
+                <p className="text-lg font-semibold text-primary print:text-2xl print:mb-2">Peso Líquido Total</p>
+                <p className="text-4xl font-bold text-primary print:text-black">{formatNumber(grandTotalLiquido)} kg</p>
+            </div>
+         </CardContent>
+      </Card>
     </div>
   );
 }
+
+function MaterialSearchInput({ value, onValueChange }: { value: string, onValueChange: (value: string) => void }) {
+  const [open, setOpen] = useState(false)
+  
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className="w-full justify-between h-8 print:hidden"
+        >
+          <span className="truncate">{value}</span>
+        </Button>
+      </PopoverTrigger>
+       <span className="hidden print:block">{value}</span>
+      <PopoverContent className="w-[300px] p-0">
+        <Command>
+          <CommandInput placeholder="Buscar sucata..." />
+          <CommandEmpty>Nenhuma sucata encontrada.</CommandEmpty>
+          <ScrollArea className="h-48">
+            <CommandGroup>
+              {scrapItems.map((item) => (
+                <CommandItem
+                  key={item.id}
+                  value={item.material}
+                  onSelect={(currentValue) => {
+                    onValueChange(currentValue === value ? "" : currentValue)
+                    setOpen(false)
+                  }}
+                >
+                  {item.material}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </ScrollArea>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+export default ScaleCalculator;
+
+    

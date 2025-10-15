@@ -11,13 +11,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "./ui/button";
-import { PlusCircle, Printer, Sparkles, Trash2 } from "lucide-react";
+import { PlusCircle, Printer, Save, Sparkles, Trash2 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
 import { Icon } from "./icons";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { Separator } from "./ui/separator";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
+
 
 interface MaterialItem {
   id: string;
@@ -119,15 +121,22 @@ export function ScaleCalculator() {
     }
   }, []);
   
-  React.useEffect(() => {
+  const saveData = () => {
     if (isClient) {
       try {
         const stateToSave = { weighingSets, headerData };
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stateToSave));
+        toast({ title: "Pesagem Salva!", description: "Os dados da pesagem foram salvos localmente." });
       } catch (error) {
         console.error("Failed to save to localStorage", error);
+        toast({ title: "Erro ao Salvar", description: "Não foi possível salvar os dados.", variant: "destructive" });
       }
     }
+  }
+
+  React.useEffect(() => {
+    // This effect can be removed if we only save on button click
+    // saveData(); 
   }, [weighingSets, headerData, isClient]);
 
 
@@ -353,34 +362,58 @@ export function ScaleCalculator() {
             </div>
         </div>
 
-        <div className="flex justify-end pt-2 gap-2 print:hidden">
-            <AlertDialog>
-                <AlertDialogTrigger asChild>
-                    <Button variant="destructive" className="gap-1">
-                        <Icon name="Sparkles" />
-                        <span className="hidden sm:inline">Limpar</span>
-                    </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                    <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Esta ação não pode ser desfeita. Isso limpará todos os campos da pesagem atual.
-                    </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleClearAll}>Continuar</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-            <Button onClick={() => window.print()} className="gap-1">
-                <Printer />
-                <span className="hidden sm:inline">Imprimir</span>
-            </Button>
+        <div className="flex justify-end pt-2 gap-1 print:hidden">
+            <TooltipProvider>
+                <AlertDialog>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="outline" size="icon">
+                                    <Sparkles />
+                                </Button>
+                            </AlertDialogTrigger>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Limpar Tudo</p>
+                        </TooltipContent>
+                    </Tooltip>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                        <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Esta ação não pode ser desfeita. Isso limpará todos os campos da pesagem atual.
+                        </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleClearAll}>Continuar</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                         <Button variant="outline" size="icon" onClick={saveData}>
+                            <Save />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Salvar Pesagem</p>
+                    </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button variant="outline" size="icon" onClick={() => window.print()}>
+                            <Printer />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>Imprimir</p>
+                    </TooltipContent>
+                </Tooltip>
+             </TooltipProvider>
         </div>
     </div>
   );
 }
-
-    

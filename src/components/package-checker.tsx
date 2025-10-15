@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ALL_CATEGORIES, SteelItem } from "@/lib/data";
+import { ALL_CATEGORIES, SteelItem } from "@/lib/data/index";
 import { Search } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
 import { cn } from "@/lib/utils";

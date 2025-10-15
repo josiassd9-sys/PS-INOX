@@ -11,8 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { perfisIpeData } from "@/lib/data/perfis-ipe";
-import type { PerfilIpe } from "@/lib/data/perfis-ipe";
+import { perfisIpeData, PerfilIpe } from "@/lib/data/index";
 import { Dashboard } from "@/components/dashboard";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";

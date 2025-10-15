@@ -204,27 +204,27 @@ function ScaleCalculator() {
 
       <Card className="mb-4 print:border-none print:shadow-none print:p-0">
         <CardContent className="p-4 print:p-0">
-          <div className="grid grid-cols-1 gap-4">
+          <div className="w-full space-y-2">
             <div className="space-y-1">
                 <Label htmlFor="cliente">Cliente</Label>
                 <Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/>
                 <span className="hidden print:block">{headerData.client || 'N/A'}</span>
             </div>
-            <div className="flex flex-wrap gap-2 w-full">
-              <div className="flex-1 min-w-[120px] space-y-1">
-                <Label htmlFor="motorista" className="text-sm md:text-base">Motorista</Label>
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,1fr))] gap-2 w-full">
+              <div className="space-y-1">
+                <Label htmlFor="motorista" className="text-xs sm:text-sm">Motorista</Label>
                 <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden text-sm"/>
                 <span className="hidden print:block">{headerData.driver || 'N/A'}</span>
               </div>
-               <div className="flex-1 min-w-[120px] space-y-1">
-                <Label htmlFor="cidade" className="text-sm md:text-base">Cidade</Label>
-                <Input id="cidade" value={headerData.city} onChange={e => handleHeaderChange('city', e.target.value)} className="h-8 print:hidden text-sm"/>
-                <span className="hidden print:block">{headerData.city || 'N/A'}</span>
-              </div>
-              <div className="flex-1 min-w-[120px] space-y-1">
-                <Label htmlFor="placa" className="text-sm md:text-base">Placa</Label>
+              <div className="space-y-1">
+                <Label htmlFor="placa" className="text-xs sm:text-sm">Placa</Label>
                 <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden text-sm"/>
                 <span className="hidden print:block">{headerData.plate || 'N/A'}</span>
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="cidade" className="text-xs sm:text-sm">Cidade</Label>
+                <Input id="cidade" value={headerData.city} onChange={e => handleHeaderChange('city', e.target.value)} className="h-8 print:hidden text-sm"/>
+                <span className="hidden print:block">{headerData.city || 'N/A'}</span>
               </div>
             </div>
           </div>
@@ -307,8 +307,8 @@ function ScaleCalculator() {
               </div>
             </CardContent>
             <CardContent className="p-4 border-t print:border-t print:border-border print:p-0 print:pt-2">
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center sm:justify-end gap-4">
-                     <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-4">
+                     <div className="flex items-center gap-2">
                          <Label htmlFor={`desconto-cacamba-${set.id}`} className="shrink-0 text-sm md:text-base">Desconto Caçamba (kg)</Label>
                          <Input
                              id={`desconto-cacamba-${set.id}`}

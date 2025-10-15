@@ -41,15 +41,40 @@ function ScaleCalculator() {
     client: "",
     plate: "",
     driver: "",
-    city: "",
+    initialWeight: "",
   });
   const [weighingSets, setWeighingSets] = useState<WeighingSet[]>([initialWeighingSet]);
   const [activeSetId, setActiveSetId] = useState<string>(initialWeighingSet.id);
   const { toast } = useToast();
 
   const handleHeaderChange = (field: keyof typeof headerData, value: string) => {
-    setHeaderData(prev => ({ ...prev, [field]: value }));
+    const sanitizedValue = value.replace(/[^0-9,]/g, '').replace('.', ',');
+    if(field === 'initialWeight') {
+        if(/^\d*\,?\d*$/.test(sanitizedValue)) {
+             setHeaderData(prev => ({ ...prev, [field]: sanitizedValue }));
+        }
+    } else {
+        setHeaderData(prev => ({ ...prev, [field]: value }));
+    }
   };
+
+  useEffect(() => {
+    const initialWeightValue = parseFloat(headerData.initialWeight.replace(',', '.')) || 0;
+    if (initialWeightValue > 0) {
+      setWeighingSets(prevSets => {
+        return prevSets.map((set, index) => {
+          if (index === 0 && set.items.length > 0) {
+            const newItems = [...set.items];
+            const firstItem = { ...newItems[0], bruto: initialWeightValue };
+            firstItem.liquido = firstItem.bruto - firstItem.tara - firstItem.descontos;
+            newItems[0] = firstItem;
+            return { ...set, items: newItems };
+          }
+          return set;
+        });
+      });
+    }
+  }, [headerData.initialWeight]);
 
   const handleInputChange = (setId: string, itemId: string, field: keyof WeighingItem, value: string) => {
     const numValue = parseFloat(value.replace(',', '.')) || 0;
@@ -95,10 +120,16 @@ function ScaleCalculator() {
   
   const addNewMaterial = (setId: string) => {
     setWeighingSets(prevSets =>
-      prevSets.map(set => {
+      prevSets.map((set, setIndex) => {
         if (set.id === setId) {
           const lastItem = set.items[set.items.length - 1];
-          const newBruto = lastItem ? lastItem.tara : 0;
+          let newBruto = lastItem ? lastItem.tara : 0;
+
+          // If this is the very first item being added, use the initial weight
+          if (setIndex === 0 && set.items.length === 0) {
+              newBruto = parseFloat(headerData.initialWeight.replace(',', '.')) || 0;
+          }
+
           const newItem: WeighingItem = {
             id: uuidv4(),
             material: "Sucata Inox",
@@ -123,9 +154,10 @@ function ScaleCalculator() {
   };
 
   const handleClear = () => {
-    setWeighingSets([initialWeighingSet]);
-    setActiveSetId(initialWeighingSet.id);
-    setHeaderData({ client: "", plate: "", driver: "", city: "" });
+    const newWeighingSet = { id: uuidv4(), items: [], descontoCacamba: 0 };
+    setWeighingSets([newWeighingSet]);
+    setActiveSetId(newWeighingSet.id);
+    setHeaderData({ client: "", plate: "", driver: "", initialWeight: "" });
   }
 
   const handleSave = () => {
@@ -143,7 +175,7 @@ function ScaleCalculator() {
           if (savedData) {
               const { weighingSets, headerData } = JSON.parse(savedData);
               setWeighingSets(weighingSets);
-              setHeaderData(headerData);
+              setHeaderData(headerData || { client: "", plate: "", driver: "", initialWeight: "" });
               setActiveSetId(weighingSets[0]?.id || initialWeighingSet.id);
               toast({ title: "Dados Carregados", description: "A última pesagem salva foi carregada." });
           } else {
@@ -211,7 +243,7 @@ function ScaleCalculator() {
                     <Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/>
                     <span className="hidden print:block">{headerData.client || 'N/A'}</span>
                 </div>
-                <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,1fr))] gap-2 w-full text-xs sm:text-sm">
+                 <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,1fr))] gap-2 w-full text-xs sm:text-sm">
                     <div className="space-y-1">
                         <Label htmlFor="motorista" className="text-xs sm:text-sm">Motorista</Label>
                         <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden text-sm"/>
@@ -223,9 +255,9 @@ function ScaleCalculator() {
                         <span className="hidden print:block">{headerData.plate || 'N/A'}</span>
                     </div>
                     <div className="space-y-1">
-                        <Label htmlFor="cidade" className="text-xs sm:text-sm">Cidade</Label>
-                        <Input id="cidade" value={headerData.city} onChange={e => handleHeaderChange('city', e.target.value)} className="h-8 print:hidden text-sm"/>
-                        <span className="hidden print:block">{headerData.city || 'N/A'}</span>
+                        <Label htmlFor="initial-weight" className="text-xs sm:text-sm">Peso Inicial (kg)</Label>
+                        <Input id="initial-weight" type="text" inputMode="decimal" value={headerData.initialWeight} onChange={e => handleHeaderChange('initialWeight', e.target.value)} className="h-8 print:hidden text-sm"/>
+                        <span className="hidden print:block">{headerData.initialWeight || 'N/A'}</span>
                     </div>
                 </div>
             </div>
@@ -247,7 +279,7 @@ function ScaleCalculator() {
             <CardContent className="p-0 overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="print:text-black">
+                   <TableRow className="print:text-black">
                     <TableHead className="w-[30%]">Material</TableHead>
                     <TableHead className="text-right w-[17.5%]">Bruto (kg)</TableHead>
                     <TableHead className="text-right w-[17.5%]">Tara (kg)</TableHead>
@@ -270,7 +302,7 @@ function ScaleCalculator() {
                           value={formatNumber(item.bruto)}
                           onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)}
                           className="text-right h-8 print:hidden"
-                          disabled={itemIndex > 0}
+                          disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight)}
                         />
                          <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
                       </TableCell>

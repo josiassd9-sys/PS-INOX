@@ -218,10 +218,10 @@ const ScaleCalculator = forwardRef((props, ref) => {
     handlePrint,
   }));
 
-  const formatNumber = (num: number, decimals = 0) => {
+  const formatNumber = (num: number) => {
     return new Intl.NumberFormat('pt-BR', {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(num);
   }
   
@@ -233,11 +233,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
   return (
     <div className="p-px bg-background max-w-7xl mx-auto" id="scale-calculator-printable-area">
       
-      <div className="hidden print:block mb-1">
-        <h1 className="text-4xl font-bold text-center">Balança</h1>
-      </div>
-
-      <Card className="mb-1 print:border-none print:shadow-none print:p-0">
+      <Card className="mb-px print:border-none print:shadow-none print:p-0">
         <CardContent className="p-1 print:p-0">
           <div className="w-full space-y-0.5">
             <div className="flex justify-between items-center">
@@ -267,7 +263,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                 <Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/>
                 <span className="hidden print:block">{headerData.client || 'N/A'}</span>
                 
-                <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,1fr))] gap-0.5 w-full text-xs sm:text-sm">
+                <div className="grid grid-cols-2 sm:grid-cols-[1fr_1fr_auto] gap-0.5 w-full text-xs sm:text-sm">
                     <div className="space-y-px">
                         <Label htmlFor="motorista" className="text-xs sm:text-sm">Motorista</Label>
                         <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden text-sm"/>
@@ -282,7 +278,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                         <Label htmlFor="initial-weight" className="text-xs sm:text-sm">
                           {operationType === 'loading' ? 'Bruto' : 'Tara'}
                         </Label>
-                        <Input id="initial-weight" type="text" inputMode="decimal" value={headerData.initialWeight} onChange={e => handleHeaderChange('initialWeight', e.target.value)} className="h-8 print:hidden text-sm"/>
+                        <Input id="initial-weight" type="text" inputMode="decimal" value={headerData.initialWeight} onChange={e => handleHeaderChange('initialWeight', e.target.value)} className="h-8 print:hidden text-sm w-24"/>
                         <span className="hidden print:block">{headerData.initialWeight || 'N/A'}</span>
                     </div>
                 </div>
@@ -296,7 +292,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
          const totalLiquidoSet = subtotalLiquido - set.descontoCacamba;
 
          return (
-          <Card key={set.id} className="mb-1 print:border-none print:shadow-none print:p-0 print:mb-0.5">
+          <Card key={set.id} className="mb-px print:border-none print:shadow-none print:p-0 print:mb-0.5">
             <CardHeader className="p-1 flex flex-row items-center justify-between print:p-0 print:mb-0.5">
               <CardTitle className="text-xl">
                 {setIndex === 0 ? "Caçamba 1" : "Bitrem / Caçamba 2"}
@@ -326,7 +322,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                               onValueChange={(newMaterial) => handleMaterialChange(set.id, item.id, newMaterial)}
                             />
                           </div>
-                          <div className="grid grid-cols-2 gap-0.5">
+                          <div className="grid grid-cols-4 gap-0.5">
                               <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">Bruto (kg)</Label>
                                   <Input type="text" value={formatNumber(item.bruto)} onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)} className="text-right h-8 print:hidden" disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')} />
@@ -366,13 +362,13 @@ const ScaleCalculator = forwardRef((props, ref) => {
                 <TableBody>
                   {set.items.map((item, itemIndex) => (
                     <tr key={item.id} className="print:text-black flex-col sm:table-row">
-                      <td className="w-full sm:w-[30%] font-medium p-0 sm:p-2">
+                      <td className="w-full sm:w-[30%] font-medium p-0 sm:p-px">
                           <MaterialSearchInput
                             value={item.material}
                             onValueChange={(newMaterial) => handleMaterialChange(set.id, item.id, newMaterial)}
                           />
                       </td>
-                      <td className="sm:w-[17.5%] p-0 sm:p-2">
+                      <td className="sm:w-[17.5%] p-0 sm:p-px">
                             <Input
                             type="text"
                             value={formatNumber(item.bruto)}
@@ -382,7 +378,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                             />
                             <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
                       </td>
-                      <td className="sm:w-[17.5%] p-0 sm:p-2">
+                      <td className="sm:w-[17.5%] p-0 sm:p-px">
                             <Input
                             type="text"
                             value={formatNumber(item.tara)}
@@ -392,7 +388,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                             />
                             <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
                       </td>
-                      <td className="sm:w-[17.5%] p-0 sm:p-2">
+                      <td className="sm:w-[17.5%] p-0 sm:p-px">
                             <Input
                             type="text"
                             value={formatNumber(item.descontos)}
@@ -401,7 +397,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                             />
                             <span className="hidden print:block text-right">{formatNumber(item.descontos)}</span>
                       </td>
-                      <td className="sm:w-[17.5%] text-right font-semibold p-0 sm:p-2">
+                      <td className="sm:w-[17.5%] text-right font-semibold p-0 sm:p-px">
                             <div className="h-8 sm:h-full flex items-center justify-end">
                                 <span className="print:text-black">{formatNumber(item.liquido)}</span>
                             </div>
@@ -420,7 +416,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                              type="text"
                              value={formatNumber(set.descontoCacamba)}
                              onChange={(e) => handleCacambaDiscount(set.id, e.target.value)}
-                             className="h-8 text-right print:hidden flex-1 min-w-[90px]"
+                             className="h-8 text-right print:hidden flex-1 min-w-[90px] w-24"
                           />
                           <span className="hidden print:block font-semibold">{formatNumber(set.descontoCacamba)}</span>
                      </div>
@@ -439,12 +435,12 @@ const ScaleCalculator = forwardRef((props, ref) => {
       })}
 
       {weighingSets.length < 2 && (
-        <div className="flex justify-center my-1 print:hidden">
+        <div className="flex justify-center my-px print:hidden">
           <Button variant="secondary" onClick={addBitrem} size="sm" className="h-8 px-2"><Tractor className="mr-2 h-4 w-4" /> + Bitrem / Caçamba 2</Button>
         </div>
       )}
 
-      <Card className="mt-1 bg-primary/10 border-primary/20 print:border print:border-accent-price print:shadow-none print:p-0.5">
+      <Card className="mt-px bg-primary/10 border-primary/20 print:border print:border-accent-price print:shadow-none print:p-0.5">
          <CardContent className="p-1 flex justify-end items-center">
              <div className="text-right">
                 <p className="text-lg font-semibold text-primary print:text-2xl print:mb-0.5">Peso Líquido Total</p>

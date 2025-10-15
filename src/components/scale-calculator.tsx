@@ -36,7 +36,7 @@ interface WeighingSet {
   totalNet: number;
 }
 
-const LOCAL_STORAGE_KEY = "scaleCalculatorState_v3";
+const LOCAL_STORAGE_KEY = "scaleCalculatorState_v4";
 
 const createNewItem = (previousItem?: MaterialItem): MaterialItem => {
     const grossValue = previousItem ? previousItem.tare : "";
@@ -58,9 +58,11 @@ const createNewWeighingSet = (): WeighingSet => ({
   totalNet: 0,
 });
 
-const sanitizeState = (state: any): { weighingSets: WeighingSet[] } => {
+const sanitizeState = (state: any): { weighingSets: WeighingSet[], headerData: any } => {
+    const headerData = state?.headerData || { client: "", plate: "", driver: "", city: "" };
+
     if (!state || !Array.isArray(state.weighingSets)) {
-        return { weighingSets: [createNewWeighingSet()] };
+        return { weighingSets: [createNewWeighingSet()], headerData };
     }
     const sanitizedSets = state.weighingSets.map((set: any) => {
         if (!set || !set.id || !Array.isArray(set.items)) {
@@ -85,6 +87,7 @@ const sanitizeState = (state: any): { weighingSets: WeighingSet[] } => {
 
     return {
         weighingSets: sanitizedSets.length > 0 ? sanitizedSets : [createNewWeighingSet()],
+        headerData,
     };
 };
 
@@ -92,6 +95,12 @@ const sanitizeState = (state: any): { weighingSets: WeighingSet[] } => {
 export function ScaleCalculator() {
   const { toast } = useToast();
   const [weighingSets, setWeighingSets] = React.useState<WeighingSet[]>([createNewWeighingSet()]);
+  const [headerData, setHeaderData] = React.useState({
+      client: "",
+      plate: "",
+      driver: "",
+      city: "",
+  });
   const [isClient, setIsClient] = React.useState(false);
 
   React.useEffect(() => {
@@ -102,6 +111,7 @@ export function ScaleCalculator() {
         const savedState = JSON.parse(savedStateJSON);
         const sanitized = sanitizeState(savedState);
         setWeighingSets(sanitized.weighingSets);
+        setHeaderData(sanitized.headerData);
       }
     } catch (error) {
       console.error("Failed to load from localStorage", error);
@@ -112,13 +122,13 @@ export function ScaleCalculator() {
   React.useEffect(() => {
     if (isClient) {
       try {
-        const stateToSave = { weighingSets };
+        const stateToSave = { weighingSets, headerData };
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stateToSave));
       } catch (error) {
         console.error("Failed to save to localStorage", error);
       }
     }
-  }, [weighingSets, isClient]);
+  }, [weighingSets, headerData, isClient]);
 
 
   const handleItemChange = (setId: string, itemId: string, field: keyof Omit<MaterialItem, 'id' | 'net'>, value: string) => {
@@ -209,7 +219,12 @@ export function ScaleCalculator() {
   
   const handleClearAll = () => {
     setWeighingSets([createNewWeighingSet()]);
+    setHeaderData({ client: "", plate: "", driver: "", city: "" });
     toast({ title: "Tudo limpo!", description: "Você pode iniciar uma nova pesagem." });
+  };
+
+   const handleHeaderChange = (field: keyof typeof headerData, value: string) => {
+      setHeaderData(prev => ({...prev, [field]: value}));
   };
   
   const grandTotalNet = weighingSets.reduce((acc, set) => acc + set.totalNet, 0);
@@ -224,6 +239,34 @@ export function ScaleCalculator() {
 
   return (
     <div className="space-y-2 p-1" id="scale-calculator-printable-area">
+        <div className="mb-2 print:mb-2" id="scale-calculator-header">
+            <h1 className="text-3xl font-bold text-center mb-2 print:text-2xl">Balança</h1>
+            <Card className="p-2 print:border-none print:shadow-none print:p-0">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <div className="space-y-1">
+                        <Label htmlFor="client" className="text-xs">Cliente</Label>
+                        <Input id="client" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} placeholder="Nome do Cliente" className="h-8"/>
+                        <span className="hidden print:block print:text-black">{headerData.client}</span>
+                    </div>
+                    <div className="space-y-1">
+                        <Label htmlFor="plate" className="text-xs">Placa</Label>
+                        <Input id="plate" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} placeholder="Placa do Veículo" className="h-8"/>
+                         <span className="hidden print:block print:text-black">{headerData.plate}</span>
+                    </div>
+                    <div className="space-y-1">
+                        <Label htmlFor="driver" className="text-xs">Motorista</Label>
+                        <Input id="driver" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} placeholder="Nome do Motorista" className="h-8"/>
+                         <span className="hidden print:block print:text-black">{headerData.driver}</span>
+                    </div>
+                    <div className="space-y-1">
+                        <Label htmlFor="city" className="text-xs">Cidade</Label>
+                        <Input id="city" value={headerData.city} onChange={e => handleHeaderChange('city', e.target.value)} placeholder="Cidade/UF" className="h-8"/>
+                         <span className="hidden print:block print:text-black">{headerData.city}</span>
+                    </div>
+                </div>
+            </Card>
+        </div>
+
         {weighingSets.map((set, setIndex) => (
             <Card key={set.id} className="bg-card/50 print:shadow-none print:border-border">
                  <CardHeader className="flex-row items-center justify-between p-2">
@@ -267,14 +310,15 @@ export function ScaleCalculator() {
                         </Table>
                     </div>
                     <div className="p-2 space-y-2">
-                        <div className="flex justify-end">
-                            <div className="flex items-center gap-4">
-                                <span className="font-semibold">Subtotal Materiais:</span>
-                                <span className="font-bold text-lg text-primary">{formatNumber(set.subTotalNet)} kg</span>
+                        <Button variant="outline" size="sm" onClick={() => addItem(set.id)} className="print:hidden">
+                            <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Material
+                        </Button>
+                        <Separator className="my-2"/>
+                        <div className="flex justify-end items-end gap-2">
+                             <div className="space-y-1">
+                                <span className="font-semibold text-sm">Subtotal Materiais:</span>
+                                <div className="font-bold text-lg text-primary text-right">{formatNumber(set.subTotalNet)} kg</div>
                             </div>
-                        </div>
-
-                         <div className="flex justify-end items-end gap-2">
                             <div className="space-y-1 w-40">
                                 <Label htmlFor={`container-weight-${set.id}`} className="text-xs">Desconto Caçamba (kg)</Label>
                                 <Input 
@@ -285,14 +329,11 @@ export function ScaleCalculator() {
                                     className="h-9"
                                 />
                             </div>
-                            <div className="flex items-center gap-4">
+                            <div className="space-y-1">
                                 <span className="font-semibold">Total Líquido:</span>
-                                <span className="font-bold text-xl text-primary">{formatNumber(set.totalNet)} kg</span>
+                                <div className="font-bold text-xl text-primary text-right">{formatNumber(set.totalNet)} kg</div>
                             </div>
                         </div>
-                        <Button variant="outline" size="sm" onClick={() => addItem(set.id)} className="print:hidden">
-                            <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Material
-                        </Button>
                     </div>
                  </CardContent>
             </Card>

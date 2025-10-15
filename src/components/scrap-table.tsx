@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { Category, ScrapItem } from "@/lib/data";
+import type { Category, ScrapItem } from "@/lib/data/index";
 import { Button } from "./ui/button";
 import { Eye, EyeOff, Trash2 } from "lucide-react";
 import {

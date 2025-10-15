@@ -5,6 +5,6 @@ import { Dashboard } from "@/components/dashboard";
 
 export default function HomePage() {
   return (
-      <Dashboard initialCategoryId={null} />
+      <Dashboard initialCategoryId="lista-materiais" />
   );
 }

@@ -340,6 +340,7 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
     {
         title: 'FERRAMENTAS',
         items: [
+            ALL_CATEGORIES.find(c => c.id === 'lista-materiais')!,
             ALL_CATEGORIES.find(c => c.id === 'package-checker')!,
             ALL_CATEGORIES.find(c => c.id === 'balanca')!,
             ALL_CATEGORIES.find(c => c.id === 'tabela-sucata')!,
@@ -375,7 +376,6 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
     {
         title: 'INFORMATIVOS',
         items: [
-            ALL_CATEGORIES.find(c => c.id === 'lista-materiais')!,
             ALL_CATEGORIES.find(c => c.id === 'ai-assistant')!,
             ALL_CATEGORIES.find(c => c.id === 'normas-astm')!,
             ALL_CATEGORIES.find(c => c.id === 'processos-fabricacao')!,

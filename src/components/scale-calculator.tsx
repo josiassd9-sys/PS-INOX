@@ -205,28 +205,28 @@ function ScaleCalculator() {
       <Card className="mb-4 print:border-none print:shadow-none print:p-0">
         <CardContent className="p-4 print:p-0">
           <div className="w-full space-y-2">
-            <div className="space-y-1">
-                <Label htmlFor="cliente">Cliente</Label>
-                <Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/>
-                <span className="hidden print:block">{headerData.client || 'N/A'}</span>
-            </div>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,1fr))] gap-2 w-full">
               <div className="space-y-1">
-                <Label htmlFor="motorista" className="text-xs sm:text-sm">Motorista</Label>
-                <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden text-sm"/>
-                <span className="hidden print:block">{headerData.driver || 'N/A'}</span>
+                  <Label htmlFor="cliente">Cliente</Label>
+                  <Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/>
+                  <span className="hidden print:block">{headerData.client || 'N/A'}</span>
               </div>
-              <div className="space-y-1">
-                <Label htmlFor="placa" className="text-xs sm:text-sm">Placa</Label>
-                <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden text-sm"/>
-                <span className="hidden print:block">{headerData.plate || 'N/A'}</span>
+              <div className="flex flex-wrap gap-2 w-full">
+                  <div className="flex-1 min-w-[90px] space-y-1">
+                      <Label htmlFor="motorista" className="text-xs sm:text-sm">Motorista</Label>
+                      <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden text-sm"/>
+                      <span className="hidden print:block">{headerData.driver || 'N/A'}</span>
+                  </div>
+                  <div className="flex-1 min-w-[90px] space-y-1">
+                      <Label htmlFor="placa" className="text-xs sm:text-sm">Placa</Label>
+                      <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden text-sm"/>
+                      <span className="hidden print:block">{headerData.plate || 'N/A'}</span>
+                  </div>
+                  <div className="flex-1 min-w-[90px] space-y-1">
+                      <Label htmlFor="cidade" className="text-xs sm:text-sm">Cidade</Label>
+                      <Input id="cidade" value={headerData.city} onChange={e => handleHeaderChange('city', e.target.value)} className="h-8 print:hidden text-sm"/>
+                      <span className="hidden print:block">{headerData.city || 'N/A'}</span>
+                  </div>
               </div>
-              <div className="space-y-1">
-                <Label htmlFor="cidade" className="text-xs sm:text-sm">Cidade</Label>
-                <Input id="cidade" value={headerData.city} onChange={e => handleHeaderChange('city', e.target.value)} className="h-8 print:hidden text-sm"/>
-                <span className="hidden print:block">{headerData.city || 'N/A'}</span>
-              </div>
-            </div>
           </div>
         </CardContent>
       </Card>
@@ -320,11 +320,11 @@ function ScaleCalculator() {
                           <span className="hidden print:block font-semibold">{formatNumber(set.descontoCacamba)}</span>
                      </div>
                      <div className="text-right flex-shrink-0">
-                         <p className="text-sm text-muted-foreground">Subtotal Líquido</p>
+                         <p className="text-sm text-muted-foreground">Subtotal</p>
                          <p className="text-lg font-bold print:text-black">{formatNumber(subtotalLiquido)} kg</p>
                      </div>
                       <div className="text-right flex-shrink-0">
-                         <p className="text-sm text-muted-foreground">Total Líquido ({setIndex === 0 ? "Caçamba 1" : "Bitrem"})</p>
+                         <p className="text-sm text-muted-foreground">{setIndex === 0 ? "Caçamba 1" : "Bitrem / Caçamba 2"}</p>
                          <p className="text-xl font-bold text-primary print:text-black">{formatNumber(totalLiquidoSet)} kg</p>
                      </div>
                  </div>
@@ -394,5 +394,3 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 }
 
 export default ScaleCalculator;
-
-    

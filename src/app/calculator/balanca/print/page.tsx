@@ -4,6 +4,8 @@
 import * as React from "react";
 import { PrintableScaleTicket } from "@/components/printable-scale-ticket";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Printer } from "lucide-react";
 
 type WeighingItem = {
   id: string;
@@ -36,7 +38,6 @@ interface ScaleData {
 export default function PrintPage() {
     const [data, setData] = React.useState<ScaleData | null>(null);
     const [isLoading, setIsLoading] = React.useState(true);
-    const printTriggered = React.useRef(false);
 
     React.useEffect(() => {
         try {
@@ -50,16 +51,6 @@ export default function PrintPage() {
             setIsLoading(false);
         }
     }, []);
-
-    React.useEffect(() => {
-        if (!isLoading && data && !printTriggered.current) {
-            printTriggered.current = true;
-            // Delay print slightly to ensure all content is rendered
-            setTimeout(() => {
-                window.print();
-            }, 500);
-        }
-    }, [isLoading, data]);
     
     if (isLoading) {
         return (
@@ -77,6 +68,12 @@ export default function PrintPage() {
 
     return (
         <div>
+            <div className="fixed top-4 right-4 print:hidden">
+                <Button onClick={() => window.print()}>
+                    <Printer className="mr-2 h-4 w-4" />
+                    Imprimir Ticket
+                </Button>
+            </div>
             <PrintableScaleTicket {...data} />
             <style jsx global>{`
                 @media print {

@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import React, { useState, useEffect, useCallback, useImperativeHandle, forwardRef } from "react";
@@ -71,24 +70,32 @@ const ScaleCalculator = forwardRef((props, ref) => {
       setWeighingSets(prevSets => {
         const newSets = [...prevSets];
         const firstSet = { ...newSets[0] };
-        const firstItem = { ...firstSet.items[0] };
         
-        if (operationType === 'loading') {
+        // Ensure we are not updating if the value is already correct
+        const firstItem = { ...firstSet.items[0] };
+        let needsUpdate = false;
+        if (operationType === 'loading' && firstItem.bruto !== initialWeightValue) {
           firstItem.bruto = initialWeightValue;
-        } else { // unloading
+          needsUpdate = true;
+        } else if (operationType === 'unloading' && firstItem.tara !== initialWeightValue) {
           firstItem.tara = initialWeightValue;
+          needsUpdate = true;
         }
 
-        // Recalculate liquido for the first item
-        firstItem.liquido = firstItem.bruto - firstItem.tara - firstItem.descontos;
+        if (needsUpdate) {
+            // Recalculate liquido for the first item
+            firstItem.liquido = firstItem.bruto - firstItem.tara - firstItem.descontos;
+            
+            firstSet.items = [firstItem, ...firstSet.items.slice(1)];
+            newSets[0] = firstSet;
+            
+            return newSets;
+        }
         
-        firstSet.items = [firstItem, ...firstSet.items.slice(1)];
-        newSets[0] = firstSet;
-        
-        return newSets;
+        return prevSets; // Return previous state if no update is needed
       });
     }
-  }, [headerData.initialWeight, operationType]);
+  }, [headerData.initialWeight, operationType, weighingSets]);
 
 
   const handleInputChange = (setId: string, itemId: string, field: keyof WeighingItem, value: string) => {

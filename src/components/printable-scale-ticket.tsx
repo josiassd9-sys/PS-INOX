@@ -98,7 +98,7 @@ export function PrintableScaleTicket({ weighingSets, headerData }: PrintableScal
                 <tr className="font-semibold">
                   <th style={{ width: "35%" }}>PRODUTO</th>
                   <th style={{ width: "10%", textAlign: "right" }}>BRUTO</th>
-                  <th style={{ width: "10%", textAlign: "right" }}>DESC KG</th>
+                  <th style={{ width: "10%", textAlign: "right" }}>DESC</th>
                   <th style={{ width: "10%", textAlign: "right" }}>TARA</th>
                   <th style={{ width: "10%", textAlign: "right" }}>LÍQUIDO</th>
                   <th style={{ width: "10%", textAlign: "right" }}>CAÇAMBA</th>

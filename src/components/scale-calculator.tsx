@@ -261,7 +261,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
   }));
 
   const formatNumber = (num: number) => {
-    if (isNaN(num)) return "0";
+    if (isNaN(num) || num === 0) return "";
     return new Intl.NumberFormat('pt-BR', {useGrouping: false}).format(num);
   }
   
@@ -345,8 +345,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>Adicionar Material</p>
-                    </TooltipContent>
+                        <p>Adicionar Material</p></TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </CardHeader>
@@ -365,17 +364,17 @@ const ScaleCalculator = forwardRef((props, ref) => {
                           <div className="grid grid-cols-4 gap-0.5">
                               <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">Bruto (kg)</Label>
-                                  <Input type="text" value={formatNumber(item.bruto)} onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)} className="text-right h-8 print:hidden w-full" disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')} />
+                                  <Input type="text" placeholder="0" value={formatNumber(item.bruto)} onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)} className="text-right h-8 print:hidden w-full" disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')} />
                                    <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
                               </div>
                                <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">Tara (kg)</Label>
-                                   <Input type="text" value={formatNumber(item.tara)} onChange={(e) => handleInputChange(set.id, item.id, 'tara', e.target.value)} className="text-right h-8 print:hidden w-full" disabled={(setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading')} />
+                                   <Input type="text" placeholder="0" value={formatNumber(item.tara)} onChange={(e) => handleInputChange(set.id, item.id, 'tara', e.target.value)} className="text-right h-8 print:hidden w-full" disabled={(setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading')} />
                                    <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
                               </div>
                                <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">A/L (kg)</Label>
-                                  <Input type="text" value={formatNumber(item.descontos)} onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)} className="text-right h-8 print:hidden w-full" />
+                                  <Input type="text" placeholder="0" value={formatNumber(item.descontos)} onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)} className="text-right h-8 print:hidden w-full" />
                                    <span className="hidden print:block text-right">{formatNumber(item.descontos)}</span>
                               </div>
                                <div className="space-y-px">
@@ -412,6 +411,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                             <div className="flex justify-end">
                                 <Input
                                 type="text"
+                                placeholder="0"
                                 value={formatNumber(item.bruto)}
                                 onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)}
                                 className="text-right h-8 print:hidden w-24"
@@ -424,6 +424,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                             <div className="flex justify-end">
                                 <Input
                                 type="text"
+                                placeholder="0"
                                 value={formatNumber(item.tara)}
                                 onChange={(e) => handleInputChange(set.id, item.id, 'tara', e.target.value)}
                                 className="text-right h-8 print:hidden w-24"
@@ -436,6 +437,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                             <div className="flex justify-end">
                                 <Input
                                 type="text"
+                                placeholder="0"
                                 value={formatNumber(item.descontos)}
                                 onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)}
                                 className="text-right h-8 print:hidden w-24"
@@ -460,6 +462,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                          <Input
                              id={`desconto-cacamba-${set.id}`}
                              type="text"
+                             placeholder="0"
                              value={formatNumber(set.descontoCacamba)}
                              onChange={(e) => handleCacambaDiscount(set.id, e.target.value)}
                              className="h-8 text-right print:hidden flex-1 min-w-[90px] w-14"
@@ -490,7 +493,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
          <CardContent className="p-px flex justify-end items-center">
              <div className="text-right">
                 <p className="text-lg font-semibold text-primary print:text-2xl print:mb-0.5">Peso Líquido Total</p>
-                <p className="text-4xl font-bold text-primary print:text-black">{formatNumber(grandTotalLiquido)} kg</p>
+                <p className="text-4xl font-bold text-primary print:text-black">{new Intl.NumberFormat('pt-BR').format(grandTotalLiquido)} kg</p>
             </div>
          </CardContent>
       </Card>
@@ -543,3 +546,5 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 }
 
 export default ScaleCalculator;
+
+    

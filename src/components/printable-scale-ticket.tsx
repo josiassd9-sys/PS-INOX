@@ -122,7 +122,7 @@ export function PrintableScaleTicket({ weighingSets, headerData }: PrintableScal
 
             {/* Total por Caçamba */}
             <div className="flex justify-end mt-1 text-[11px] font-semibold border-b border-black pb-1">
-              TOTAL {set.name.toUpperCase()}: {formatNumber(total)} KG
+              TOTAL CAÇAMBA: {formatNumber(total)} KG
             </div>
           </div>
         );

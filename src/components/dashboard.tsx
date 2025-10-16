@@ -444,36 +444,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
               )}
               
               <div className="flex items-center gap-1">
-                {selectedCategoryId === 'balanca' && scaleCalculatorRef.current && (
-                  <div className="flex items-center gap-px">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button onClick={scaleCalculatorRef.current.handleClear} variant="outline" size="icon" className="h-8 w-8"><Trash2 className="h-4 w-4" /></Button>
-                          </TooltipTrigger>
-                          <TooltipContent><p>Limpar Tudo</p></TooltipContent>
-                        </Tooltip>
-                         <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button onClick={scaleCalculatorRef.current.handleSave} variant="outline" size="icon" className="h-8 w-8"><Save className="h-4 w-4"/></Button>
-                          </TooltipTrigger>
-                          <TooltipContent><p>Salvar Pesagem</p></TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button onClick={scaleCalculatorRef.current.handleLoad} variant="outline" size="icon" className="h-8 w-8"><ArrowUpFromLine className="h-4 w-4"/></Button>
-                          </TooltipTrigger>
-                          <TooltipContent><p>Carregar Última Pesagem</p></TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button onClick={scaleCalculatorRef.current.handlePrint} variant="outline" size="icon" className="h-8 w-8"><Printer className="h-4 w-4" /></Button>
-                          </TooltipTrigger>
-                          <TooltipContent><p>Imprimir</p></TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                )}
+                
                 {showPriceControls && currentPriceParams && (
                   <Dialog>
                     <DialogTrigger asChild>

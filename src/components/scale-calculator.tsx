@@ -10,7 +10,7 @@ import { Label } from "./ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "./ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
-import { PlusCircle, Tractor, ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
+import { PlusCircle, Tractor, ArrowDownToLine, ArrowUpFromLine, Trash2, Save, Printer } from "lucide-react";
 import { scrapItems } from "@/lib/data/sucata";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "./ui/command";
@@ -326,6 +326,34 @@ const ScaleCalculator = forwardRef((props, ref) => {
                     </div>
                 </div>
             </div>
+            <div className="flex items-center gap-px justify-center pt-1">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button onClick={handleClear} variant="outline" size="icon" className="h-8 w-8"><Trash2 className="h-4 w-4" /></Button>
+                    </TooltipTrigger>
+                    <TooltipContent><p>Limpar Tudo</p></TooltipContent>
+                  </Tooltip>
+                    <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button onClick={handleSave} variant="outline" size="icon" className="h-8 w-8"><Save className="h-4 w-4"/></Button>
+                    </TooltipTrigger>
+                    <TooltipContent><p>Salvar Pesagem</p></TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button onClick={handleLoad} variant="outline" size="icon" className="h-8 w-8"><ArrowUpFromLine className="h-4 w-4"/></Button>
+                    </TooltipTrigger>
+                    <TooltipContent><p>Carregar Última Pesagem</p></TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button onClick={handlePrint} variant="outline" size="icon" className="h-8 w-8"><Printer className="h-4 w-4" /></Button>
+                    </TooltipTrigger>
+                    <TooltipContent><p>Imprimir</p></TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
           </div>
         </CardContent>
       </Card>
@@ -551,5 +579,3 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 }
 
 export default ScaleCalculator;
-
-    

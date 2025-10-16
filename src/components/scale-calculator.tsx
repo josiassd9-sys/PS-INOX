@@ -326,34 +326,6 @@ const ScaleCalculator = forwardRef((props, ref) => {
                     </div>
                 </div>
             </div>
-            <div className="flex items-center gap-px justify-center pt-1">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button onClick={handleClear} variant="outline" size="icon" className="h-8 w-8"><Trash2 className="h-4 w-4" /></Button>
-                    </TooltipTrigger>
-                    <TooltipContent><p>Limpar Tudo</p></TooltipContent>
-                  </Tooltip>
-                    <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button onClick={handleSave} variant="outline" size="icon" className="h-8 w-8"><Save className="h-4 w-4"/></Button>
-                    </TooltipTrigger>
-                    <TooltipContent><p>Salvar Pesagem</p></TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button onClick={handleLoad} variant="outline" size="icon" className="h-8 w-8"><ArrowUpFromLine className="h-4 w-4"/></Button>
-                    </TooltipTrigger>
-                    <TooltipContent><p>Carregar Última Pesagem</p></TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button onClick={handlePrint} variant="outline" size="icon" className="h-8 w-8"><Printer className="h-4 w-4" /></Button>
-                    </TooltipTrigger>
-                    <TooltipContent><p>Imprimir</p></TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
           </div>
         </CardContent>
       </Card>
@@ -530,6 +502,34 @@ const ScaleCalculator = forwardRef((props, ref) => {
             </div>
          </CardContent>
       </Card>
+      <div className="flex items-center gap-1 justify-center pt-1 print:hidden">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button onClick={handleClear} variant="outline" size="icon" className="h-8 w-8"><Trash2 className="h-4 w-4" /></Button>
+            </TooltipTrigger>
+            <TooltipContent><p>Limpar Tudo</p></TooltipContent>
+          </Tooltip>
+            <Tooltip>
+            <TooltipTrigger asChild>
+              <Button onClick={handleSave} variant="outline" size="icon" className="h-8 w-8"><Save className="h-4 w-4"/></Button>
+            </TooltipTrigger>
+            <TooltipContent><p>Salvar Pesagem</p></TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button onClick={handleLoad} variant="outline" size="icon" className="h-8 w-8"><ArrowUpFromLine className="h-4 w-4"/></Button>
+            </TooltipTrigger>
+            <TooltipContent><p>Carregar Última Pesagem</p></TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button onClick={handlePrint} variant="outline" size="icon" className="h-8 w-8"><Printer className="h-4 w-4" /></Button>
+            </TooltipTrigger>
+            <TooltipContent><p>Imprimir</p></TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
     </div>
   );
 });
@@ -579,3 +579,5 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 }
 
 export default ScaleCalculator;
+
+    

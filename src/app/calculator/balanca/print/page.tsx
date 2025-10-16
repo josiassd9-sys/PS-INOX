@@ -43,7 +43,10 @@ export default function PrintPage() {
         try {
             const savedData = localStorage.getItem("scaleData");
             if (savedData) {
-                setData(JSON.parse(savedData));
+                const parsedData = JSON.parse(savedData);
+                setData(parsedData);
+                // Trigger print only after data is set and component has re-rendered
+                setTimeout(() => window.print(), 100); 
             }
         } catch (error) {
             console.error("Failed to load scale data from localStorage", error);
@@ -68,12 +71,6 @@ export default function PrintPage() {
 
     return (
         <div>
-            <div className="fixed top-4 right-4 print:hidden">
-                <Button onClick={() => window.print()}>
-                    <Printer className="mr-2 h-4 w-4" />
-                    Imprimir Ticket
-                </Button>
-            </div>
             <PrintableScaleTicket {...data} />
             <style jsx global>{`
                 @media print {
@@ -86,3 +83,4 @@ export default function PrintPage() {
         </div>
     );
 }
+

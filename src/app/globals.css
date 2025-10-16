@@ -133,7 +133,7 @@
     color: black !important;
   }
 
-  .print\:hidden {
+  .no-print {
     display: none !important;
   }
   

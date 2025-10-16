@@ -209,7 +209,13 @@ const ScaleCalculator = forwardRef((props, ref) => {
   }
 
   const handlePrint = () => {
-    window.print();
+    // Save current state to localStorage for the print page to access
+    try {
+        localStorage.setItem("scaleData", JSON.stringify({ weighingSets, headerData, operationType }));
+        window.open('/calculator/balanca/print', '_blank');
+    } catch (e) {
+        toast({ variant: "destructive", title: "Erro ao Imprimir", description: "Não foi possível preparar os dados para impressão." });
+    }
   }
 
   useImperativeHandle(ref, () => ({

@@ -66,7 +66,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
     const initialWeightValue = parseFloat(headerData.initialWeight) || 0;
     
     // Only proceed if there's an initial weight and at least one item
-    if (initialWeightValue > 0 && weighingSets[0] && weighingSets[0].items.length > 0) {
+    if (initialWeightValue > 0 && weighingSets.length > 0 && weighingSets[0].items.length > 0) {
       setWeighingSets(prevSets => {
         const newSets = [...prevSets];
         const firstSet = { ...newSets[0] };
@@ -177,9 +177,9 @@ const ScaleCalculator = forwardRef((props, ref) => {
     if (weighingSets.length >= 2) return;
 
     const firstSet = weighingSets[0];
-    const lastItemOfFirstSet = firstSet.items[firstSet.items.length - 1];
+    const firstItemOfFirstSet = firstSet.items[0];
 
-    if (!lastItemOfFirstSet) {
+    if (!firstItemOfFirstSet) {
         toast({
             variant: "destructive",
             title: "Primeira caçamba vazia",
@@ -188,15 +188,15 @@ const ScaleCalculator = forwardRef((props, ref) => {
         return;
     }
 
-    const initialBrutoForSecondSet = lastItemOfFirstSet.tara;
+    const truckTara = firstItemOfFirstSet.tara;
 
     const newItem: WeighingItem = {
         id: uuidv4(),
         material: "Sucata Inox",
-        bruto: initialBrutoForSecondSet,
-        tara: 0,
+        bruto: 0,
+        tara: truckTara,
         descontos: 0,
-        liquido: initialBrutoForSecondSet, 
+        liquido: 0 - truckTara, 
     };
 
     const newSet: WeighingSet = {
@@ -543,5 +543,3 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 }
 
 export default ScaleCalculator;
-
-    

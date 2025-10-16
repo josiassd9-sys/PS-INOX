@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -19,124 +18,109 @@ type WeighingSet = {
   descontoCacamba: number;
 };
 
-interface PrintableScaleTicketProps {
-  weighingSets: WeighingSet[];
-  headerData: {
-    client: string;
-    plate: string;
-    driver: string;
-  };
+type OperationType = 'loading' | 'unloading';
+
+interface ScaleData {
+    weighingSets: WeighingSet[];
+    headerData: {
+        client: string;
+        plate: string;
+        driver: string;
+        initialWeight: string;
+    };
+    operationType: OperationType;
 }
 
-export function PrintableScaleTicket({ weighingSets, headerData }: PrintableScaleTicketProps) {
-  const formatNumber = (num: number) =>
-    isNaN(num) ? "0,00" : new Intl.NumberFormat("pt-BR").format(num);
 
-  const totalGeral = weighingSets.reduce((sum, set) => {
-    const subtotal = set.items.reduce((acc, i) => acc + i.liquido, 0);
-    return sum + subtotal - set.descontoCacamba;
-  }, 0);
+export function PrintableScaleTicket({ weighingSets, headerData, operationType }: ScaleData) {
+    
+    const formatNumber = (num: number) => {
+        if (isNaN(num)) return "0";
+        return new Intl.NumberFormat('pt-BR').format(num);
+    }
+
+    const grandTotalLiquido = weighingSets.reduce((total, set) => {
+      const setItemsTotal = set.items.reduce((acc, item) => acc + item.liquido, 0);
+      return total + (setItemsTotal - set.descontoCacamba);
+    }, 0);
 
   return (
-    <div className="print:block hidden text-[11px] text-black font-sans bg-white">
-      <style>
-        {`
-        @page {
-          size: A4 portrait;
-          margin: 12mm 10mm;
-        }
-        @media print {
-          body {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          .no-print {
-            display: none !important;
-          }
-        }
-        table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-        th, td {
-          padding: 4px 6px;
-        }
-        th {
-          border-bottom: 1px solid #000;
-        }
-        td {
-          border-bottom: 1px solid #ccc;
-        }
-      `}
-      </style>
-
+    <div className="print-container p-4 font-sans text-xs">
       {/* Cabeçalho */}
-      <div className="text-center mb-2">
-        <h1 className="text-xl font-bold tracking-wide leading-tight">PS INOX</h1>
-        <h2 className="text-sm font-semibold leading-tight">
-          PSINOX COMERCIO DE AÇO LTDA
-        </h2>
+      <div className="text-center mb-4">
+        <h1 className="font-bold text-lg">PSINOX COMERCIO DE AÇO LTDA</h1>
+        <p className="text-sm">TICKET DE PESAGEM - {operationType === 'loading' ? 'CARREGAMENTO' : 'DESCARREGAMENTO'}</p>
+        <p className="text-xs">Data: {new Date().toLocaleDateString('pt-BR')}</p>
       </div>
 
-      {/* Linha com Motorista, Placa, Cliente */}
-      <div className="grid grid-cols-3 border-b border-black pb-1 mb-2 text-[11px]">
-        <div><strong>Motorista:</strong> {headerData.driver || "—"}</div>
-        <div><strong>Placa:</strong> {headerData.plate || "—"}</div>
-        <div><strong>Cidade/Cliente:</strong> {headerData.client || "—"}</div>
+      {/* Informações do Cliente */}
+      <div className="border-y border-black py-1 mb-2">
+        <div className="flex justify-between">
+          <span>CLIENTE: <strong>{headerData.client || 'N/A'}</strong></span>
+        </div>
+        <div className="flex justify-between">
+          <span>MOTORISTA: <strong>{headerData.driver || 'N/A'}</strong></span>
+          <span>PLACA: <strong>{headerData.plate || 'N/A'}</strong></span>
+        </div>
+      </div>
+      
+      {/* Itens de Pesagem */}
+      <div className="space-y-2">
+        {weighingSets.map((set) => {
+             const subtotalLiquido = set.items.reduce((acc, item) => acc + item.liquido, 0);
+             const totalLiquidoSet = subtotalLiquido - set.descontoCacamba;
+
+            return (
+              <div key={set.id} className="break-inside-avoid">
+                 <h3 className="font-bold text-center text-sm bg-gray-200 py-px">{set.name}</h3>
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-black">
+                      <th className="text-left font-bold w-[55%]">PRODUTO</th>
+                      <th className="text-right font-bold">BRUTO</th>
+                      <th className="text-right font-bold">TARA</th>
+                      <th className="text-right font-bold">DESC</th>
+                      <th className="text-right font-bold">LÍQUIDO</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {set.items.map((item) => (
+                      <tr key={item.id}>
+                        <td>{item.material}</td>
+                        <td className="text-right">{formatNumber(item.bruto)}</td>
+                        <td className="text-right">{formatNumber(item.tara)}</td>
+                        <td className="text-right">{formatNumber(item.descontos)}</td>
+                        <td className="text-right font-semibold">{formatNumber(item.liquido)}</td>
+                      </tr>
+                    ))}
+                    {/* Linha de Subtotal */}
+                     <tr className="border-t border-black">
+                        <td colSpan={2} className="text-left font-bold pt-1">DESC CAÇAMBA</td>
+                        <td className="text-right font-bold pt-1">{formatNumber(set.descontoCacamba)}</td>
+                        <td className="text-right font-bold pt-1">TOTAL CAÇAMBA</td>
+                        <td className="text-right font-bold pt-1">{formatNumber(totalLiquidoSet)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )
+        })}
       </div>
 
-      {/* Tabelas por Caçamba */}
-      {weighingSets.map((set) => {
-        const subtotal = set.items.reduce((s, i) => s + i.liquido, 0);
-        const total = subtotal - set.descontoCacamba;
-
-        return (
-          <div key={set.id} className="mb-4 break-inside-avoid">
-            <h3 className="text-[12px] font-bold mb-1">{set.name}</h3>
-            <table>
-              <thead>
-                <tr className="font-semibold">
-                  <th style={{ width: "35%" }}>PRODUTO</th>
-                  <th style={{ width: "10%", textAlign: "right" }}>BRUTO</th>
-                  <th style={{ width: "10%", textAlign: "right" }}>DESC</th>
-                  <th style={{ width: "10%", textAlign: "right" }}>TARA</th>
-                  <th style={{ width: "10%", textAlign: "right" }}>LÍQUIDO</th>
-                  <th style={{ width: "10%", textAlign: "right" }}>CAÇAMBA</th>
-                  <th style={{ width: "15%", textAlign: "right" }}>SUBTOTAL</th>
-                </tr>
-              </thead>
-              <tbody>
-                {set.items.map((item, idx) => (
-                  <tr key={idx}>
-                    <td>{item.material}</td>
-                    <td style={{ textAlign: "right" }}>{formatNumber(item.bruto)}</td>
-                    <td style={{ textAlign: "right" }}>{formatNumber(item.descontos)}</td>
-                    <td style={{ textAlign: "right" }}>{formatNumber(item.tara)}</td>
-                    <td style={{ textAlign: "right" }}>{formatNumber(item.liquido)}</td>
-                    <td style={{ textAlign: "right" }}>{formatNumber(set.descontoCacamba)}</td>
-                    <td style={{ textAlign: "right" }}>{formatNumber(subtotal)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            {/* Total por Caçamba */}
-            <div className="flex justify-end mt-1 text-[11px] font-semibold border-b border-black pb-1">
-              TOTAL CAÇAMBA: {formatNumber(total)} KG
-            </div>
-          </div>
-        );
-      })}
-
-      {/* Rodapé Total */}
-      <div className="text-right mt-4 border-t-2 border-black pt-2 font-bold text-[12px]">
-        TOTAL LÍQUIDO QTD: {formatNumber(totalGeral)} KG
+      {/* Total Geral */}
+      <div className="border-t-2 border-dashed border-black mt-4 pt-2 text-right">
+        <span className="font-bold text-sm mr-2">PESO LÍQUIDO TOTAL:</span>
+        <span className="font-bold text-lg">{formatNumber(grandTotalLiquido)} KG</span>
       </div>
 
       {/* Assinatura */}
-      <div className="mt-8 text-center text-[10px] text-gray-700">
-        ____________________________ <br />
-        Assinatura do Motorista
+      <div className="mt-20 flex justify-around">
+          <div className="text-center w-1/2">
+              <p className="border-t border-black pt-1 mx-4">CONFERIDO</p>
+          </div>
+          <div className="text-center w-1/2">
+              <p className="border-t border-black pt-1 mx-4">MOTORISTA</p>
+          </div>
       </div>
     </div>
   );

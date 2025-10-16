@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -14,6 +15,7 @@ type WeighingItem = {
 
 type WeighingSet = {
   id: string;
+  name: string;
   items: WeighingItem[];
   descontoCacamba: number;
 };
@@ -56,6 +58,9 @@ export function PrintableScaleTicket({ weighingSets, headerData, operationType }
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
               }
+              .no-print {
+                display: none;
+              }
             }
             table, th, td {
               border-collapse: collapse;
@@ -66,7 +71,7 @@ export function PrintableScaleTicket({ weighingSets, headerData, operationType }
         {/* Logo + Cabeçalho */}
         <div className="text-center mb-3">
           <h1 className="text-lg font-bold tracking-wide mb-1">PS INOX</h1>
-          <h2 className="text-sm font-semibold">PSINOX INDÚSTRIA METÁLICA</h2>
+          <h2 className="text-sm font-semibold">PSINOX COMERCIO DE AÇO LTDA</h2>
         </div>
 
         {/* Ticket e Data */}
@@ -88,11 +93,11 @@ export function PrintableScaleTicket({ weighingSets, headerData, operationType }
 
             return (
                 <div key={set.id} className="mb-3">
-                     <h3 className="font-bold text-sm mb-1">{setIndex === 0 ? "Caçamba 1" : "Caçamba 2"}</h3>
-                    <table className="w-full text-[11px] border-t border-b border-black">
+                     <h3 className="font-bold text-sm mb-1">{set.name}</h3>
+                    <table className="w-full text-[11px] border-t border-black">
                         <thead>
                             <tr className="border-b border-black font-semibold">
-                            <th className="text-left py-1">PRODUTO</th>
+                            <th className="text-left py-1 w-[40%]">PRODUTO</th>
                             <th className="text-right py-1">BRUTO</th>
                             <th className="text-right py-1">DESC KG</th>
                             <th className="text-right py-1">TARA</th>

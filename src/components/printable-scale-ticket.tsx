@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 
 type WeighingItem = {
   id: string;
@@ -18,109 +18,120 @@ type WeighingSet = {
   descontoCacamba: number;
 };
 
-type OperationType = 'loading' | 'unloading';
-
 interface ScaleData {
     weighingSets: WeighingSet[];
     headerData: {
         client: string;
         plate: string;
         driver: string;
-        initialWeight: string;
     };
-    operationType: OperationType;
+    operationType: 'loading' | 'unloading';
 }
 
+export default function PrintableScaleTicket() {
+  const [data, setData] = useState<ScaleData | null>(null);
 
-export function PrintableScaleTicket({ weighingSets, headerData, operationType }: ScaleData) {
-    
-    const formatNumber = (num: number) => {
-        if (isNaN(num)) return "0";
-        return new Intl.NumberFormat('pt-BR').format(num);
+  useEffect(() => {
+    try {
+        const savedData = localStorage.getItem("scaleData");
+        if (savedData) {
+            const parsedData = JSON.parse(savedData);
+            setData(parsedData);
+            // Give React a moment to render the data before printing
+            setTimeout(() => window.print(), 100); 
+        }
+    } catch (error) {
+        console.error("Failed to load scale data from localStorage", error);
     }
+  }, []);
 
-    const grandTotalLiquido = weighingSets.reduce((total, set) => {
-      const setItemsTotal = set.items.reduce((acc, item) => acc + item.liquido, 0);
-      return total + (setItemsTotal - set.descontoCacamba);
-    }, 0);
+  if (!data) {
+    return (
+      <div className="p-4 text-center text-muted-foreground no-print">
+        Carregando dados para impressão...
+      </div>
+    );
+  }
+
+  const { weighingSets, headerData } = data;
+
+  const formatNumber = (num: number, useGrouping = false) => {
+    if (isNaN(num)) return "0";
+    return new Intl.NumberFormat('pt-BR', { useGrouping }).format(num);
+  };
+  
+  const grandTotalLiquido = weighingSets.reduce((total, set) => {
+    const setItemsTotal = set.items.reduce((acc, item) => acc + item.liquido, 0);
+    return total + (setItemsTotal - set.descontoCacamba);
+  }, 0);
 
   return (
-    <div className="print-container p-4 font-sans text-xs">
-      {/* Cabeçalho */}
-      <div className="text-center mb-4">
-        <h1 className="font-bold text-lg">PSINOX COMERCIO DE AÇO LTDA</h1>
-        <p className="text-sm">TICKET DE PESAGEM - {operationType === 'loading' ? 'CARREGAMENTO' : 'DESCARREGAMENTO'}</p>
-        <p className="text-xs">Data: {new Date().toLocaleDateString('pt-BR')}</p>
-      </div>
+    <div className="bg-white text-black font-sans text-xs w-full">
+      <div className="p-4">
+        {/* HEADER */}
+        <div className="text-center mb-2">
+          <h1 className="text-xl font-bold uppercase">PSINOX COMERCIO DE AÇO LTDA</h1>
+          <p>Fone: (16) 3382-1957 - Cel:(16) 98118-4948</p>
+        </div>
 
-      {/* Informações do Cliente */}
-      <div className="border-y border-black py-1 mb-2">
-        <div className="flex justify-between">
-          <span>CLIENTE: <strong>{headerData.client || 'N/A'}</strong></span>
+        {/* INFO */}
+        <div className="border-t-2 border-b-2 border-black py-1 mb-2">
+            <div className="flex justify-between">
+                <span>CLIENTE: {headerData.client}</span>
+                <span>PLACA: {headerData.plate}</span>
+                <span>MOTORISTA: {headerData.driver}</span>
+            </div>
         </div>
-        <div className="flex justify-between">
-          <span>MOTORISTA: <strong>{headerData.driver || 'N/A'}</strong></span>
-          <span>PLACA: <strong>{headerData.plate || 'N/A'}</strong></span>
-        </div>
-      </div>
-      
-      {/* Itens de Pesagem */}
-      <div className="space-y-2">
-        {weighingSets.map((set) => {
-             const subtotalLiquido = set.items.reduce((acc, item) => acc + item.liquido, 0);
-             const totalLiquidoSet = subtotalLiquido - set.descontoCacamba;
+
+        {/* BODY */}
+        <div className="space-y-2">
+          {weighingSets.map((set) => {
+            const subtotalLiquido = set.items.reduce((acc, item) => acc + item.liquido, 0);
+            const totalLiquidoSet = subtotalLiquido - set.descontoCacamba;
 
             return (
-              <div key={set.id} className="break-inside-avoid">
-                 <h3 className="font-bold text-center text-sm bg-gray-200 py-px">{set.name}</h3>
-                <table className="w-full">
+              <div key={set.id} className="w-full">
+                <h3 className="font-bold uppercase text-center mb-1">{set.name}</h3>
+                <table className="w-full table-fixed">
                   <thead>
-                    <tr className="border-b border-black">
-                      <th className="text-left font-bold w-[55%]">PRODUTO</th>
-                      <th className="text-right font-bold">BRUTO</th>
-                      <th className="text-right font-bold">TARA</th>
-                      <th className="text-right font-bold">DESC</th>
-                      <th className="text-right font-bold">LÍQUIDO</th>
+                    <tr className="border-t border-b border-dashed border-black">
+                      <th className="text-left w-auto">PRODUTO</th>
+                      <th className="text-right w-[15%]">BRUTO KG</th>
+                      <th className="text-right w-[15%]">TARA KG</th>
+                      <th className="text-right w-[12%]">DESC</th>
+                      <th className="text-right w-[18%]">LÍQUIDO KG</th>
                     </tr>
                   </thead>
                   <tbody>
                     {set.items.map((item) => (
                       <tr key={item.id}>
-                        <td>{item.material}</td>
+                        <td className="text-left">{item.material}</td>
                         <td className="text-right">{formatNumber(item.bruto)}</td>
                         <td className="text-right">{formatNumber(item.tara)}</td>
                         <td className="text-right">{formatNumber(item.descontos)}</td>
-                        <td className="text-right font-semibold">{formatNumber(item.liquido)}</td>
+                        <td className="text-right">{formatNumber(item.liquido)}</td>
                       </tr>
                     ))}
-                    {/* Linha de Subtotal */}
-                     <tr className="border-t border-black">
-                        <td colSpan={2} className="text-left font-bold pt-1">DESC CAÇAMBA</td>
-                        <td className="text-right font-bold pt-1">{formatNumber(set.descontoCacamba)}</td>
-                        <td className="text-right font-bold pt-1">TOTAL CAÇAMBA</td>
-                        <td className="text-right font-bold pt-1">{formatNumber(totalLiquidoSet)}</td>
+                    {/* Linha de Total da Caçamba */}
+                    <tr className="border-t border-dashed border-black font-bold">
+                       <td colSpan={3} className="text-left">TOTAL CAÇAMBA</td>
+                       <td className="text-right"></td>
+                       <td className="text-right">{formatNumber(totalLiquidoSet)}</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
-            )
-        })}
-      </div>
+            );
+          })}
+        </div>
 
-      {/* Total Geral */}
-      <div className="border-t-2 border-dashed border-black mt-4 pt-2 text-right">
-        <span className="font-bold text-sm mr-2">PESO LÍQUIDO TOTAL:</span>
-        <span className="font-bold text-lg">{formatNumber(grandTotalLiquido)} KG</span>
-      </div>
-
-      {/* Assinatura */}
-      <div className="mt-20 flex justify-around">
-          <div className="text-center w-1/2">
-              <p className="border-t border-black pt-1 mx-4">CONFERIDO</p>
-          </div>
-          <div className="text-center w-1/2">
-              <p className="border-t border-black pt-1 mx-4">MOTORISTA</p>
-          </div>
+        {/* FOOTER */}
+        <div className="mt-4 border-t-2 border-black pt-1">
+            <div className="flex justify-between font-bold text-sm">
+                <span>PESO LÍQUIDO TOTAL:</span>
+                <span>{formatNumber(grandTotalLiquido)} KG</span>
+            </div>
+        </div>
       </div>
     </div>
   );

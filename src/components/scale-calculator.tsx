@@ -174,11 +174,39 @@ const ScaleCalculator = forwardRef((props, ref) => {
   };
   
   const addBitrem = () => {
-    if (weighingSets.length < 2) {
-      const newSet: WeighingSet = { id: uuidv4(), items: [], descontoCacamba: 0 };
-      setWeighingSets(prev => [...prev, newSet]);
-      setActiveSetId(newSet.id);
+    if (weighingSets.length >= 2) return;
+
+    const firstSet = weighingSets[0];
+    const lastItemOfFirstSet = firstSet.items[firstSet.items.length - 1];
+
+    if (!lastItemOfFirstSet) {
+        toast({
+            variant: "destructive",
+            title: "Primeira caçamba vazia",
+            description: "Adicione e pese pelo menos um material na Caçamba 1 antes de adicionar o bitrem.",
+        });
+        return;
     }
+
+    const initialBrutoForSecondSet = lastItemOfFirstSet.tara;
+
+    const newItem: WeighingItem = {
+        id: uuidv4(),
+        material: "Sucata Inox",
+        bruto: initialBrutoForSecondSet,
+        tara: 0,
+        descontos: 0,
+        liquido: initialBrutoForSecondSet, 
+    };
+
+    const newSet: WeighingSet = {
+        id: uuidv4(),
+        items: [newItem],
+        descontoCacamba: 0
+    };
+
+    setWeighingSets(prev => [...prev, newSet]);
+    setActiveSetId(newSet.id);
   };
 
   const handleClear = () => {
@@ -515,3 +543,5 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 }
 
 export default ScaleCalculator;
+
+    

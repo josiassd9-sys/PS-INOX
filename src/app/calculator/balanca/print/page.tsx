@@ -3,9 +3,6 @@
 
 import * as React from "react";
 import { PrintableScaleTicket } from "@/components/printable-scale-ticket";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
-import { Printer } from "lucide-react";
 
 type WeighingItem = {
   id: string;
@@ -37,7 +34,6 @@ interface ScaleData {
 
 export default function PrintPage() {
     const [data, setData] = React.useState<ScaleData | null>(null);
-    const [isLoading, setIsLoading] = React.useState(true);
 
     React.useEffect(() => {
         try {
@@ -45,36 +41,22 @@ export default function PrintPage() {
             if (savedData) {
                 const parsedData = JSON.parse(savedData);
                 setData(parsedData);
+                setTimeout(() => {
+                    window.print();
+                }, 100); 
             }
         } catch (error) {
             console.error("Failed to load scale data from localStorage", error);
-        } finally {
-            setIsLoading(false);
         }
     }, []);
-    
-    if (isLoading) {
-        return (
-            <div className="p-4 space-y-4">
-                <Skeleton className="h-10 w-full" />
-                <Skeleton className="h-20 w-full" />
-                <Skeleton className="h-40 w-full" />
-            </div>
-        )
-    }
 
     if (!data) {
-        return <div className="p-4 text-center">Nenhum dado de pesagem encontrado para imprimir.</div>;
+        // Render nothing or a minimal loader until data is ready for printing
+        return null;
     }
 
     return (
         <div>
-             <div className="fixed top-2 right-2 print:hidden">
-                <Button onClick={() => window.print()} disabled={!data}>
-                    <Printer className="mr-2 h-4 w-4" />
-                    Imprimir Ticket
-                </Button>
-            </div>
             <PrintableScaleTicket {...data} />
             <style jsx global>{`
                 @media print {

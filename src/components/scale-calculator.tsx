@@ -37,7 +37,7 @@ type WeighingSet = {
 type OperationType = 'loading' | 'unloading';
 
 const initialItem: WeighingItem = { id: '', material: '', bruto: 0, tara: 0, descontos: 0, liquido: 0 };
-const initialWeighingSet: WeighingSet = { id: uuidv4(), name: "Caçamba 1", items: [], descontoCacamba: 0 };
+const initialWeighingSet: WeighingSet = { id: uuidv4(), name: "CAÇAMBA 1", items: [], descontoCacamba: 0 };
 
 const ScaleCalculator = forwardRef((props, ref) => {
   const [headerData, setHeaderData] = useState({
@@ -59,7 +59,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
         let formattedValue = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
         setHeaderData(prev => ({ ...prev, [field]: formattedValue }));
     } else {
-        setHeaderData(prev => ({ ...prev, [field]: value }));
+        setHeaderData(prev => ({ ...prev, [field]: value.toUpperCase() }));
     }
   };
 
@@ -124,7 +124,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
       prevSets.map(set => {
         if (set.id === setId) {
           const newItems = set.items.map(item =>
-            item.id === itemId ? { ...item, material: newMaterial } : item
+            item.id === itemId ? { ...item, material: newMaterial.toUpperCase() } : item
           );
           return { ...set, items: newItems };
         }
@@ -136,7 +136,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
   const handleSetNameChange = (setId: string, newName: string) => {
     setWeighingSets(prevSets =>
       prevSets.map(set =>
-        set.id === setId ? { ...set, name: newName } : set
+        set.id === setId ? { ...set, name: newName.toUpperCase() } : set
       )
     );
   };
@@ -165,7 +165,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
            
           const newItem: WeighingItem = {
             id: uuidv4(),
-            material: "Sucata Inox",
+            material: "SUCATA INOX",
             bruto: newBruto,
             tara: newTara,
             descontos: 0,
@@ -197,10 +197,10 @@ const ScaleCalculator = forwardRef((props, ref) => {
 
     const newSet: WeighingSet = {
         id: uuidv4(),
-        name: "Bitrem / Caçamba 2",
+        name: "BITREM / CAÇAMBA 2",
         items: [{
             id: uuidv4(),
-            material: "Sucata Inox",
+            material: "SUCATA INOX",
             bruto: 0,
             tara: truckTara,
             descontos: 0,
@@ -214,7 +214,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
   };
 
   const handleClear = () => {
-    const newWeighingSet: WeighingSet = { id: uuidv4(), name: "Caçamba 1", items: [], descontoCacamba: 0 };
+    const newWeighingSet: WeighingSet = { id: uuidv4(), name: "CAÇAMBA 1", items: [], descontoCacamba: 0 };
     setWeighingSets([newWeighingSet]);
     setActiveSetId(newWeighingSet.id);
     setHeaderData({ client: "", plate: "", driver: "", initialWeight: "" });

@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "./ui/table";
 
 type WeighingItem = {
   id: string;
@@ -19,122 +18,123 @@ type WeighingSet = {
   descontoCacamba: number;
 };
 
-type OperationType = 'loading' | 'unloading';
-
 interface PrintableScaleTicketProps {
   weighingSets: WeighingSet[];
   headerData: {
     client: string;
     plate: string;
     driver: string;
-    initialWeight: string;
   };
-  operationType: OperationType;
 }
 
-export function PrintableScaleTicket({ weighingSets, headerData, operationType }: PrintableScaleTicketProps) {
+export function PrintableScaleTicket({ weighingSets, headerData }: PrintableScaleTicketProps) {
+  const formatNumber = (num: number) =>
+    isNaN(num) ? "0,00" : new Intl.NumberFormat("pt-BR").format(num);
 
-  const formatNumber = (num: number) => {
-    if (isNaN(num)) return "0";
-    return new Intl.NumberFormat('pt-BR', { useGrouping: true }).format(num);
-  };
-
-  const grandTotalLiquido = weighingSets.reduce((total, set) => {
-    const setItemsTotal = set.items.reduce((acc, item) => acc + item.liquido, 0);
-    return total + (setItemsTotal - set.descontoCacamba);
+  const totalGeral = weighingSets.reduce((sum, set) => {
+    const subtotal = set.items.reduce((acc, i) => acc + i.liquido, 0);
+    return sum + subtotal - set.descontoCacamba;
   }, 0);
 
   return (
-    <div className="w-full p-6 text-xs font-sans text-black bg-white">
+    <div className="print:block hidden text-[11px] text-black font-sans bg-white">
       <style>
         {`
-          @page {
-            size: A4;
-            margin: 10mm;
+        @page {
+          size: A4 portrait;
+          margin: 12mm 10mm;
+        }
+        @media print {
+          body {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
-          @media print {
-            body {
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-            }
-            .no-print {
-              display: none !important;
-            }
+          .no-print {
+            display: none !important;
           }
-          table, th, td {
-            border-collapse: collapse;
-          }
-        `}
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+        }
+        th, td {
+          padding: 4px 6px;
+        }
+        th {
+          border-bottom: 1px solid #000;
+        }
+        td {
+          border-bottom: 1px solid #ccc;
+        }
+      `}
       </style>
 
-      {/* Logo + Cabeçalho */}
-      <div className="text-center mb-3">
-        <h1 className="text-lg font-bold tracking-wide mb-1">PS INOX</h1>
-        <h2 className="text-sm font-semibold">PSINOX COMERCIO DE AÇO LTDA</h2>
+      {/* Cabeçalho */}
+      <div className="text-center mb-2">
+        <h1 className="text-xl font-bold tracking-wide leading-tight">PS INOX</h1>
+        <h2 className="text-sm font-semibold leading-tight">
+          PSINOX COMERCIO DE AÇO LTDA
+        </h2>
       </div>
 
-      {/* Ticket e Data */}
-      <div className="flex justify-between text-[11px] mb-1">
-        <span></span>
-        <span>Data: <strong>{new Date().toLocaleDateString('pt-BR')}</strong></span>
+      {/* Linha com Motorista, Placa, Cliente */}
+      <div className="grid grid-cols-3 border-b border-black pb-1 mb-2 text-[11px]">
+        <div><strong>Motorista:</strong> {headerData.driver || "—"}</div>
+        <div><strong>Placa:</strong> {headerData.plate || "—"}</div>
+        <div><strong>Cidade/Cliente:</strong> {headerData.client || "—"}</div>
       </div>
 
-      {/* Linha 1: Motorista, Placa, Cliente */}
-      <div className="grid grid-cols-3 gap-2 border-b border-black py-1 mb-2 text-[11px]">
-        <div><strong>Motorista:</strong> {headerData.driver || 'N/A'}</div>
-        <div><strong>Placa:</strong> {headerData.plate || 'N/A'}</div>
-        <div><strong>Cliente:</strong> {headerData.client || 'N/A'}</div>
-      </div>
-
-      {/* BLOCO DE PESAGEM */}
-      {weighingSets.map((set, setIndex) => {
-        const subtotalLiquido = set.items.reduce((acc, item) => acc + item.liquido, 0);
-        const totalLiquidoSet = subtotalLiquido - set.descontoCacamba;
+      {/* Tabelas por Caçamba */}
+      {weighingSets.map((set) => {
+        const subtotal = set.items.reduce((s, i) => s + i.liquido, 0);
+        const total = subtotal - set.descontoCacamba;
 
         return (
           <div key={set.id} className="mb-4 break-inside-avoid">
-            <h3 className="font-bold text-sm mb-1">{set.name}</h3>
-            <table className="w-full text-[11px] border-t border-black">
+            <h3 className="text-[12px] font-bold mb-1">{set.name}</h3>
+            <table>
               <thead>
-                <tr className="border-b border-black font-semibold">
-                  <th className="text-left py-1 w-[55%]">PRODUTO</th>
-                  <th className="text-right py-1 w-[10%]">BRUTO</th>
-                  <th className="text-right py-1 w-[10%]">DESC KG</th>
-                  <th className="text-right py-1 w-[10%]">TARA</th>
-                  <th className="text-right py-1 w-[15%]">LÍQUIDO</th>
+                <tr className="font-semibold">
+                  <th style={{ width: "35%" }}>PRODUTO</th>
+                  <th style={{ width: "10%", textAlign: "right" }}>BRUTO</th>
+                  <th style={{ width: "10%", textAlign: "right" }}>DESC KG</th>
+                  <th style={{ width: "10%", textAlign: "right" }}>TARA</th>
+                  <th style={{ width: "10%", textAlign: "right" }}>LÍQUIDO</th>
+                  <th style={{ width: "10%", textAlign: "right" }}>CAÇAMBA</th>
+                  <th style={{ width: "15%", textAlign: "right" }}>SUBTOTAL</th>
                 </tr>
               </thead>
               <tbody>
                 {set.items.map((item, idx) => (
-                  <tr key={idx} className="border-b border-gray-300">
-                    <td className="py-1">{item.material}</td>
-                    <td className="text-right py-1">{formatNumber(item.bruto)}</td>
-                    <td className="text-right py-1">{formatNumber(item.descontos)}</td>
-                    <td className="text-right py-1">{formatNumber(item.tara)}</td>
-                    <td className="text-right py-1 font-semibold">{formatNumber(item.liquido)}</td>
+                  <tr key={idx}>
+                    <td>{item.material}</td>
+                    <td style={{ textAlign: "right" }}>{formatNumber(item.bruto)}</td>
+                    <td style={{ textAlign: "right" }}>{formatNumber(item.descontos)}</td>
+                    <td style={{ textAlign: "right" }}>{formatNumber(item.tara)}</td>
+                    <td style={{ textAlign: "right" }}>{formatNumber(item.liquido)}</td>
+                    <td style={{ textAlign: "right" }}>{formatNumber(set.descontoCacamba)}</td>
+                    <td style={{ textAlign: "right" }}>{formatNumber(subtotal)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
 
-            {/* Totais da Caçamba */}
-            <div className="flex justify-end gap-6 mt-1 text-[11px] pt-1 border-b border-gray-400 pb-1">
-              <div>Subtotal: <span className="font-semibold">{formatNumber(subtotalLiquido)} kg</span></div>
-              <div>Caçamba: <span className="font-semibold">{formatNumber(set.descontoCacamba)} kg</span></div>
-              <div className="font-bold">Total Caçamba: <span className="font-bold">{formatNumber(totalLiquidoSet)} kg</span></div>
+            {/* Total por Caçamba */}
+            <div className="flex justify-end mt-1 text-[11px] font-semibold border-b border-black pb-1">
+              TOTAL {set.name.toUpperCase()}: {formatNumber(total)} KG
             </div>
           </div>
         );
       })}
 
-      {/* Rodapé com total */}
-      <div className="text-right font-semibold text-[12px] mt-4 border-t-2 border-black pt-2">
-        TOTAL LÍQUIDO QTD: {formatNumber(grandTotalLiquido)} KG
+      {/* Rodapé Total */}
+      <div className="text-right mt-4 border-t-2 border-black pt-2 font-bold text-[12px]">
+        TOTAL LÍQUIDO QTD: {formatNumber(totalGeral)} KG
       </div>
 
-      {/* Linha inferior */}
-      <div className="mt-6 text-center text-[10px] text-gray-600">
-        ____________________________<br />
+      {/* Assinatura */}
+      <div className="mt-8 text-center text-[10px] text-gray-700">
+        ____________________________ <br />
         Assinatura do Motorista
       </div>
     </div>

@@ -57,9 +57,6 @@ const ScaleCalculator = forwardRef((props, ref) => {
         setHeaderData(prev => ({ ...prev, [field]: sanitizedValue }));
     } else if (field === 'plate') {
         let formattedValue = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
-        if (formattedValue.length > 3 && /^\d$/.test(formattedValue[3])) {
-            formattedValue = `${formattedValue.slice(0, 3)}-${formattedValue.slice(3)}`;
-        }
         setHeaderData(prev => ({ ...prev, [field]: formattedValue }));
     } else {
         setHeaderData(prev => ({ ...prev, [field]: value }));
@@ -266,7 +263,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                 <span className="hidden print:block">{headerData.client || 'N/A'}</span>
                 
                  <div className="flex w-full items-end gap-0.5 text-xs sm:text-sm flex-nowrap">
-                    <div className="space-y-px flex-1">
+                    <div className="space-y-px flex-1 min-w-0">
                         <Label htmlFor="motorista" className="text-xs sm:text-sm">Motorista</Label>
                         <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden text-sm"/>
                         <span className="hidden print:block">{headerData.driver || 'N/A'}</span>
@@ -351,7 +348,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                   ))}
               </div>
               {/* Desktop Layout */}
-              <Table className="hidden sm:table">
+              <Table className="hidden sm:table table-fixed">
                 <TableHeader>
                    <TableRow className="print:text-black">
                     <TableHead className="w-[30%]">Material</TableHead>
@@ -371,32 +368,38 @@ const ScaleCalculator = forwardRef((props, ref) => {
                           />
                       </TableCell>
                       <TableCell className="w-[17.5%] p-0 sm:p-px">
-                            <Input
-                            type="text"
-                            value={formatNumber(item.bruto)}
-                            onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)}
-                            className="text-right h-8 print:hidden w-24"
-                            disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')}
-                            />
+                            <div className="flex justify-end">
+                                <Input
+                                type="text"
+                                value={formatNumber(item.bruto)}
+                                onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)}
+                                className="text-right h-8 print:hidden w-24"
+                                disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')}
+                                />
+                            </div>
                             <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
                       </TableCell>
                       <TableCell className="w-[17.5%] p-0 sm:p-px">
-                            <Input
-                            type="text"
-                            value={formatNumber(item.tara)}
-                            onChange={(e) => handleInputChange(set.id, item.id, 'tara', e.target.value)}
-                            className="text-right h-8 print:hidden w-24"
-                            disabled={(setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading')}
-                            />
+                            <div className="flex justify-end">
+                                <Input
+                                type="text"
+                                value={formatNumber(item.tara)}
+                                onChange={(e) => handleInputChange(set.id, item.id, 'tara', e.target.value)}
+                                className="text-right h-8 print:hidden w-24"
+                                disabled={(setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading')}
+                                />
+                            </div>
                             <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
                       </TableCell>
                       <TableCell className="w-[17.5%] p-0 sm:p-px">
-                            <Input
-                            type="text"
-                            value={formatNumber(item.descontos)}
-                            onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)}
-                            className="text-right h-8 print:hidden w-24"
-                            />
+                            <div className="flex justify-end">
+                                <Input
+                                type="text"
+                                value={formatNumber(item.descontos)}
+                                onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)}
+                                className="text-right h-8 print:hidden w-24"
+                                />
+                            </div>
                             <span className="hidden print:block text-right">{formatNumber(item.descontos)}</span>
                       </TableCell>
                       <TableCell className="w-[17.5%] text-right font-semibold p-0 sm:p-px">

@@ -70,7 +70,7 @@ export default function PrintableScaleTicket() {
       style={{
         width: "210mm",
         minHeight: "297mm",
-        padding: "20mm 15mm", // margens para afastar do topo e da esquerda
+        padding: "20mm 15mm",
         boxSizing: "border-box",
       }}
     >
@@ -78,7 +78,7 @@ export default function PrintableScaleTicket() {
         {/* HEADER */}
         <div className="text-center mb-2">
           <div className="text-[10pt]">PS INOX</div>
-          <h1 className="text-xl font-bold uppercase">
+          <h1 className="text-xl font-bold uppercase text-center">
             PSINOX COMERCIO DE AÇO LTDA
           </h1>
           <p>Fone: (16) 3761-9564 - Cel:(16) 99788-7055</p>
@@ -131,9 +131,14 @@ export default function PrintableScaleTicket() {
                         </td>
                       </tr>
                     ))}
+                    
+                    <tr className="border-t border-dashed border-black">
+                       <td colSpan={3} className="text-left">DESCONTO CAÇAMBA</td>
+                       <td colSpan={2} className="text-right"> -{formatNumber(set.descontoCacamba)}</td>
+                    </tr>
 
                     {/* Linha de Total da Caçamba */}
-                    <tr className="border-t border-dashed border-black font-bold">
+                    <tr className="font-bold">
                       <td colSpan={3} className="text-left">
                         TOTAL CAÇAMBA
                       </td>

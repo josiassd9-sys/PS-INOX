@@ -29,6 +29,7 @@ type WeighingItem = {
 
 type WeighingSet = {
   id: string;
+  name: string;
   items: WeighingItem[];
   descontoCacamba: number;
 };
@@ -36,7 +37,7 @@ type WeighingSet = {
 type OperationType = 'loading' | 'unloading';
 
 const initialItem: WeighingItem = { id: '', material: '', bruto: 0, tara: 0, descontos: 0, liquido: 0 };
-const initialWeighingSet: WeighingSet = { id: uuidv4(), items: [], descontoCacamba: 0 };
+const initialWeighingSet: WeighingSet = { id: uuidv4(), name: "Caçamba 1", items: [], descontoCacamba: 0 };
 
 const ScaleCalculator = forwardRef((props, ref) => {
   const [headerData, setHeaderData] = useState({
@@ -65,13 +66,11 @@ const ScaleCalculator = forwardRef((props, ref) => {
   useEffect(() => {
     const initialWeightValue = parseFloat(headerData.initialWeight) || 0;
     
-    // Only proceed if there's an initial weight and at least one item
     if (initialWeightValue > 0 && weighingSets.length > 0 && weighingSets[0].items.length > 0) {
       setWeighingSets(prevSets => {
         const newSets = [...prevSets];
         const firstSet = { ...newSets[0] };
         
-        // Ensure we are not updating if the value is already correct
         const firstItem = { ...firstSet.items[0] };
         let needsUpdate = false;
         if (operationType === 'loading' && firstItem.bruto !== initialWeightValue) {
@@ -83,7 +82,6 @@ const ScaleCalculator = forwardRef((props, ref) => {
         }
 
         if (needsUpdate) {
-            // Recalculate liquido for the first item
             firstItem.liquido = firstItem.bruto - firstItem.tara - firstItem.descontos;
             
             firstSet.items = [firstItem, ...firstSet.items.slice(1)];
@@ -92,7 +90,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
             return newSets;
         }
         
-        return prevSets; // Return previous state if no update is needed
+        return prevSets;
       });
     }
   }, [headerData.initialWeight, operationType, weighingSets]);
@@ -134,6 +132,14 @@ const ScaleCalculator = forwardRef((props, ref) => {
       })
     );
   };
+  
+  const handleSetNameChange = (setId: string, newName: string) => {
+    setWeighingSets(prevSets =>
+      prevSets.map(set =>
+        set.id === setId ? { ...set, name: newName } : set
+      )
+    );
+  };
 
   const handleCacambaDiscount = (setId: string, value: string) => {
      const numValue = parseInt(value.replace(/\D/g, ''), 10) || 0;
@@ -152,7 +158,6 @@ const ScaleCalculator = forwardRef((props, ref) => {
           if (operationType === 'loading') {
             newBruto = lastItem ? lastItem.tara : 0;
           } else { // unloading
-             // If there's a last item, the new tara is its bruto.
              if (lastItem) {
               newTara = lastItem.bruto;
              }
@@ -190,18 +195,17 @@ const ScaleCalculator = forwardRef((props, ref) => {
 
     const truckTara = firstItemOfFirstSet.tara;
 
-    const newItem: WeighingItem = {
-        id: uuidv4(),
-        material: "Sucata Inox",
-        bruto: 0,
-        tara: truckTara,
-        descontos: 0,
-        liquido: 0 - truckTara, 
-    };
-
     const newSet: WeighingSet = {
         id: uuidv4(),
-        items: [newItem],
+        name: "Bitrem / Caçamba 2",
+        items: [{
+            id: uuidv4(),
+            material: "Sucata Inox",
+            bruto: 0,
+            tara: truckTara,
+            descontos: 0,
+            liquido: 0 - truckTara,
+        }],
         descontoCacamba: 0
     };
 
@@ -210,7 +214,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
   };
 
   const handleClear = () => {
-    const newWeighingSet = { id: uuidv4(), items: [], descontoCacamba: 0 };
+    const newWeighingSet: WeighingSet = { id: uuidv4(), name: "Caçamba 1", items: [], descontoCacamba: 0 };
     setWeighingSets([newWeighingSet]);
     setActiveSetId(newWeighingSet.id);
     setHeaderData({ client: "", plate: "", driver: "", initialWeight: "" });
@@ -244,7 +248,6 @@ const ScaleCalculator = forwardRef((props, ref) => {
   }
 
   const handlePrint = () => {
-    // Save current state to localStorage for the print page to access
     try {
         localStorage.setItem("scaleData", JSON.stringify({ weighingSets, headerData, operationType }));
         window.open('/calculator/balanca/print', '_blank');
@@ -334,9 +337,11 @@ const ScaleCalculator = forwardRef((props, ref) => {
          return (
           <Card key={set.id} className="mb-px print:border-none print:shadow-none print:p-0 print:mb-0.5">
             <CardHeader className="p-px flex flex-row items-center justify-between print:p-0 print:mb-0.5">
-              <CardTitle className="text-xl">
-                {setIndex === 0 ? "Caçamba 1" : "Bitrem / Caçamba 2"}
-              </CardTitle>
+              <Input 
+                value={set.name}
+                onChange={(e) => handleSetNameChange(set.id, e.target.value)}
+                className="text-xl font-bold border-none focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent p-0 h-auto"
+              />
               <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>

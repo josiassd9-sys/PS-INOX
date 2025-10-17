@@ -353,7 +353,7 @@ const ALL_CATEGORIES: Category[] = [
     items: [],
     path: '/perfis/guia'
   },
-    {
+  {
     id: 'lista-sucatas',
     name: 'Lista de Sucatas',
     description: 'Crie e gerencie listas de sucatas.',
@@ -361,7 +361,16 @@ const ALL_CATEGORIES: Category[] = [
     unit: 'calc',
     items: [],
     path: '/lista-sucatas'
-  }
+  },
+  {
+    id: 'informativos/centro-usinagem',
+    name: 'Centro de Usinagem',
+    description: 'Guia sobre centros de usinagem CNC, suas operações e aplicações.',
+    icon: 'Factory',
+    unit: 'calc',
+    items: [],
+    path: '/informativos/centro-usinagem',
+  },
 ];
 
 const CATEGORY_GROUPS: CategoryGroup[] = [
@@ -410,6 +419,7 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
             ALL_CATEGORIES.find(c => c.id === 'processos-fabricacao')!,
             ALL_CATEGORIES.find(c => c.id === 'desenho-tecnico')!,
             ALL_CATEGORIES.find(c => c.id === 'gauge')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/centro-usinagem')!,
         ]
     },
     {
@@ -437,3 +447,5 @@ export {
     E_ACO_MPA
 };
 export type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction };
+
+    

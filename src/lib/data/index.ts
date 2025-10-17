@@ -1,6 +1,3 @@
-
-
-
 import type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction } from './types';
 import { perfisData, tiposAco, PESO_CONCRETO_KGF_M3, E_ACO_MPA } from './perfis';
 import { perfisIpeData } from './perfis-ipe';
@@ -67,7 +64,7 @@ const ALL_CATEGORIES: Category[] = [
     icon: 'Trash2',
     unit: 'kg',
     items: scrapItems,
-    path: '/calculator/tabela-sucata',
+    path: '/tabela-sucata',
   },
   {
     id: 'tubos-od',
@@ -444,6 +441,15 @@ const ALL_CATEGORIES: Category[] = [
     items: [],
     path: '/mecanica/elementos-fixacao',
   },
+  {
+    id: 'mecanica/transmissao-potencia',
+    name: 'Transmissão de Potência',
+    description: 'Guia sobre eixos, rolamentos, engrenagens e outros componentes de transmissão.',
+    icon: 'Cog',
+    unit: 'calc',
+    items: [],
+    path: '/mecanica/transmissao-potencia',
+  },
 ];
 
 const CATEGORY_GROUPS: CategoryGroup[] = [
@@ -518,6 +524,7 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
         title: 'MECÂNICA',
         items: [
             ALL_CATEGORIES.find(c => c.id === 'mecanica/elementos-fixacao')!,
+            ALL_CATEGORIES.find(c => c.id === 'mecanica/transmissao-potencia')!,
         ]
     },
 ];
@@ -533,5 +540,3 @@ export {
     E_ACO_MPA
 };
 export type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction };
-
-    

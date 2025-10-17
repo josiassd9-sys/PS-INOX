@@ -20,20 +20,20 @@ const LoadingComponent = () => (
 )
 
 const SteelDeckCalculator = dynamic(() => import('@/components/perfis/SteelDeckCalculator').then(mod => mod.SteelDeckCalculator), {
+    ssr: false,
     loading: () => <LoadingComponent />,
-    ssr: false
 });
 const VigaSecundariaCalculator = dynamic(() => import('@/components/perfis/VigaSecundariaCalculator').then(mod => mod.VigaSecundariaCalculator), {
+    ssr: false,
     loading: () => <LoadingComponent />,
-    ssr: false
 });
 const VigaPrincipalCalculator = dynamic(() => import('@/components/perfis/VigaPrincipalCalculator').then(mod => mod.VigaPrincipalCalculator), {
+    ssr: false,
     loading: () => <LoadingComponent />,
-    ssr: false
 });
 const PilarCalculator = dynamic(() => import('@/components/perfis/PilarCalculator').then(mod => mod.PilarCalculator), {
+    ssr: false,
     loading: () => <LoadingComponent />,
-    ssr: false
 });
 
 

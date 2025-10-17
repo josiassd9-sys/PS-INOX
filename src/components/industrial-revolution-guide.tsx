@@ -41,13 +41,15 @@ const topics = [
         title: "Fatores que Impulsionaram o Processo na Inglaterra",
         icon: "Factory",
         content: (
-            <p className="mb-2">A Inglaterra foi pioneira na industrialização devido a uma combinação única de fatores:</p>
-            <ul className="list-disc pl-5 space-y-1">
-                <li><strong>Capital Acumulado:</strong> A burguesia inglesa acumulou riqueza através do comércio colonial e da agricultura modernizada.</li>
-                <li><strong>Recursos Naturais:</strong> O país possuía grandes reservas de carvão e ferro, essenciais para a indústria.</li>
-                <li><strong>Mão de Obra:</strong> O cercamento dos campos ("enclosures") expulsou camponeses para as cidades, criando uma mão de obra abundante e barata.</li>
-                <li><strong>Mercado e Transporte:</strong> Uma poderosa frota mercante e uma política econômica liberal garantiram o acesso a mercados e o incentivo a investimentos.</li>
-            </ul>
+            <div>
+                <p className="mb-2">A Inglaterra foi pioneira na industrialização devido a uma combinação única de fatores:</p>
+                <ul className="list-disc pl-5 space-y-1">
+                    <li><strong>Capital Acumulado:</strong> A burguesia inglesa acumulou riqueza através do comércio colonial e da agricultura modernizada.</li>
+                    <li><strong>Recursos Naturais:</strong> O país possuía grandes reservas de carvão e ferro, essenciais para a indústria.</li>
+                    <li><strong>Mão de Obra:</strong> O cercamento dos campos ("enclosures") expulsou camponeses para as cidades, criando uma mão de obra abundante e barata.</li>
+                    <li><strong>Mercado e Transporte:</strong> Uma poderosa frota mercante e uma política econômica liberal garantiram o acesso a mercados e o incentivo a investimentos.</li>
+                </ul>
+            </div>
         ),
     },
     {

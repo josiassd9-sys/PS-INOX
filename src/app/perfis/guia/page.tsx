@@ -56,6 +56,36 @@ const guideTopics = [
             </div>
         )
     },
+     {
+        id: "vao-simples-duplo",
+        title: "Vão Simples vs. Vão Duplo: Entenda a Diferença",
+        icon: "GitCompareArrows",
+        content: (
+            <div className="space-y-2">
+                 <p>
+                    Na tabela de referência de Steel Deck, você notará as colunas "Vão Simples" e "Vão Duplo". A escolha correta é crucial para a eficiência do projeto.
+                </p>
+                <div>
+                    <h4 className="font-semibold">Vão Simples (Apoio Bi-apoiado)</h4>
+                    <p className="text-muted-foreground">
+                        Ocorre quando uma única chapa de Steel Deck é apoiada em apenas duas vigas, uma em cada extremidade. Toda a carga é suportada nesse único vão. É a situação mais simples, mas menos eficiente.
+                    </p>
+                </div>
+                 <div>
+                    <h4 className="font-semibold">Vão Duplo (Apoios Contínuos)</h4>
+                    <p className="text-muted-foreground">
+                        Acontece quando uma chapa de Steel Deck é contínua e passa sobre três ou mais vigas. Por exemplo, uma chapa de 6 metros apoiada em vigas a cada 3 metros (nos pontos 0m, 3m e 6m). Isso cria múltiplos vãos (neste caso, dois vãos de 3m cada).
+                    </p>
+                </div>
+                 <div>
+                    <h4 className="font-semibold text-primary">Por que o Vão Duplo é Melhor?</h4>
+                    <p className="text-muted-foreground">
+                       Devido ao efeito de "viga contínua", os esforços de flexão são mais bem distribuídos. Isso significa que, para a mesma carga e espessura de chapa, o Steel Deck em vão duplo consegue vencer distâncias maiores do que em vão simples. Na prática, você pode usar menos vigas de apoio, economizando material e custo. Sempre que possível, projete para ter vãos duplos ou múltiplos.
+                    </p>
+                </div>
+            </div>
+        )
+    },
     {
         id: "viga-secundaria",
         title: "3. Aba Viga Secundária (IPE)",

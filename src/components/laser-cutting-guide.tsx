@@ -55,7 +55,7 @@ const topics = [
                     <strong>Desenho (CAD):</strong> O processo começa com um desenho digital 2D da peça, criado em um software CAD (como AutoCAD ou SolidWorks). O arquivo é geralmente salvo em formatos como .DXF ou .DWG.
                 </li>
                 <li>
-                    <strong>Programação (CAM):</strong> O arquivo CAD é importado para um software CAM (Manufacturing Aided Design), que gera o programa CNC. Nesta etapa, o programador define a sequência de cortes, os pontos de entrada do laser (lead-in/lead-out) e otimiza o posicionamento das peças na chapa (nesting) para minimizar o desperdício de material.
+                    <strong>Programação (CAM) e Nesting:</strong> O arquivo CAD é importado para um software CAM. O programador define a sequência de cortes e os pontos de entrada do laser. Crucialmente, é nesta etapa que se utiliza um <strong>software de Nesting</strong> (aninhamento). Este software organiza automaticamente as peças na chapa para obter o máximo aproveitamento do material e minimizar o desperdício (sucata). Softwares dedicados como <strong>Lantek</strong> ou <strong>SigmaNEST</strong>, ou módulos dentro de pacotes CAM, são usados para essa finalidade.
                 </li>
                 <li>
                     <strong>Setup da Máquina:</strong> O operador carrega a chapa de metal na mesa da máquina, seleciona o programa CNC correto e garante que os parâmetros (potência, velocidade, gás de assistência) estão corretos para o material e espessura.

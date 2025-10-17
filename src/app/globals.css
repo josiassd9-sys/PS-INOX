@@ -126,6 +126,11 @@
 
 
 @media print {
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+
   body {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
@@ -314,18 +319,33 @@
     
     #printable-ticket-body {
       width: 100% !important;
-      padding: 20mm 15mm !important;
+      padding: 0 !important;
       box-sizing: border-box !important;
     }
-    #printable-ticket-body .border-t-2, #printable-ticket-body .border-b-2 {
-      border: none !important;
+    #printable-ticket-body .border, #printable-ticket-body .border-b, #printable-ticket-body .border-t {
+        border: none !important;
     }
     #printable-ticket-body table {
       width: 100% !important;
+      border: none !important;
     }
     #printable-ticket-body table th {
       text-align: left;
+      border: none !important;
     }
+    #printable-ticket-body table td {
+      border: none !important;
+    }
+    #printable-ticket-body .border-dashed {
+        border-style: dashed !important;
+    }
+    #printable-ticket-body .border-t.border-dashed {
+        border-top-width: 1px !important;
+    }
+    #printable-ticket-body .border-b.border-dashed {
+        border-bottom-width: 1px !important;
+    }
+
     #printable-ticket-body .w-auto {
       width: 100% !important;
     }

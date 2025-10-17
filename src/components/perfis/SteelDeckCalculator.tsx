@@ -15,6 +15,7 @@ import { steelDeckData, PESO_CONCRETO_KGF_M3, BudgetItem, liveLoadOptions, LiveL
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { analyzeSlabSelection, AnalyzeSlabSelectionInput, AnalyzeSlabSelectionOutput } from "@/ai/flows/slab-analysis-flow";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface SteelDeckCalculatorProps {
     onCalculated: (load: number) => void;
@@ -25,7 +26,7 @@ export function SteelDeckCalculator({ onCalculated, onAddToBudget }: SteelDeckCa
     const [selectedDeckId, setSelectedDeckId] = React.useState<string>(steelDeckData[0].nome);
     const [concreteThickness, setConcreteThickness] = React.useState<string>("12");
     const [selectedLoads, setSelectedLoads] = React.useState<string[]>(['office']);
-    const [extraLoad, setExtraLoad] = React.useState<string>("250");
+    const [extraLoad, setExtraLoad] = React.useState<string>("200");
     const [totalLoad, setTotalLoad] = React.useState<number>(0);
     const { toast } = useToast();
 
@@ -138,10 +139,13 @@ export function SteelDeckCalculator({ onCalculated, onAddToBudget }: SteelDeckCa
     
     const handleLoadSelection = (id: string, checked: boolean) => {
         setSelectedLoads(prev => {
-            const isExclusive = liveLoadOptions.find(o => o.id === id)?.exclusive;
+            const optionInfo = liveLoadOptions.find(o => o.id === id);
+            if (!optionInfo) return prev;
+
             if (checked) {
-                 if (isExclusive) {
-                    const exclusiveGroup = liveLoadOptions.find(o => o.id === id)?.group;
+                 if (optionInfo.exclusive) {
+                    const exclusiveGroup = optionInfo.group;
+                    // Remove other items from the same exclusive group
                     const othersInGroup = liveLoadOptions.filter(o => o.group === exclusiveGroup && o.id !== id).map(o => o.id);
                     const filteredPrev = prev.filter(p => !othersInGroup.includes(p));
                     return [...filteredPrev, id];
@@ -151,6 +155,21 @@ export function SteelDeckCalculator({ onCalculated, onAddToBudget }: SteelDeckCa
                 return prev.filter(lId => lId !== id);
             }
         })
+    }
+    
+    const renderLoadOptions = (group: LiveLoadOption['group']) => {
+        return liveLoadOptions.filter(o => o.group === group).map(option => (
+             <div key={option.id} className="flex items-center space-x-2 p-2 rounded-md bg-background border">
+                <Checkbox 
+                    id={option.id}
+                    checked={selectedLoads.includes(option.id)}
+                    onCheckedChange={(checked) => handleLoadSelection(option.id, !!checked)}
+                />
+                <label htmlFor={option.id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                   {option.label} <span className="text-xs text-muted-foreground">({option.value} kgf/m²)</span>
+                </label>
+            </div>
+        ))
     }
 
     return (
@@ -199,31 +218,41 @@ export function SteelDeckCalculator({ onCalculated, onAddToBudget }: SteelDeckCa
                     </div>
                 </div>
 
-                <Card className="bg-muted/30">
-                    <CardHeader className="p-2">
-                        <CardTitle className="text-base">Construtor de Sobrecarga de Utilização</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-2 space-y-2">
-                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                            {liveLoadOptions.map(option => (
-                                <div key={option.id} className="flex items-center space-x-2 p-2 rounded-md bg-background border">
-                                    <Checkbox 
-                                        id={option.id}
-                                        checked={selectedLoads.includes(option.id)}
-                                        onCheckedChange={(checked) => handleLoadSelection(option.id, !!checked)}
-                                    />
-                                    <label htmlFor={option.id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                       {option.label} <span className="text-xs text-muted-foreground">({option.value} kgf/m²)</span>
-                                    </label>
+                <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="load-builder" className="border rounded-md px-2 bg-muted/30">
+                        <AccordionTrigger className="text-base font-semibold hover:no-underline">
+                           Construtor de Sobrecarga de Utilização
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-2">
+                             <div className="space-y-3">
+                                <div>
+                                    <h4 className="font-medium text-sm mb-1">Uso Principal (selecione um)</h4>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                                        {renderLoadOptions('uso')}
+                                    </div>
                                 </div>
-                            ))}
-                        </div>
-                         <div className="space-y-2 pt-2">
-                            <Label htmlFor="extra-load">Sobrecarga de Utilização Total (kgf/m²)</Label>
-                            <Input id="extra-load" type="text" value={extraLoad} readOnly className="font-bold bg-background"/>
-                        </div>
-                    </CardContent>
-                </Card>
+                                <div>
+                                    <h4 className="font-medium text-sm mb-1">Cobertura (selecione um)</h4>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                                        {renderLoadOptions('cobertura')}
+                                    </div>
+                                </div>
+                                 <div>
+                                    <h4 className="font-medium text-sm mb-1">Cargas Adicionais (selecione quantas precisar)</h4>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                                        {renderLoadOptions('adicional')}
+                                    </div>
+                                </div>
+                                <Separator />
+                                <div className="space-y-2 pt-2">
+                                    <Label htmlFor="extra-load">Sobrecarga de Utilização Total (kgf/m²)</Label>
+                                    <Input id="extra-load" type="text" value={extraLoad} readOnly className="font-bold bg-background"/>
+                                </div>
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
+                
 
                  <Button onClick={handleCalculate} className="w-full md:w-auto" disabled={isAnalyzing}>
                    {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : "Calcular Carga e Analisar"}

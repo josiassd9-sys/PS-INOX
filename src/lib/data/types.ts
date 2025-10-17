@@ -102,5 +102,5 @@ export type LiveLoadOption = {
   label: string;
   value: number; // kgf/m²
   exclusive?: boolean;
-  group: 'uso' | 'adicional';
+  group: 'uso' | 'cobertura' | 'adicional';
 };

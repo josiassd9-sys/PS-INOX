@@ -169,6 +169,8 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
     const [selectedItemId, setSelectedItemId] = React.useState<string | null>(null);
 
     const handleItemSelection = (item: SteelItem | ScrapItem, category: Category) => {
+         if (isScrapCalculatorActive) return;
+
          if (selectedItemId === item.id) {
             setSelectedItemId(null);
         } else {

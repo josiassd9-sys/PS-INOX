@@ -60,7 +60,7 @@ export function SteelDeckCalculator({ onCalculated, onAddToBudget }: SteelDeckCa
         
         setAnalysisResult(null);
 
-        if (h_cm > 0 && S_kgf > 0) {
+        if (h_cm > 0) { // S_kgf can be 0 if no load is selected
             const concreteWeight = (h_cm / 100) * PESO_CONCRETO_KGF_M3;
             const finalLoad = deck.pesoProprio + concreteWeight + S_kgf;
             setTotalLoad(finalLoad);
@@ -226,19 +226,19 @@ export function SteelDeckCalculator({ onCalculated, onAddToBudget }: SteelDeckCa
                         <AccordionContent className="pt-2">
                              <div className="space-y-3">
                                 <div>
-                                    <h4 className="font-medium text-sm mb-1">Uso Principal (selecione um)</h4>
+                                    <h4 className="font-medium text-sm mb-1">Uso Principal <span className="text-xs text-muted-foreground">(selecione um)</span></h4>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                                         {renderLoadOptions('uso')}
                                     </div>
                                 </div>
                                 <div>
-                                    <h4 className="font-medium text-sm mb-1">Cobertura (selecione um)</h4>
+                                    <h4 className="font-medium text-sm mb-1">Cobertura <span className="text-xs text-muted-foreground">(selecione um)</span></h4>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                                         {renderLoadOptions('cobertura')}
                                     </div>
                                 </div>
                                  <div>
-                                    <h4 className="font-medium text-sm mb-1">Cargas Adicionais (selecione quantas precisar)</h4>
+                                    <h4 className="font-medium text-sm mb-1">Cargas Adicionais <span className="text-xs text-muted-foreground">(selecione quantas precisar)</span></h4>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                                         {renderLoadOptions('adicional')}
                                     </div>

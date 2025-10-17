@@ -2,7 +2,7 @@
 
 "use client";
 
-import { LucideProps, icons, RectangleHorizontal, Hexagon, Scissors, PackageCheck, Weight, Printer, Save, Download, Trash2, Eye, EyeOff, GalleryVertical, Book, Factory, Sparkles, DraftingCompass, Link, ClipboardList, Home, Sheet, FlipHorizontal, Square, Layers, PenRuler, Scale, CheckCircle, Type, ZoomIn, BookOpen, Variable, Calculator, Ruler, Send, Workflow, X, Cog, Car, Users, Globe, Flame, Shield, FlaskConical, Forklift, Circle, Lock, GitCompareArrows } from 'lucide-react';
+import { LucideProps, icons, RectangleHorizontal, Hexagon, Scissors, PackageCheck, Weight, Printer, Save, Download, Trash2, Eye, EyeOff, GalleryVertical, Book, Factory, Sparkles, DraftingCompass, Link, ClipboardList, Home, Sheet, FlipHorizontal, Square, Layers, PenRuler, Scale, CheckCircle, Type, ZoomIn, BookOpen, Variable, Calculator, Ruler, Send, Workflow, X, Cog, Car, Users, Globe, Flame, Shield, FlaskConical, Forklift, Circle, Lock, GitCompareArrows, Loader } from 'lucide-react';
 
 const AllianceRing = (props: LucideProps) => (
   <svg
@@ -87,7 +87,8 @@ workflow: Workflow,
     Forklift,
     Circle,
     Lock,
-    GitCompareArrows
+    GitCompareArrows,
+    Loader
 }
 
 interface IconProps extends LucideProps {

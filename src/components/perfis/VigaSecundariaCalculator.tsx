@@ -8,9 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle, PlusCircle, RefreshCw } from "lucide-react";
+import { CheckCircle, PlusCircle, RefreshCw, Sparkles, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { perfisIpeData, tiposAco, E_ACO_MPA, BudgetItem, PerfilIpe } from "@/lib/data/index";
+import { interpretProfileSelection, InterpretProfileSelectionInput, InterpretProfileSelectionOutput } from "@/ai/flows/interpret-profile-selection";
+
 
 interface VigaSecundariaCalculatorProps {
     onAddToBudget: (item: BudgetItem) => void;
@@ -20,6 +22,8 @@ interface VigaSecundariaCalculatorProps {
 
 interface CalculationResult {
     profile: PerfilIpe;
+    requiredWx: number;
+    requiredIx: number;
     ltbCheck: {
         msd: number;
         mrd: number;
@@ -40,6 +44,9 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
   const [error, setError] = React.useState<string | null>(null);
   const [reaction, setReaction] = React.useState(0);
   const { toast } = useToast();
+
+  const [isAnalyzing, setIsAnalyzing] = React.useState(false);
+  const [analysisResult, setAnalysisResult] = React.useState<InterpretProfileSelectionOutput | null>(null);
   
   React.useEffect(() => {
     const E_m = parseFloat(spacing.replace(",", "."));
@@ -67,13 +74,14 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
     }
   };
 
-  const handleCalculate = () => {
+  const handleCalculate = async () => {
     const L_m = parseFloat(span.replace(",", "."));
     const q_dist_kgf_m = parseFloat(distributedLoad.replace(",", "."));
 
     setError(null);
     setRecommendedProfile(null);
     setReaction(0);
+    setAnalysisResult(null);
 
     if (isNaN(L_m) || isNaN(q_dist_kgf_m) || L_m <= 0 || q_dist_kgf_m <= 0) {
       setError("Por favor, insira valores válidos e positivos para todos os campos.");
@@ -118,6 +126,8 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
         if (ltbPassed) {
              finalProfile = {
                 profile: profile,
+                requiredWx: requiredWx_cm3,
+                requiredIx: requiredIx_cm4,
                 ltbCheck: {
                     msd: Msd_kNm,
                     mrd: Mrd_kNcm / 100,
@@ -141,8 +151,32 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
     setRecommendedProfile(finalProfile);
     toast({
         title: "Cálculo de Viga Secundária Concluído",
-        description: `O perfil recomendado é ${finalProfile.profile.nome}. Adicione-o ao orçamento.`,
-    })
+        description: `O perfil recomendado é ${finalProfile.profile.nome}. Iniciando análise.`,
+    });
+
+    setIsAnalyzing(true);
+    try {
+        const aiInput: InterpretProfileSelectionInput = {
+            span: L_m,
+            load: q_dist_kgf_m,
+            steelType: selectedSteel.nome,
+            recommendedProfile: {
+                nome: finalProfile.profile.nome,
+                peso: finalProfile.profile.peso,
+                Wx: finalProfile.profile.Wx,
+                Ix: finalProfile.profile.Ix,
+            },
+            requiredWx: requiredWx_cm3,
+            requiredIx: requiredIx_cm4,
+        };
+        const analysis = await interpretProfileSelection(aiInput);
+        setAnalysisResult(analysis);
+    } catch (e) {
+        console.error("AI analysis failed:", e);
+        setAnalysisResult({ analysis: "A análise da IA não pôde ser concluída no momento." });
+    } finally {
+        setIsAnalyzing(false);
+    }
   };
   
   const handleAddToBudget = () => {
@@ -179,6 +213,7 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
     onAddToBudget(newItem);
     setRecommendedProfile(null);
     setReaction(0);
+    setAnalysisResult(null);
     toast({ title: "Item Adicionado!", description: `${qty}x viga(s) ${recommendedProfile.profile.nome} adicionada(s).`})
   }
 
@@ -232,7 +267,9 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
               </Select>
             </div>
           </div>
-          <Button onClick={handleCalculate} className="w-full md:w-auto">Calcular Viga Secundária</Button>
+          <Button onClick={handleCalculate} className="w-full md:w-auto" disabled={isAnalyzing}>
+            {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : "Calcular Viga Secundária"}
+          </Button>
 
           {error && <Alert variant="destructive"><AlertTitle>Erro</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
 
@@ -255,6 +292,21 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
                     </AlertDescription>
                 </CardHeader>
                  <CardContent className="space-y-4">
+                     {isAnalyzing && (
+                        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-4">
+                           <Loader className="animate-spin h-4 w-4" />
+                           IA está analisando o resultado...
+                        </div>
+                     )}
+                     {analysisResult && (
+                        <Alert variant="default">
+                           <Sparkles className="h-4 w-4" />
+                           <AlertTitle className="font-semibold">Análise da IA</AlertTitle>
+                           <AlertDescription>
+                               {analysisResult.analysis}
+                           </AlertDescription>
+                        </Alert>
+                     )}
                      <div className="grid grid-cols-2 gap-4 border-t pt-4">
                          <div className="space-y-2">
                             <Label htmlFor="vs-quantity">Quantidade</Label>

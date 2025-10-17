@@ -450,6 +450,15 @@ const ALL_CATEGORIES: Category[] = [
     items: [],
     path: '/mecanica/transmissao-potencia',
   },
+  {
+    id: 'mecanica/sistemas-vedacao',
+    name: 'Sistemas de Vedação',
+    description: 'Guia sobre juntas, gaxetas, anéis de vedação e selos mecânicos.',
+    icon: 'Shield',
+    unit: 'calc',
+    items: [],
+    path: '/mecanica/sistemas-vedacao',
+  },
 ];
 
 const CATEGORY_GROUPS: CategoryGroup[] = [
@@ -525,6 +534,7 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
         items: [
             ALL_CATEGORIES.find(c => c.id === 'mecanica/elementos-fixacao')!,
             ALL_CATEGORIES.find(c => c.id === 'mecanica/transmissao-potencia')!,
+            ALL_CATEGORIES.find(c => c.id === 'mecanica/sistemas-vedacao')!,
         ]
     },
 ];
@@ -540,3 +550,4 @@ export {
     E_ACO_MPA
 };
 export type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction };
+    

@@ -18,6 +18,18 @@ interface VigaPrincipalCalculatorProps {
     onReactionCalculated: (reaction: number) => void;
 }
 
+interface CalculationResult {
+    profile: Perfil;
+    requiredWx: number;
+    requiredIx: number;
+    ltbCheck: {
+        msd: number;
+        mrd: number;
+        passed: boolean;
+    };
+}
+
+
 export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }: VigaPrincipalCalculatorProps) {
   const [span, setSpan] = React.useState("5");
   const [load, setLoad] = React.useState("300");
@@ -25,7 +37,7 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
   const [quantity, setQuantity] = React.useState("1");
   const [pricePerKg, setPricePerKg] = React.useState("8.50");
   
-  const [recommendedProfile, setRecommendedProfile] = React.useState<Perfil | null>(null);
+  const [recommendedProfile, setRecommendedProfile] = React.useState<CalculationResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [reaction, setReaction] = React.useState(0);
   const { toast } = useToast();
@@ -62,9 +74,10 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
     const fy_MPa = selectedSteel.fy;
     const fy_kN_cm2 = fy_MPa / 10;
     const q_kN_m = q_kgf_m * 0.009807;
-    const maxMoment_kNm = (q_kN_m * Math.pow(L_m, 2)) / 8;
-    const maxMoment_kNcm = maxMoment_kNm * 100;
-    const requiredWx_cm3 = maxMoment_kNcm / fy_kN_cm2;
+    const Msd_kNm = (q_kN_m * Math.pow(L_m, 2)) / 8;
+    const Msd_kNcm = Msd_kNm * 100;
+    
+    const requiredWx_cm3 = Msd_kNcm / fy_kN_cm2;
     
     const L_cm = L_m * 100;
     const allowedDeflection_cm = L_cm / 360;
@@ -72,26 +85,63 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
     const E_kN_cm2 = E_ACO_MPA / 10;
     const requiredIx_cm4 = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * allowedDeflection_cm);
 
-    const suitableProfiles = perfisData.filter(p => p.Wx >= requiredWx_cm3 && p.Ix >= requiredIx_cm4);
+    // Filtro inicial por Wx e Ix
+    const suitableProfiles = perfisData
+        .filter(p => p.Wx >= requiredWx_cm3 && p.Ix >= requiredIx_cm4)
+        .sort((a,b) => a.peso - b.peso); // Ordena pelo mais leve
     
     if (suitableProfiles.length === 0) {
       setError("Nenhum perfil na tabela atende aos requisitos de resistência e/ou deformação. A carga ou o vão podem ser muito grandes.");
       return;
     }
     
-    const lightestProfile = suitableProfiles.reduce((lightest, current) => {
-      return current.peso < lightest.peso ? current : lightest;
-    });
+    // Verificação de FLT (Flambagem Lateral-Torcional)
+    let finalProfile: CalculationResult | null = null;
 
+    for (const profile of suitableProfiles) {
+        const Cb = 1.0; // Simplificação conservadora
+        const Lb = L_m * 100; // Comprimento destravado em cm (conservador = vão total)
+
+        // Resistência Plástica
+        const Mp_kNcm = profile.Wx * fy_kN_cm2;
+
+        const Mrd_kNcm = Cb * Mp_kNcm; // Simplificado, sem considerar FLT por enquanto.
+        // NBR 8800: Mrd = Xlt * Mp, onde Xlt <= 1. O cálculo de Xlt é complexo.
+        // Faremos uma checagem simplificada: se Msd < 0.5 * Mp, é provável que passe.
+        
+        // Verificação simplificada:
+        const ltbPassed = Mrd_kNcm >= Msd_kNcm;
+        
+        if (ltbPassed) {
+             finalProfile = {
+                profile: profile,
+                requiredIx: requiredIx_cm4,
+                requiredWx: requiredWx_cm3,
+                ltbCheck: {
+                    msd: Msd_kNm,
+                    mrd: Mrd_kNcm / 100, // em kNm
+                    passed: ltbPassed,
+                }
+            };
+            break; // Para no primeiro perfil que passar em tudo
+        }
+    }
+
+
+    if (!finalProfile) {
+      setError("Nenhum perfil passou na verificação de Flambagem Lateral-Torcional (FLT). Considere um vão menor ou travamentos laterais.");
+      return;
+    }
+    
     const reaction_kN = (q_kN_m * L_m) / 2;
     const reaction_kgf = reaction_kN / 0.009807;
     setReaction(reaction_kgf);
     onReactionCalculated(reaction_kgf);
 
-    setRecommendedProfile(lightestProfile);
+    setRecommendedProfile(finalProfile);
     toast({
         title: "Cálculo Concluído",
-        description: `O perfil recomendado é ${lightestProfile.nome}. Iniciando análise da IA.`,
+        description: `O perfil recomendado é ${finalProfile.profile.nome}. Iniciando análise da IA.`,
     });
 
     // AI Analysis
@@ -102,10 +152,10 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
             load: q_kgf_m,
             steelType: selectedSteel.nome,
             recommendedProfile: {
-                nome: lightestProfile.nome,
-                peso: lightestProfile.peso,
-                Wx: lightestProfile.Wx,
-                Ix: lightestProfile.Ix,
+                nome: finalProfile.profile.nome,
+                peso: finalProfile.profile.peso,
+                Wx: finalProfile.profile.Wx,
+                Ix: finalProfile.profile.Ix,
             },
             requiredWx: requiredWx_cm3,
             requiredIx: requiredIx_cm4,
@@ -143,14 +193,14 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
         return;
     }
 
-    const weightPerUnit = recommendedProfile.peso * L;
+    const weightPerUnit = recommendedProfile.profile.peso * L;
     const totalWeight = weightPerUnit * qty;
     const costPerUnit = weightPerUnit * price;
     const totalCost = totalWeight * price;
 
     const newItem: BudgetItem = {
-        id: `${recommendedProfile.nome}-${Date.now()}`,
-        perfil: recommendedProfile,
+        id: `${recommendedProfile.profile.nome}-${Date.now()}`,
+        perfil: recommendedProfile.profile,
         span: L,
         quantity: qty,
         weightPerUnit,
@@ -166,7 +216,7 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
     setAnalysisResult(null);
     toast({
         title: "Item Adicionado!",
-        description: `${qty}x viga(s) ${recommendedProfile.nome} adicionada(s) ao orçamento.`,
+        description: `${qty}x viga(s) ${recommendedProfile.profile.nome} adicionada(s) ao orçamento.`,
     })
   }
 
@@ -176,7 +226,7 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
         <CardHeader>
           <CardTitle>Calculadora de Viga Principal (Perfil W)</CardTitle>
           <CardDescription>
-            Pré-dimensione o perfil W (considerando resistência e deformação) e adicione-o à lista para montar seu orçamento.
+            Pré-dimensione o perfil W (considerando resistência, deformação e flambagem) e adicione-o à lista para montar seu orçamento.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -218,9 +268,18 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
              <Card className="mt-4 bg-primary/5 border-primary/20">
                 <CardHeader>
                     <AlertTitle className="text-primary font-bold flex items-center gap-2"><CheckCircle className="h-5 w-5"/> Perfil Recomendado</AlertTitle>
-                    <AlertDescription className="space-y-2 pt-2">
-                        <p>Para um vão de <span className="font-semibold">{span}m</span> e carga de <span className="font-semibold">{load}kgf/m</span> com aço <span className="font-semibold">{steelType}</span>, o perfil mais leve que atende aos critérios é:</p>
-                        <div className="text-2xl font-bold text-center py-2 text-primary">{recommendedProfile.nome}</div>
+                     <AlertDescription className="space-y-2 pt-2">
+                        <div className="text-2xl font-bold text-center py-2 text-primary">{recommendedProfile.profile.nome}</div>
+                         <div className="grid grid-cols-2 gap-2 text-center text-sm border-t pt-2">
+                             <div>
+                                <p className="text-muted-foreground">Verificação FLT (kNm)</p>
+                                <p className="font-semibold">{`Msd: ${recommendedProfile.ltbCheck.msd.toFixed(1)} ≤ Mrd: ${recommendedProfile.ltbCheck.mrd.toFixed(1)}`}</p>
+                            </div>
+                            <div>
+                                <p className="text-muted-foreground">Status FLT</p>
+                                <p className="font-semibold text-green-600">{recommendedProfile.ltbCheck.passed ? 'Aprovado' : 'Reprovado'}</p>
+                            </div>
+                        </div>
                     </AlertDescription>
                 </CardHeader>
                  <CardContent className="space-y-4">

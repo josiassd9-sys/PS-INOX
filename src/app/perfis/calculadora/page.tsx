@@ -4,14 +4,38 @@
 
 import { Dashboard } from "@/components/dashboard";
 import * as React from "react";
+import dynamic from "next/dynamic";
 import { perfisData, Perfil, perfisIpeData, PerfilIpe, steelDeckData, SteelDeck, BudgetItem, SupportReaction } from "@/lib/data/index";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SteelDeckCalculator } from "@/components/perfis/SteelDeckCalculator";
-import { VigaSecundariaCalculator } from "@/components/perfis/VigaSecundariaCalculator";
-import { VigaPrincipalCalculator } from "@/components/perfis/VigaPrincipalCalculator";
-import { PilarCalculator } from "@/components/perfis/PilarCalculator";
 import { BudgetTable } from "@/components/perfis/BudgetTable";
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Loader } from "lucide-react";
+
+const LoadingComponent = () => (
+    <div className="flex items-center justify-center p-8 gap-2">
+        <Loader className="animate-spin h-5 w-5 text-primary"/>
+        <span className="text-muted-foreground">Carregando calculadora...</span>
+    </div>
+)
+
+const SteelDeckCalculator = dynamic(() => import('@/components/perfis/SteelDeckCalculator').then(mod => mod.SteelDeckCalculator), {
+    loading: () => <LoadingComponent />,
+    ssr: false
+});
+const VigaSecundariaCalculator = dynamic(() => import('@/components/perfis/VigaSecundariaCalculator').then(mod => mod.VigaSecundariaCalculator), {
+    loading: () => <LoadingComponent />,
+    ssr: false
+});
+const VigaPrincipalCalculator = dynamic(() => import('@/components/perfis/VigaPrincipalCalculator').then(mod => mod.VigaPrincipalCalculator), {
+    loading: () => <LoadingComponent />,
+    ssr: false
+});
+const PilarCalculator = dynamic(() => import('@/components/perfis/PilarCalculator').then(mod => mod.PilarCalculator), {
+    loading: () => <LoadingComponent />,
+    ssr: false
+});
+
 
 export default function Page() {
   const [budgetItems, setBudgetItems] = React.useState<BudgetItem[]>([]);

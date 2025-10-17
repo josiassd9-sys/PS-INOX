@@ -75,7 +75,7 @@ const customIcons = {
     Calculator,
     Ruler,
     Send,
-workflow: Workflow,
+    Workflow,
     X,
     Cog,
     Car,

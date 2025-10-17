@@ -37,8 +37,6 @@ import { PackageChecker } from "./package-checker";
 import ScaleCalculator from "./scale-calculator";
 import { ScrapTable } from "./scrap-table";
 import { cn } from "@/lib/utils";
-import { AstmStandards } from "./astm-standards";
-import { ManufacturingProcesses } from "./manufacturing-processes";
 import { useToast } from "@/hooks/use-toast";
 import {
   Accordion,
@@ -46,7 +44,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "./ui/accordion";
-import { TechnicalDrawingGuide } from "./technical-drawing-guide";
 import { ConnectionsTable } from "./connections-table";
 import { CostAdjustmentCalculator } from "./cost-adjustment-calculator";
 import Link from "next/link";
@@ -295,15 +292,13 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
   const isSpecialPage = children ||
                          selectedCategoryId === 'balanca' ||
                          selectedCategoryId === 'tabela-sucata' ||
-                         selectedCategoryId === 'normas-astm' ||
-                         selectedCategoryId === 'processos-fabricacao' ||
-                         selectedCategoryId === 'desenho-tecnico' ||
                          selectedCategoryId === 'conexoes' ||
                          selectedCategoryId === 'gauge' ||
                          selectedCategoryId === 'ai-assistant' ||
                          selectedCategoryId === 'lista-materiais' ||
                          selectedCategoryId === 'lista-sucatas' ||
                          selectedCategoryId?.startsWith('perfis/') ||
+                         selectedCategoryId?.startsWith('informativos/') ||
                          selectedCategoryId === 'print-preview';
 
   const renderContent = () => {
@@ -341,9 +336,6 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
       case 'package-checker': return <PackageChecker />;
       case 'balanca': return <ScaleCalculator ref={scaleCalculatorRef} />;
       case 'tabela-sucata': return <ScrapTable category={selectedCategory as any} isDialogOpen={isScrapItemDialogOpen} setIsDialogOpen={setIsScrapItemDialogOpen} searchTerm={searchTerm} />;
-      case 'normas-astm': return <AstmStandards />;
-      case 'processos-fabricacao': return <ManufacturingProcesses />;
-      case 'desenho-tecnico': return <TechnicalDrawingGuide />;
       case 'conexoes': return <ConnectionsTable category={selectedCategory as any} sellingPrice={currentPriceParams.sellingPrice} editedWeights={editedWeights} onWeightChange={handleWeightChange} />;
       case 'gauge': return <GaugeStandards />;
       case 'lista-materiais': return <div/>;

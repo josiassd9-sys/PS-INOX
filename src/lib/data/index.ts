@@ -415,6 +415,15 @@ const ALL_CATEGORIES: Category[] = [
     items: [],
     path: '/informativos/tipos-de-solda',
   },
+  {
+    id: 'informativos/acabamentos-inox',
+    name: 'Acabamentos Inox',
+    description: 'Guia sobre os principais acabamentos do aço inoxidável.',
+    icon: 'Sparkles',
+    unit: 'calc',
+    items: [],
+    path: '/informativos/acabamentos-inox',
+  },
 ];
 
 const CATEGORY_GROUPS: CategoryGroup[] = [
@@ -462,6 +471,7 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
             ALL_CATEGORIES.find(c => c.id === 'informativos/normas-astm')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/processos-fabricacao')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/tipos-de-solda')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/acabamentos-inox')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/processos-industriais-modernos')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/inicio-producao-industrial')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/desenho-tecnico')!,

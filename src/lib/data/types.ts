@@ -96,3 +96,11 @@ export type SupportReaction = {
   vigaPrincipal: number;
   vigaSecundaria: number;
 };
+
+export type LiveLoadOption = {
+  id: string;
+  label: string;
+  value: number; // kgf/m²
+  exclusive?: boolean;
+  group: 'uso' | 'adicional';
+};

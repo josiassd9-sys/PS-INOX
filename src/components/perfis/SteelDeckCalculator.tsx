@@ -11,9 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { CheckCircle, PlusCircle, Info, Sparkles, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { steelDeckData, PESO_CONCRETO_KGF_M3, BudgetItem } from "@/lib/data/index";
+import { steelDeckData, PESO_CONCRETO_KGF_M3, BudgetItem, liveLoadOptions, LiveLoadOption } from "@/lib/data/index";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { analyzeSlabSelection, AnalyzeSlabSelectionInput, AnalyzeSlabSelectionOutput } from "@/ai/flows/slab-analysis-flow";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface SteelDeckCalculatorProps {
     onCalculated: (load: number) => void;
@@ -23,6 +24,7 @@ interface SteelDeckCalculatorProps {
 export function SteelDeckCalculator({ onCalculated, onAddToBudget }: SteelDeckCalculatorProps) {
     const [selectedDeckId, setSelectedDeckId] = React.useState<string>(steelDeckData[0].nome);
     const [concreteThickness, setConcreteThickness] = React.useState<string>("12");
+    const [selectedLoads, setSelectedLoads] = React.useState<string[]>(['office']);
     const [extraLoad, setExtraLoad] = React.useState<string>("250");
     const [totalLoad, setTotalLoad] = React.useState<number>(0);
     const { toast } = useToast();
@@ -32,6 +34,14 @@ export function SteelDeckCalculator({ onCalculated, onAddToBudget }: SteelDeckCa
 
     const [isAnalyzing, setIsAnalyzing] = React.useState(false);
     const [analysisResult, setAnalysisResult] = React.useState<AnalyzeSlabSelectionOutput | null>(null);
+    
+    React.useEffect(() => {
+        const total = selectedLoads.reduce((acc, id) => {
+            const load = liveLoadOptions.find(o => o.id === id);
+            return acc + (load?.value || 0);
+        }, 0);
+        setExtraLoad(total.toString());
+    }, [selectedLoads]);
 
     const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -49,7 +59,7 @@ export function SteelDeckCalculator({ onCalculated, onAddToBudget }: SteelDeckCa
         
         setAnalysisResult(null);
 
-        if (h_cm > 0) {
+        if (h_cm > 0 && S_kgf > 0) {
             const concreteWeight = (h_cm / 100) * PESO_CONCRETO_KGF_M3;
             const finalLoad = deck.pesoProprio + concreteWeight + S_kgf;
             setTotalLoad(finalLoad);
@@ -125,6 +135,23 @@ export function SteelDeckCalculator({ onCalculated, onAddToBudget }: SteelDeckCa
     const formatNumber = (value: number, decimals = 2) => {
         return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(value);
     }
+    
+    const handleLoadSelection = (id: string, checked: boolean) => {
+        setSelectedLoads(prev => {
+            const isExclusive = liveLoadOptions.find(o => o.id === id)?.exclusive;
+            if (checked) {
+                 if (isExclusive) {
+                    const exclusiveGroup = liveLoadOptions.find(o => o.id === id)?.group;
+                    const othersInGroup = liveLoadOptions.filter(o => o.group === exclusiveGroup && o.id !== id).map(o => o.id);
+                    const filteredPrev = prev.filter(p => !othersInGroup.includes(p));
+                    return [...filteredPrev, id];
+                }
+                return [...prev, id];
+            } else {
+                return prev.filter(lId => lId !== id);
+            }
+        })
+    }
 
     return (
         <Card>
@@ -135,7 +162,7 @@ export function SteelDeckCalculator({ onCalculated, onAddToBudget }: SteelDeckCa
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label>Tipo de Steel Deck</Label>
                         <Select value={selectedDeckId} onValueChange={setSelectedDeckId}>
@@ -170,11 +197,34 @@ export function SteelDeckCalculator({ onCalculated, onAddToBudget }: SteelDeckCa
                         </div>
                         <Input id="concrete-thickness" type="text" inputMode="decimal" value={concreteThickness} onChange={e => handleInputChange(setConcreteThickness, e.target.value)} placeholder="Ex: 10"/>
                     </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="extra-load">Sobrecarga de Utilização (kgf/m²)</Label>
-                        <Input id="extra-load" type="text" inputMode="decimal" value={extraLoad} onChange={e => handleInputChange(setExtraLoad, e.target.value)} placeholder="Ex: 250"/>
-                    </div>
                 </div>
+
+                <Card className="bg-muted/30">
+                    <CardHeader className="p-2">
+                        <CardTitle className="text-base">Construtor de Sobrecarga de Utilização</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-2 space-y-2">
+                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            {liveLoadOptions.map(option => (
+                                <div key={option.id} className="flex items-center space-x-2 p-2 rounded-md bg-background border">
+                                    <Checkbox 
+                                        id={option.id}
+                                        checked={selectedLoads.includes(option.id)}
+                                        onCheckedChange={(checked) => handleLoadSelection(option.id, !!checked)}
+                                    />
+                                    <label htmlFor={option.id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                       {option.label} <span className="text-xs text-muted-foreground">({option.value} kgf/m²)</span>
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                         <div className="space-y-2 pt-2">
+                            <Label htmlFor="extra-load">Sobrecarga de Utilização Total (kgf/m²)</Label>
+                            <Input id="extra-load" type="text" value={extraLoad} readOnly className="font-bold bg-background"/>
+                        </div>
+                    </CardContent>
+                </Card>
+
                  <Button onClick={handleCalculate} className="w-full md:w-auto" disabled={isAnalyzing}>
                    {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : "Calcular Carga e Analisar"}
                 </Button>

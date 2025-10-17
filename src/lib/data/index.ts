@@ -1,4 +1,5 @@
-import type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction } from './types';
+
+import type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction, LiveLoadOption } from './types';
 import { perfisData, tiposAco, PESO_CONCRETO_KGF_M3, E_ACO_MPA } from './perfis';
 import { perfisIpeData } from './perfis-ipe';
 import { steelDeckData } from './steel-deck';
@@ -19,6 +20,7 @@ import { cantoneirasItems } from './cantoneiras';
 import { barrasChatasItems } from './barras-chatas';
 import { metalonQuadradoItems } from './metalon-quadrado';
 import { metalonRetangularItems } from './metalon-retangular';
+import { liveLoadOptions } from './loads';
 
 const ALL_CATEGORIES: Category[] = [
   {
@@ -547,7 +549,8 @@ export {
     steelDeckData,
     tiposAco,
     PESO_CONCRETO_KGF_M3,
-    E_ACO_MPA
+    E_ACO_MPA,
+    liveLoadOptions
 };
-export type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction };
+export type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction, LiveLoadOption };
     

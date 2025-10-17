@@ -56,6 +56,36 @@ const guideTopics = [
             </div>
         )
     },
+    {
+        id: "md57-vs-md75",
+        title: "MD57 vs. MD75: Qual Steel Deck Escolher?",
+        icon: "Layers",
+        content: (
+            <div className="space-y-2">
+                <p>
+                    A sigla refere-se à altura da nervura do perfil: <strong>MD57</strong> tem 57mm de altura, e <strong>MD75</strong> tem 75mm. A escolha impacta a estrutura e o consumo de concreto.
+                </p>
+                <div>
+                    <h4 className="font-semibold">Steel Deck MD57</h4>
+                    <p className="text-muted-foreground">
+                        É um perfil muito versátil e amplamente utilizado. Por ter uma nervura mais baixa, consome um volume ligeiramente menor de concreto para atingir a espessura final da laje. É ideal para vãos moderados.
+                    </p>
+                </div>
+                 <div>
+                    <h4 className="font-semibold">Steel Deck MD75</h4>
+                    <p className="text-muted-foreground">
+                        A nervura mais alta confere a este perfil uma <strong>maior resistência e inércia</strong>. Isso significa que, para a mesma espessura de chapa e mesma carga, o MD75 consegue vencer vãos maiores.
+                    </p>
+                </div>
+                 <div>
+                    <h4 className="font-semibold text-primary">Qual escolher?</h4>
+                    <p className="text-muted-foreground">
+                       A decisão depende do seu projeto. Se você precisa vencer <strong>vãos maiores</strong> entre as vigas de apoio, o <strong>MD75</strong> é geralmente a escolha mais eficiente, pois pode reduzir a quantidade de vigas secundárias necessárias. Para <strong>vãos menores ou moderados</strong>, o <strong>MD57</strong> pode ser mais econômico devido ao menor consumo de concreto.
+                    </p>
+                </div>
+            </div>
+        )
+    },
      {
         id: "vao-simples-duplo",
         title: "Vão Simples vs. Vão Duplo: Entenda a Diferença",

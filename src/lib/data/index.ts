@@ -508,13 +508,13 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
             ALL_CATEGORIES.find(c => c.id === 'informativos/tipos-de-solda')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/acabamentos-inox')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/logistica-armazenamento')!,
-            ALL_CATEGORIES.find(c => c.id === 'informativos/processos-industriais-modernos')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/inicio-producao-industrial')!,
-            ALL_CATEGORIES.find(c => c.id === 'informativos/desenho-tecnico')!,
-            ALL_CATEGORIES.find(c => c.id === 'gauge')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/processos-industriais-modernos')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/linha-montagem-automotiva')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/centro-usinagem')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/corte-laser')!,
-            ALL_CATEGORIES.find(c => c.id === 'informativos/linha-montagem-automotiva')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/desenho-tecnico')!,
+            ALL_CATEGORIES.find(c => c.id === 'gauge')!,
         ]
     },
     {

@@ -37,6 +37,7 @@ export default function PrintableScaleTicket() {
       if (savedData) {
         const parsedData = JSON.parse(savedData);
         setData(parsedData);
+        // Adiciona um pequeno atraso para garantir que o DOM seja atualizado antes de imprimir
         setTimeout(() => window.print(), 100);
       }
     } catch (error) {
@@ -72,7 +73,7 @@ export default function PrintableScaleTicket() {
       <div className="p-0">
         {/* HEADER */}
         <div className="text-center mb-2">
-          <div className="text-[10pt]">PS INOX</div>
+          <div className="text-[20pt]">PS INOX</div>
           <h1 className="text-xl font-bold uppercase text-center">
             PSINOX COMERCIO DE AÇO LTDA
           </h1>

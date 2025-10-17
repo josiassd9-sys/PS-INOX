@@ -10,11 +10,17 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckCircle, PlusCircle, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { perfisData, tiposAco, BudgetItem, Perfil, SupportReaction } from "@/lib/data/index";
+import { perfisData, tiposAco, BudgetItem, Perfil, SupportReaction, E_ACO_MPA } from "@/lib/data/index";
 
 interface PilarCalculatorProps {
     onAddToBudget: (item: BudgetItem) => void;
     supportReactions: SupportReaction;
+}
+
+interface CalculationResult {
+    profile: Perfil;
+    actingStress: number; // Tensão atuante
+    allowableStress: number; // Tensão admissível
 }
 
 export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalculatorProps) {
@@ -24,7 +30,7 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
     const [quantity, setQuantity] = React.useState("1");
     const [pricePerKg, setPricePerKg] = React.useState("8.50");
 
-    const [recommendedProfile, setRecommendedProfile] = React.useState<Perfil | null>(null);
+    const [result, setResult] = React.useState<CalculationResult | null>(null);
     const [error, setError] = React.useState<string | null>(null);
     const { toast } = useToast();
 
@@ -51,7 +57,7 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
         const H_m = parseFloat(height.replace(",", "."));
         const P_kgf = parseFloat(axialLoad.replace(",", "."));
         setError(null);
-        setRecommendedProfile(null);
+        setResult(null);
 
         if (isNaN(H_m) || isNaN(P_kgf) || H_m <= 0 || P_kgf <= 0) {
             setError("Por favor, insira valores válidos para altura e carga axial.");
@@ -63,39 +69,68 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
             setError("Tipo de aço inválido selecionado.");
             return;
         }
-        
-        // Verificação Simplificada por Compressão Axial
-        // Tensão = Força / Área -> Área_necessária = Força / Tensão_admissível
-        // Considera um fator de segurança e um fator redutor para flambagem simplificado.
-        const fy_MPa = selectedSteel.fy;
-        const FATOR_SEGURANCA_COMPRESSAO = 1.67;
-        const FATOR_REDUTOR_FLAMBAGEM_SIMPLIFICADO = 0.5;
-        
-        const tensao_admissivel_MPa = (fy_MPa / FATOR_SEGURANCA_COMPRESSAO) * FATOR_REDUTOR_FLAMBAGEM_SIMPLIFICADO;
-        const P_N = P_kgf * 9.807; // Converte kgf para Newtons
-        const requiredArea_mm2 = P_N / tensao_admissivel_MPa;
-        const requiredArea_cm2 = requiredArea_mm2 / 100;
 
-        const suitableProfiles = perfisData.filter(p => p.area >= requiredArea_cm2);
+        const P_N = P_kgf * 9.807; // Força em Newtons
+        const L_cm = H_m * 100; // Altura em cm
+        const K = 1.0; // Fator de comprimento efetivo (pilar bi-rotulado, simplificação conservadora)
+        const E_MPa = E_ACO_MPA;
+        const fy_MPa = selectedSteel.fy;
+
+        const suitableProfiles = perfisData
+            .map(profile => {
+                const area_cm2 = profile.area;
+                const area_mm2 = area_cm2 * 100;
+                
+                // Análise de Esbeltez (Slenderness)
+                const slenderness = (K * L_cm) / profile.ry; // Usa o menor raio de giração (ry)
+                const slendernessLimit = 4.71 * Math.sqrt(E_MPa / fy_MPa);
+
+                let fcr_MPa: number; // Tensão crítica de flambagem
+                if (slenderness <= slendernessLimit) {
+                    // Flambagem inelástica
+                    const fe_MPa = (Math.pow(Math.PI, 2) * E_MPa) / Math.pow(slenderness, 2);
+                    fcr_MPa = Math.pow(0.658, fy_MPa / fe_MPa) * fy_MPa;
+                } else {
+                    // Flambagem elástica
+                    fcr_MPa = (0.877 * Math.pow(Math.PI, 2) * E_MPa) / Math.pow(slenderness, 2);
+                }
+
+                const FATOR_SEGURANCA = 1.67;
+                const allowableStress_MPa = fcr_MPa / FATOR_SEGURANCA;
+                const maxLoad_N = allowableStress_MPa * area_mm2;
+                
+                const actingStress_MPa = P_N / area_mm2;
+
+                if (maxLoad_N >= P_N) {
+                    return {
+                        profile,
+                        allowableStress: allowableStress_MPa,
+                        actingStress: actingStress_MPa,
+                    };
+                }
+                return null;
+            })
+            .filter(p => p !== null) as { profile: Perfil, allowableStress: number, actingStress: number }[];
         
         if (suitableProfiles.length === 0) {
-            setError("Nenhum perfil W atende à área necessária para a carga especificada (considerando fatores de segurança simplificados). A carga pode ser muito alta.");
+            setError("Nenhum perfil W atende aos requisitos de flambagem para a carga e altura especificadas. Tente uma carga menor ou verifique os parâmetros.");
             return;
         }
 
-        const lightestProfile = suitableProfiles.reduce((lightest, current) => 
-            current.peso < lightest.peso ? current : lightest
+        // Encontra o perfil mais leve entre os adequados
+        const bestProfileData = suitableProfiles.reduce((lightest, current) => 
+            current.profile.peso < lightest.profile.peso ? current : lightest
         );
 
-        setRecommendedProfile(lightestProfile);
+        setResult(bestProfileData);
         toast({
             title: "Cálculo do Pilar Concluído",
-            description: `O perfil recomendado é ${lightestProfile.nome}.`,
+            description: `O perfil recomendado é ${bestProfileData.profile.nome}.`,
         });
     };
 
     const handleAddToBudget = () => {
-        if (!recommendedProfile) {
+        if (!result) {
             toast({ variant: "destructive", title: "Nenhum Perfil Calculado" });
             return;
         }
@@ -108,14 +143,14 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
             return;
         }
 
-        const weightPerUnit = recommendedProfile.peso * H;
+        const weightPerUnit = result.profile.peso * H;
         const totalWeight = weightPerUnit * qty;
         const costPerUnit = weightPerUnit * price;
         const totalCost = totalWeight * price;
 
         const newItem: BudgetItem = {
-            id: `${recommendedProfile.nome}-pilar-${Date.now()}`,
-            perfil: recommendedProfile,
+            id: `${result.profile.nome}-pilar-${Date.now()}`,
+            perfil: result.profile,
             height: H,
             quantity: qty,
             weightPerUnit,
@@ -126,8 +161,8 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
         };
 
         onAddToBudget(newItem);
-        setRecommendedProfile(null);
-        toast({ title: "Pilar Adicionado!", description: `${qty}x pilar(es) ${recommendedProfile.nome} adicionado(s).` });
+        setResult(null);
+        toast({ title: "Pilar Adicionado!", description: `${qty}x pilar(es) ${result.profile.nome} adicionado(s).` });
     };
 
     return (
@@ -135,7 +170,7 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
             <CardHeader>
                 <CardTitle>Calculadora de Pilar (Coluna)</CardTitle>
                 <CardDescription>
-                    Dimensione um perfil W para um pilar submetido à carga axial.
+                    Dimensione um perfil W para um pilar submetido à carga axial, com verificação de flambagem.
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -186,13 +221,23 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
 
                 {error && <Alert variant="destructive"><AlertTitle>Erro</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
                 
-                {recommendedProfile && (
+                {result && (
                      <Card className="mt-4 bg-primary/5 border-primary/20">
                         <CardHeader>
                             <AlertTitle className="text-primary font-bold flex items-center gap-2"><CheckCircle className="h-5 w-5"/> Perfil Recomendado para Pilar</AlertTitle>
                             <AlertDescription className="space-y-2 pt-2">
-                                <p>O perfil mais leve que atende à carga axial de <span className="font-semibold">{axialLoad} kgf</span> é:</p>
-                                <div className="text-2xl font-bold text-center py-2 text-primary">{recommendedProfile.nome}</div>
+                                <p>O perfil mais leve que atende à carga axial de <span className="font-semibold">{axialLoad} kgf</span> e altura de <span className="font-semibold">{height}m</span> é:</p>
+                                <div className="text-2xl font-bold text-center py-2 text-primary">{result.profile.nome}</div>
+                                 <div className="grid grid-cols-2 gap-2 text-center text-sm">
+                                    <div>
+                                        <p className="text-muted-foreground">Tensão Atuante</p>
+                                        <p className="font-semibold">{result.actingStress.toFixed(1)} MPa</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-muted-foreground">Tensão Admissível</p>
+                                        <p className="font-semibold">{result.allowableStress.toFixed(1)} MPa</p>
+                                    </div>
+                                </div>
                             </AlertDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">

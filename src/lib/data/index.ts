@@ -1,5 +1,4 @@
 
-
 import type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction } from './types';
 import { perfisData, tiposAco, PESO_CONCRETO_KGF_M3, E_ACO_MPA } from './perfis';
 import { perfisIpeData } from './perfis-ipe';
@@ -389,6 +388,15 @@ const ALL_CATEGORIES: Category[] = [
     items: [],
     path: '/informativos/linha-montagem-automotiva',
   },
+  {
+    id: 'informativos/processos-industriais-modernos',
+    name: 'Processos Industriais',
+    description: 'Guia sobre a Indústria 4.0 e os processos produtivos modernos.',
+    icon: 'Cog',
+    unit: 'calc',
+    items: [],
+    path: '/informativos/processos-industriais-modernos',
+  },
 ];
 
 const CATEGORY_GROUPS: CategoryGroup[] = [
@@ -435,6 +443,7 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
             ALL_CATEGORIES.find(c => c.id === 'ai-assistant')!,
             ALL_CATEGORIES.find(c => c.id === 'normas-astm')!,
             ALL_CATEGORIES.find(c => c.id === 'processos-fabricacao')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/processos-industriais-modernos')!,
             ALL_CATEGORIES.find(c => c.id === 'desenho-tecnico')!,
             ALL_CATEGORIES.find(c => c.id === 'gauge')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/centro-usinagem')!,

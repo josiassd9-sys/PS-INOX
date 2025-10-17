@@ -406,6 +406,15 @@ const ALL_CATEGORIES: Category[] = [
     items: [],
     path: '/informativos/inicio-producao-industrial',
   },
+  {
+    id: 'informativos/tipos-de-solda',
+    name: 'Tipos de Solda',
+    description: 'Guia sobre os principais processos de soldagem industrial.',
+    icon: 'Flame',
+    unit: 'calc',
+    items: [],
+    path: '/informativos/tipos-de-solda',
+  },
 ];
 
 const CATEGORY_GROUPS: CategoryGroup[] = [
@@ -452,6 +461,7 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
             ALL_CATEGORIES.find(c => c.id === 'ai-assistant')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/normas-astm')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/processos-fabricacao')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/tipos-de-solda')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/processos-industriais-modernos')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/inicio-producao-industrial')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/desenho-tecnico')!,
@@ -486,3 +496,5 @@ export {
     E_ACO_MPA
 };
 export type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction };
+
+    

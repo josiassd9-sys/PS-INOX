@@ -397,6 +397,15 @@ const ALL_CATEGORIES: Category[] = [
     items: [],
     path: '/informativos/processos-industriais-modernos',
   },
+  {
+    id: 'informativos/inicio-producao-industrial',
+    name: 'Início da Produção Industrial',
+    description: 'Guia sobre a Primeira Revolução Industrial e suas consequências.',
+    icon: 'BookOpen',
+    unit: 'calc',
+    items: [],
+    path: '/informativos/inicio-producao-industrial',
+  },
 ];
 
 const CATEGORY_GROUPS: CategoryGroup[] = [
@@ -444,6 +453,7 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
             ALL_CATEGORIES.find(c => c.id === 'normas-astm')!,
             ALL_CATEGORIES.find(c => c.id === 'processos-fabricacao')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/processos-industriais-modernos')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/inicio-producao-industrial')!,
             ALL_CATEGORIES.find(c => c.id === 'desenho-tecnico')!,
             ALL_CATEGORIES.find(c => c.id === 'gauge')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/centro-usinagem')!,
@@ -476,5 +486,3 @@ export {
     E_ACO_MPA
 };
 export type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction };
-
-    

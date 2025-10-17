@@ -1,4 +1,5 @@
 
+
 import type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction } from './types';
 import { perfisData, tiposAco, PESO_CONCRETO_KGF_M3, E_ACO_MPA } from './perfis';
 import { perfisIpeData } from './perfis-ipe';
@@ -424,6 +425,15 @@ const ALL_CATEGORIES: Category[] = [
     items: [],
     path: '/informativos/acabamentos-inox',
   },
+  {
+    id: 'informativos/logistica-armazenamento',
+    name: 'Logística de Aço',
+    description: 'Guia sobre armazenamento e manuseio de aço.',
+    icon: 'Forklift',
+    unit: 'calc',
+    items: [],
+    path: '/informativos/logistica-armazenamento',
+  },
 ];
 
 const CATEGORY_GROUPS: CategoryGroup[] = [
@@ -472,6 +482,7 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
             ALL_CATEGORIES.find(c => c.id === 'informativos/processos-fabricacao')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/tipos-de-solda')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/acabamentos-inox')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/logistica-armazenamento')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/processos-industriais-modernos')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/inicio-producao-industrial')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/desenho-tecnico')!,

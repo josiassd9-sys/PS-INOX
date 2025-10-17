@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -11,7 +12,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const AnalyzeSlabSelectionInputSchema = z.object({
+const AnalyzeSlabSelectionInputSchema = z.object({
   deckType: z.string().describe('O tipo de Steel Deck (ex: MD57, MD75).'),
   deckThickness: z.number().describe('A espessura da chapa do Steel Deck em mm.'),
   concreteSlabThickness: z.number().describe('A espessura total da laje de concreto em cm.'),
@@ -20,7 +21,7 @@ export const AnalyzeSlabSelectionInputSchema = z.object({
 });
 export type AnalyzeSlabSelectionInput = z.infer<typeof AnalyzeSlabSelectionInputSchema>;
 
-export const AnalyzeSlabSelectionOutputSchema = z.object({
+const AnalyzeSlabSelectionOutputSchema = z.object({
   analysis: z.string().describe('Uma análise concisa e em linguagem clara sobre a configuração da laje, com insights sobre a otimização e adequação.'),
 });
 export type AnalyzeSlabSelectionOutput = z.infer<typeof AnalyzeSlabSelectionOutputSchema>;
@@ -42,7 +43,7 @@ const prompt = ai.definePrompt({
       - Modelo do Deck: {{{deckType}}} (chapa {{{deckThickness}}}mm)
       - Espessura da Laje de Concreto: {{{concreteSlabThickness}}} cm
       - Sobrecarga de Projeto: {{{liveLoad}}} kgf/m²
-      - Carga Total Resultante: {{{totalLoad}}} kgf/m²
+      - Carga Total Resultante: ~{{{totalLoad}}} kgf/m²
 
       **Sua Análise (seja breve, didático e objetivo em 1-2 parágrafos):**
 

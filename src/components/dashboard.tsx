@@ -303,7 +303,8 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                          selectedCategoryId === 'ai-assistant' ||
                          selectedCategoryId === 'lista-materiais' ||
                          selectedCategoryId === 'lista-sucatas' ||
-                         selectedCategoryId?.startsWith('perfis/');
+                         selectedCategoryId?.startsWith('perfis/') ||
+                         selectedCategoryId === 'print-preview';
 
   const renderContent = () => {
     if (children && selectedCategoryId) return children;

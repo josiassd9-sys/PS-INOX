@@ -51,6 +51,15 @@ const ALL_CATEGORIES: Category[] = [
     path: '/calculator/balanca',
   },
   {
+    id: 'print-preview',
+    name: 'Preview Impressão',
+    description: 'Visualize o layout de impressão da balança em tempo real.',
+    icon: 'Eye',
+    unit: 'calc',
+    items: [],
+    path: '/calculator/balanca/print/preview'
+  },
+  {
     id: 'tabela-sucata',
     name: 'Tabela Sucata',
     description: 'Tabela de preços e composição de sucatas.',
@@ -362,6 +371,7 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
             ALL_CATEGORIES.find(c => c.id === 'lista-materiais')!,
             ALL_CATEGORIES.find(c => c.id === 'package-checker')!,
             ALL_CATEGORIES.find(c => c.id === 'balanca')!,
+            ALL_CATEGORIES.find(c => c.id === 'print-preview')!,
             ALL_CATEGORIES.find(c => c.id === 'tabela-sucata')!,
             ALL_CATEGORIES.find(c => c.id === 'lista-sucatas')!,
         ]

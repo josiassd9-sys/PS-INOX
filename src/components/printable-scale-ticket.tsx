@@ -28,7 +28,11 @@ interface ScaleData {
   operationType: "loading" | "unloading";
 }
 
-export default function PrintableScaleTicket() {
+interface PrintableScaleTicketProps {
+  autoPrint?: boolean;
+}
+
+export default function PrintableScaleTicket({ autoPrint = true }: PrintableScaleTicketProps) {
   const [data, setData] = useState<ScaleData | null>(null);
 
   useEffect(() => {
@@ -37,13 +41,14 @@ export default function PrintableScaleTicket() {
       if (savedData) {
         const parsedData = JSON.parse(savedData);
         setData(parsedData);
-        // Adiciona um pequeno atraso para garantir que o DOM seja atualizado antes de imprimir
-        setTimeout(() => window.print(), 100);
+        if (autoPrint) {
+          setTimeout(() => window.print(), 500);
+        }
       }
     } catch (error) {
       console.error("Failed to load scale data from localStorage", error);
     }
-  }, []);
+  }, [autoPrint]);
 
   if (!data) {
     return (

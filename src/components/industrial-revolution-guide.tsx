@@ -57,15 +57,23 @@ const topics = [
         title: "Impactos Sociais e Econômicos Iniciais",
         icon: "Users",
         content: (
-            <div>
-                <p className="mb-2">A industrialização trouxe transformações profundas e, muitas vezes, brutais:</p>
-                 <ul className="list-disc pl-5 space-y-1">
-                    <li><strong>Urbanização Acelerada:</strong> Crescimento desordenado das cidades devido ao êxodo rural.</li>
-                    <li><strong>Nova Estrutura Social:</strong> Surgimento da classe operária (proletariado), submetida a condições de trabalho precárias, com longas jornadas e baixos salários.</li>
-                    <li><strong>Desigualdade:</strong> Aumento do abismo social entre a burguesia industrial (dona das fábricas) e os operários.</li>
-                    <li><strong>Exploração:</strong> O trabalho infantil era comum e amplamente explorado nas fábricas.</li>
-                    <li><strong>Consolidação do Capitalismo:</strong> O modelo industrial solidificou o capitalismo como o sistema econômico dominante.</li>
-                </ul>
+            <div className="space-y-4">
+                <div>
+                    <p className="mb-2">A industrialização trouxe transformações profundas e, muitas vezes, brutais:</p>
+                    <ul className="list-disc pl-5 space-y-1">
+                        <li><strong>Urbanização Acelerada:</strong> Crescimento desordenado das cidades devido ao êxodo rural.</li>
+                        <li><strong>Nova Estrutura Social:</strong> Surgimento da classe operária (proletariado), submetida a condições de trabalho precárias, com longas jornadas e baixos salários.</li>
+                        <li><strong>Desigualdade:</strong> Aumento do abismo social entre a burguesia industrial (dona das fábricas) e os operários.</li>
+                        <li><strong>Exploração:</strong> O trabalho infantil era comum e amplamente explorado nas fábricas.</li>
+                        <li><strong>Consolidação do Capitalismo:</strong> O modelo industrial solidificou o capitalismo como o sistema econômico dominante.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 className="font-semibold text-foreground mb-1">Contraponto: A Vida Antes das Fábricas</h4>
+                    <p>
+                        É importante notar que, embora as condições nas fábricas fossem extremamente duras, a vida no campo para a maioria da população antes da revolução também era marcada por dificuldades. A subsistência dependia de colheitas incertas, a fome era uma ameaça constante e a expectativa de vida era baixa. O trabalho rural era fisicamente exaustivo e oferecia pouquíssima mobilidade social. A migração para as cidades, apesar de levar a novas formas de exploração, representava para muitos a única alternativa à miséria e à falta de oportunidades no campo. A mudança foi menos uma passagem do "bom" para o "ruim" e mais uma troca de um tipo de vida precária por outro, com desafios e dinâmicas diferentes.
+                    </p>
+                </div>
             </div>
         ),
     },

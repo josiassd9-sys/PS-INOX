@@ -371,6 +371,15 @@ const ALL_CATEGORIES: Category[] = [
     items: [],
     path: '/informativos/centro-usinagem',
   },
+  {
+    id: 'informativos/corte-laser',
+    name: 'Corte a Laser',
+    description: 'Guia sobre tecnologia de corte a laser, máquinas e processos.',
+    icon: 'Scissors',
+    unit: 'calc',
+    items: [],
+    path: '/informativos/corte-laser',
+  },
 ];
 
 const CATEGORY_GROUPS: CategoryGroup[] = [
@@ -420,6 +429,7 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
             ALL_CATEGORIES.find(c => c.id === 'desenho-tecnico')!,
             ALL_CATEGORIES.find(c => c.id === 'gauge')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/centro-usinagem')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/corte-laser')!,
         ]
     },
     {

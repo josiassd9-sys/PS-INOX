@@ -380,6 +380,15 @@ const ALL_CATEGORIES: Category[] = [
     items: [],
     path: '/informativos/corte-laser',
   },
+  {
+    id: 'informativos/linha-montagem-automotiva',
+    name: 'Linha de Montagem',
+    description: 'Guia sobre os processos e etapas da produção automotiva.',
+    icon: 'Car',
+    unit: 'calc',
+    items: [],
+    path: '/informativos/linha-montagem-automotiva',
+  },
 ];
 
 const CATEGORY_GROUPS: CategoryGroup[] = [
@@ -430,6 +439,7 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
             ALL_CATEGORIES.find(c => c.id === 'gauge')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/centro-usinagem')!,
             ALL_CATEGORIES.find(c => c.id === 'informativos/corte-laser')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/linha-montagem-automotiva')!,
         ]
     },
     {

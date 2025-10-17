@@ -1,5 +1,6 @@
 
 
+
 import type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction } from './types';
 import { perfisData, tiposAco, PESO_CONCRETO_KGF_M3, E_ACO_MPA } from './perfis';
 import { perfisIpeData } from './perfis-ipe';
@@ -434,6 +435,15 @@ const ALL_CATEGORIES: Category[] = [
     items: [],
     path: '/informativos/logistica-armazenamento',
   },
+  {
+    id: 'mecanica/elementos-fixacao',
+    name: 'Elementos de Fixação',
+    description: 'Guia sobre parafusos, porcas, arruelas e outros fixadores.',
+    icon: 'Lock',
+    unit: 'calc',
+    items: [],
+    path: '/mecanica/elementos-fixacao',
+  },
 ];
 
 const CATEGORY_GROUPS: CategoryGroup[] = [
@@ -502,6 +512,12 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
             ALL_CATEGORIES.find(c => c.id === 'perfis/tabela-steel-deck')!,
             ALL_CATEGORIES.find(c => c.id === 'perfis/parametros-vigas-i')!,
             ALL_CATEGORIES.find(c => c.id === 'perfis/informacoes')!,
+        ]
+    },
+     {
+        title: 'MECÂNICA',
+        items: [
+            ALL_CATEGORIES.find(c => c.id === 'mecanica/elementos-fixacao')!,
         ]
     },
 ];

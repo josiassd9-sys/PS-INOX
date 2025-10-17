@@ -11,7 +11,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const InterpretProfileSelectionInputSchema = z.object({
+const InterpretProfileSelectionInputSchema = z.object({
   span: z.number().describe('O vão da viga em metros.'),
   load: z.number().describe('A carga distribuída na viga em kgf/m.'),
   steelType: z.string().describe('O tipo de aço usado (ex: ASTM A36).'),
@@ -26,7 +26,7 @@ export const InterpretProfileSelectionInputSchema = z.object({
 });
 export type InterpretProfileSelectionInput = z.infer<typeof InterpretProfileSelectionInputSchema>;
 
-export const InterpretProfileSelectionOutputSchema = z.object({
+const InterpretProfileSelectionOutputSchema = z.object({
   analysis: z.string().describe('Uma análise concisa e em linguagem clara sobre a escolha do perfil, explicando o porquê da seleção e o nível de otimização.'),
 });
 export type InterpretProfileSelectionOutput = z.infer<typeof InterpretProfileSelectionOutputSchema>;

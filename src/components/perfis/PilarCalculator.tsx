@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -8,9 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle, PlusCircle, Send } from "lucide-react";
+import { CheckCircle, PlusCircle, Send, Sparkles, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { perfisData, tiposAco, BudgetItem, Perfil, SupportReaction, E_ACO_MPA } from "@/lib/data/index";
+import { analyzePillarSelection, AnalyzePillarSelectionInput, AnalyzePillarSelectionOutput } from "@/ai/flows/pilar-analysis-flow";
+
 
 interface PilarCalculatorProps {
     onAddToBudget: (item: BudgetItem) => void;
@@ -33,6 +34,9 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
     const [result, setResult] = React.useState<CalculationResult | null>(null);
     const [error, setError] = React.useState<string | null>(null);
     const { toast } = useToast();
+    
+    const [isAnalyzing, setIsAnalyzing] = React.useState(false);
+    const [analysisResult, setAnalysisResult] = React.useState<AnalyzePillarSelectionOutput | null>(null);
 
     const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -53,11 +57,12 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
         }
     }
 
-    const handleCalculate = () => {
+    const handleCalculate = async () => {
         const H_m = parseFloat(height.replace(",", "."));
         const P_kgf = parseFloat(axialLoad.replace(",", "."));
         setError(null);
         setResult(null);
+        setAnalysisResult(null);
 
         if (isNaN(H_m) || isNaN(P_kgf) || H_m <= 0 || P_kgf <= 0) {
             setError("Por favor, insira valores válidos para altura e carga axial.");
@@ -81,17 +86,14 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
                 const area_cm2 = profile.area;
                 const area_mm2 = area_cm2 * 100;
                 
-                // Análise de Esbeltez (Slenderness)
-                const slenderness = (K * L_cm) / profile.ry; // Usa o menor raio de giração (ry)
+                const slenderness = (K * L_cm) / profile.ry;
                 const slendernessLimit = 4.71 * Math.sqrt(E_MPa / fy_MPa);
 
-                let fcr_MPa: number; // Tensão crítica de flambagem
+                let fcr_MPa: number;
                 if (slenderness <= slendernessLimit) {
-                    // Flambagem inelástica
                     const fe_MPa = (Math.pow(Math.PI, 2) * E_MPa) / Math.pow(slenderness, 2);
                     fcr_MPa = Math.pow(0.658, fy_MPa / fe_MPa) * fy_MPa;
                 } else {
-                    // Flambagem elástica
                     fcr_MPa = (0.877 * Math.pow(Math.PI, 2) * E_MPa) / Math.pow(slenderness, 2);
                 }
 
@@ -117,7 +119,6 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
             return;
         }
 
-        // Encontra o perfil mais leve entre os adequados
         const bestProfileData = suitableProfiles.reduce((lightest, current) => 
             current.profile.peso < lightest.profile.peso ? current : lightest
         );
@@ -127,6 +128,25 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
             title: "Cálculo do Pilar Concluído",
             description: `O perfil recomendado é ${bestProfileData.profile.nome}.`,
         });
+
+        setIsAnalyzing(true);
+        try {
+            const aiInput: AnalyzePillarSelectionInput = {
+                pillarHeight: H_m,
+                axialLoad: P_kgf,
+                supportReactions,
+                recommendedProfile: bestProfileData.profile.nome,
+                actingStress: bestProfileData.actingStress,
+                allowableStress: bestProfileData.allowableStress
+            };
+            const analysis = await analyzePillarSelection(aiInput);
+            setAnalysisResult(analysis);
+        } catch (e) {
+            console.error("AI pillar analysis failed:", e);
+            setAnalysisResult({ analysis: "A análise da IA não pôde ser concluída no momento." });
+        } finally {
+            setIsAnalyzing(false);
+        }
     };
 
     const handleAddToBudget = () => {
@@ -241,6 +261,21 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
                             </AlertDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
+                            {isAnalyzing && (
+                                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-4">
+                                    <Loader className="animate-spin h-4 w-4" />
+                                    IA está gerando a análise final...
+                                </div>
+                            )}
+                            {analysisResult && (
+                                <Alert variant="default">
+                                    <Sparkles className="h-4 w-4" />
+                                    <AlertTitle className="font-semibold">Análise Final da IA</AlertTitle>
+                                    <AlertDescription>
+                                        {analysisResult.analysis}
+                                    </AlertDescription>
+                                </Alert>
+                            )}
                             <div className="grid grid-cols-2 gap-4 border-t pt-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="pilar-quantity">Quantidade</Label>

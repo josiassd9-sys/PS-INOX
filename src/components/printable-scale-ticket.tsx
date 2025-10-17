@@ -66,13 +66,8 @@ export default function PrintableScaleTicket() {
 
   return (
     <div
+      id="printable-ticket-body"
       className="bg-white text-black font-sans text-xs w-full"
-      style={{
-        width: "210mm",
-        minHeight: "297mm",
-        padding: "20mm 15mm",
-        boxSizing: "border-box",
-      }}
     >
       <div className="p-0">
         {/* HEADER */}
@@ -85,7 +80,7 @@ export default function PrintableScaleTicket() {
         </div>
 
         {/* INFO */}
-        <div className="border-t-2 border-b-2 border-black py-1 mb-2">
+        <div className="py-1 mb-2">
           <div className="flex justify-between text-sm">
             <span>CLIENTE: {headerData.client}</span>
             <span>PLACA: {headerData.plate}</span>
@@ -110,7 +105,7 @@ export default function PrintableScaleTicket() {
                 <table className="w-full table-fixed border-collapse">
                   <thead>
                     <tr className="border-t border-b border-dashed border-black">
-                      <th className="text-left w-auto">PRODUTO</th>
+                      <th className="w-auto">PRODUTO</th>
                       <th className="text-right w-[15%]">BRUTO KG</th>
                       <th className="text-right w-[15%]">TARA KG</th>
                       <th className="text-right w-[12%]">DESC</th>
@@ -155,7 +150,7 @@ export default function PrintableScaleTicket() {
         </div>
 
         {/* FOOTER */}
-        <div className="mt-4 border-t-2 border-black pt-1">
+        <div className="mt-4 pt-1">
           <div className="flex justify-between font-bold text-sm">
             <span>PESO LÍQUIDO TOTAL:</span>
             <span>{formatNumber(grandTotalLiquido)} KG</span>

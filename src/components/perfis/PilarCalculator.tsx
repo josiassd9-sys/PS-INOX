@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -237,7 +238,7 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
                 )}
                 
 
-                <Button onClick={handleCalculate} className="w-full md:w-auto">Calcular Pilar</Button>
+                <Button type="button" onClick={handleCalculate} className="w-full md:w-auto">Calcular Pilar</Button>
 
                 {error && <Alert variant="destructive"><AlertTitle>Erro</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
                 

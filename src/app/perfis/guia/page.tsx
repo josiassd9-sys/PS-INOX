@@ -30,7 +30,7 @@ const guideTopics = [
                         <strong>Viga Secundária (IPE):</strong> Use a carga da laje calculada (ou informe uma carga linear manualmente). A calculadora dimensionará a viga IPE mais leve. Adicione-a ao orçamento. O resultado crucial aqui é a <strong>Reação de Apoio (kgf)</strong>.
                     </li>
                     <li>
-                        <strong>Viga Principal (W):</strong> Aqui você pode dimensionar as vigas que receberão as cargas das vigas secundárias. O resultado também fornecerá a Reação de Apoio.
+                        <strong>Viga Principal (W):</strong> Aqui você pode dimensionar as vigas que receberão as cargas das vigas secundárias. Lembre-se de escolher o esquema de viga correto (bi-apoiada, com balanços, etc.). O resultado também fornecerá a Reação de Apoio.
                     </li>
                      <li>
                         <strong>Pilar (Coluna):</strong> Use os botões <strong>"Enviar Reação"</strong> para somar automaticamente as reações de apoio calculadas nas vigas. Isso compõe a carga final do pilar, que será dimensionado. Adicione o pilar ao orçamento para finalizar.
@@ -55,6 +55,34 @@ const guideTopics = [
                     <li><strong>Como Usar:</strong> Escolha o modelo de Steel Deck, a espessura da camada de concreto e use o <strong>"Construtor de Sobrecarga"</strong> para selecionar as cargas de uso (residencial, escritório, etc.) conforme a norma NBR 6120.</li>
                     <li><strong>Resultado Principal:</strong> A <strong>Carga Total em kgf/m²</strong>. Este valor é a soma do peso próprio do deck, do concreto e da sobrecarga selecionada.</li>
                     <li><strong>Ação:</strong> Após o cálculo e a análise da IA, você pode adicionar a quantidade de chapas de Steel Deck (em m²) ao seu orçamento.</li>
+                </ul>
+            </div>
+        )
+    },
+        {
+        id: "vigas",
+        title: "3. Abas de Viga (Secundária e Principal)",
+        icon: "Minus",
+        content: (
+            <div>
+                <p className="mb-2">Dimensiona as vigas que suportam a laje ou outras vigas. A lógica é a mesma para vigas secundárias (IPE) e principais (W).</p>
+                <ul className="list-disc pl-5 space-y-1">
+                    <li><strong>Como Usar:</strong>
+                        <ul className="list-disc pl-5 mt-1 space-y-1">
+                             <li>Para vigas secundárias, o campo <strong>Carga da Laje (kgf/m²)</strong> pode ser preenchido automaticamente clicando no ícone de atualização (<Icon name="RefreshCw" className="inline h-4 w-4" />) se você já calculou na aba Laje. Informe também o <strong>Espaçamento</strong> entre as vigas.</li>
+                             <li>Alternativamente, você pode digitar a <strong>Carga na Viga (kgf/m)</strong> diretamente.</li>
+                              <li>O mais importante: selecione o <strong>Esquema da Viga</strong>. Isso é crucial, pois o cálculo dos esforços muda drasticamente.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Entendendo os Esquemas de Viga:</strong>
+                         <ul className="list-disc pl-5 mt-1 space-y-1 text-sm">
+                            <li><strong>Viga Bi-apoiada:</strong> A viga é simplesmente apoiada em duas extremidades. Use para vãos únicos.</li>
+                            <li><strong>Viga com um Balanço:</strong> A viga tem um apoio e uma extremidade em balanço (beiral).</li>
+                            <li><strong>Viga com Dois Balanços:</strong> A viga tem dois apoios e se estende para além de ambos. Este esquema é excelente para simular um <strong>vão interno de uma viga contínua</strong> (uma viga que passa por 3 ou mais pilares). Os balanços simulam a continuidade da viga sobre os outros vãos.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Resultado Principal:</strong> O <strong>Perfil Recomendado</strong> (o mais leve que atende à resistência e deformação) e a <strong>Reação de Apoio (kgf)</strong>.</li>
+                     <li><strong>Ação:</strong> Após a análise da IA, adicione a viga ao orçamento. Use a Reação de Apoio para dimensionar a viga principal ou os pilares.</li>
                 </ul>
             </div>
         )
@@ -120,45 +148,8 @@ const guideTopics = [
         )
     },
     {
-        id: "viga-secundaria",
-        title: "3. Aba Viga Secundária (IPE)",
-        icon: "Minus",
-        content: (
-            <div>
-                <p className="mb-2">Dimensiona as vigas que suportam diretamente a laje.</p>
-                <ul className="list-disc pl-5 space-y-1">
-                    <li><strong>Como Usar:</strong>
-                        <ul className="list-disc pl-5 mt-1 space-y-1">
-                             <li>O campo <strong>Carga da Laje (kgf/m²)</strong> pode ser preenchido automaticamente clicando no ícone de atualização (<Icon name="RefreshCw" className="inline h-4 w-4" />) se você já calculou na aba Laje.</li>
-                             <li>Informe o <strong>Vão da Viga</strong> e o <strong>Espaçamento</strong> entre elas. A calculadora determinará a carga linear (em kgf/m).</li>
-                             <li>Selecione o <strong>Esquema da Viga</strong> (Bi-apoiada, com um ou dois Balanços). Isso é crucial, pois o cálculo dos esforços muda drasticamente.</li>
-                             <li>Alternativamente, você pode digitar a <strong>Carga na Viga (kgf/m)</strong> diretamente.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Resultado Principal:</strong> O <strong>Perfil IPE Recomendado</strong> (o mais leve que atende à resistência e deformação) e a <strong>Reação de Apoio (kgf)</strong> em cada extremidade da viga.</li>
-                     <li><strong>Ação:</strong> Após a análise da IA, adicione a viga ao orçamento. Use a Reação de Apoio para dimensionar a viga principal ou os pilares.</li>
-                </ul>
-            </div>
-        )
-    },
-    {
-        id: "viga-principal",
-        title: "4. Aba Viga Principal (W)",
-        icon: "Minus",
-        content: (
-            <div>
-                <p className="mb-2">Dimensiona as vigas maiores que suportam as vigas secundárias.</p>
-                <ul className="list-disc pl-5 space-y-1">
-                    <li><strong>Como Usar:</strong> O uso é similar ao da viga secundária, mas aqui a "Carga Distribuída" geralmente virá das reações das vigas secundárias que se apoiam nela. Lembre-se de selecionar o <strong>Esquema da Viga</strong> correto.</li>
-                    <li><strong>Resultado Principal:</strong> O <strong>Perfil W Recomendado</strong> e a <strong>Reação de Apoio (kgf)</strong>.</li>
-                     <li><strong>Ação:</strong> Após a análise da IA, adicione a viga ao orçamento. Use a Reação de Apoio para dimensionar os pilares.</li>
-                </ul>
-            </div>
-        )
-    },
-    {
         id: "pilar",
-        title: "5. Aba Pilar (Coluna)",
+        title: "4. Aba Pilar (Coluna)",
         icon: "Square",
         content: (
             <div>
@@ -167,7 +158,7 @@ const guideTopics = [
                     <li><strong>Como Usar:</strong>
                         <ul className="list-disc pl-5 mt-1 space-y-1">
                              <li>A <strong>Carga Axial (kgf)</strong> é a força total que o pilar deve suportar.</li>
-                             <li>Use os botões "Enviar Reação" (<Icon name="Send" className="inline h-4 w-4" />) que aparecem após calcular as vigas para somar automaticamente as reações de apoio a este campo.</li>
+                             <li>Use os botões "Enviar Reação" (<Icon name="Send" className="inline h-4 w-4" />) que aparecem após calcular as vigas para somar automaticamente as reações de apoio a este campo. Você pode clicar várias vezes para somar reações de múltiplas vigas.</li>
                              <li>Informe a <strong>Altura do Pilar</strong>.</li>
                         </ul>
                     </li>
@@ -179,7 +170,7 @@ const guideTopics = [
     },
     {
         id: "orcamento",
-        title: "6. O Orçamento Final",
+        title: "5. O Orçamento Final",
         icon: "Calculator",
         content: (
             <p>
@@ -228,4 +219,3 @@ export default function Page() {
         </Dashboard>
     );
 }
-

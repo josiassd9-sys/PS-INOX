@@ -30,12 +30,15 @@ const guideTopics = [
                         <strong>Viga Secundária (IPE):</strong> Use a carga da laje calculada (ou informe uma carga linear manualmente). A calculadora dimensionará a viga IPE mais leve. Adicione-a ao orçamento. O resultado crucial aqui é a <strong>Reação de Apoio (kgf)</strong>.
                     </li>
                     <li>
-                        <strong>Viga Principal (W):</strong> Aqui você pode dimensionar as vigas que receberão as cargas das vigas secundárias.
+                        <strong>Viga Principal (W):</strong> Aqui você pode dimensionar as vigas que receberão as cargas das vigas secundárias. O resultado também fornecerá a Reação de Apoio.
                     </li>
                      <li>
-                        <strong>Pilar (Coluna):</strong> Use as reações de apoio calculadas nas vigas para dimensionar os pilares que sustentarão a estrutura. Adicione o pilar ao orçamento.
+                        <strong>Pilar (Coluna):</strong> Use os botões <strong>"Enviar Reação"</strong> para somar automaticamente as reações de apoio calculadas nas vigas. Isso compõe a carga final do pilar, que será dimensionado. Adicione o pilar ao orçamento para finalizar.
                     </li>
                 </ol>
+                <p className="mt-2 text-sm text-muted-foreground">
+                    Após cada cálculo, uma <strong>análise da IA</strong> fornecerá insights sobre a seleção do perfil, otimização e segurança.
+                </p>
             </div>
         )
     },
@@ -49,9 +52,9 @@ const guideTopics = [
                    O ponto de partida para sistemas de piso.
                 </p>
                 <ul className="list-disc pl-5 space-y-1">
-                    <li><strong>Como Usar:</strong> Escolha o modelo de Steel Deck, a espessura da camada de concreto e a sobrecarga (carga de uso, como pessoas e móveis).</li>
-                    <li><strong>Resultado Principal:</strong> A <strong>Carga Total em kgf/m²</strong>. Este valor é a soma do peso próprio do deck, do concreto e da sobrecarga.</li>
-                    <li><strong>Ação:</strong> Após o cálculo, você pode adicionar a quantidade de chapas de Steel Deck (em m²) ao seu orçamento.</li>
+                    <li><strong>Como Usar:</strong> Escolha o modelo de Steel Deck, a espessura da camada de concreto e use o <strong>"Construtor de Sobrecarga"</strong> para selecionar as cargas de uso (residencial, escritório, etc.) conforme a norma NBR 6120.</li>
+                    <li><strong>Resultado Principal:</strong> A <strong>Carga Total em kgf/m²</strong>. Este valor é a soma do peso próprio do deck, do concreto e da sobrecarga selecionada.</li>
+                    <li><strong>Ação:</strong> Após o cálculo e a análise da IA, você pode adicionar a quantidade de chapas de Steel Deck (em m²) ao seu orçamento.</li>
                 </ul>
             </div>
         )
@@ -132,7 +135,7 @@ const guideTopics = [
                         </ul>
                     </li>
                     <li><strong>Resultado Principal:</strong> O <strong>Perfil IPE Recomendado</strong> (o mais leve que atende à resistência e deformação) e a <strong>Reação de Apoio (kgf)</strong> em cada extremidade da viga.</li>
-                     <li><strong>Ação:</strong> Adicione a viga ao orçamento. Use a Reação de Apoio para dimensionar a viga principal ou os pilares.</li>
+                     <li><strong>Ação:</strong> Após a análise da IA, adicione a viga ao orçamento. Use a Reação de Apoio para dimensionar a viga principal ou os pilares.</li>
                 </ul>
             </div>
         )
@@ -147,7 +150,7 @@ const guideTopics = [
                 <ul className="list-disc pl-5 space-y-1">
                     <li><strong>Como Usar:</strong> O uso é similar ao da viga secundária, mas aqui a "Carga Distribuída" geralmente virá das reações das vigas secundárias que se apoiam nela.</li>
                     <li><strong>Resultado Principal:</strong> O <strong>Perfil W Recomendado</strong> e a <strong>Reação de Apoio (kgf)</strong>.</li>
-                     <li><strong>Ação:</strong> Adicione a viga ao orçamento. Use a Reação de Apoio para dimensionar os pilares.</li>
+                     <li><strong>Ação:</strong> Após a análise da IA, adicione a viga ao orçamento. Use a Reação de Apoio para dimensionar os pilares.</li>
                 </ul>
             </div>
         )
@@ -163,11 +166,11 @@ const guideTopics = [
                     <li><strong>Como Usar:</strong>
                         <ul className="list-disc pl-5 mt-1 space-y-1">
                              <li>A <strong>Carga Axial (kgf)</strong> é a força total que o pilar deve suportar.</li>
-                             <li>Você pode usar os botões "Enviar Reação" (<Icon name="Send" className="inline h-4 w-4" />) das abas de viga para somar automaticamente as reações de apoio a este campo.</li>
+                             <li>Use os botões "Enviar Reação" (<Icon name="Send" className="inline h-4 w-4" />) que aparecem após calcular as vigas para somar automaticamente as reações de apoio a este campo.</li>
                              <li>Informe a <strong>Altura do Pilar</strong>.</li>
                         </ul>
                     </li>
-                    <li><strong>Resultado Principal:</strong> O <strong>Perfil W Recomendado</strong> para o pilar, baseado em um cálculo simplificado de compressão.</li>
+                    <li><strong>Resultado Principal:</strong> O <strong>Perfil W Recomendado</strong> para o pilar e uma <strong>análise final da IA</strong> sobre a coerência de todo o sistema.</li>
                      <li><strong>Ação:</strong> Adicione os pilares ao orçamento para ter a lista completa de materiais da sua estrutura.</li>
                 </ul>
             </div>

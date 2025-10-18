@@ -254,7 +254,7 @@ export function SteelDeckCalculator({ onCalculated, onAddToBudget }: SteelDeckCa
                 </Accordion>
                 
 
-                 <Button onClick={handleCalculate} className="w-full md:w-auto" disabled={isAnalyzing}>
+                 <Button type="button" onClick={handleCalculate} className="w-full md:w-auto" disabled={isAnalyzing}>
                    {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : "Calcular Carga e Analisar"}
                 </Button>
 

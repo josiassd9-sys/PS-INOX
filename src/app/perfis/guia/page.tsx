@@ -78,7 +78,7 @@ const guideTopics = [
                          <ul className="list-disc pl-5 mt-1 space-y-1 text-sm">
                             <li><strong>Viga Bi-apoiada:</strong> A viga é simplesmente apoiada em duas extremidades. Use para vãos únicos.</li>
                             <li><strong>Viga com um Balanço:</strong> A viga tem um apoio e uma extremidade em balanço (beiral).</li>
-                            <li><strong>Viga com Dois Balanços:</strong> A viga tem dois apoios e se estende para além de ambos. Este esquema é excelente para simular um <strong>vão interno de uma viga contínua</strong> (uma viga que passa por 3 ou mais pilares). Os balanços simulam a continuidade da viga sobre os outros vãos.</li>
+                            <li><strong>Viga com Dois Balanços:</strong> Este é o esquema mais poderoso. Permite calcular vigas com balanços em ambas as extremidades. <strong class="text-primary">Dica de Engenharia:</strong> Este esquema é excelente para simular um <strong>vão interno de uma viga contínua</strong> (uma viga que passa por 3 ou mais pilares). Nesse caso, o "Vão Central" da calculadora representa o vão entre dois pilares, e os "Balanços" representam a continuidade da viga sobre os vãos adjacentes, resultando em um dimensionamento mais otimizado.</li>
                         </ul>
                     </li>
                     <li><strong>Resultado Principal:</strong> O <strong>Perfil Recomendado</strong> (o mais leve que atende à resistência e deformação) e a <strong>Reação de Apoio (kgf)</strong>.</li>

@@ -222,7 +222,7 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
                 {(supportReactions.vigaPrincipal > 0 || supportReactions.vigaSecundaria > 0) && (
                      <div className="space-y-2 rounded-md border p-2">
                         <p className="text-sm font-medium">Reações de Apoio Calculadas</p>
-                        <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row gap-2">
                              {supportReactions.vigaPrincipal > 0 && (
                                 <Button variant="outline" size="sm" onClick={() => handleApplyReaction(supportReactions.vigaPrincipal)} className="flex-1 gap-1">
                                     <Send size={16}/> Enviar {supportReactions.vigaPrincipal.toFixed(0)} kgf (Viga Princ.)
@@ -238,7 +238,9 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
                 )}
                 
 
-                <Button type="button" onClick={handleCalculate} className="w-full md:w-auto">Calcular Pilar</Button>
+                <Button type="button" onClick={handleCalculate} className="w-full md:w-auto" disabled={isAnalyzing}>
+                    {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : "Calcular Pilar"}
+                </Button>
 
                 {error && <Alert variant="destructive"><AlertTitle>Erro</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
                 

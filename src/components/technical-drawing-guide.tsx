@@ -33,27 +33,27 @@ const topics = [
             <TableBody>
                 <TableRow>
                     <TableCell className="font-medium">Linha Contínua Larga</TableCell>
-                    <TableCell>____</TableCell>
+                    <TableCell className="font-mono text-xl font-bold">━━━━</TableCell>
                     <TableCell>Arestas e contornos visíveis.</TableCell>
                 </TableRow>
                 <TableRow>
                     <TableCell className="font-medium">Linha Contínua Estreita</TableCell>
-                    <TableCell>----</TableCell>
+                    <TableCell className="font-mono text-xl font-bold">────</TableCell>
                     <TableCell>Linhas de cota, linhas auxiliares, linhas de chamada, hachuras.</TableCell>
                 </TableRow>
                 <TableRow>
                     <TableCell className="font-medium">Linha Tracejada</TableCell>
-                    <TableCell>- - - -</TableCell>
+                    <TableCell className="font-mono text-xl font-bold">- - - -</TableCell>
                     <TableCell>Arestas e contornos não visíveis (escondidos).</TableCell>
                 </TableRow>
                 <TableRow>
                     <TableCell className="font-medium">Linha Traço e Ponto Estreita</TableCell>
-                    <TableCell>_ . _ . _</TableCell>
+                    <TableCell className="font-mono text-xl font-bold">―·―·―</TableCell>
                     <TableCell>Linhas de centro de furos e peças, eixos de simetria.</TableCell>
                 </TableRow>
                  <TableRow>
                     <TableCell className="font-medium">Linha Traço e Ponto (Larga nas extremidades)</TableCell>
-                    <TableCell>__ . _ . __</TableCell>
+                    <TableCell className="font-mono text-xl font-bold">━━·━·━━</TableCell>
                     <TableCell>Indicação de planos de corte.</TableCell>
                 </TableRow>
             </TableBody>
@@ -129,13 +129,13 @@ export function TechnicalDrawingGuide() {
         </CardHeader>
       </Card>
 
-      <Accordion type="single" collapsible className="w-full">
+      <Accordion type="single" collapsible className="w-full" defaultValue="vistas">
           {topics.map(topic => (
               <AccordionItem value={topic.id} key={topic.id}>
-                  <AccordionTrigger className="text-base font-semibold hover:bg-primary/10 px-1">{topic.title} - <span className="text-sm font-normal text-muted-foreground ml-1 flex-1 text-left">{topic.summary}</span></AccordionTrigger>
-                  <AccordionContent className="px-1 py-1 border-t bg-primary/5">
-                      {topic.details && <p className="text-base whitespace-pre-wrap">{topic.details}</p>}
-                      {topic.content && <div className="text-base">{topic.content}</div>}
+                  <AccordionTrigger className="text-base font-semibold hover:bg-primary/10 px-1 text-left">{topic.title}</AccordionTrigger>
+                  <AccordionContent className="px-1 py-1 border-t bg-primary/5 text-base">
+                      {topic.details && <p className="whitespace-pre-wrap">{topic.details}</p>}
+                      {topic.content && <div className="">{topic.content}</div>}
                   </AccordionContent>
               </AccordionItem>
           ))}

@@ -30,10 +30,12 @@ interface CalculationResult {
     };
 }
 
-type BeamScheme = "biapoiada" | "balanco";
+type BeamScheme = "biapoiada" | "balanco" | "dois-balancos";
 
 export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReactionCalculated }: VigaSecundariaCalculatorProps) {
   const [span, setSpan] = React.useState("4");
+  const [balanco1, setBalanco1] = React.useState("1");
+  const [balanco2, setBalanco2] = React.useState("1");
   const [spacing, setSpacing] = React.useState("1.5");
   const [slabLoad, setSlabLoad] = React.useState("450");
   const [distributedLoad, setDistributedLoad] = React.useState("");
@@ -77,7 +79,9 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
   };
 
   const handleCalculate = async () => {
-    const L_m = parseFloat(span.replace(",", "."));
+    const L_central_m = parseFloat(span.replace(",", "."));
+    const L_balanco1_m = parseFloat(balanco1.replace(",", "."));
+    const L_balanco2_m = parseFloat(balanco2.replace(",", "."));
     const q_dist_kgf_m = parseFloat(distributedLoad.replace(",", "."));
 
     setError(null);
@@ -85,8 +89,12 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
     setReaction(0);
     setAnalysisResult(null);
 
-    if (isNaN(L_m) || isNaN(q_dist_kgf_m) || L_m <= 0 || q_dist_kgf_m <= 0) {
-      setError("Por favor, insira valores válidos e positivos para todos os campos.");
+    let mainSpan = 0;
+    if (beamScheme === 'biapoiada' || beamScheme === 'balanco') mainSpan = L_central_m;
+    if (beamScheme === 'dois-balancos') mainSpan = L_central_m;
+
+    if (isNaN(mainSpan) || isNaN(q_dist_kgf_m) || mainSpan <= 0 || q_dist_kgf_m <= 0) {
+      setError("Por favor, insira valores válidos e positivos para os vãos e a carga.");
       return;
     }
     
@@ -101,26 +109,45 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
     const q_kN_m = q_dist_kgf_m * 0.009807;
 
     let Msd_kNm = 0;
+    let requiredIx_cm4 = 0;
+    let reaction_kgf = 0;
+    let totalLengthForBudget = mainSpan;
+
     if (beamScheme === "biapoiada") {
-        Msd_kNm = (q_kN_m * Math.pow(L_m, 2)) / 8;
-    } else {
-        Msd_kNm = (q_kN_m * Math.pow(L_m, 2)) / 2;
+        Msd_kNm = (q_kN_m * Math.pow(mainSpan, 2)) / 8;
+        const L_cm = mainSpan * 100;
+        const q_kN_cm = q_kN_m / 100;
+        const E_kN_cm2 = E_ACO_MPA / 10;
+        const allowedDeflection_cm = L_cm / 360;
+        requiredIx_cm4 = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * allowedDeflection_cm);
+        reaction_kgf = (q_kN_m * mainSpan) / 2;
+    } else if (beamScheme === 'balanco') {
+        Msd_kNm = (q_kN_m * Math.pow(mainSpan, 2)) / 2;
+        const L_cm = mainSpan * 100;
+        const q_kN_cm = q_kN_m / 100;
+        const E_kN_cm2 = E_ACO_MPA / 10;
+        const allowedDeflection_cm = L_cm / 360; // Simplificação, norma pode ser mais restritiva
+        requiredIx_cm4 = (q_kN_cm * Math.pow(L_cm, 4)) / (8 * E_kN_cm2 * allowedDeflection_cm);
+        reaction_kgf = q_kN_m * mainSpan; // Reação total no engaste
+    } else if (beamScheme === 'dois-balancos') {
+        const M_neg_1 = (q_kN_m * Math.pow(L_balanco1_m, 2)) / 2;
+        const M_neg_2 = (q_kN_m * Math.pow(L_balanco2_m, 2)) / 2;
+        const M_pos_max = (q_kN_m * Math.pow(mainSpan, 2)) / 8 - (M_neg_1 + M_neg_2) / 2;
+        Msd_kNm = Math.max(M_neg_1, M_neg_2, M_pos_max);
+        // Simplificação para flecha
+        const L_cm = mainSpan * 100;
+        const q_kN_cm = q_kN_m / 100;
+        const E_kN_cm2 = E_ACO_MPA / 10;
+        const allowedDeflection_cm = L_cm / 360;
+        requiredIx_cm4 = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * allowedDeflection_cm);
+        const R1 = (q_kN_m * mainSpan / 2) + M_neg_1 / mainSpan - M_neg_2 / mainSpan + (q_kN_m * L_balanco1_m);
+        const R2 = (q_kN_m * mainSpan / 2) - M_neg_1 / mainSpan + M_neg_2 / mainSpan + (q_kN_m * L_balanco2_m);
+        reaction_kgf = Math.max(R1, R2) / 0.009807;
+        totalLengthForBudget = mainSpan + L_balanco1_m + L_balanco2_m;
     }
 
     const Msd_kNcm = Msd_kNm * 100;
     const requiredWx_cm3 = Msd_kNcm / fy_kN_cm2;
-    
-    const L_cm = L_m * 100;
-    const allowedDeflection_cm = L_cm / 360;
-    const q_kN_cm = q_kN_m / 100;
-    const E_kN_cm2 = E_ACO_MPA / 10;
-    
-    let requiredIx_cm4 = 0;
-    if (beamScheme === 'biapoiada') {
-        requiredIx_cm4 = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * allowedDeflection_cm);
-    } else {
-        requiredIx_cm4 = (q_kN_cm * Math.pow(L_cm, 4)) / (8 * E_kN_cm2 * allowedDeflection_cm);
-    }
 
     const suitableProfiles = perfisIpeData
         .filter(p => p.Wx >= requiredWx_cm3 && p.Ix >= requiredIx_cm4)
@@ -157,16 +184,7 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
       setError("Nenhum perfil passou na verificação de Flambagem Lateral-Torcional (FLT).");
       return;
     }
-
-    let reaction_kgf = 0;
-    if (beamScheme === 'biapoiada') {
-        const reaction_kN = (q_kN_m * L_m) / 2;
-        reaction_kgf = reaction_kN / 0.009807;
-    } else {
-        const reaction_kN = q_kN_m * L_m;
-        reaction_kgf = reaction_kN / 0.009807;
-    }
-
+    
     setReaction(reaction_kgf);
     onReactionCalculated(reaction_kgf);
 
@@ -179,7 +197,7 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
     setIsAnalyzing(true);
     try {
         const aiInput: InterpretProfileSelectionInput = {
-            span: L_m,
+            span: mainSpan,
             load: q_dist_kgf_m,
             steelType: selectedSteel.nome,
             recommendedProfile: {
@@ -206,16 +224,22 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
         toast({ variant: "destructive", title: "Nenhum Perfil Calculado" });
         return;
     }
-    const L = parseFloat(span.replace(",", "."));
+    const L_central_m = parseFloat(span.replace(",", "."));
+    const L_balanco1_m = parseFloat(balanco1.replace(",", "."));
+    const L_balanco2_m = parseFloat(balanco2.replace(",", "."));
     const qty = parseInt(quantity);
     const price = parseFloat(pricePerKg.replace(",", "."));
 
-    if (isNaN(L) || isNaN(qty) || isNaN(price) || L <= 0 || qty <= 0 || price <= 0) {
+    let totalLengthForBudget = 0;
+    if (beamScheme === 'biapoiada' || beamScheme === 'balanco') totalLengthForBudget = L_central_m;
+    if (beamScheme === 'dois-balancos') totalLengthForBudget = L_central_m + L_balanco1_m + L_balanco2_m;
+
+    if (isNaN(totalLengthForBudget) || isNaN(qty) || isNaN(price) || totalLengthForBudget <= 0 || qty <= 0 || price <= 0) {
         toast({ variant: "destructive", title: "Valores Inválidos" });
         return;
     }
 
-    const weightPerUnit = recommendedProfile.profile.peso * L;
+    const weightPerUnit = recommendedProfile.profile.peso * totalLengthForBudget;
     const totalWeight = weightPerUnit * qty;
     const costPerUnit = weightPerUnit * price;
     const totalCost = totalWeight * price;
@@ -223,7 +247,7 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
     const newItem: BudgetItem = {
         id: `${recommendedProfile.profile.nome}-${Date.now()}`,
         perfil: recommendedProfile.profile,
-        span: L,
+        span: totalLengthForBudget,
         quantity: qty,
         weightPerUnit,
         totalWeight,
@@ -251,11 +275,31 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
-            <div className="space-y-2">
-              <Label htmlFor="vs-span">Vão da Viga (m)</Label>
-              <Input id="vs-span" type="text" inputMode="decimal" value={span} onChange={(e) => handleInputChange(setSpan, e.target.value)} placeholder="Ex: 4,0" />
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+            
+            {beamScheme === 'biapoiada' || beamScheme === 'balanco' ? (
+                <div className="space-y-2">
+                  <Label htmlFor="vs-span">Vão / Comprimento do Balanço (m)</Label>
+                  <Input id="vs-span" type="text" inputMode="decimal" value={span} onChange={(e) => handleInputChange(setSpan, e.target.value)} placeholder="Ex: 4,0" />
+                </div>
+            ) : (
+                <>
+                    <div className="space-y-2">
+                        <Label htmlFor="vs-balanco1">Balanço 1 (m)</Label>
+                        <Input id="vs-balanco1" type="text" inputMode="decimal" value={balanco1} onChange={(e) => handleInputChange(setBalanco1, e.target.value)} placeholder="Ex: 1,0"/>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="vs-span-central">Vão Central (m)</Label>
+                        <Input id="vs-span-central" type="text" inputMode="decimal" value={span} onChange={(e) => handleInputChange(setSpan, e.target.value)} placeholder="Ex: 4,0"/>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="vs-balanco2">Balanço 2 (m)</Label>
+                        <Input id="vs-balanco2" type="text" inputMode="decimal" value={balanco2} onChange={(e) => handleInputChange(setBalanco2, e.target.value)} placeholder="Ex: 1,0"/>
+                    </div>
+                </>
+            )}
+
+
              <div className="space-y-2">
                 <div className="flex items-center justify-between">
                     <Label htmlFor="vs-slab-load">Carga da Laje (kgf/m²)</Label>
@@ -283,7 +327,8 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="biapoiada">Viga Bi-apoiada</SelectItem>
-                        <SelectItem value="balanco">Viga com Balanço (Beiral)</SelectItem>
+                        <SelectItem value="balanco">Viga com Balanço (um lado)</SelectItem>
+                        <SelectItem value="dois-balancos">Viga com Dois Balanços</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -363,3 +408,4 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
     </div>
   );
 }
+

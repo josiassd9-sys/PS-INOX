@@ -29,10 +29,12 @@ interface CalculationResult {
     };
 }
 
-type BeamScheme = "biapoiada" | "balanco";
+type BeamScheme = "biapoiada" | "balanco" | "dois-balancos";
 
 export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }: VigaPrincipalCalculatorProps) {
   const [span, setSpan] = React.useState("5");
+  const [balanco1, setBalanco1] = React.useState("1.5");
+  const [balanco2, setBalanco2] = React.useState("1.5");
   const [load, setLoad] = React.useState("300");
   const [steelType, setSteelType] = React.useState(tiposAco[0].nome);
   const [beamScheme, setBeamScheme] = React.useState<BeamScheme>("biapoiada");
@@ -55,14 +57,20 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
   };
 
   const handleCalculate = async () => {
-    const L_m = parseFloat(span.replace(",", "."));
+    const L_central_m = parseFloat(span.replace(",", "."));
+    const L_balanco1_m = parseFloat(balanco1.replace(",", "."));
+    const L_balanco2_m = parseFloat(balanco2.replace(",", "."));
     const q_kgf_m = parseFloat(load.replace(",", "."));
     setError(null);
     setRecommendedProfile(null);
     setReaction(0);
     setAnalysisResult(null);
 
-    if (isNaN(L_m) || isNaN(q_kgf_m) || L_m <= 0 || q_kgf_m <= 0) {
+    let mainSpan = 0;
+    if (beamScheme === 'biapoiada' || beamScheme === 'balanco') mainSpan = L_central_m;
+    if (beamScheme === 'dois-balancos') mainSpan = L_central_m;
+
+    if (isNaN(mainSpan) || isNaN(q_kgf_m) || mainSpan <= 0 || q_kgf_m <= 0) {
       setError("Por favor, insira valores válidos e positivos para o vão e a carga.");
       return;
     }
@@ -77,36 +85,52 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
     const fy_kN_cm2 = fy_MPa / 10;
     const q_kN_m = q_kgf_m * 0.009807;
     
-    // Momento Fletor Solicitante de Cálculo (Msd) - A fórmula muda aqui!
     let Msd_kNm = 0;
+    let requiredIx_cm4 = 0;
+    let reaction_kgf = 0;
+    let totalLengthForBudget = mainSpan;
+
     if (beamScheme === "biapoiada") {
-        Msd_kNm = (q_kN_m * Math.pow(L_m, 2)) / 8; // Viga bi-apoiada
-    } else { // balanco
-        Msd_kNm = (q_kN_m * Math.pow(L_m, 2)) / 2; // Viga em balanço (cantilever)
+        Msd_kNm = (q_kN_m * Math.pow(mainSpan, 2)) / 8;
+        const L_cm = mainSpan * 100;
+        const q_kN_cm = q_kN_m / 100;
+        const E_kN_cm2 = E_ACO_MPA / 10;
+        const allowedDeflection_cm = L_cm / 360;
+        requiredIx_cm4 = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * allowedDeflection_cm);
+        reaction_kgf = (q_kN_m * mainSpan) / 2 / 0.009807;
+    } else if (beamScheme === 'balanco') {
+        Msd_kNm = (q_kN_m * Math.pow(mainSpan, 2)) / 2;
+        const L_cm = mainSpan * 100;
+        const q_kN_cm = q_kN_m / 100;
+        const E_kN_cm2 = E_ACO_MPA / 10;
+        const allowedDeflection_cm = L_cm / 360; // Simplificação
+        requiredIx_cm4 = (q_kN_cm * Math.pow(L_cm, 4)) / (8 * E_kN_cm2 * allowedDeflection_cm);
+        reaction_kgf = (q_kN_m * mainSpan) / 0.009807;
+    } else if (beamScheme === 'dois-balancos') {
+        const M_neg_1 = (q_kN_m * Math.pow(L_balanco1_m, 2)) / 2;
+        const M_neg_2 = (q_kN_m * Math.pow(L_balanco2_m, 2)) / 2;
+        const M_pos_max = (q_kN_m * Math.pow(mainSpan, 2)) / 8 - (M_neg_1 + M_neg_2) / 2;
+        Msd_kNm = Math.max(M_neg_1, M_neg_2, M_pos_max);
+        
+        // Simplificação para flecha, considerando apenas o vão central
+        const L_cm = mainSpan * 100;
+        const q_kN_cm = q_kN_m / 100;
+        const E_kN_cm2 = E_ACO_MPA / 10;
+        const allowedDeflection_cm = L_cm / 360;
+        requiredIx_cm4 = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * allowedDeflection_cm);
+
+        const R1 = (q_kN_m * mainSpan / 2) + M_neg_1 / mainSpan - M_neg_2 / mainSpan + (q_kN_m * L_balanco1_m);
+        const R2 = (q_kN_m * mainSpan / 2) - M_neg_1 / mainSpan + M_neg_2 / mainSpan + (q_kN_m * L_balanco2_m);
+        reaction_kgf = Math.max(R1, R2) / 0.009807;
+        totalLengthForBudget = mainSpan + L_balanco1_m + L_balanco2_m;
     }
 
     const Msd_kNcm = Msd_kNm * 100;
-    
     const requiredWx_cm3 = Msd_kNcm / fy_kN_cm2;
-    
-    const L_cm = L_m * 100;
-    const allowedDeflection_cm = L_cm / 360; // Simplificação para bi-apoiada
-    const q_kN_cm = q_kN_m / 100;
-    const E_kN_cm2 = E_ACO_MPA / 10;
-    
-    // Deformação - A fórmula também muda aqui!
-    let requiredIx_cm4 = 0;
-    if (beamScheme === 'biapoiada') {
-        requiredIx_cm4 = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * allowedDeflection_cm);
-    } else { // balanco
-        requiredIx_cm4 = (q_kN_cm * Math.pow(L_cm, 4)) / (8 * E_kN_cm2 * allowedDeflection_cm);
-    }
 
-
-    // Filtro inicial por Wx e Ix
     const suitableProfiles = perfisData
         .filter(p => p.Wx >= requiredWx_cm3 && p.Ix >= requiredIx_cm4)
-        .sort((a,b) => a.peso - b.peso); // Ordena pelo mais leve
+        .sort((a,b) => a.peso - b.peso);
     
     if (suitableProfiles.length === 0) {
       setError("Nenhum perfil na tabela atende aos requisitos de resistência e/ou deformação. A carga ou o vão podem ser muito grandes para este esquema.");
@@ -135,22 +159,11 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
         }
     }
 
-
     if (!finalProfile) {
       setError("Nenhum perfil passou na verificação de Flambagem Lateral-Torcional (FLT). Considere um vão menor ou travamentos laterais.");
       return;
     }
     
-    // Reação no apoio - Muda também!
-    let reaction_kgf = 0;
-    if (beamScheme === 'biapoiada') {
-        const reaction_kN = (q_kN_m * L_m) / 2; // Reação em cada um dos 2 apoios
-        reaction_kgf = reaction_kN / 0.009807;
-    } else { // balanco
-        const reaction_kN = q_kN_m * L_m; // Reação total no único apoio (engaste)
-        reaction_kgf = reaction_kN / 0.009807;
-    }
-
     setReaction(reaction_kgf);
     onReactionCalculated(reaction_kgf);
 
@@ -160,11 +173,10 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
         description: `O perfil recomendado é ${finalProfile.profile.nome}. Iniciando análise da IA.`,
     });
 
-    // AI Analysis
     setIsAnalyzing(true);
     try {
         const aiInput: InterpretProfileSelectionInput = {
-            span: L_m,
+            span: mainSpan,
             load: q_kgf_m,
             steelType: selectedSteel.nome,
             recommendedProfile: {
@@ -196,20 +208,26 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
         return;
     }
 
-    const L = parseFloat(span.replace(",", "."));
+    const L_central_m = parseFloat(span.replace(",", "."));
+    const L_balanco1_m = parseFloat(balanco1.replace(",", "."));
+    const L_balanco2_m = parseFloat(balanco2.replace(",", "."));
     const qty = parseInt(quantity);
     const price = parseFloat(pricePerKg.replace(",", "."));
 
-    if (isNaN(L) || isNaN(qty) || isNaN(price) || L <= 0 || qty <= 0 || price <= 0) {
+    let totalLengthForBudget = 0;
+    if (beamScheme === 'biapoiada' || beamScheme === 'balanco') totalLengthForBudget = L_central_m;
+    if (beamScheme === 'dois-balancos') totalLengthForBudget = L_central_m + L_balanco1_m + L_balanco2_m;
+
+    if (isNaN(totalLengthForBudget) || isNaN(qty) || isNaN(price) || totalLengthForBudget <= 0 || qty <= 0 || price <= 0) {
         toast({
             variant: "destructive",
             title: "Valores Inválidos",
-            description: "Verifique o vão, quantidade e preço antes de adicionar.",
+            description: "Verifique os vãos, quantidade e preço antes de adicionar.",
         });
         return;
     }
 
-    const weightPerUnit = recommendedProfile.profile.peso * L;
+    const weightPerUnit = recommendedProfile.profile.peso * totalLengthForBudget;
     const totalWeight = weightPerUnit * qty;
     const costPerUnit = weightPerUnit * price;
     const totalCost = totalWeight * price;
@@ -217,7 +235,7 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
     const newItem: BudgetItem = {
         id: `${recommendedProfile.profile.nome}-${Date.now()}`,
         perfil: recommendedProfile.profile,
-        span: L,
+        span: totalLengthForBudget,
         quantity: qty,
         weightPerUnit,
         totalWeight,
@@ -247,10 +265,29 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="span">Comprimento do Vão/Balanço (m)</Label>
-              <Input id="span" type="text" inputMode="decimal" value={span} onChange={(e) => handleInputChange(setSpan, e.target.value)} placeholder="Ex: 5,0" />
-            </div>
+
+            {beamScheme === 'biapoiada' || beamScheme === 'balanco' ? (
+                 <div className="space-y-2">
+                    <Label htmlFor="span">Vão / Comprimento do Balanço (m)</Label>
+                    <Input id="span" type="text" inputMode="decimal" value={span} onChange={(e) => handleInputChange(setSpan, e.target.value)} placeholder="Ex: 5,0" />
+                 </div>
+            ) : (
+                <>
+                    <div className="space-y-2">
+                        <Label htmlFor="vp-balanco1">Balanço 1 (m)</Label>
+                        <Input id="vp-balanco1" type="text" inputMode="decimal" value={balanco1} onChange={(e) => handleInputChange(setBalanco1, e.target.value)} placeholder="Ex: 1,5"/>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="vp-span-central">Vão Central (m)</Label>
+                        <Input id="vp-span-central" type="text" inputMode="decimal" value={span} onChange={(e) => handleInputChange(setSpan, e.target.value)} placeholder="Ex: 5,0"/>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="vp-balanco2">Balanço 2 (m)</Label>
+                        <Input id="vp-balanco2" type="text" inputMode="decimal" value={balanco2} onChange={(e) => handleInputChange(setBalanco2, e.target.value)} placeholder="Ex: 1,5"/>
+                    </div>
+                </>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="load">Carga Distribuída (kgf/m)</Label>
               <Input id="load" type="text" inputMode="decimal" value={load} onChange={(e) => handleInputChange(setLoad, e.target.value)} placeholder="Ex: 300" />
@@ -263,7 +300,8 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="biapoiada">Viga Bi-apoiada</SelectItem>
-                        <SelectItem value="balanco">Viga com Balanço (Beiral)</SelectItem>
+                        <SelectItem value="balanco">Viga com Balanço (um lado)</SelectItem>
+                        <SelectItem value="dois-balancos">Viga com Dois Balanços</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -348,3 +386,4 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
     </div>
   );
 }
+

@@ -59,31 +59,49 @@ const guideTopics = [
             </div>
         )
     },
-        {
+    {
         id: "vigas",
         title: "3. Abas de Viga (Secundária e Principal)",
         icon: "Minus",
         content: (
-            <div>
-                <p className="mb-2">Dimensiona as vigas que suportam a laje ou outras vigas. A lógica é a mesma para vigas secundárias (IPE) e principais (W).</p>
-                <ul className="list-disc pl-5 space-y-1">
-                    <li><strong>Como Usar:</strong>
-                        <ul className="list-disc pl-5 mt-1 space-y-1">
-                             <li>Para vigas secundárias, o campo <strong>Carga da Laje (kgf/m²)</strong> pode ser preenchido automaticamente clicando no ícone de atualização (<Icon name="RefreshCw" className="inline h-4 w-4" />) se você já calculou na aba Laje. Informe também o <strong>Espaçamento</strong> entre as vigas.</li>
-                             <li>Alternativamente, você pode digitar a <strong>Carga na Viga (kgf/m)</strong> diretamente.</li>
-                              <li>O mais importante: selecione o <strong>Esquema da Viga</strong>. Isso é crucial, pois o cálculo dos esforços muda drasticamente.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Entendendo os Esquemas de Viga:</strong>
-                         <ul className="list-disc pl-5 mt-1 space-y-1 text-sm">
-                            <li><strong>Viga Bi-apoiada:</strong> A viga é simplesmente apoiada em duas extremidades. Use para vãos únicos.</li>
-                            <li><strong>Viga com um Balanço:</strong> A viga tem um apoio e uma extremidade em balanço (beiral).</li>
-                            <li><strong>Viga com Dois Balanços:</strong> Este é o esquema mais poderoso. Permite calcular vigas com balanços em ambas as extremidades. <strong class="text-primary">Dica de Engenharia:</strong> Este esquema é excelente para simular um <strong>vão interno de uma viga contínua</strong> (uma viga que passa por 3 ou mais pilares). Nesse caso, o "Vão Central" da calculadora representa o vão entre dois pilares, e os "Balanços" representam a continuidade da viga sobre os vãos adjacentes, resultando em um dimensionamento mais otimizado.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Resultado Principal:</strong> O <strong>Perfil Recomendado</strong> (o mais leve que atende à resistência e deformação) e a <strong>Reação de Apoio (kgf)</strong>.</li>
-                     <li><strong>Ação:</strong> Após a análise da IA, adicione a viga ao orçamento. Use a Reação de Apoio para dimensionar a viga principal ou os pilares.</li>
-                </ul>
+            <div className="space-y-4">
+                <p>Dimensiona as vigas que suportam a laje ou outras vigas. A lógica é a mesma para vigas secundárias (IPE) e principais (W).</p>
+                <div className="space-y-1">
+                    <h4 className="font-semibold">Como Usar</h4>
+                    <ul className="list-disc pl-5 mt-1 space-y-1">
+                         <li>Para vigas secundárias, o campo <strong>Carga da Laje (kgf/m²)</strong> pode ser preenchido automaticamente clicando no ícone de atualização (<Icon name="RefreshCw" className="inline h-4 w-4" />) se você já calculou na aba Laje. Informe também o <strong>Espaçamento</strong> entre as vigas.</li>
+                         <li>Alternativamente, você pode digitar a <strong>Carga na Viga (kgf/m)</strong> diretamente.</li>
+                          <li>O mais importante: selecione o <strong>Esquema da Viga</strong>. Isso é crucial, pois o cálculo dos esforços muda drasticamente.</li>
+                    </ul>
+                </div>
+                <div className="space-y-2">
+                    <h4 className="font-semibold">Entendendo os Esquemas de Viga e o Conceito de Viga Contínua</h4>
+                     <ul className="list-disc pl-5 mt-1 space-y-2 text-sm">
+                        <li><strong>Viga Bi-apoiada:</strong> É uma viga simples, apoiada em dois pilares. Todo o esforço de flexão (momento fletor) é positivo, com o máximo no centro do vão (M = qL²/8). É o esquema menos eficiente, mas mais simples.</li>
+                        <li><strong>Viga Contínua (2 ou mais vãos):</strong> É uma única viga longa que passa sobre 3 ou mais pilares. Este é um sistema muito mais eficiente. A continuidade faz com que surjam <strong>momentos negativos</strong> sobre os apoios internos, o que alivia o momento positivo no meio do vão. O resultado é que a viga sofre menos deformação e exige um perfil mais leve do que se usássemos várias vigas bi-apoiadas.</li>
+                        <li><strong>Como a Calculadora Lida com Isso:</strong> A nossa calculadora não resolve uma viga contínua inteira, pois isso é muito complexo. Em vez disso, usamos esquemas que simulam os trechos mais importantes:
+                            <ul className="list-disc pl-5 mt-1 space-y-2 text-primary/90">
+                                <li>
+                                    <strong>Viga com um Balanço:</strong> Perfeito para simular o **vão da ponta** de uma viga contínua que tem um beiral ou marquise.
+                                </li>
+                                <li>
+                                    <strong className="text-primary">Viga com Dois Balanços:</strong> Esta é a ferramenta mais poderosa! Ela permite simular com excelente precisão um **vão interno** de uma viga contínua. Para isso:
+                                    <br />- O **Vão Central** da calculadora é o vão que você quer dimensionar (entre dois pilares).
+                                    <br />- Os **Balanços 1 e 2** representam a "continuidade" da viga para os vãos vizinhos. Um bom ponto de partida é usar cerca de 20-30% do comprimento do vão adjacente como o comprimento do balanço na calculadora.
+                                    <br />- Ao fazer isso, a calculadora irá computar os momentos negativos nos apoios e o momento positivo aliviado no centro do vão, resultando em um perfil muito mais otimizado e realista.
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                 <div>
+                     <p className="mt-2 text-sm text-muted-foreground">
+                        <strong>Resultado Principal:</strong> O <strong>Perfil Recomendado</strong> (o mais leve que atende à resistência e deformação) e a <strong>Reação de Apoio (kgf)</strong>.
+                     </p>
+                     <p className="mt-1 text-sm text-muted-foreground">
+                        <strong>Ação:</strong> Após a análise da IA, adicione a viga ao orçamento. Use a Reação de Apoio para dimensionar a viga principal ou os pilares.
+                    </p>
+                 </div>
             </div>
         )
     },

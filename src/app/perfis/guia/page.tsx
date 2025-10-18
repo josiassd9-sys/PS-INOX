@@ -131,6 +131,7 @@ const guideTopics = [
                         <ul className="list-disc pl-5 mt-1 space-y-1">
                              <li>O campo <strong>Carga da Laje (kgf/m²)</strong> pode ser preenchido automaticamente clicando no ícone de atualização (<Icon name="RefreshCw" className="inline h-4 w-4" />) se você já calculou na aba Laje.</li>
                              <li>Informe o <strong>Vão da Viga</strong> e o <strong>Espaçamento</strong> entre elas. A calculadora determinará a carga linear (em kgf/m).</li>
+                             <li>Selecione o <strong>Esquema da Viga</strong> (Bi-apoiada ou com Balanço). Isso é crucial, pois o cálculo dos esforços muda drasticamente.</li>
                              <li>Alternativamente, você pode digitar a <strong>Carga na Viga (kgf/m)</strong> diretamente.</li>
                         </ul>
                     </li>
@@ -148,7 +149,7 @@ const guideTopics = [
             <div>
                 <p className="mb-2">Dimensiona as vigas maiores que suportam as vigas secundárias.</p>
                 <ul className="list-disc pl-5 space-y-1">
-                    <li><strong>Como Usar:</strong> O uso é similar ao da viga secundária, mas aqui a "Carga Distribuída" geralmente virá das reações das vigas secundárias que se apoiam nela.</li>
+                    <li><strong>Como Usar:</strong> O uso é similar ao da viga secundária, mas aqui a "Carga Distribuída" geralmente virá das reações das vigas secundárias que se apoiam nela. Lembre-se de selecionar o <strong>Esquema da Viga</strong> correto (Bi-apoiada ou com Balanço).</li>
                     <li><strong>Resultado Principal:</strong> O <strong>Perfil W Recomendado</strong> e a <strong>Reação de Apoio (kgf)</strong>.</li>
                      <li><strong>Ação:</strong> Após a análise da IA, adicione a viga ao orçamento. Use a Reação de Apoio para dimensionar os pilares.</li>
                 </ul>

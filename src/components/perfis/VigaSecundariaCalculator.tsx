@@ -13,7 +13,6 @@ import { useToast } from "@/hooks/use-toast";
 import { perfisIpeData, tiposAco, E_ACO_MPA, BudgetItem, PerfilIpe } from "@/lib/data/index";
 import { interpretProfileSelection, InterpretProfileSelectionInput, InterpretProfileSelectionOutput } from "@/ai/flows/interpret-profile-selection";
 
-
 interface VigaSecundariaCalculatorProps {
     onAddToBudget: (item: BudgetItem) => void;
     lastSlabLoad: number;
@@ -31,12 +30,15 @@ interface CalculationResult {
     };
 }
 
+type BeamScheme = "biapoiada" | "balanco";
+
 export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReactionCalculated }: VigaSecundariaCalculatorProps) {
   const [span, setSpan] = React.useState("4");
   const [spacing, setSpacing] = React.useState("1.5");
   const [slabLoad, setSlabLoad] = React.useState("450");
   const [distributedLoad, setDistributedLoad] = React.useState("");
   const [steelType, setSteelType] = React.useState(tiposAco[0].nome);
+  const [beamScheme, setBeamScheme] = React.useState<BeamScheme>("biapoiada");
   const [quantity, setQuantity] = React.useState("1");
   const [pricePerKg, setPricePerKg] = React.useState("8.50");
 
@@ -97,7 +99,14 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
     const fy_MPa = selectedSteel.fy;
     const fy_kN_cm2 = fy_MPa / 10;
     const q_kN_m = q_dist_kgf_m * 0.009807;
-    const Msd_kNm = (q_kN_m * Math.pow(L_m, 2)) / 8;
+
+    let Msd_kNm = 0;
+    if (beamScheme === "biapoiada") {
+        Msd_kNm = (q_kN_m * Math.pow(L_m, 2)) / 8;
+    } else {
+        Msd_kNm = (q_kN_m * Math.pow(L_m, 2)) / 2;
+    }
+
     const Msd_kNcm = Msd_kNm * 100;
     const requiredWx_cm3 = Msd_kNcm / fy_kN_cm2;
     
@@ -105,7 +114,13 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
     const allowedDeflection_cm = L_cm / 360;
     const q_kN_cm = q_kN_m / 100;
     const E_kN_cm2 = E_ACO_MPA / 10;
-    const requiredIx_cm4 = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * allowedDeflection_cm);
+    
+    let requiredIx_cm4 = 0;
+    if (beamScheme === 'biapoiada') {
+        requiredIx_cm4 = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * allowedDeflection_cm);
+    } else {
+        requiredIx_cm4 = (q_kN_cm * Math.pow(L_cm, 4)) / (8 * E_kN_cm2 * allowedDeflection_cm);
+    }
 
     const suitableProfiles = perfisIpeData
         .filter(p => p.Wx >= requiredWx_cm3 && p.Ix >= requiredIx_cm4)
@@ -143,8 +158,15 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
       return;
     }
 
-    const reaction_kN = (q_kN_m * L_m) / 2;
-    const reaction_kgf = reaction_kN / 0.009807;
+    let reaction_kgf = 0;
+    if (beamScheme === 'biapoiada') {
+        const reaction_kN = (q_kN_m * L_m) / 2;
+        reaction_kgf = reaction_kN / 0.009807;
+    } else {
+        const reaction_kN = q_kN_m * L_m;
+        reaction_kgf = reaction_kN / 0.009807;
+    }
+
     setReaction(reaction_kgf);
     onReactionCalculated(reaction_kgf);
 
@@ -229,7 +251,7 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
             <div className="space-y-2">
               <Label htmlFor="vs-span">Vão da Viga (m)</Label>
               <Input id="vs-span" type="text" inputMode="decimal" value={span} onChange={(e) => handleInputChange(setSpan, e.target.value)} placeholder="Ex: 4,0" />
@@ -252,6 +274,18 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
              <div className="space-y-2">
               <Label htmlFor="vs-load">Carga na Viga (kgf/m)</Label>
               <Input id="vs-load" type="text" inputMode="decimal" value={distributedLoad} onChange={(e) => handleInputChange(setDistributedLoad, e.target.value)} placeholder="Carga linear" />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="vs-beam-scheme">Esquema da Viga</Label>
+                <Select value={beamScheme} onValueChange={(value) => setBeamScheme(value as BeamScheme)}>
+                    <SelectTrigger id="vs-beam-scheme">
+                        <SelectValue placeholder="Selecione o esquema" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="biapoiada">Viga Bi-apoiada</SelectItem>
+                        <SelectItem value="balanco">Viga com Balanço (Beiral)</SelectItem>
+                    </SelectContent>
+                </Select>
             </div>
              <div className="space-y-2">
               <Label htmlFor="vs-steel-type">Tipo de Aço</Label>
@@ -320,7 +354,7 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
                      {reaction > 0 && (
                         <div className="text-sm text-center text-muted-foreground">Reação de apoio por extremidade: <span className="font-bold text-foreground">{reaction.toFixed(0)} kgf</span></div>
                     )}
-                    <Button onClick={handleAddToBudget} className="w-full gap-2"><PlusCircle/> Adicionar ao Orçamento</Button>
+                    <Button type="button" onClick={handleAddToBudget} className="w-full gap-2"><PlusCircle/> Adicionar ao Orçamento</Button>
                 </CardContent>
             </Card>
           )}

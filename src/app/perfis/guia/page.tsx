@@ -37,7 +37,7 @@ const guideTopics = [
                     </li>
                 </ol>
                 <p className="mt-2 text-sm text-muted-foreground">
-                    Após cada cálculo, uma <strong>análise da IA</strong> fornecerá insights sobre a seleção do perfil, otimização e segurança.
+                    Após cada cálculo, um botão <strong>"Analisar com IA"</strong> aparecerá. Clique nele para obter insights sobre a seleção do perfil, otimização e segurança.
                 </p>
             </div>
         )
@@ -71,6 +71,7 @@ const guideTopics = [
                     <ul className="list-disc pl-5 mt-1 space-y-1">
                          <li>Para vigas secundárias, o campo <strong>Carga da Laje (kgf/m²)</strong> pode ser preenchido automaticamente clicando no ícone de atualização (<Icon name="RefreshCw" className="inline h-4 w-4" />) se você já calculou na aba Laje. Informe também o <strong>Espaçamento</strong> entre as vigas.</li>
                          <li>Alternativamente, você pode digitar a <strong>Carga na Viga (kgf/m)</strong> diretamente.</li>
+                         <li>Para simular vigas que recebem outras vigas, ou equipamentos, você pode usar o campo <strong>Carga Pontual (kgf)</strong> e sua <strong>Posição (m)</strong>.</li>
                           <li>O mais importante: selecione o <strong>Esquema da Viga</strong>. Isso é crucial, pois o cálculo dos esforços muda drasticamente.</li>
                     </ul>
                 </div>
@@ -96,7 +97,7 @@ const guideTopics = [
                 </div>
                  <div>
                      <p className="mt-2 text-sm text-muted-foreground">
-                        <strong>Resultado Principal:</strong> O <strong>Perfil Recomendado</strong> (o mais leve que atende à resistência e deformação) e a <strong>Reação de Apoio (kgf)</strong>.
+                        <strong>Resultado Principal:</strong> O <strong>Perfil Recomendado</strong> (o mais leve que atende à resistência e deformação), a verificação de <strong>Esforço Cortante</strong>, a quantidade de <strong>Conectores de Cisalhamento</strong> (para vigas secundárias) e a <strong>Reação de Apoio (kgf)</strong>.
                      </p>
                      <p className="mt-1 text-sm text-muted-foreground">
                         <strong>Ação:</strong> Após a análise da IA, adicione a viga ao orçamento. Use a Reação de Apoio para dimensionar a viga principal ou os pilares.
@@ -180,7 +181,7 @@ const guideTopics = [
                              <li>Informe a <strong>Altura do Pilar</strong>.</li>
                         </ul>
                     </li>
-                    <li><strong>Resultado Principal:</strong> O <strong>Perfil W Recomendado</strong> para o pilar e uma <strong>análise final da IA</strong> sobre a coerência de todo o sistema.</li>
+                    <li><strong>Resultado Principal:</strong> O <strong>Perfil W Recomendado</strong> para o pilar e uma <strong>análise final da IA</strong> sobre a coerência de todo o sistema, incluindo alertas sobre a necessidade de verificar as ligações viga-pilar.</li>
                      <li><strong>Ação:</strong> Adicione os pilares ao orçamento para ter a lista completa de materiais da sua estrutura.</li>
                 </ul>
             </div>

@@ -14,6 +14,9 @@ import {z} from 'genkit';
 const InterpretProfileSelectionInputSchema = z.object({
   span: z.number().describe('O vão da viga em metros.'),
   load: z.number().describe('A carga distribuída na viga em kgf/m.'),
+  pointLoad: z.number().optional().describe('A carga pontual aplicada na viga em kgf, se houver.'),
+  pointLoadPosition: z.number().optional().describe('A posição da carga pontual em metros, se houver.'),
+  beamScheme: z.string().describe('O esquema da viga (ex: biapoiada, dois-balancos).'),
   steelType: z.string().describe('O tipo de aço usado (ex: ASTM A36).'),
   recommendedProfile: z.object({
       nome: z.string(),
@@ -45,8 +48,10 @@ const prompt = ai.definePrompt({
       Você é um engenheiro estrutural sênior, especialista em estruturas de aço. Sua tarefa é fornecer uma análise clara e concisa sobre a seleção de um perfil de viga, feita por uma calculadora.
 
       **Contexto do Cálculo:**
-      - Vão da Viga: {{{span}}} metros
-      - Carga na Viga: {{{load}}} kgf/m
+      - Esquema da Viga: {{{beamScheme}}}
+      - Vão Principal: {{{span}}} metros
+      - Carga Distribuída: {{{load}}} kgf/m
+      {{#if pointLoad}}- Carga Pontual: {{{pointLoad}}} kgf a {{{pointLoadPosition}}} m do apoio{{/if}}
       - Tipo de Aço: {{{steelType}}}
 
       **Requisitos Mínimos Calculados:**
@@ -61,7 +66,7 @@ const prompt = ai.definePrompt({
 
       **Sua Análise (seja breve, técnico mas claro, em 1-2 parágrafos):**
 
-      1.  **Justificativa da Escolha**: Comece explicando por que o perfil '{{{recommendedProfile.nome}}}' foi selecionado. Mencione que ele foi a opção mais leve que atendeu aos dois critérios essenciais: resistência (Wx) e rigidez (Ix).
+      1.  **Justificativa da Escolha**: Comece explicando por que o perfil '{{{recommendedProfile.nome}}}' foi selecionado. Mencione que, para o esquema de viga "{{{beamScheme}}}" e as cargas aplicadas, ele foi a opção mais leve que atendeu aos dois critérios essenciais: resistência (Wx) e rigidez (Ix).
       2.  **Nível de Otimização**: Calcule a "folga" ou "sobra" de capacidade do perfil em relação ao necessário, tanto para Wx quanto para Ix.
           - Otimização de Resistência (%) = ( (Wx do Perfil / Wx necessário) - 1 ) * 100
           - Otimização de Rigidez (%) = ( (Ix do Perfil / Ix necessário) - 1 ) * 100

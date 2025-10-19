@@ -180,6 +180,9 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
     }
     const L_central_m = parseFloat(span.replace(",", "."));
     const q_kgf_m = parseFloat(load.replace(",", "."));
+    const P_kgf = parseFloat(pointLoad.replace(",", ".")) || undefined;
+    const a_m = parseFloat(pointLoadPosition.replace(",", ".")) || undefined;
+    
     const selectedSteel = tiposAco.find(s => s.nome === steelType);
 
     if (!selectedSteel || isNaN(L_central_m) || isNaN(q_kgf_m)) return;
@@ -190,6 +193,9 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
         const aiInput: InterpretProfileSelectionInput = {
             span: L_central_m,
             load: q_kgf_m,
+            pointLoad: P_kgf,
+            pointLoadPosition: a_m,
+            beamScheme: beamScheme,
             steelType: selectedSteel.nome,
             recommendedProfile: {
                 nome: recommendedProfile.profile.nome,

@@ -93,15 +93,15 @@ echo ""
 echo -e "${YELLOW}Removing files from Git history...${NC}"
 
 # Build the path list for git-filter-repo
-PATH_ARGS=""
+PATH_ARGS=()
 for file in "${FILES_TO_REMOVE[@]}"; do
-    PATH_ARGS="${PATH_ARGS} --path ${file}"
-    PATH_ARGS="${PATH_ARGS} --path functions/${file}"
+    PATH_ARGS+=("--path" "${file}")
+    PATH_ARGS+=("--path" "functions/${file}")
 done
 
 # Run git-filter-repo to remove the files
-echo "Running: git-filter-repo --invert-paths --force ${PATH_ARGS}"
-git-filter-repo --invert-paths --force ${PATH_ARGS}
+echo "Running: git-filter-repo --invert-paths --force" "${PATH_ARGS[@]}"
+git-filter-repo --invert-paths --force "${PATH_ARGS[@]}"
 
 echo ""
 echo -e "${GREEN}✓ History rewrite complete!${NC}"

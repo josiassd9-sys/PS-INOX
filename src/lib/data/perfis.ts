@@ -8,6 +8,7 @@ export const tiposAco = [
 
 export const PESO_CONCRETO_KGF_M3 = 2400; // kgf/m³
 export const E_ACO_MPA = 200000; // Módulo de Elasticidade do Aço em MPa
+export const RESISTENCIA_CALCULO_CONECTOR_KN = 45.3; // Resistência de cálculo para conector de 19mm em viga mista
 
 
 // Catálogo Gerdau (W) completo

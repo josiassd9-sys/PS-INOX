@@ -10,7 +10,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckCircle, PlusCircle, RefreshCw, Sparkles, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { perfisIpeData, tiposAco, E_ACO_MPA, BudgetItem, PerfilIpe } from "@/lib/data/index";
+import { perfisIpeData, tiposAco, E_ACO_MPA, BudgetItem, PerfilIpe, RESISTENCIA_CALCULO_CONECTOR_KN } from "@/lib/data/index";
 import { interpretProfileSelection, InterpretProfileSelectionInput, InterpretProfileSelectionOutput } from "@/ai/flows/interpret-profile-selection";
 
 interface VigaSecundariaCalculatorProps {
@@ -33,6 +33,7 @@ interface CalculationResult {
         vrd: number; // kN
         passed: boolean;
     };
+    connectorCount: number;
 }
 
 type BeamScheme = "biapoiada" | "balanco" | "dois-balancos";
@@ -178,6 +179,13 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
         const shearPassed = Vrd_kN >= Vsd_kN;
 
         if (ltbPassed && shearPassed) {
+            // Shear Connectors Calculation
+            const Ac_cm2 = (parseFloat(spacing.replace(',', '.')) * 100) * (profile.tf / 10); // Area de influencia do concreto
+            const Fcc_kN = 0.85 * 2.5 * Ac_cm2; // 25MPa = 2.5 kN/cm2
+            const Fst_kN = profile.area * fy_kN_cm2;
+            const Vh_kN = Math.min(Fcc_kN, Fst_kN);
+            const numConnectors = Math.ceil(Vh_kN / RESISTENCIA_CALCULO_CONECTOR_KN);
+
              finalProfile = {
                 profile: profile,
                 requiredWx: requiredWx_cm3,
@@ -191,7 +199,8 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
                     vsd: Vsd_kN,
                     vrd: Vrd_kN,
                     passed: shearPassed,
-                }
+                },
+                connectorCount: numConnectors,
             };
             break;
         }
@@ -246,7 +255,8 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
             shearCheck: {
                 vsd: recommendedProfile.shearCheck.vsd,
                 vrd: recommendedProfile.shearCheck.vrd,
-            }
+            },
+            connectorCount: recommendedProfile.connectorCount
         };
         const analysis = await interpretProfileSelection(aiInput);
         setAnalysisResult(analysis);
@@ -422,6 +432,11 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
                     </AlertDescription>
                 </CardHeader>
                  <CardContent className="space-y-4">
+                      <div className="rounded-lg border bg-background p-2">
+                        <p className="text-sm font-medium text-center text-muted-foreground">Conectores de Cisalhamento (Stud Bolts 19mm)</p>
+                        <p className="text-xl font-bold text-center text-primary">{recommendedProfile.connectorCount} unidades</p>
+                        <p className="text-xs text-center text-muted-foreground">({(recommendedProfile.connectorCount / parseFloat(span.replace(',', '.'))).toFixed(1)} un/m)</p>
+                      </div>
                       <Button type="button" onClick={handleAnalyze} className="w-full" disabled={isAnalyzing}>
                          {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar com IA</>}
                       </Button>

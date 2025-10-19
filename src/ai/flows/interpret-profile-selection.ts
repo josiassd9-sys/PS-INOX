@@ -30,7 +30,8 @@ const InterpretProfileSelectionInputSchema = z.object({
    shearCheck: z.object({
        vsd: z.number().describe('O esforço cortante solicitante em kN.'),
        vrd: z.number().describe('O esforço cortante resistente do perfil em kN.'),
-   }).describe('Verificação do esforço cortante.')
+   }).describe('Verificação do esforço cortante.'),
+   connectorCount: z.number().optional().describe('A quantidade de conectores de cisalhamento (stud bolts) calculada para a viga, se aplicável.')
 });
 export type InterpretProfileSelectionInput = z.infer<typeof InterpretProfileSelectionInputSchema>;
 
@@ -72,6 +73,11 @@ const prompt = ai.definePrompt({
       **Verificações de Segurança:**
       - Esforço Cortante: Solicitante (Vsd) = {{{shearCheck.vsd}}} kN | Resistente (Vrd) = {{{shearCheck.vrd}}} kN
 
+      {{#if connectorCount}}
+      **Conectores de Cisalhamento (Ação Mista):**
+      - Quantidade Calculada: {{{connectorCount}}} unidades
+      {{/if}}
+
       **Sua Análise (seja breve, técnico mas claro, em 1-2 parágrafos):**
 
       1.  **Justificativa da Escolha**: Comece explicando que, para o esquema de viga "{{{beamScheme}}}" e as cargas aplicadas, o perfil '{{{recommendedProfile.nome}}}' foi selecionado por ser a opção mais leve que atendeu a todos os critérios de segurança e serviço. Mencione os critérios principais:
@@ -85,7 +91,11 @@ const prompt = ai.definePrompt({
           - Otimização ao Cortante (%) = ( (Vrd / Vsd) - 1) * 100
           Apresente isso de forma clara. Por exemplo: "Este perfil tem uma capacidade de resistência à flexão X% acima do mínimo e uma rigidez Y% superior. Sua resistência ao esforço cortante está com uma folga de Z%, indicando um dimensionamento seguro em todos os aspectos."
 
-      3.  **Conclusão**: Faça uma breve declaração final sobre a adequação da escolha.
+      3.  {{#if connectorCount}}
+          **Análise da Ação Mista**: Comente sobre a importância dos conectores. Ex: "Foram calculados {{{connectorCount}}} conectores de cisalhamento. A instalação correta destes elementos é fundamental para garantir a ação mista entre a viga de aço e a laje de concreto, o que aumenta a rigidez e a capacidade de carga do sistema."
+          {{/if}}
+
+      4.  **Conclusão**: Faça uma breve declaração final sobre a adequação da escolha.
     `,
 });
 

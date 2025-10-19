@@ -342,7 +342,7 @@ const ALL_CATEGORIES: Category[] = [
     icon: 'Calculator',
     unit: 'calc',
     items: [],
-    path: '/perfis/calculadora'
+    path: '/perfis/calculadora/laje'
   },
   {
     id: 'perfis/guia',
@@ -502,24 +502,6 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
         ]
     },
     {
-        title: 'INFORMATIVOS',
-        items: [
-            ALL_CATEGORIES.find(c => c.id === 'ai-assistant')!,
-            ALL_CATEGORIES.find(c => c.id === 'informativos/normas-astm')!,
-            ALL_CATEGORIES.find(c => c.id === 'informativos/processos-fabricacao')!,
-            ALL_CATEGORIES.find(c => c.id === 'informativos/tipos-de-solda')!,
-            ALL_CATEGORIES.find(c => c.id === 'informativos/acabamentos-inox')!,
-            ALL_CATEGORIES.find(c => c.id === 'informativos/logistica-armazenamento')!,
-            ALL_CATEGORIES.find(c => c.id === 'informativos/inicio-producao-industrial')!,
-            ALL_CATEGORIES.find(c => c.id === 'informativos/processos-industriais-modernos')!,
-            ALL_CATEGORIES.find(c => c.id === 'informativos/linha-montagem-automotiva')!,
-            ALL_CATEGORIES.find(c => c.id === 'informativos/centro-usinagem')!,
-            ALL_CATEGORIES.find(c => c.id === 'informativos/corte-laser')!,
-            ALL_CATEGORIES.find(c => c.id === 'informativos/desenho-tecnico')!,
-            ALL_CATEGORIES.find(c => c.id === 'gauge')!,
-        ]
-    },
-    {
         title: 'Perfis de Aço',
         items: [
             ALL_CATEGORIES.find(c => c.id === 'perfis/guia')!,
@@ -539,6 +521,24 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
             ALL_CATEGORIES.find(c => c.id === 'mecanica/sistemas-vedacao')!,
         ]
     },
+    {
+        title: 'INFORMATIVOS',
+        items: [
+            ALL_CATEGORIES.find(c => c.id === 'ai-assistant')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/normas-astm')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/processos-fabricacao')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/tipos-de-solda')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/acabamentos-inox')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/logistica-armazenamento')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/inicio-producao-industrial')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/processos-industriais-modernos')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/linha-montagem-automotiva')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/centro-usinagem')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/corte-laser')!,
+            ALL_CATEGORIES.find(c => c.id === 'informativos/desenho-tecnico')!,
+            ALL_CATEGORIES.find(c => c.id === 'gauge')!,
+        ]
+    },
 ];
 
 export { 
@@ -554,4 +554,3 @@ export {
     liveLoadOptions
 };
 export type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction, LiveLoadOption };
-    

@@ -195,7 +195,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
 
   const selectedCategory = React.useMemo(() => {
     if (!selectedCategoryId) return null;
-    return ALL_CATEGORIES.find((c) => c.id === selectedCategoryId);
+    return ALL_CATEGORIES.find((c) => c.id === selectedCategoryId || selectedCategoryId.startsWith(c.id + '/'));
   }, [selectedCategoryId]);
 
   const currentPriceParamsKey = selectedCategory?.hasOwnPriceControls ? selectedCategoryId : 'global';
@@ -372,7 +372,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
           </div>
         </SidebarHeader>
         <SidebarContent className="p-1">
-           <Accordion type="multiple" className="w-full flex flex-col gap-1">
+           <Accordion type="multiple" className="w-full flex flex-col gap-1" defaultValue={CATEGORY_GROUPS.map(g => g.title)}>
             {CATEGORY_GROUPS.map((group) => (
                <AccordionItem value={group.title} key={group.title} className="border-none rounded-lg bg-sidebar-accent/10 p-1">
                  <AccordionTrigger className="p-2 text-sm font-semibold text-sidebar-primary hover:no-underline [&[data-state=open]>svg]:-rotate-180">
@@ -386,7 +386,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                             <SidebarMenuItem key={category.id}>
                               <Link href={href} passHref>
                                 <SidebarMenuButton
-                                  isActive={selectedCategoryId === category.id && !searchTerm}
+                                  isActive={selectedCategoryId === category.id && !searchTerm || (category.id === 'perfis/calculadora' && selectedCategoryId?.startsWith('perfis/calculadora/'))}
                                   className="w-full justify-start h-8"
                                   onClick={() => handleSelectCategory(category.id)}
                                 >
@@ -418,7 +418,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                 </div>
               </div>
               
-             {selectedCategoryId !== 'balanca' && (
+             {selectedCategoryId !== 'balanca' && !selectedCategoryId?.startsWith('perfis/calculadora') && (
                 <div className="relative flex-1 max-w-sm">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -476,7 +476,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
             </header>
             
             <div className="flex-1 flex flex-col overflow-hidden">
-              <div className={cn("p-1 flex-1 overflow-y-auto", (selectedCategoryId === 'tabela-sucata' || selectedCategoryId === 'conexoes') && "p-0 md:p-0")}>
+              <div className={cn("p-1 flex-1 overflow-y-auto", (selectedCategoryId === 'tabela-sucata' || selectedCategoryId === 'conexoes') && "p-0 md:p-0", selectedCategoryId?.startsWith('perfis/calculadora') && 'p-0')}>
                  {renderContent()}
               </div>
             </div>

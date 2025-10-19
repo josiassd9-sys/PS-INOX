@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -53,16 +54,13 @@ const prompt = ai.definePrompt({
       - Da Viga Principal: {{{supportReactions.vigaPrincipal}}} kgf
       - Da Viga Secundária: {{{supportReactions.vigaSecundaria}}} kgf
 
-      **Sua Análise Final (seja conciso, didático e conclusivo):**
+      **Sua Análise Final (seja conciso, didático e conclusivo em 2-3 parágrafos):**
 
-      1.  **Revisão da Carga**: Comece verificando a coerência da carga total. Compare a soma das reações recebidas ({{{supportReactions.vigaPrincipal}}} + {{{supportReactions.vigaSecundaria}}}) com a carga total informada ({{{axialLoad}}}). Se houver outras cargas não listadas, mencione que a carga total inclui essas reações mais outras cargas.
+      1.  **Revisão da Carga e Segurança do Pilar**: Primeiro, avalie a escolha do perfil '{{{recommendedProfile}}}'. Compare a tensão atuante ({{{actingStress}}} MPa) com a tensão admissível ({{{allowableStress}}} MPa), calculando a porcentagem de utilização: (Tensão Atuante / Tensão Admissível) * 100. Comente o resultado, por exemplo: "O perfil {{{recommendedProfile}}} está trabalhando com XX% de sua capacidade resistente à flambagem, indicando um dimensionamento seguro e com uma margem adequada."
 
-      2.  **Análise de Segurança do Pilar**: Avalie a escolha do perfil '{{{recommendedProfile}}}'.
-          - Compare a tensão atuante ({{{actingStress}}} MPa) com a tensão admissível ({{{allowableStress}}} MPa).
-          - Calcule a porcentagem de utilização do perfil: (Tensão Atuante / Tensão Admissível) * 100.
-          - Comente o resultado. Por exemplo: "O perfil {{{recommendedProfile}}} está trabalhando com XX% de sua capacidade resistente à flambagem, o que indica um dimensionamento seguro e com uma margem de segurança adequada." ou "O perfil está trabalhando muito próximo do seu limite, um perfil superior poderia oferecer mais segurança.".
+      2.  **Análise da Conexão Viga-Pilar**: Com base na sua experiência, avalie as cargas concentradas (as reações da viga principal e secundária) em relação ao perfil do pilar selecionado ({{{recommendedProfile}}}). Se as reações forem muito altas (ex: acima de 5-10 toneladas-força) para um perfil de pilar relativamente leve (série 150, 200), comente sobre a importância da conexão. Exemplo de frase: "As reações de apoio de {{{supportReactions.vigaPrincipal}}} kgf e {{{supportReactions.vigaSecundaria}}} kgf são cargas concentradas significativas. No projeto detalhado, será crucial verificar a alma do pilar {{{recommendedProfile}}} quanto ao esmagamento e à flambagem local, podendo ser necessário o uso de enrijecedores na alma para garantir uma transferência segura dos esforços." Se as cargas forem baixas, diga que a conexão pode ser feita de forma mais simples.
 
-      3.  **Conclusão Geral do Sistema**: Forneça um parágrafo de conclusão sobre o pré-dimensionamento. Exemplo: "Em resumo, o sistema pré-dimensionado aparenta ser coerente. As cargas da laje foram transferidas para as vigas secundárias, estas para as principais (se aplicável), e finalmente concentradas no pilar. O pilar {{{recommendedProfile}}} foi dimensionado de forma segura para suportar esses esforços. Este resultado serve como uma excelente base para o projeto executivo final."
+      3.  **Conclusão Geral do Sistema**: Forneça um parágrafo de conclusão sobre a coerência do pré-dimensionamento. Exemplo: "Em resumo, o sistema pré-dimensionado aparenta ser coerente. As cargas foram transferidas da laje para as vigas, e finalmente concentradas no pilar. O pilar {{{recommendedProfile}}} foi dimensionado de forma segura para a carga axial total, e foi feito um alerta para a verificação da ligação viga-pilar. Este resultado serve como uma excelente base para o projeto executivo final."
     `,
 });
 

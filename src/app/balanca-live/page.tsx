@@ -15,12 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 
 // Componente para inicializar o Firebase e prover para os filhos
@@ -110,7 +105,10 @@ function ConfigManager({ onSaveSuccess }: { onSaveSuccess: () => void }) {
     }
 
     return (
-        <Card className="border-none shadow-none">
+        <Card className="border-primary/20 bg-primary/5 mb-4">
+            <CardHeader>
+                <CardTitle className="text-lg">Configurações da Balança</CardTitle>
+            </CardHeader>
             <CardContent className="space-y-4 pt-4">
                  {error && <Alert variant="destructive"><AlertTitle>Erro</AlertTitle><AlertDescription>Não foi possível carregar as configurações do Firestore.</AlertDescription></Alert>}
                 <div className="space-y-2">
@@ -141,7 +139,7 @@ function ConfigManager({ onSaveSuccess }: { onSaveSuccess: () => void }) {
 }
 
 
-function BalancaLiveComponent() {
+function BalancaLiveComponent({ onToggleConfig, isConfigOpen }: { onToggleConfig: () => void, isConfigOpen: boolean }) {
   const firestore = useFirestore();
 
   if (!firestore) {
@@ -155,9 +153,14 @@ function BalancaLiveComponent() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Balança em Tempo Real</CardTitle>
-        <CardDescription>Visualização das últimas pesagens enviadas pela balança.</CardDescription>
+      <CardHeader className="flex flex-row items-start justify-between">
+        <div>
+            <CardTitle>Balança em Tempo Real</CardTitle>
+            <CardDescription>Visualização das últimas pesagens enviadas pela balança.</CardDescription>
+        </div>
+        <Button variant={isConfigOpen ? "secondary" : "ghost"} size="icon" onClick={onToggleConfig} className="shrink-0">
+            <Settings className="h-5 w-5" />
+        </Button>
       </CardHeader>
       <CardContent>
         {error && <p className="text-destructive">Erro: {error.message}</p>}
@@ -192,34 +195,22 @@ function BalancaLiveComponent() {
 
 
 export default function BalancaLivePage() {
-  const [accordionValue, setAccordionValue] = React.useState<string | undefined>(undefined);
+  const [isConfigOpen, setIsConfigOpen] = React.useState(false);
 
   const handleSaveSuccess = () => {
-    setAccordionValue(undefined); // Fecha o accordion
+    setIsConfigOpen(false); // Fecha o painel de config
   };
-  
-  const handleAccordionChange = (value: string | undefined) => {
-    setAccordionValue(value);
-  }
 
   return (
     <FirebaseProvider>
        <Dashboard initialCategoryId="balanca-live">
           <div className="container mx-auto p-4 space-y-4">
-              <Accordion type="single" collapsible className="w-full" value={accordionValue} onValueChange={handleAccordionChange}>
-                  <AccordionItem value="config" className="border rounded-lg overflow-hidden bg-card">
-                      <AccordionTrigger className="px-4 py-3 hover:bg-muted/50 text-base font-semibold">
-                          <div className="flex items-center gap-2">
-                            <Settings className="h-5 w-5 text-primary" />
-                            Gerenciar Configurações da Balança
-                          </div>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                         <ConfigManager onSaveSuccess={handleSaveSuccess} />
-                      </AccordionContent>
-                  </AccordionItem>
-              </Accordion>
-              <BalancaLiveComponent />
+              <Collapsible open={isConfigOpen} onOpenChange={setIsConfigOpen}>
+                  <CollapsibleContent>
+                     <ConfigManager onSaveSuccess={handleSaveSuccess} />
+                  </CollapsibleContent>
+              </Collapsible>
+              <BalancaLiveComponent onToggleConfig={() => setIsConfigOpen(prev => !prev)} isConfigOpen={isConfigOpen}/>
           </div>
        </Dashboard>
     </FirebaseProvider>

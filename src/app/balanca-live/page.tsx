@@ -8,13 +8,20 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useCollection, useDocument } from "react-firebase-hooks/firestore";
 import { collection, query, orderBy, limit, getFirestore, doc, setDoc, Firestore } from "firebase/firestore";
 import { getFirebaseConfig } from "@/lib/firebase-config";
-import { Loader, Save } from "lucide-react";
+import { Loader, Save, Settings } from "lucide-react";
 import { FirebaseApp, initializeApp } from "firebase/app";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
 
 // Componente para inicializar o Firebase e prover para os filhos
 function FirebaseProvider({ children }: { children: React.ReactNode }) {
@@ -24,10 +31,14 @@ function FirebaseProvider({ children }: { children: React.ReactNode }) {
 
     React.useEffect(() => {
         if (firebaseConfig && !app) {
-            const initializedApp = initializeApp(firebaseConfig);
-            const db = getFirestore(initializedApp);
-            setApp(initializedApp);
-            setFirestore(db);
+            try {
+                const initializedApp = initializeApp(firebaseConfig);
+                const db = getFirestore(initializedApp);
+                setApp(initializedApp);
+                setFirestore(db);
+            } catch (error) {
+                console.error("Firebase initialization error:", error);
+            }
         }
     }, [firebaseConfig, app]);
 
@@ -98,14 +109,8 @@ function ConfigManager() {
     }
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Configurações do Script da Balança</CardTitle>
-                <CardDescription>
-                    Gerencie os parâmetros que o script `balanca.js` utilizará para se conectar.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        <Card className="border-none shadow-none">
+            <CardContent className="space-y-4 pt-4">
                  {error && <Alert variant="destructive"><AlertTitle>Erro</AlertTitle><AlertDescription>Não foi possível carregar as configurações do Firestore.</AlertDescription></Alert>}
                 <div className="space-y-2">
                     <Label htmlFor="serialPort">Porta Serial</Label>
@@ -190,11 +195,22 @@ export default function BalancaLivePage() {
     <FirebaseProvider>
        <Dashboard initialCategoryId="balanca-live">
           <div className="container mx-auto p-4 space-y-4">
-              <ConfigManager />
+              <Accordion type="single" collapsible className="w-full" defaultValue="config">
+                  <AccordionItem value="config" className="border rounded-lg overflow-hidden bg-card">
+                      <AccordionTrigger className="px-4 py-3 hover:bg-muted/50 text-base font-semibold">
+                          <div className="flex items-center gap-2">
+                            <Settings className="h-5 w-5 text-primary" />
+                            Gerenciar Configurações da Balança
+                          </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                         <ConfigManager />
+                      </AccordionContent>
+                  </AccordionItem>
+              </Accordion>
               <BalancaLiveComponent />
           </div>
        </Dashboard>
     </FirebaseProvider>
   );
 }
-

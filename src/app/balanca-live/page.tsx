@@ -6,14 +6,58 @@ import { Dashboard } from "@/components/dashboard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useCollection } from "react-firebase-hooks/firestore";
-import { collection, query, orderBy, limit, getFirestore } from "firebase/firestore";
-import { FirebaseAppProvider, useFirebaseApp } from "reactfire";
+import { collection, query, orderBy, limit, getFirestore, Firestore } from "firebase/firestore";
 import { getFirebaseConfig } from "@/lib/firebase-config";
 import { Loader } from "lucide-react";
+import { FirebaseApp, initializeApp } from "firebase/app";
+
+// Componente para inicializar o Firebase e prover para os filhos
+function FirebaseProvider({ children }: { children: React.ReactNode }) {
+    const firebaseConfig = getFirebaseConfig();
+    const [app, setApp] = React.useState<FirebaseApp | null>(null);
+    const [firestore, setFirestore] = React.useState<Firestore | null>(null);
+
+    React.useEffect(() => {
+        if (firebaseConfig) {
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+            setApp(app);
+            setFirestore(db);
+        }
+    }, [firebaseConfig]);
+
+    if (!app || !firestore) {
+        const firebaseConfig = getFirebaseConfig();
+         if (!firebaseConfig) {
+            return (
+                <div className="p-4 text-center">
+                    Firebase não configurado. Adicione as variáveis de ambiente.
+                </div>
+            )
+        }
+        return <div className="flex items-center justify-center p-8 gap-2"><Loader className="animate-spin h-5 w-5 text-primary"/><span>Inicializando Firebase...</span></div>;
+    }
+
+    return (
+        <FirestoreContext.Provider value={firestore}>
+            {children}
+        </FirestoreContext.Provider>
+    );
+}
+
+const FirestoreContext = React.createContext<Firestore | null>(null);
+
+function useFirestore() {
+    return React.useContext(FirestoreContext);
+}
+
 
 function BalancaLiveComponent() {
-  const app = useFirebaseApp();
-  const firestore = getFirestore(app);
+  const firestore = useFirestore();
+
+  if (!firestore) {
+    return <div className="flex items-center justify-center p-8 gap-2"><Loader className="animate-spin h-5 w-5 text-primary"/><span>Conectando ao Firestore...</span></div>;
+  }
 
   const pesagensRef = collection(firestore, "pesagens");
   const q = query(pesagensRef, orderBy("timestamp", "desc"), limit(20));
@@ -59,26 +103,14 @@ function BalancaLiveComponent() {
 
 
 export default function BalancaLivePage() {
-  const firebaseConfig = getFirebaseConfig();
-
-  if (!firebaseConfig) {
-    return (
-        <Dashboard initialCategoryId="balanca-live">
-            <div className="p-4 text-center">
-                Firebase não configurado. Adicione as variáveis de ambiente.
-            </div>
-      </Dashboard>
-    )
-  }
-
   return (
-    <FirebaseAppProvider firebaseConfig={firebaseConfig}>
+    <FirebaseProvider>
        <Dashboard initialCategoryId="balanca-live">
           <div className="container mx-auto p-4">
               <BalancaLiveComponent />
           </div>
        </Dashboard>
-    </FirebaseAppProvider>
+    </FirebaseProvider>
   );
 }
 

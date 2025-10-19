@@ -118,9 +118,9 @@ Action Required:
 
 Commands to run after notification:
 cd ..
-rm -rf PS-INOX
+rm -rf <repository-name>
 git clone <repository-url>
-cd PS-INOX
+cd <repository-name>
 ```
 
 ## Prevention Measures (Already Implemented)

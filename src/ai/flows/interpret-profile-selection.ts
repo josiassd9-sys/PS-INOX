@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -26,6 +27,10 @@ const InterpretProfileSelectionInputSchema = z.object({
   }).describe('O perfil de aço que foi recomendado pela calculadora.'),
    requiredWx: z.number().describe('O módulo de resistência mínimo necessário (Wx) em cm³.'),
    requiredIx: z.number().describe('O momento de inércia mínimo necessário (Ix) em cm⁴.'),
+   shearCheck: z.object({
+       vsd: z.number().describe('O esforço cortante solicitante em kN.'),
+       vrd: z.number().describe('O esforço cortante resistente do perfil em kN.'),
+   }).describe('Verificação do esforço cortante.')
 });
 export type InterpretProfileSelectionInput = z.infer<typeof InterpretProfileSelectionInputSchema>;
 
@@ -55,7 +60,7 @@ const prompt = ai.definePrompt({
       - Tipo de Aço: {{{steelType}}}
 
       **Requisitos Mínimos Calculados:**
-      - Módulo de Resistência (Wx) necessário: {{{requiredWx}}} cm³ (para resistir à força)
+      - Módulo de Resistência (Wx) necessário: {{{requiredWx}}} cm³ (para resistir à flexão)
       - Momento de Inércia (Ix) necessário: {{{requiredIx}}} cm⁴ (para limitar a deformação/flecha)
 
       **Perfil Recomendado:**
@@ -64,16 +69,23 @@ const prompt = ai.definePrompt({
       - Ix do Perfil: {{{recommendedProfile.Ix}}} cm⁴
       - Peso: {{{recommendedProfile.peso}}} kg/m
 
+      **Verificações de Segurança:**
+      - Esforço Cortante: Solicitante (Vsd) = {{{shearCheck.vsd}}} kN | Resistente (Vrd) = {{{shearCheck.vrd}}} kN
+
       **Sua Análise (seja breve, técnico mas claro, em 1-2 parágrafos):**
 
-      1.  **Justificativa da Escolha**: Comece explicando por que o perfil '{{{recommendedProfile.nome}}}' foi selecionado. Mencione que, para o esquema de viga "{{{beamScheme}}}" e as cargas aplicadas, ele foi a opção mais leve que atendeu aos dois critérios essenciais: resistência (Wx) e rigidez (Ix).
-      2.  **Nível de Otimização**: Calcule a "folga" ou "sobra" de capacidade do perfil em relação ao necessário, tanto para Wx quanto para Ix.
-          - Otimização de Resistência (%) = ( (Wx do Perfil / Wx necessário) - 1 ) * 100
-          - Otimização de Rigidez (%) = ( (Ix do Perfil / Ix necessário) - 1 ) * 100
-          Apresente isso de forma clara. Por exemplo: "Este perfil tem uma capacidade de resistência X% acima do mínimo necessário e uma rigidez Y% superior, indicando uma boa margem de segurança."
-      3.  **Conclusão**: Faça uma breve declaração final sobre a adequação da escolha.
+      1.  **Justificativa da Escolha**: Comece explicando que, para o esquema de viga "{{{beamScheme}}}" e as cargas aplicadas, o perfil '{{{recommendedProfile.nome}}}' foi selecionado por ser a opção mais leve que atendeu a todos os critérios de segurança e serviço. Mencione os critérios principais:
+          - **Resistência à Flexão** (Momento Fletor), atendido pelo Wx.
+          - **Rigidez** (limite de deformação/flecha), atendido pelo Ix.
+          - **Resistência ao Cisalhamento** (Esforço Cortante), atendido pela alma do perfil.
 
-      Use um tom profissional e didático.
+      2.  **Nível de Otimização**: Calcule a "folga" ou "sobra" de capacidade do perfil em relação ao necessário, tanto para Wx, Ix, quanto para o Cortante.
+          - Otimização de Resistência à Flexão (%) = ( (Wx do Perfil / Wx necessário) - 1 ) * 100
+          - Otimização de Rigidez (%) = ( (Ix do Perfil / Ix necessário) - 1 ) * 100
+          - Otimização ao Cortante (%) = ( (Vrd / Vsd) - 1) * 100
+          Apresente isso de forma clara. Por exemplo: "Este perfil tem uma capacidade de resistência à flexão X% acima do mínimo e uma rigidez Y% superior. Sua resistência ao esforço cortante está com uma folga de Z%, indicando um dimensionamento seguro em todos os aspectos."
+
+      3.  **Conclusão**: Faça uma breve declaração final sobre a adequação da escolha.
     `,
 });
 

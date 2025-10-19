@@ -28,6 +28,11 @@ interface CalculationResult {
         mrd: number;
         passed: boolean;
     };
+    shearCheck: {
+        vsd: number; // kN
+        vrd: number; // kN
+        passed: boolean;
+    };
 }
 
 type BeamScheme = "biapoiada" | "balanco" | "dois-balancos";
@@ -129,31 +134,23 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
     const q_kN_cm = q_kN_m / 100;
 
     // --- Momento Fletor Máximo (Msd) ---
-    // Momento da carga distribuída
     const M_dist_kNm = (q_kN_m * L_m * L_m) / 8;
-    // Momento da carga pontual
     const M_pont_kNm = (P_kN * a_m * b_cm) / L_m / 100;
-    
-    // Simplificação: Soma dos momentos máximos. Uma análise exata buscaria o ponto do momento máximo da combinação.
-    // Para pré-dimensionamento, somar os máximos é uma aproximação segura.
     const Msd_kNm = M_dist_kNm + M_pont_kNm;
     const Msd_kNcm = Msd_kNm * 100;
 
     // --- Deformação (Flecha) / Ix Mínimo ---
     const allowedDeflection_cm = L_cm / 360;
-    // Flecha da carga distribuída
     const Ix_dist_req = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * allowedDeflection_cm);
-    // Flecha da carga pontual
     const Ix_pont_req = (P_kN * a_cm * b_cm * (L_cm + b_cm) * Math.sqrt(3 * a_cm * (L_cm + b_cm))) / (27 * E_kN_cm2 * L_cm * allowedDeflection_cm);
-
     const requiredIx_cm4 = Ix_dist_req + Ix_pont_req;
 
     // --- Esforço Cortante / Reação nos Apoios ---
     const R_dist_kN = (q_kN_m * L_m) / 2;
     const R_pont_a_kN = (P_kN * b_cm) / L_cm;
     const R_pont_b_kN = (P_kN * a_cm) / L_cm;
-    const R_max_kN = R_dist_kN + Math.max(R_pont_a_kN, R_pont_b_kN);
-    const reaction_kgf = R_max_kN / 0.009807;
+    const Vsd_kN = R_dist_kN + Math.max(R_pont_a_kN, R_pont_b_kN);
+    const reaction_kgf = Vsd_kN / 0.009807;
 
     // --- Dimensionamento ---
     const requiredWx_cm3 = Msd_kNcm / fy_kN_cm2;
@@ -169,12 +166,18 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
     
     let finalProfile: CalculationResult | null = null;
     for (const profile of suitableProfiles) {
+        // LTB Check
         const Cb = 1.0; 
         const Mp_kNcm = profile.Wx * fy_kN_cm2;
         const Mrd_kNcm = Cb * Mp_kNcm;
         const ltbPassed = Mrd_kNcm >= Msd_kNcm;
         
-        if (ltbPassed) {
+        // Shear Check
+        const Aw_cm2 = (profile.h / 10) * (profile.tw / 10);
+        const Vrd_kN = (0.6 * fy_kN_cm2 * Aw_cm2); // NBR 8800
+        const shearPassed = Vrd_kN >= Vsd_kN;
+
+        if (ltbPassed && shearPassed) {
              finalProfile = {
                 profile: profile,
                 requiredWx: requiredWx_cm3,
@@ -183,6 +186,11 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
                     msd: Msd_kNm,
                     mrd: Mrd_kNcm / 100,
                     passed: ltbPassed,
+                },
+                shearCheck: {
+                    vsd: Vsd_kN,
+                    vrd: Vrd_kN,
+                    passed: shearPassed,
                 }
             };
             break;
@@ -190,7 +198,7 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
     }
 
     if (!finalProfile) {
-      setError("Nenhum perfil passou na verificação de Flambagem Lateral-Torcional (FLT).");
+      setError("Nenhum perfil passou em todas as verificações (Flexão, Deformação, FLT e Cortante).");
       return;
     }
     
@@ -235,6 +243,10 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
             },
             requiredWx: recommendedProfile.requiredWx,
             requiredIx: recommendedProfile.requiredIx,
+            shearCheck: {
+                vsd: recommendedProfile.shearCheck.vsd,
+                vrd: recommendedProfile.shearCheck.vrd,
+            }
         };
         const analysis = await interpretProfileSelection(aiInput);
         setAnalysisResult(analysis);
@@ -395,12 +407,16 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
                          <div className="text-2xl font-bold text-center py-2 text-primary">{recommendedProfile.profile.nome}</div>
                          <div className="grid grid-cols-2 gap-2 text-center text-sm border-t pt-2">
                             <div>
-                                <p className="text-muted-foreground">Verificação FLT (kNm)</p>
-                                <p className="font-semibold">{`Msd: ${recommendedProfile.ltbCheck.msd.toFixed(1)} ≤ Mrd: ${recommendedProfile.ltbCheck.mrd.toFixed(1)}`}</p>
+                                <p className="text-muted-foreground">Cortante (kN)</p>
+                                <p className={`font-semibold ${recommendedProfile.shearCheck.passed ? 'text-green-600' : 'text-destructive'}`}>
+                                    {`Vsd: ${recommendedProfile.shearCheck.vsd.toFixed(1)} ≤ Vrd: ${recommendedProfile.shearCheck.vrd.toFixed(1)}`}
+                                </p>
                             </div>
                             <div>
-                                <p className="text-muted-foreground">Status FLT</p>
-                                <p className="font-semibold text-green-600">{recommendedProfile.ltbCheck.passed ? 'Aprovado' : 'Reprovado'}</p>
+                                <p className="text-muted-foreground">FLT (kNm)</p>
+                                <p className={`font-semibold ${recommendedProfile.ltbCheck.passed ? 'text-green-600' : 'text-destructive'}`}>
+                                    {`Msd: ${recommendedProfile.ltbCheck.msd.toFixed(1)} ≤ Mrd: ${recommendedProfile.ltbCheck.mrd.toFixed(1)}`}
+                                </p>
                             </div>
                         </div>
                     </AlertDescription>

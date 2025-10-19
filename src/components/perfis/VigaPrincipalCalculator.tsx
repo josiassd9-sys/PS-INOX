@@ -27,6 +27,11 @@ interface CalculationResult {
         mrd: number;
         passed: boolean;
     };
+    shearCheck: {
+        vsd: number; // kN
+        vrd: number; // kN
+        passed: boolean;
+    };
 }
 
 type BeamScheme = "biapoiada" | "balanco" | "dois-balancos";
@@ -122,8 +127,8 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
     const R_dist_kN = (q_kN_m * L_m) / 2;
     const R_pont_a_kN = (P_kN * b_cm) / L_cm;
     const R_pont_b_kN = (P_kN * a_cm) / L_cm;
-    const R_max_kN = R_dist_kN + Math.max(R_pont_a_kN, R_pont_b_kN);
-    const reaction_kgf = R_max_kN / 0.009807;
+    const Vsd_kN = R_dist_kN + Math.max(R_pont_a_kN, R_pont_b_kN);
+    const reaction_kgf = Vsd_kN / 0.009807;
 
     const requiredWx_cm3 = Msd_kNcm / fy_kN_cm2;
 
@@ -138,12 +143,18 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
     
     let finalProfile: CalculationResult | null = null;
     for (const profile of suitableProfiles) {
+        // LTB Check
         const Cb = 1.0;
         const Mp_kNcm = profile.Wx * fy_kN_cm2;
         const Mrd_kNcm = Cb * Mp_kNcm;
         const ltbPassed = Mrd_kNcm >= Msd_kNcm;
+
+        // Shear Check
+        const Aw_cm2 = profile.d / 10 * profile.tw / 10;
+        const Vrd_kN = (0.6 * fy_kN_cm2 * Aw_cm2); // NBR 8800
+        const shearPassed = Vrd_kN >= Vsd_kN;
         
-        if (ltbPassed) {
+        if (ltbPassed && shearPassed) {
              finalProfile = {
                 profile: profile,
                 requiredIx: requiredIx_cm4,
@@ -152,6 +163,11 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
                     msd: Msd_kNm,
                     mrd: Mrd_kNcm / 100,
                     passed: ltbPassed,
+                },
+                shearCheck: {
+                    vsd: Vsd_kN,
+                    vrd: Vrd_kN,
+                    passed: shearPassed,
                 }
             };
             break;
@@ -159,7 +175,7 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
     }
 
     if (!finalProfile) {
-      setError("Nenhum perfil passou na verificação de Flambagem Lateral-Torcional (FLT). Considere um vão menor ou travamentos laterais.");
+      setError("Nenhum perfil passou em todas as verificações (Flexão, Deformação, FLT e Cortante). Considere um vão menor, carga menor ou travamentos laterais.");
       return;
     }
     
@@ -205,6 +221,10 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
             },
             requiredWx: recommendedProfile.requiredWx,
             requiredIx: recommendedProfile.requiredIx,
+            shearCheck: {
+                vsd: recommendedProfile.shearCheck.vsd,
+                vrd: recommendedProfile.shearCheck.vrd,
+            }
         };
         const analysis = await interpretProfileSelection(aiInput);
         setAnalysisResult(analysis);
@@ -364,13 +384,17 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
                      <AlertDescription className="space-y-2 pt-2">
                         <div className="text-2xl font-bold text-center py-2 text-primary">{recommendedProfile.profile.nome}</div>
                          <div className="grid grid-cols-2 gap-2 text-center text-sm border-t pt-2">
-                             <div>
-                                <p className="text-muted-foreground">Verificação FLT (kNm)</p>
-                                <p className="font-semibold">{`Msd: ${recommendedProfile.ltbCheck.msd.toFixed(1)} ≤ Mrd: ${recommendedProfile.ltbCheck.mrd.toFixed(1)}`}</p>
+                            <div>
+                                <p className="text-muted-foreground">Cortante (kN)</p>
+                                <p className={`font-semibold ${recommendedProfile.shearCheck.passed ? 'text-green-600' : 'text-destructive'}`}>
+                                    {`Vsd: ${recommendedProfile.shearCheck.vsd.toFixed(1)} ≤ Vrd: ${recommendedProfile.shearCheck.vrd.toFixed(1)}`}
+                                </p>
                             </div>
                             <div>
-                                <p className="text-muted-foreground">Status FLT</p>
-                                <p className="font-semibold text-green-600">{recommendedProfile.ltbCheck.passed ? 'Aprovado' : 'Reprovado'}</p>
+                                <p className="text-muted-foreground">FLT (kNm)</p>
+                                <p className={`font-semibold ${recommendedProfile.ltbCheck.passed ? 'text-green-600' : 'text-destructive'}`}>
+                                    {`Msd: ${recommendedProfile.ltbCheck.msd.toFixed(1)} ≤ Mrd: ${recommendedProfile.ltbCheck.mrd.toFixed(1)}`}
+                                </p>
                             </div>
                         </div>
                     </AlertDescription>

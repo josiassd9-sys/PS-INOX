@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sparkles, Loader, RefreshCw, CheckCircle } from "lucide-react";
+import { Sparkles, Loader, RefreshCw, CheckCircle, Calculator } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { analyzeSapata, AnalyzeSapataInput, AnalyzeSapataOutput } from "@/ai/flows/sapata-analysis-flow";
 
@@ -32,6 +32,11 @@ export function SapataCalculator({ pillarLoad }: SapataCalculatorProps) {
     const [analysisResult, setAnalysisResult] = React.useState<AnalyzeSapataOutput | null>(null);
     const [error, setError] = React.useState<string | null>(null);
     const { toast } = useToast();
+
+    // Cost states
+    const [concretePrice, setConcretePrice] = React.useState("750"); // R$/m³
+    const [steelPrice, setSteelPrice] = React.useState("8.50"); // R$/kg
+    const [steelRatio, setSteelRatio] = React.useState("100"); // kg/m³
 
     const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -79,6 +84,32 @@ export function SapataCalculator({ pillarLoad }: SapataCalculatorProps) {
             setIsAnalyzing(false);
         }
     };
+    
+    const { volumeM3, concreteCost, steelCost, totalCost } = React.useMemo(() => {
+        if (!analysisResult) return { volumeM3: 0, concreteCost: 0, steelCost: 0, totalCost: 0 };
+        
+        const cPrice = parseFloat(concretePrice.replace(",", ".")) || 0;
+        const sPrice = parseFloat(steelPrice.replace(",", ".")) || 0;
+        const sRatio = parseFloat(steelRatio.replace(",", ".")) || 0;
+
+        const vol = analysisResult.footingDimensions.sideLengthM * analysisResult.footingDimensions.sideLengthM * (analysisResult.footingDimensions.recommendedHeightCm / 100);
+        const totalSteelKg = vol * sRatio;
+
+        const cCost = vol * cPrice;
+        const sCost = totalSteelKg * sPrice;
+        
+        return {
+            volumeM3: vol,
+            concreteCost: cCost,
+            steelCost: sCost,
+            totalCost: cCost + sCost
+        }
+
+    }, [analysisResult, concretePrice, steelPrice, steelRatio]);
+
+    const formatCurrency = (value: number) => {
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+    }
 
     return (
         <Card>
@@ -156,6 +187,47 @@ export function SapataCalculator({ pillarLoad }: SapataCalculatorProps) {
                                     {analysisResult.analysis}
                                 </AlertDescription>
                             </Alert>
+
+                            {/* Cost Estimation */}
+                            <Card>
+                                <CardHeader className="p-3">
+                                    <CardTitle className="text-lg flex items-center gap-2"><Calculator className="h-5 w-5"/> Estimativa de Custo</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4 p-3 pt-0">
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                        <div className="space-y-1">
+                                            <Label htmlFor="concrete-price" className="text-xs">Preço Concreto (R$/m³)</Label>
+                                            <Input id="concrete-price" type="text" inputMode="decimal" value={concretePrice} onChange={e => handleInputChange(setConcretePrice, e.target.value)} />
+                                        </div>
+                                         <div className="space-y-1">
+                                            <Label htmlFor="steel-price" className="text-xs">Preço Aço (R$/kg)</Label>
+                                            <Input id="steel-price" type="text" inputMode="decimal" value={steelPrice} onChange={e => handleInputChange(setSteelPrice, e.target.value)} />
+                                        </div>
+                                         <div className="space-y-1">
+                                            <Label htmlFor="steel-ratio" className="text-xs">Taxa de Aço (kg/m³)</Label>
+                                            <Input id="steel-ratio" type="text" inputMode="decimal" value={steelRatio} onChange={e => handleInputChange(setSteelRatio, e.target.value)} />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2 rounded-lg border bg-background p-2">
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-muted-foreground">Volume de Concreto:</span>
+                                            <span className="font-medium">{volumeM3.toFixed(3)} m³</span>
+                                        </div>
+                                         <div className="flex justify-between items-center text-sm">
+                                            <span className="text-muted-foreground">Custo Concreto:</span>
+                                            <span className="font-medium">{formatCurrency(concreteCost)}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-muted-foreground">Custo Aço:</span>
+                                            <span className="font-medium">{formatCurrency(steelCost)}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center text-lg font-bold text-primary border-t pt-1 mt-1">
+                                            <span>Custo Total Estimado:</span>
+                                            <span>{formatCurrency(totalCost)}</span>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
                         </CardContent>
                     </Card>
                 )}

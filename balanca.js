@@ -76,13 +76,17 @@ function setupSerialPort(portPath) {
         const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
 
         parser.on('data', async (line) => {
-            const pesoLimpo = line.trim();
-            console.log('Peso lido da balança:', pesoLimpo);
+            // Remove todos os caracteres que não são dígitos, vírgula ou ponto.
+            const numeroBruto = line.replace(/[^\d,.-]+/g, '').trim();
+            // Substitui vírgula por ponto para garantir o formato numérico correto.
+            const numeroLimpo = numeroBruto.replace(',', '.');
+            
+            console.log(`Dado bruto: "${line.trim()}" -> Dado limpo: "${numeroLimpo}"`);
 
-            if (pesoLimpo && db) {
+            if (numeroLimpo && db) {
                 try {
                     await db.collection('pesagens').add({
-                        peso: pesoLimpo,
+                        peso: numeroLimpo, // Envia o valor numérico limpo
                         timestamp: admin.firestore.FieldValue.serverTimestamp()
                     });
                     console.log('Peso enviado para o Firebase!');

@@ -15,9 +15,10 @@ const VigaPrincipalCalculator = dynamic(() => import('@/components/perfis/VigaPr
     ssr: false,
     loading: () => <LoadingComponent />,
 });
-VigaPrincipalCalculator.displayName = 'VigaPrincipalCalculator';
 
-
-export default function VigaPrincipalPage(props: any) {
+function VigaPrincipalPage(props: any) {
   return <VigaPrincipalCalculator {...props} />;
 }
+
+VigaPrincipalPage.displayName = 'VigaPrincipalPage';
+export default VigaPrincipalPage;

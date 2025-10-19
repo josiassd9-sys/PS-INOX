@@ -16,6 +16,7 @@ export default function CalculatorLayout({
   const [budgetItems, setBudgetItems] = React.useState<BudgetItem[]>([]);
   const [lastSlabLoad, setLastSlabLoad] = React.useState(0);
   const [supportReactions, setSupportReactions] = React.useState<SupportReaction>({ vigaPrincipal: 0, vigaSecundaria: 0 });
+  const [finalPillarLoad, setFinalPillarLoad] = React.useState(0);
   const { toast } = useToast();
 
   const handleAddToBudget = (item: BudgetItem) => {
@@ -27,6 +28,10 @@ export default function CalculatorLayout({
   }
   const handleVigaSecundariaReaction = (reaction: number) => {
     setSupportReactions(prev => ({...prev, vigaSecundaria: reaction}));
+  }
+
+  const handlePillarLoadCalculated = (load: number) => {
+      setFinalPillarLoad(load);
   }
 
   const handleClearBudget = () => {
@@ -51,13 +56,30 @@ export default function CalculatorLayout({
   // Inject shared state and handlers into child components
   const childrenWithProps = React.Children.map(children, child => {
     if (React.isValidElement(child)) {
-      return React.cloneElement(child, {
+      const pageName = (child.type as any).displayName;
+      let extraProps: any = {
           onAddToBudget: handleAddToBudget,
-          onCalculated: setLastSlabLoad,
-          lastSlabLoad: lastSlabLoad,
-          onReactionCalculated: (child.type as any).displayName === 'VigaPrincipalCalculator' ? handleVigaPrincipalReaction : handleVigaSecundariaReaction,
-          supportReactions: supportReactions,
-       } as any);
+      };
+
+      if (pageName === 'LajePage') {
+        extraProps.onCalculated = setLastSlabLoad;
+      }
+      if (pageName === 'VigaSecundariaPage') {
+          extraProps.lastSlabLoad = lastSlabLoad;
+          extraProps.onReactionCalculated = handleVigaSecundariaReaction;
+      }
+       if (pageName === 'VigaPrincipalPage') {
+          extraProps.onReactionCalculated = handleVigaPrincipalReaction;
+      }
+      if (pageName === 'PilarPage') {
+          extraProps.supportReactions = supportReactions;
+          extraProps.onPillarLoadCalculated = handlePillarLoadCalculated;
+      }
+      if (pageName === 'SapataPage') {
+          extraProps.pillarLoad = finalPillarLoad;
+      }
+
+      return React.cloneElement(child, extraProps);
     }
     return child;
   });

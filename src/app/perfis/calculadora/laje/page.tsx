@@ -16,6 +16,10 @@ const SteelDeckCalculator = dynamic(() => import('@/components/perfis/SteelDeckC
     loading: () => <LoadingComponent />,
 });
 
-export default function LajePage(props: any) {
+
+function LajePage(props: any) {
   return <SteelDeckCalculator {...props} />;
 }
+LajePage.displayName = 'LajePage';
+
+export default LajePage;

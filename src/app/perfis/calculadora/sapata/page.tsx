@@ -11,14 +11,14 @@ const LoadingComponent = () => (
     </div>
 )
 
-const PilarCalculator = dynamic(() => import('@/components/perfis/PilarCalculator').then(mod => mod.PilarCalculator), {
+const SapataCalculator = dynamic(() => import('@/components/perfis/SapataCalculator').then(mod => mod.SapataCalculator), {
     ssr: false,
     loading: () => <LoadingComponent />,
 });
 
-function PilarPage(props: any) {
-  return <PilarCalculator {...props} />;
+function SapataPage(props: any) {
+  return <SapataCalculator {...props} />;
 }
+SapataPage.displayName = 'SapataPage';
 
-PilarPage.displayName = 'PilarPage';
-export default PilarPage;
+export default SapataPage;

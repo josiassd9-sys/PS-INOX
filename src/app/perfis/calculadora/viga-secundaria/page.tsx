@@ -15,9 +15,10 @@ const VigaSecundariaCalculator = dynamic(() => import('@/components/perfis/VigaS
     ssr: false,
     loading: () => <LoadingComponent />,
 });
-VigaSecundariaCalculator.displayName = 'VigaSecundariaCalculator';
 
-
-export default function VigaSecundariaPage(props: any) {
+function VigaSecundariaPage(props: any) {
   return <VigaSecundariaCalculator {...props} />;
 }
+
+VigaSecundariaPage.displayName = 'VigaSecundariaPage';
+export default VigaSecundariaPage;

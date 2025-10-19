@@ -17,6 +17,7 @@ import { analyzePillarSelection, AnalyzePillarSelectionInput, AnalyzePillarSelec
 interface PilarCalculatorProps {
     onAddToBudget: (item: BudgetItem) => void;
     supportReactions: SupportReaction;
+    onPillarLoadCalculated: (load: number) => void;
 }
 
 interface CalculationResult {
@@ -25,7 +26,7 @@ interface CalculationResult {
     allowableStress: number; // Tensão admissível
 }
 
-export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalculatorProps) {
+export function PilarCalculator({ onAddToBudget, supportReactions, onPillarLoadCalculated }: PilarCalculatorProps) {
     const [height, setHeight] = React.useState("3");
     const [axialLoad, setAxialLoad] = React.useState("5000");
     const [steelType, setSteelType] = React.useState(tiposAco[0].nome);
@@ -38,6 +39,14 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
     
     const [isAnalyzing, setIsAnalyzing] = React.useState(false);
     const [analysisResult, setAnalysisResult] = React.useState<AnalyzePillarSelectionOutput | null>(null);
+
+    React.useEffect(() => {
+        const load = parseFloat(axialLoad.replace(',', '.'));
+        if (!isNaN(load) && load > 0) {
+            onPillarLoadCalculated(load);
+        }
+    }, [axialLoad, onPillarLoadCalculated]);
+
 
     const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');

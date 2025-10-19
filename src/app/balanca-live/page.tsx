@@ -67,7 +67,7 @@ function useFirestore() {
     return React.useContext(FirestoreContext);
 }
 
-function ConfigManager() {
+function ConfigManager({ onSaveSuccess }: { onSaveSuccess: () => void }) {
     const firestore = useFirestore();
     const { toast } = useToast();
     const configRef = firestore ? doc(firestore, "configuracoes", "balanca") : null;
@@ -94,6 +94,7 @@ function ConfigManager() {
                 title: "Configuração Salva!",
                 description: "As configurações da balança foram salvas no Firestore.",
             });
+            onSaveSuccess();
         } catch (e) {
             console.error(e);
             toast({
@@ -191,11 +192,21 @@ function BalancaLiveComponent() {
 
 
 export default function BalancaLivePage() {
+  const [accordionValue, setAccordionValue] = React.useState<string | undefined>(undefined);
+
+  const handleSaveSuccess = () => {
+    setAccordionValue(undefined); // Fecha o accordion
+  };
+  
+  const handleAccordionChange = (value: string | undefined) => {
+    setAccordionValue(value);
+  }
+
   return (
     <FirebaseProvider>
        <Dashboard initialCategoryId="balanca-live">
           <div className="container mx-auto p-4 space-y-4">
-              <Accordion type="single" collapsible className="w-full" defaultValue="config">
+              <Accordion type="single" collapsible className="w-full" value={accordionValue} onValueChange={handleAccordionChange}>
                   <AccordionItem value="config" className="border rounded-lg overflow-hidden bg-card">
                       <AccordionTrigger className="px-4 py-3 hover:bg-muted/50 text-base font-semibold">
                           <div className="flex items-center gap-2">
@@ -204,7 +215,7 @@ export default function BalancaLivePage() {
                           </div>
                       </AccordionTrigger>
                       <AccordionContent>
-                         <ConfigManager />
+                         <ConfigManager onSaveSuccess={handleSaveSuccess} />
                       </AccordionContent>
                   </AccordionItem>
               </Accordion>

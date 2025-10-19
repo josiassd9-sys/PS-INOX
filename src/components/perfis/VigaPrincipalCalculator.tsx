@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -12,6 +11,8 @@ import { CheckCircle, PlusCircle, Sparkles, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { perfisData, tiposAco, E_ACO_MPA, BudgetItem, Perfil } from "@/lib/data/index";
 import { interpretProfileSelection, InterpretProfileSelectionInput, InterpretProfileSelectionOutput } from "@/ai/flows/interpret-profile-selection";
+import { BeamSchemeDiagram } from "./BeamSchemeDiagram";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
 
 interface VigaPrincipalCalculatorProps {
     onAddToBudget: (item: BudgetItem) => void;
@@ -32,6 +33,7 @@ interface CalculationResult {
         vrd: number; // kN
         passed: boolean;
     };
+    optimizationData: { name: string; utilization: number }[];
 }
 
 type BeamScheme = "biapoiada" | "balanco" | "dois-balancos";
@@ -148,7 +150,12 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
         const shearPassed = Vrd_kN >= Vsd_kN;
         
         if (ltbPassed && shearPassed) {
-             finalProfile = { profile, requiredIx: requiredIx_cm4, requiredWx: requiredWx_cm3, ltbCheck: { msd: Msd_kNm, mrd: Mrd_kNcm / 100, passed: ltbPassed }, shearCheck: { vsd: Vsd_kN, vrd: Vrd_kN, passed: shearPassed } };
+            const optimizationData = [
+                { name: 'Flexão (Wx)', utilization: Math.min(100, (requiredWx_cm3 / profile.Wx) * 100) },
+                { name: 'Deform. (Ix)', utilization: Math.min(100, (requiredIx_cm4 / profile.Ix) * 100) },
+                { name: 'Cortante', utilization: Math.min(100, (Vsd_kN / Vrd_kN) * 100) },
+            ];
+             finalProfile = { profile, requiredIx: requiredIx_cm4, requiredWx: requiredWx_cm3, ltbCheck: { msd: Msd_kNm, mrd: Mrd_kNcm / 100, passed: ltbPassed }, shearCheck: { vsd: Vsd_kN, vrd: Vrd_kN, passed: shearPassed }, optimizationData };
             break;
         }
     }
@@ -258,8 +265,13 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <BeamSchemeDiagram 
+            scheme={beamScheme}
+            span={parseFloat(span.replace(",", ".")) || 0}
+            balanco1={parseFloat(balanco1.replace(",", ".")) || 0}
+            balanco2={parseFloat(balanco2.replace(",", ".")) || 0}
+          />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-
             {beamScheme === 'biapoiada' ? (
                  <div className="space-y-2">
                     <Label htmlFor="span">Vão / Comprimento (m)</Label>
@@ -349,23 +361,34 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
                     <AlertTitle className="text-primary font-bold flex items-center gap-2"><CheckCircle className="h-5 w-5"/> Perfil Recomendado</AlertTitle>
                      <AlertDescription className="space-y-2 pt-2">
                         <div className="text-2xl font-bold text-center py-2 text-primary">{recommendedProfile.profile.nome}</div>
-                         <div className="grid grid-cols-2 gap-2 text-center text-sm border-t pt-2">
-                            <div>
-                                <p className="text-muted-foreground">Cortante (kN)</p>
-                                <p className={`font-semibold ${recommendedProfile.shearCheck.passed ? 'text-green-600' : 'text-destructive'}`}>
-                                    {`Vsd: ${recommendedProfile.shearCheck.vsd.toFixed(1)} ≤ Vrd: ${recommendedProfile.shearCheck.vrd.toFixed(1)}`}
-                                </p>
-                            </div>
-                            <div>
-                                <p className="text-muted-foreground">Momento Fletor (kNm)</p>
-                                <p className={`font-semibold ${recommendedProfile.ltbCheck.passed ? 'text-green-600' : 'text-destructive'}`}>
-                                    {`Msd: ${recommendedProfile.ltbCheck.msd.toFixed(1)} ≤ Mrd: ${recommendedProfile.ltbCheck.mrd.toFixed(1)}`}
-                                </p>
-                            </div>
-                        </div>
                     </AlertDescription>
                 </CardHeader>
                  <CardContent className="space-y-4">
+                     <div className="h-40">
+                         <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={recommendedProfile.optimizationData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                                <XAxis type="number" domain={[0, 100]} hide />
+                                <YAxis type="category" dataKey="name" hide />
+                                <Tooltip
+                                    cursor={{fill: 'hsla(var(--primary) / 0.1)'}}
+                                    content={({ active, payload }) => {
+                                        if (active && payload && payload.length) {
+                                            return (
+                                                <div className="rounded-lg border bg-background p-2 shadow-sm">
+                                                    <p className="text-sm font-bold">{`${payload[0].payload.name}: ${payload[0].value?.toFixed(1)}% de utilização`}</p>
+                                                </div>
+                                            );
+                                        }
+                                        return null;
+                                    }}
+                                />
+                                <Bar dataKey="utilization" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]}>
+                                    <LabelList dataKey="name" position="insideLeft" offset={10} className="fill-primary-foreground text-xs" />
+                                    <LabelList dataKey="utilization" position="right" formatter={(value: number) => `${value.toFixed(0)}%`} className="fill-foreground text-xs" />
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                     </div>
                      <Button type="button" onClick={handleAnalyze} className="w-full" disabled={isAnalyzing}>
                          {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar com IA</>}
                       </Button>
@@ -406,4 +429,3 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
     </div>
   );
 }
-

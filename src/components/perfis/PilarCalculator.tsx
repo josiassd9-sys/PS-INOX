@@ -12,13 +12,8 @@ import { CheckCircle, PlusCircle, Send, Sparkles, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { perfisData, tiposAco, BudgetItem, Perfil, SupportReaction, E_ACO_MPA } from "@/lib/data/index";
 import { analyzePillarSelection, AnalyzePillarSelectionInput, AnalyzePillarSelectionOutput } from "@/ai/flows/pilar-analysis-flow";
+import { useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
 
-
-interface PilarCalculatorProps {
-    onAddToBudget: (item: BudgetItem) => void;
-    supportReactions: SupportReaction;
-    onPillarLoadCalculated: (load: number) => void;
-}
 
 interface CalculationResult {
     profile: Perfil;
@@ -26,7 +21,8 @@ interface CalculationResult {
     allowableStress: number; // Tensão admissível
 }
 
-export function PilarCalculator({ onAddToBudget, supportReactions, onPillarLoadCalculated }: PilarCalculatorProps) {
+export function PilarCalculator() {
+    const { onAddToBudget, supportReactions, onPillarLoadCalculated } = useCalculator();
     const [height, setHeight] = React.useState("3");
     const [axialLoad, setAxialLoad] = React.useState("5000");
     const [steelType, setSteelType] = React.useState(tiposAco[0].nome);

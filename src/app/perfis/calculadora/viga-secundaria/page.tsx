@@ -3,6 +3,7 @@
 
 import dynamic from "next/dynamic";
 import { Loader } from "lucide-react";
+import * as React from "react";
 
 const LoadingComponent = () => (
     <div className="flex items-center justify-center p-8 gap-2">
@@ -16,9 +17,6 @@ const VigaSecundariaCalculator = dynamic(() => import('@/components/perfis/VigaS
     loading: () => <LoadingComponent />,
 });
 
-function VigaSecundariaPage(props: any) {
-  return <VigaSecundariaCalculator {...props} />;
+export default function VigaSecundariaPage() {
+  return <VigaSecundariaCalculator />;
 }
-
-VigaSecundariaPage.displayName = 'VigaSecundariaPage';
-export default VigaSecundariaPage;

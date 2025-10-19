@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -13,11 +14,7 @@ import { perfisData, tiposAco, E_ACO_MPA, BudgetItem, Perfil } from "@/lib/data/
 import { interpretProfileSelection, InterpretProfileSelectionInput, InterpretProfileSelectionOutput } from "@/ai/flows/interpret-profile-selection";
 import { BeamSchemeDiagram } from "./BeamSchemeDiagram";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
-
-interface VigaPrincipalCalculatorProps {
-    onAddToBudget: (item: BudgetItem) => void;
-    onReactionCalculated: (reaction: number) => void;
-}
+import { useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
 
 interface CalculationResult {
     profile: Perfil;
@@ -38,7 +35,8 @@ interface CalculationResult {
 
 type BeamScheme = "biapoiada" | "balanco" | "dois-balancos";
 
-export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }: VigaPrincipalCalculatorProps) {
+export function VigaPrincipalCalculator() {
+  const { onAddToBudget, onVigaPrincipalReactionCalculated } = useCalculator();
   const [span, setSpan] = React.useState("5");
   const [balanco1, setBalanco1] = React.useState("1.5");
   const [balanco2, setBalanco2] = React.useState("1.5");
@@ -166,7 +164,7 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
     }
     
     setReaction(reaction_kgf);
-    onReactionCalculated(reaction_kgf);
+    onVigaPrincipalReactionCalculated(reaction_kgf);
     setRecommendedProfile(finalProfile);
     toast({ title: "Cálculo Concluído", description: `O perfil recomendado é ${finalProfile.profile.nome}.` });
   };

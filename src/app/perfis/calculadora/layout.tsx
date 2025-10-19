@@ -7,6 +7,8 @@ import { useToast } from "@/hooks/use-toast";
 import { BudgetItem, SupportReaction } from "@/lib/data/index";
 import { BudgetTable } from "@/components/perfis/BudgetTable";
 import { CalculatorTabs } from "@/components/perfis/CalculatorTabs";
+import { CalculatorProvider } from "./CalculatorContext";
+
 
 export default function CalculatorLayout({
   children,
@@ -53,55 +55,38 @@ export default function CalculatorLayout({
       window.print();
   }
 
-  // Inject shared state and handlers into child components
-  const childrenWithProps = React.Children.map(children, child => {
-    if (React.isValidElement(child) && typeof child.type === 'function') {
-      const pageName = (child.type as any).displayName;
-      let extraProps: any = {
-          onAddToBudget: handleAddToBudget,
-      };
-
-      if (pageName === 'LajePage') {
-        extraProps.onCalculated = setLastSlabLoad;
-      }
-      if (pageName === 'VigaSecundariaPage') {
-          extraProps.lastSlabLoad = lastSlabLoad;
-          extraProps.onReactionCalculated = handleVigaSecundariaReaction;
-      }
-       if (pageName === 'VigaPrincipalPage') {
-          extraProps.onReactionCalculated = handleVigaPrincipalReaction;
-      }
-      if (pageName === 'PilarPage') {
-          extraProps.supportReactions = supportReactions;
-          extraProps.onPillarLoadCalculated = handlePillarLoadCalculated;
-      }
-      if (pageName === 'SapataPage') {
-          extraProps.pillarLoad = finalPillarLoad;
-      }
-
-      return React.cloneElement(child, extraProps);
-    }
-    return child;
-  });
+  const contextValue = {
+    budgetItems,
+    lastSlabLoad,
+    supportReactions,
+    finalPillarLoad,
+    onAddToBudget: handleAddToBudget,
+    setLastSlabLoad,
+    onVigaPrincipalReactionCalculated: handleVigaPrincipalReaction,
+    onVigaSecundariaReactionCalculated: handleVigaSecundariaReaction,
+    onPillarLoadCalculated: handlePillarLoadCalculated,
+  };
   
   return (
-    <Dashboard initialCategoryId="perfis/calculadora">
-      <div className="container mx-auto p-4 space-y-4 print:p-0">
-          <CalculatorTabs />
-          
-          <div className="mt-4">
-            {childrenWithProps}
-          </div>
-          
-          {budgetItems.length > 0 && (
-              <BudgetTable 
-                  items={budgetItems}
-                  onClear={handleClearBudget}
-                  onSave={handleSaveBudget}
-                  onPrint={handlePrintBudget}
-              />
-          )}
-      </div>
-    </Dashboard>
+    <CalculatorProvider value={contextValue}>
+      <Dashboard initialCategoryId="perfis/calculadora">
+        <div className="container mx-auto p-4 space-y-4 print:p-0">
+            <CalculatorTabs />
+            
+            <div className="mt-4">
+              {children}
+            </div>
+            
+            {budgetItems.length > 0 && (
+                <BudgetTable 
+                    items={budgetItems}
+                    onClear={handleClearBudget}
+                    onSave={handleSaveBudget}
+                    onPrint={handlePrintBudget}
+                />
+            )}
+        </div>
+      </Dashboard>
+    </CalculatorProvider>
   );
 }

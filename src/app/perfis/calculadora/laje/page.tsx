@@ -3,6 +3,7 @@
 
 import dynamic from "next/dynamic";
 import { Loader } from "lucide-react";
+import * as React from "react";
 
 const LoadingComponent = () => (
     <div className="flex items-center justify-center p-8 gap-2">
@@ -17,9 +18,6 @@ const SteelDeckCalculator = dynamic(() => import('@/components/perfis/SteelDeckC
 });
 
 
-function LajePage(props: any) {
-  return <SteelDeckCalculator {...props} />;
+export default function LajePage() {
+  return <SteelDeckCalculator />;
 }
-LajePage.displayName = 'LajePage';
-
-export default LajePage;

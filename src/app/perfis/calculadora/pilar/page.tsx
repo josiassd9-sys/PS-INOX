@@ -3,6 +3,7 @@
 
 import dynamic from "next/dynamic";
 import { Loader } from "lucide-react";
+import * as React from "react";
 
 const LoadingComponent = () => (
     <div className="flex items-center justify-center p-8 gap-2">
@@ -16,9 +17,6 @@ const PilarCalculator = dynamic(() => import('@/components/perfis/PilarCalculato
     loading: () => <LoadingComponent />,
 });
 
-function PilarPage(props: any) {
-  return <PilarCalculator {...props} />;
+export default function PilarPage() {
+  return <PilarCalculator />;
 }
-
-PilarPage.displayName = 'PilarPage';
-export default PilarPage;

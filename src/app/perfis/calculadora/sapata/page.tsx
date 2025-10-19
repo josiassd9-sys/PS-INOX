@@ -3,6 +3,7 @@
 
 import dynamic from "next/dynamic";
 import { Loader } from "lucide-react";
+import * as React from "react";
 
 const LoadingComponent = () => (
     <div className="flex items-center justify-center p-8 gap-2">
@@ -16,9 +17,6 @@ const SapataCalculator = dynamic(() => import('@/components/perfis/SapataCalcula
     loading: () => <LoadingComponent />,
 });
 
-function SapataPage(props: any) {
-  return <SapataCalculator {...props} />;
+export default function SapataPage() {
+  return <SapataCalculator />;
 }
-SapataPage.displayName = 'SapataPage';
-
-export default SapataPage;

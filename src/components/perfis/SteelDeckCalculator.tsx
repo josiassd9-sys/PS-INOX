@@ -16,13 +16,10 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { analyzeSlabSelection, AnalyzeSlabSelectionInput, AnalyzeSlabSelectionOutput } from "@/ai/flows/slab-analysis-flow";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
 
-interface SteelDeckCalculatorProps {
-    onCalculated: (load: number) => void;
-    onAddToBudget: (item: BudgetItem) => void;
-}
-
-export function SteelDeckCalculator({ onCalculated, onAddToBudget }: SteelDeckCalculatorProps) {
+export function SteelDeckCalculator() {
+    const { setLastSlabLoad, onAddToBudget } = useCalculator();
     const [selectedDeckId, setSelectedDeckId] = React.useState<string>(steelDeckData[0].nome);
     const [concreteThickness, setConcreteThickness] = React.useState<string>("12");
     const [selectedLoads, setSelectedLoads] = React.useState<string[]>(['office']);
@@ -64,7 +61,7 @@ export function SteelDeckCalculator({ onCalculated, onAddToBudget }: SteelDeckCa
             const concreteWeight = (h_cm / 100) * PESO_CONCRETO_KGF_M3;
             const finalLoad = deck.pesoProprio + concreteWeight + S_kgf;
             setTotalLoad(finalLoad);
-            onCalculated(finalLoad);
+            setLastSlabLoad(finalLoad);
             toast({
               title: "Cálculo da Laje Concluído!",
               description: `A carga total é de ${finalLoad.toFixed(0)} kgf/m².`,

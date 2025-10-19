@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -13,12 +14,7 @@ import { perfisIpeData, tiposAco, E_ACO_MPA, BudgetItem, PerfilIpe, RESISTENCIA_
 import { interpretProfileSelection, InterpretProfileSelectionInput, InterpretProfileSelectionOutput } from "@/ai/flows/interpret-profile-selection";
 import { BeamSchemeDiagram } from "./BeamSchemeDiagram";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
-
-interface VigaSecundariaCalculatorProps {
-    onAddToBudget: (item: BudgetItem) => void;
-    lastSlabLoad: number;
-    onReactionCalculated: (reaction: number) => void;
-}
+import { useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
 
 interface CalculationResult {
     profile: PerfilIpe;
@@ -40,7 +36,8 @@ interface CalculationResult {
 
 type BeamScheme = "biapoiada" | "balanco" | "dois-balancos";
 
-export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReactionCalculated }: VigaSecundariaCalculatorProps) {
+export function VigaSecundariaCalculator() {
+  const { onAddToBudget, lastSlabLoad, onVigaSecundariaReactionCalculated } = useCalculator();
   const [span, setSpan] = React.useState("4");
   const [balanco1, setBalanco1] = React.useState("1");
   const [balanco2, setBalanco2] = React.useState("1");
@@ -203,7 +200,7 @@ export function VigaSecundariaCalculator({ onAddToBudget, lastSlabLoad, onReacti
     }
     
     setReaction(reaction_kgf);
-    onReactionCalculated(reaction_kgf);
+    onVigaSecundariaReactionCalculated(reaction_kgf);
     setRecommendedProfile(finalProfile);
     toast({ title: "Cálculo de Viga Secundária Concluído", description: `O perfil recomendado é ${finalProfile.profile.nome}.` });
   };

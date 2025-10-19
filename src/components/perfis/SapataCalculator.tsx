@@ -11,10 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sparkles, Loader, RefreshCw, CheckCircle, Calculator } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { analyzeSapata, AnalyzeSapataInput, AnalyzeSapataOutput } from "@/ai/flows/sapata-analysis-flow";
+import { useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
 
-interface SapataCalculatorProps {
-    pillarLoad: number;
-}
+interface SapataCalculatorProps {}
 
 const soilTypes = [
     { name: "Rocha Sã", pressure: 10.0 }, // kgf/cm²
@@ -24,7 +23,8 @@ const soilTypes = [
     { name: "Areia Fofa", pressure: 1.0 },
 ];
 
-export function SapataCalculator({ pillarLoad }: SapataCalculatorProps) {
+export function SapataCalculator(props: SapataCalculatorProps) {
+    const { finalPillarLoad } = useCalculator();
     const [load, setLoad] = React.useState("0");
     const [selectedSoil, setSelectedSoil] = React.useState(soilTypes[2].name); // Argila Rija
     
@@ -46,16 +46,16 @@ export function SapataCalculator({ pillarLoad }: SapataCalculatorProps) {
     };
 
     const handleApplyPillarLoad = () => {
-        if (pillarLoad > 0) {
-            setLoad(pillarLoad.toFixed(0));
+        if (finalPillarLoad > 0) {
+            setLoad(finalPillarLoad.toFixed(0));
             toast({
                 title: "Carga do Pilar Aplicada!",
-                description: `A carga de ${pillarLoad.toFixed(0)} kgf foi inserida no campo.`
+                description: `A carga de ${finalPillarLoad.toFixed(0)} kgf foi inserida no campo.`
             });
         }
     };
     
-    const isPillarLoadSynced = pillarLoad > 0 && pillarLoad.toFixed(0) === load;
+    const isPillarLoadSynced = finalPillarLoad > 0 && finalPillarLoad.toFixed(0) === load;
 
     const handleAnalyze = async () => {
         const totalLoadKgf = parseFloat(load.replace(',', '.'));
@@ -124,7 +124,7 @@ export function SapataCalculator({ pillarLoad }: SapataCalculatorProps) {
                     <div className="space-y-2">
                          <div className="flex items-center justify-between">
                             <Label htmlFor="pillar-load">Carga Total do Pilar (kgf)</Label>
-                            {pillarLoad > 0 && (
+                            {finalPillarLoad > 0 && (
                             <Button variant="ghost" size="icon" className="h-6 w-6 text-primary" onClick={handleApplyPillarLoad} title="Aplicar carga calculada na aba de pilar">
                                 <RefreshCw className={`h-4 w-4 ${isPillarLoadSynced ? 'text-green-500' : 'animate-pulse'}`}/>
                             </Button>

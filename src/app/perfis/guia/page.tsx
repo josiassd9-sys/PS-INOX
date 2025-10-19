@@ -24,20 +24,23 @@ const guideTopics = [
                 </p>
                 <ol className="list-decimal pl-5 space-y-2">
                     <li>
-                        <strong>Laje (Steel Deck):</strong> Comece aqui para definir o piso. O resultado principal é a <strong>Carga Total (kgf/m²)</strong>, que será usada no próximo passo. Adicione a chapa de aço ao orçamento se desejar.
+                        <strong>Laje (Steel Deck):</strong> Comece aqui para definir o piso. Use o "Construtor de Sobrecarga" para definir as cargas de uso. O resultado principal é a <strong>Carga Total (kgf/m²)</strong>, que será usada no próximo passo.
                     </li>
                     <li>
-                        <strong>Viga Secundária (IPE):</strong> Use a carga da laje calculada (ou informe uma carga linear manualmente). A calculadora dimensionará a viga IPE mais leve. Adicione-a ao orçamento. O resultado crucial aqui é a <strong>Reação de Apoio (kgf)</strong>.
+                        <strong>Viga Secundária (IPE):</strong> Use a carga da laje calculada (ou informe uma carga linear manualmente) e o espaçamento. A calculadora dimensionará a viga IPE mais leve. O resultado crucial aqui é a <strong>Reação de Apoio (kgf)</strong>.
                     </li>
                     <li>
-                        <strong>Viga Principal (W):</strong> Aqui você pode dimensionar as vigas que receberão as cargas das vigas secundárias. Lembre-se de escolher o esquema de viga correto (bi-apoiada, com balanços, etc.). O resultado também fornecerá a Reação de Apoio.
+                        <strong>Viga Principal (W):</strong> Dimensione as vigas que receberão as cargas das vigas secundárias. Lembre-se de escolher o esquema de viga correto (bi-apoiada, com balanços para simular viga contínua, etc.). O resultado também fornecerá a Reação de Apoio.
                     </li>
                      <li>
-                        <strong>Pilar (Coluna):</strong> Use os botões <strong>"Enviar Reação"</strong> para somar automaticamente as reações de apoio calculadas nas vigas. Isso compõe a carga final do pilar, que será dimensionado. Adicione o pilar ao orçamento para finalizar.
+                        <strong>Pilar (Coluna):</strong> Use os botões <strong>"Enviar Reação"</strong> nas abas de viga para somar automaticamente as reações de apoio. Isso compõe a carga final do pilar, que será dimensionado para resistir à compressão e flambagem.
+                    </li>
+                     <li>
+                        <strong>Sapata (Fundação):</strong> A carga do pilar será enviada para esta aba. Informe o tipo de solo e o assistente de IA irá pré-dimensionar a sapata de concreto necessária, incluindo uma estimativa de custo.
                     </li>
                 </ol>
                 <p className="mt-2 text-sm text-muted-foreground">
-                    Após cada cálculo, um botão <strong>"Analisar com IA"</strong> aparecerá. Clique nele para obter insights sobre a seleção do perfil, otimização e segurança.
+                    Após cada cálculo, um botão <strong>"Analisar com IA"</strong> aparecerá. Clique nele para obter insights sobre a seleção do perfil, otimização e segurança. Todos os itens podem ser adicionados ao <strong>Orçamento Final</strong> na parte inferior da página.
                 </p>
             </div>
         )
@@ -107,66 +110,6 @@ const guideTopics = [
         )
     },
     {
-        id: "md57-vs-md75",
-        title: "MD57 vs. MD75: Qual Steel Deck Escolher?",
-        icon: "Layers",
-        content: (
-            <div className="space-y-2">
-                <p>
-                    A sigla refere-se à altura da nervura do perfil: <strong>MD57</strong> tem 57mm de altura, e <strong>MD75</strong> tem 75mm. A escolha impacta a estrutura e o consumo de concreto.
-                </p>
-                <div>
-                    <h4 className="font-semibold">Steel Deck MD57</h4>
-                    <p className="text-muted-foreground">
-                        É um perfil muito versátil e amplamente utilizado. Por ter uma nervura mais baixa, consome um volume ligeiramente menor de concreto para atingir a espessura final da laje. É ideal para vãos moderados.
-                    </p>
-                </div>
-                 <div>
-                    <h4 className="font-semibold">Steel Deck MD75</h4>
-                    <p className="text-muted-foreground">
-                        A nervura mais alta confere a este perfil uma <strong>maior resistência e inércia</strong>. Isso significa que, para a mesma espessura de chapa e mesma carga, o MD75 consegue vencer vãos maiores.
-                    </p>
-                </div>
-                 <div>
-                    <h4 className="font-semibold text-primary">Qual escolher?</h4>
-                    <p className="text-muted-foreground">
-                       A decisão depende do seu projeto. Se você precisa vencer <strong>vãos maiores</strong> entre as vigas de apoio, o <strong>MD75</strong> é geralmente a escolha mais eficiente, pois pode reduzir a quantidade de vigas secundárias necessárias. Para <strong>vãos menores ou moderados</strong>, o <strong>MD57</strong> pode ser mais econômico devido ao menor consumo de concreto.
-                    </p>
-                </div>
-            </div>
-        )
-    },
-     {
-        id: "vao-simples-duplo",
-        title: "Vão Simples vs. Vão Duplo: Entenda a Diferença",
-        icon: "GitCompareArrows",
-        content: (
-            <div className="space-y-2">
-                 <p>
-                    Na tabela de referência de Steel Deck, você notará as colunas "Vão Simples" e "Vão Duplo". A escolha correta é crucial para a eficiência do projeto.
-                </p>
-                <div>
-                    <h4 className="font-semibold">Vão Simples (Apoio Bi-apoiado)</h4>
-                    <p className="text-muted-foreground">
-                        Ocorre quando uma única chapa de Steel Deck é apoiada em apenas duas vigas, uma em cada extremidade. Toda a carga é suportada nesse único vão. É a situação mais simples, mas menos eficiente.
-                    </p>
-                </div>
-                 <div>
-                    <h4 className="font-semibold">Vão Duplo (Apoios Contínuos)</h4>
-                    <p className="text-muted-foreground">
-                        Acontece quando uma chapa de Steel Deck é contínua e passa sobre três ou mais vigas. Por exemplo, uma chapa de 6 metros apoiada em vigas a cada 3 metros (nos pontos 0m, 3m e 6m). Isso cria múltiplos vãos (neste caso, dois vãos de 3m cada).
-                    </p>
-                </div>
-                 <div>
-                    <h4 className="font-semibold text-primary">Por que o Vão Duplo é Melhor?</h4>
-                    <p className="text-muted-foreground">
-                       Devido ao efeito de "viga contínua", os esforços de flexão são mais bem distribuídos. Isso significa que, para a mesma carga e espessura de chapa, o Steel Deck em vão duplo consegue vencer distâncias maiores do que em vão simples. Na prática, você pode usar menos vigas de apoio, economizando material e custo. Sempre que possível, projete para ter vãos duplos ou múltiplos.
-                    </p>
-                </div>
-            </div>
-        )
-    },
-    {
         id: "pilar",
         title: "4. Aba Pilar (Coluna)",
         icon: "Square",
@@ -181,19 +124,40 @@ const guideTopics = [
                              <li>Informe a <strong>Altura do Pilar</strong>.</li>
                         </ul>
                     </li>
-                    <li><strong>Resultado Principal:</strong> O <strong>Perfil W Recomendado</strong> para o pilar e uma <strong>análise final da IA</strong> sobre a coerência de todo o sistema, incluindo alertas sobre a necessidade de verificar as ligações viga-pilar.</li>
+                    <li><strong>Resultado Principal:</strong> O <strong>Perfil W Recomendado</strong> para o pilar e uma <strong>análise final da IA</strong> sobre a coerência de todo o sistema, incluindo alertas sobre a necessidade de verificar as ligações viga-pilar. A carga do pilar será enviada automaticamente para a próxima aba.</li>
                      <li><strong>Ação:</strong> Adicione os pilares ao orçamento para ter a lista completa de materiais da sua estrutura.</li>
                 </ul>
             </div>
         )
     },
     {
+        id: "sapata",
+        title: "5. Aba Sapata (Fundação)",
+        icon: "Layers",
+        content: (
+            <div>
+                <p className="mb-2">Pré-dimensiona a fundação de concreto para o pilar.</p>
+                 <ul className="list-disc pl-5 space-y-1">
+                    <li><strong>Como Usar:</strong>
+                        <ul className="list-disc pl-5 mt-1 space-y-1">
+                             <li>O campo <strong>Carga Total do Pilar (kgf)</strong> será preenchido automaticamente com o valor calculado na aba "Pilar".</li>
+                             <li>Selecione o <strong>Tipo de Solo</strong> mais apropriado para o seu local. A tensão admissível de cada solo é mostrada ao lado.</li>
+                             <li>Clique em "Analisar Fundação".</li>
+                        </ul>
+                    </li>
+                    <li><strong>Resultado Principal:</strong> A IA fornecerá uma <strong>análise completa</strong> e o <strong>pré-dimensionamento da sapata</strong> (área, dimensões e altura recomendada).</li>
+                     <li><strong>Estimativa de Custo:</strong> Após a análise, você pode ajustar os preços do concreto e do aço para obter uma estimativa de custo para a sua fundação.</li>
+                </ul>
+            </div>
+        )
+    },
+    {
         id: "orcamento",
-        title: "5. O Orçamento Final",
+        title: "6. O Orçamento Final",
         icon: "Calculator",
         content: (
             <p>
-                Todos os itens adicionados (Laje, Vigas e Pilares) são consolidados na tabela de orçamento na parte inferior da página. Ali, você pode ver o peso e o custo total do seu projeto, além de poder salvar ou imprimir um relatório limpo e profissional.
+                Todos os itens adicionados (Laje, Vigas e Pilares) são consolidados na tabela de orçamento na parte inferior da página. Ali, você pode ver o peso e o custo total do seu projeto, além de poder salvar, limpar ou imprimir um relatório limpo e profissional para o seu cliente ou para registro.
             </p>
         )
     }
@@ -206,7 +170,7 @@ function GuideComponent() {
             <CardHeader>
                 <CardTitle>Guia da Calculadora de Estruturas</CardTitle>
                 <CardDescription>
-                    Aprenda passo a passo como dimensionar e orçar seu projeto de estrutura metálica.
+                    Aprenda passo a passo como dimensionar e orçar seu projeto de estrutura metálica, da laje à fundação.
                 </CardDescription>
             </CardHeader>
         </Card>

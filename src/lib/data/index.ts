@@ -328,7 +328,7 @@ const ALL_CATEGORIES: Category[] = [
   },
   {
     id: 'perfis/informacoes',
-    name: 'Informações Técnicas',
+    name: 'Inf. Estruturais',
     description: 'Contexto e conceitos fundamentais para o uso e dimensionamento de perfis de aço estrutural.',
     icon: 'BookOpen',
     unit: 'calc',
@@ -348,7 +348,7 @@ const ALL_CATEGORIES: Category[] = [
     id: 'perfis/guia',
     name: 'Guia da Calculadora',
     description: 'Aprenda a usar a calculadora de estruturas passo a passo.',
-    icon: 'BookOpen',
+    icon: 'Info',
     unit: 'calc',
     items: [],
     path: '/perfis/guia'

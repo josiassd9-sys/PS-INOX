@@ -1,4 +1,5 @@
 
+
 import type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction, LiveLoadOption } from './types';
 import { perfisData, tiposAco, PESO_CONCRETO_KGF_M3, E_ACO_MPA, RESISTENCIA_CALCULO_CONECTOR_KN } from './perfis';
 import { perfisIpeData } from './perfis-ipe';
@@ -31,6 +32,15 @@ const ALL_CATEGORIES: Category[] = [
     unit: 'calc',
     items: [],
     path: '/lista-materiais'
+  },
+  {
+    id: 'balanca-live',
+    name: 'Balança Live',
+    description: 'Visualize as pesagens da balança em tempo real.',
+    icon: 'GitCompareArrows',
+    unit: 'calc',
+    items: [],
+    path: '/balanca-live'
   },
   {
     id: 'package-checker',
@@ -470,6 +480,7 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
             ALL_CATEGORIES.find(c => c.id === 'lista-materiais')!,
             ALL_CATEGORIES.find(c => c.id === 'package-checker')!,
             ALL_CATEGORIES.find(c => c.id === 'balanca')!,
+            ALL_CATEGORIES.find(c => c.id === 'balanca-live')!,
             ALL_CATEGORIES.find(c => c.id === 'print-preview')!,
             ALL_CATEGORIES.find(c => c.id === 'tabela-sucata')!,
             ALL_CATEGORIES.find(c => c.id === 'lista-sucatas')!,

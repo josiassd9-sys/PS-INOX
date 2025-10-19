@@ -1,0 +1,71 @@
+mutation CreateWeighingSession(
+  $userId: UUID
+  $vehicleId: UUID
+  $cargoDescription: String
+  $destination: String
+  $grossWeight: Float!
+  $netWeight: Float
+  $notes: String
+  $origin: String
+  $status: String!
+  $tareWeight: Float
+  $timestamp: Timestamp!
+) @auth(level: USER) {
+  weighingSession_insert(
+    data: {
+      userId: $userId
+      vehicleId: $vehicleId
+      cargoDescription: $cargoDescription
+      destination: $destination
+      grossWeight: $grossWeight
+      netWeight: $netWeight
+      notes: $notes
+      origin: $origin
+      status: $status
+      tareWeight: $tareWeight
+      timestamp: $timestamp
+    }
+  )
+}
+
+query GetWeighingSession($id: UUID!) @auth(level: USER) {
+  weighingSession(id: $id) {
+    id
+    userId
+    vehicleId
+    cargoDescription
+    destination
+    grossWeight
+    netWeight
+    notes
+    origin
+    status
+    tareWeight
+    timestamp
+  }
+}
+
+query ListVehicles @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public") {
+  vehicles {
+    id
+    licensePlate
+    make
+    model
+    ownerCompanyName
+    vehicleType
+    year
+  }
+}
+
+mutation UpdateVehicle($id: UUID!, $make: String, $model: String, $ownerCompanyName: String, $vehicleType: String, $year: Int) @auth(level: USER) {
+  vehicle_update(
+    id: $id,
+    data: {
+      make: $make
+      model: $model
+      ownerCompanyName: $ownerCompanyName
+      vehicleType: $vehicleType
+      year: $year
+    }
+  )
+}

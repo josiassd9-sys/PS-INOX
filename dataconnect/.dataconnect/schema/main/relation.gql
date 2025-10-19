@@ -1,0 +1,507 @@
+extend type Company {
+  """
+  Implicit metadata field that cannot be written. It provides extra information about query results.
+  """
+  _metadata: _Metadata @fdc_generated(from: "Company", purpose: METADATA_FIELD)
+  """
+  ✨ Count the number of rows in the `Company` table.
+  """
+  _count: Int! @fdc_generated(from: "Company.", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `Company` table where the `address` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  address_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "Company.address", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `Company` table where the `companyName` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  companyName_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "Company.companyName", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `Company` table where the `contactPerson` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  contactPerson_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "Company.contactPerson", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `Company` table where the `email` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  email_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "Company.email", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `Company` table where the `id` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  id_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "Company.id", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `Company` table where the `phoneNumber` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  phoneNumber_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "Company.phoneNumber", purpose: QUERY_COUNT)
+}
+extend type User {
+  """
+  ✨ List `WeighingSession` objects in a one-to-many relationship (where `WeighingSession`.`user` is this object).
+  """
+  weighingSessions_on_user(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: WeighingSession_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [WeighingSession_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: WeighingSession_Having
+  ): [WeighingSession!]! @fdc_generated(from: "WeighingSession.user", purpose: QUERY_MULTIPLE_ONE_TO_MANY)
+  """
+  Implicit metadata field that cannot be written. It provides extra information about query results.
+  """
+  _metadata: _Metadata @fdc_generated(from: "User", purpose: METADATA_FIELD)
+  """
+  ✨ Count the number of rows in the `User` table.
+  """
+  _count: Int! @fdc_generated(from: "User.", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `User` table where the `createdAt` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  createdAt_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "User.createdAt", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `User` table where the `displayName` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  displayName_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "User.displayName", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `User` table where the `email` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  email_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "User.email", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `User` table where the `id` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  id_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "User.id", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `User` table where the `phoneNumber` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  phoneNumber_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "User.phoneNumber", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `User` table where the `role` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  role_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "User.role", purpose: QUERY_COUNT)
+  """
+  ✨ Minimum of the `createdAt` field in the `User` table.
+  """
+  createdAt_min: Timestamp @fdc_generated(from: "User.createdAt", purpose: QUERY_MIN)
+  """
+  ✨ Maximum of the `createdAt` field in the `User` table.
+  """
+  createdAt_max: Timestamp @fdc_generated(from: "User.createdAt", purpose: QUERY_MAX)
+}
+extend type Vehicle {
+  """
+  ✨ List `WeighingSession` objects in a one-to-many relationship (where `WeighingSession`.`vehicle` is this object).
+  """
+  weighingSessions_on_vehicle(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: WeighingSession_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [WeighingSession_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: WeighingSession_Having
+  ): [WeighingSession!]! @fdc_generated(from: "WeighingSession.vehicle", purpose: QUERY_MULTIPLE_ONE_TO_MANY)
+  """
+  Implicit metadata field that cannot be written. It provides extra information about query results.
+  """
+  _metadata: _Metadata @fdc_generated(from: "Vehicle", purpose: METADATA_FIELD)
+  """
+  ✨ Count the number of rows in the `Vehicle` table.
+  """
+  _count: Int! @fdc_generated(from: "Vehicle.", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `Vehicle` table where the `id` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  id_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "Vehicle.id", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `Vehicle` table where the `licensePlate` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  licensePlate_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "Vehicle.licensePlate", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `Vehicle` table where the `make` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  make_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "Vehicle.make", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `Vehicle` table where the `model` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  model_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "Vehicle.model", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `Vehicle` table where the `ownerCompanyName` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  ownerCompanyName_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "Vehicle.ownerCompanyName", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `Vehicle` table where the `vehicleType` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  vehicleType_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "Vehicle.vehicleType", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `Vehicle` table where the `year` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  year_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "Vehicle.year", purpose: QUERY_COUNT)
+  """
+  ✨ Sum the `year` field in the `Vehicle` table.
+  """
+  year_sum(
+    """
+    Set to true to sum the distinct values.
+    """
+    distinct: Boolean = false
+  ): Int @fdc_generated(from: "Vehicle.year", purpose: QUERY_SUM)
+  """
+  ✨ Average the `year` field in the `Vehicle` table.
+  """
+  year_avg(
+    """
+    Set to true to average the distinct values.
+    """
+    distinct: Boolean = false
+  ): Float @fdc_generated(from: "Vehicle.year", purpose: QUERY_AVG)
+  """
+  ✨ Minimum of the `year` field in the `Vehicle` table.
+  """
+  year_min: Int @fdc_generated(from: "Vehicle.year", purpose: QUERY_MIN)
+  """
+  ✨ Maximum of the `year` field in the `Vehicle` table.
+  """
+  year_max: Int @fdc_generated(from: "Vehicle.year", purpose: QUERY_MAX)
+}
+extend type WeighingSession {
+  """
+  Implicit metadata field that cannot be written. It provides extra information about query results.
+  """
+  _metadata: _Metadata @fdc_generated(from: "WeighingSession", purpose: METADATA_FIELD)
+  """
+  ✨ Count the number of rows in the `WeighingSession` table.
+  """
+  _count: Int! @fdc_generated(from: "WeighingSession.", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `WeighingSession` table where the `cargoDescription` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  cargoDescription_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "WeighingSession.cargoDescription", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `WeighingSession` table where the `destination` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  destination_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "WeighingSession.destination", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `WeighingSession` table where the `grossWeight` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  grossWeight_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "WeighingSession.grossWeight", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `WeighingSession` table where the `id` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  id_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "WeighingSession.id", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `WeighingSession` table where the `netWeight` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  netWeight_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "WeighingSession.netWeight", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `WeighingSession` table where the `notes` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  notes_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "WeighingSession.notes", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `WeighingSession` table where the `origin` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  origin_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "WeighingSession.origin", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `WeighingSession` table where the `status` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  status_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "WeighingSession.status", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `WeighingSession` table where the `tareWeight` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  tareWeight_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "WeighingSession.tareWeight", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `WeighingSession` table where the `timestamp` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  timestamp_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "WeighingSession.timestamp", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `WeighingSession` table where the `userId` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  userId_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "WeighingSession.userId", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `WeighingSession` table where the `vehicleId` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  vehicleId_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "WeighingSession.vehicleId", purpose: QUERY_COUNT)
+  """
+  ✨ Sum the `grossWeight` field in the `WeighingSession` table.
+  """
+  grossWeight_sum(
+    """
+    Set to true to sum the distinct values.
+    """
+    distinct: Boolean = false
+  ): Float @fdc_generated(from: "WeighingSession.grossWeight", purpose: QUERY_SUM)
+  """
+  ✨ Sum the `netWeight` field in the `WeighingSession` table.
+  """
+  netWeight_sum(
+    """
+    Set to true to sum the distinct values.
+    """
+    distinct: Boolean = false
+  ): Float @fdc_generated(from: "WeighingSession.netWeight", purpose: QUERY_SUM)
+  """
+  ✨ Sum the `tareWeight` field in the `WeighingSession` table.
+  """
+  tareWeight_sum(
+    """
+    Set to true to sum the distinct values.
+    """
+    distinct: Boolean = false
+  ): Float @fdc_generated(from: "WeighingSession.tareWeight", purpose: QUERY_SUM)
+  """
+  ✨ Average the `grossWeight` field in the `WeighingSession` table.
+  """
+  grossWeight_avg(
+    """
+    Set to true to average the distinct values.
+    """
+    distinct: Boolean = false
+  ): Float @fdc_generated(from: "WeighingSession.grossWeight", purpose: QUERY_AVG)
+  """
+  ✨ Average the `netWeight` field in the `WeighingSession` table.
+  """
+  netWeight_avg(
+    """
+    Set to true to average the distinct values.
+    """
+    distinct: Boolean = false
+  ): Float @fdc_generated(from: "WeighingSession.netWeight", purpose: QUERY_AVG)
+  """
+  ✨ Average the `tareWeight` field in the `WeighingSession` table.
+  """
+  tareWeight_avg(
+    """
+    Set to true to average the distinct values.
+    """
+    distinct: Boolean = false
+  ): Float @fdc_generated(from: "WeighingSession.tareWeight", purpose: QUERY_AVG)
+  """
+  ✨ Minimum of the `grossWeight` field in the `WeighingSession` table.
+  """
+  grossWeight_min: Float @fdc_generated(from: "WeighingSession.grossWeight", purpose: QUERY_MIN)
+  """
+  ✨ Minimum of the `netWeight` field in the `WeighingSession` table.
+  """
+  netWeight_min: Float @fdc_generated(from: "WeighingSession.netWeight", purpose: QUERY_MIN)
+  """
+  ✨ Minimum of the `tareWeight` field in the `WeighingSession` table.
+  """
+  tareWeight_min: Float @fdc_generated(from: "WeighingSession.tareWeight", purpose: QUERY_MIN)
+  """
+  ✨ Minimum of the `timestamp` field in the `WeighingSession` table.
+  """
+  timestamp_min: Timestamp @fdc_generated(from: "WeighingSession.timestamp", purpose: QUERY_MIN)
+  """
+  ✨ Maximum of the `grossWeight` field in the `WeighingSession` table.
+  """
+  grossWeight_max: Float @fdc_generated(from: "WeighingSession.grossWeight", purpose: QUERY_MAX)
+  """
+  ✨ Maximum of the `netWeight` field in the `WeighingSession` table.
+  """
+  netWeight_max: Float @fdc_generated(from: "WeighingSession.netWeight", purpose: QUERY_MAX)
+  """
+  ✨ Maximum of the `tareWeight` field in the `WeighingSession` table.
+  """
+  tareWeight_max: Float @fdc_generated(from: "WeighingSession.tareWeight", purpose: QUERY_MAX)
+  """
+  ✨ Maximum of the `timestamp` field in the `WeighingSession` table.
+  """
+  timestamp_max: Timestamp @fdc_generated(from: "WeighingSession.timestamp", purpose: QUERY_MAX)
+}

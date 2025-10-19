@@ -1,0 +1,23 @@
+I1019 17:28:41.306459   13775 load.go:31] Reloading schema and connectors...
+I1019 17:28:41.393297   13775 control.go:94] [/emulator/studio 0bfb] UpdateResources(): done
+Main schema: sources: schema/schema.gql [641B] 
+Connector "example": sources: example/queries.gql [1444B] 
+I1019 17:28:41.452049   13775 codegen.go:82] [connector "example" javascriptSdk] Generating sources into "/home/user/studio/src/dataconnect-generated"
+I1019 17:28:41.480933   13775 collector.go:107] schema extensions wrote into "/home/user/studio/dataconnect/.dataconnect/schema"
+Generated sources: prelude.gql [73219B] main/query.gql [5108B] main/mutation.gql [13790B] main/implicit.gql [1556B] main/input.gql [40564B] main/relation.gql [19138B] 
+I1019 17:28:41.483913   13775 collector.go:107] connector "example" javascriptSdk wrote into "/home/user/studio/src/dataconnect-generated"
+Generated sources: .guides/setup.md [1682B] esm/package.json [17B] index.cjs.js [2147B] package.json [863B] README.md [24192B] react/index.d.ts [2244B] react/package.json [460B] react/esm/package.json [17B] react/index.cjs.js [1771B] index.d.ts [4949B] esm/index.esm.js [1847B] react/esm/index.esm.js [1671B] react/README.md [29716B] .guides/usage.md [2470B] 
+I1019 17:28:41.503941   13775 installsdk.go:55] Package @dataconnect/generated is already installed. Skipping installation
+I1019 17:28:41.504011   13775 load.go:109] Finished reloading
+I1019 17:28:41.519779   13775 dev.go:102] Listening on address (HTTP + gRPC): 127.0.0.1:9399
+I1019 17:28:50.705205   13775 migrate.go:24] Running migration SQL:
+Step 1: CREATE EXTENSION IF NOT EXISTS "uuid-ossp"
+Step 2: CREATE TABLE "public"."company" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "address" text NULL, "company_name" text NOT NULL, "contact_person" text NULL, "email" text NULL, "phone_number" text NULL, PRIMARY KEY ("id"))
+Step 3: CREATE TABLE "public"."user" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "created_at" timestamptz NULL, "display_name" text NOT NULL, "email" text NOT NULL, "phone_number" text NULL, "role" text NOT NULL, PRIMARY KEY ("id"))
+Step 4: CREATE TABLE "public"."vehicle" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "license_plate" text NOT NULL, "make" text NULL, "model" text NULL, "owner_company_name" text NULL, "vehicle_type" text NOT NULL, "year" integer NULL, PRIMARY KEY ("id"))
+Step 5: CREATE TABLE "public"."weighing_session" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "user_id" uuid NULL, "vehicle_id" uuid NULL, "cargo_description" text NULL, "destination" text NULL, "gross_weight" double precision NOT NULL, "net_weight" double precision NULL, "notes" text NULL, "origin" text NULL, "status" text NOT NULL, "tare_weight" double precision NULL, "timestamp" timestamptz NOT NULL, PRIMARY KEY ("id"), CONSTRAINT "weighing_session_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "public"."user" ("id") ON DELETE SET NULL, CONSTRAINT "weighing_session_vehicle_id_fkey" FOREIGN KEY ("vehicle_id") REFERENCES "public"."vehicle" ("id") ON DELETE SET NULL)
+Step 6: CREATE INDEX "weighing_session_userId_idx" ON "public"."weighing_session" ("user_id")
+Step 7: CREATE INDEX "weighing_session_vehicleId_idx" ON "public"."weighing_session" ("vehicle_id")
+I1019 17:28:52.038840   13775 control.go:94] [/emulator/studio c4af] UpdateResources(): done
+Main schema: sources: schema/schema.gql [641B] 
+Connector "example": sources: example/queries.gql [1444B] 

@@ -55,7 +55,7 @@ export default function CalculatorLayout({
 
   // Inject shared state and handlers into child components
   const childrenWithProps = React.Children.map(children, child => {
-    if (React.isValidElement(child)) {
+    if (React.isValidElement(child) && typeof child.type === 'function') {
       const pageName = (child.type as any).displayName;
       let extraProps: any = {
           onAddToBudget: handleAddToBudget,

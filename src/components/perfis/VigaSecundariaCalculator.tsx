@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle, PlusCircle, RefreshCw, Sparkles, Loader } from "lucide-react";
+import { CheckCircle, PlusCircle, Sparkles, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { perfisIpeData, tiposAco, E_ACO_MPA, BudgetItem, PerfilIpe, RESISTENCIA_CALCULO_CONECTOR_KN } from "@/lib/data/index";
 import { interpretProfileSelection, InterpretProfileSelectionInput, InterpretProfileSelectionOutput } from "@/ai/flows/interpret-profile-selection";
@@ -42,7 +42,7 @@ export function VigaSecundariaCalculator() {
   const [balanco1, setBalanco1] = React.useState("1");
   const [balanco2, setBalanco2] = React.useState("1");
   const [spacing, setSpacing] = React.useState("1.5");
-  const [slabLoad, setSlabLoad] = React.useState("450");
+  const [slabLoad, setSlabLoad] = React.useState("0");
   const [distributedLoad, setDistributedLoad] = React.useState("");
   const [pointLoad, setPointLoad] = React.useState("");
   const [pointLoadPosition, setPointLoadPosition] = React.useState("");
@@ -53,7 +53,6 @@ export function VigaSecundariaCalculator() {
 
   const [recommendedProfile, setRecommendedProfile] = React.useState<CalculationResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
-  const [reaction, setReaction] = React.useState(0);
   const { toast } = useToast();
 
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
@@ -66,17 +65,13 @@ export function VigaSecundariaCalculator() {
       const q_dist_kgf_m = S_kgf_m2 * E_m;
       setDistributedLoad(q_dist_kgf_m.toFixed(2).replace('.',','));
     }
-  }, [slabLoad, spacing])
+  }, [slabLoad, spacing]);
 
-  const handleApplySlabLoad = () => {
+  React.useEffect(() => {
     if (lastSlabLoad > 0) {
       setSlabLoad(lastSlabLoad.toFixed(0));
-      toast({
-        title: "Carga da Laje Aplicada!",
-        description: `O valor ${lastSlabLoad.toFixed(0)} kgf/m² foi inserido no campo de carga.`
-      })
     }
-  }
+  }, [lastSlabLoad]);
 
   const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -95,7 +90,7 @@ export function VigaSecundariaCalculator() {
     
     setError(null);
     setRecommendedProfile(null);
-    setReaction(0);
+    onVigaSecundariaReactionCalculated(0);
     setAnalysisResult(null);
 
     const checkNaN = (...vals: number[]) => vals.some(v => isNaN(v));
@@ -199,7 +194,6 @@ export function VigaSecundariaCalculator() {
       return;
     }
     
-    setReaction(reaction_kgf);
     onVigaSecundariaReactionCalculated(reaction_kgf);
     setRecommendedProfile(finalProfile);
     toast({ title: "Cálculo de Viga Secundária Concluído", description: `O perfil recomendado é ${finalProfile.profile.nome}.` });
@@ -282,12 +276,10 @@ export function VigaSecundariaCalculator() {
 
     onAddToBudget(newItem);
     setRecommendedProfile(null);
-    setReaction(0);
+    onVigaSecundariaReactionCalculated(0);
     setAnalysisResult(null);
     toast({ title: "Item Adicionado!", description: `${qty}x viga(s) ${recommendedProfile.profile.nome} adicionada(s).`})
   }
-
-  const isSlabLoadSynced = lastSlabLoad > 0 && lastSlabLoad.toFixed(0) === slabLoad;
 
   return (
     <div className="space-y-4">
@@ -344,11 +336,6 @@ export function VigaSecundariaCalculator() {
              <div className="space-y-2">
                 <div className="flex items-center justify-between">
                     <Label htmlFor="vs-slab-load">Carga da Laje (kgf/m²)</Label>
-                    {lastSlabLoad > 0 && (
-                    <Button variant="ghost" size="icon" className="h-6 w-6 text-primary" onClick={handleApplySlabLoad} title="Aplicar carga calculada na aba de laje">
-                        <RefreshCw className={`h-4 w-4 ${isSlabLoadSynced ? 'text-green-500' : 'animate-pulse'}`}/>
-                    </Button>
-                    )}
                 </div>
                 <Input id="vs-slab-load" type="text" inputMode="decimal" value={slabLoad} onChange={(e) => handleInputChange(setSlabLoad, e.target.value)} placeholder="Ex: 450" />
             </div>
@@ -468,8 +455,8 @@ export function VigaSecundariaCalculator() {
                             <Input id="vs-pricePerKg" type="text" inputMode="decimal" value={pricePerKg} onChange={(e) => handleInputChange(setPricePerKg, e.target.value)} placeholder="Ex: 8,50" />
                         </div>
                     </div>
-                     {reaction > 0 && (
-                        <div className="text-sm text-center text-muted-foreground">Reação de apoio máxima: <span className="font-bold text-foreground">{reaction.toFixed(0)} kgf</span></div>
+                     {recommendedProfile.shearCheck.vsd > 0 && (
+                        <div className="text-sm text-center text-muted-foreground">Reação de apoio máxima: <span className="font-bold text-foreground">{ (recommendedProfile.shearCheck.vsd / 0.009807).toFixed(0)} kgf</span></div>
                     )}
                     <Button type="button" onClick={handleAddToBudget} className="w-full gap-2"><PlusCircle/> Adicionar ao Orçamento</Button>
                 </CardContent>

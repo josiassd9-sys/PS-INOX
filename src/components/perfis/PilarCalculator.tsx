@@ -8,9 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle, PlusCircle, Send, Sparkles, Loader } from "lucide-react";
+import { CheckCircle, PlusCircle, Sparkles, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { perfisData, tiposAco, BudgetItem, Perfil, SupportReaction, E_ACO_MPA } from "@/lib/data/index";
+import { perfisData, tiposAco, BudgetItem, Perfil, E_ACO_MPA } from "@/lib/data/index";
 import { analyzePillarSelection, AnalyzePillarSelectionInput, AnalyzePillarSelectionOutput } from "@/ai/flows/pilar-analysis-flow";
 import { useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
 
@@ -24,7 +24,7 @@ interface CalculationResult {
 export function PilarCalculator() {
     const { onAddToBudget, supportReactions, onPillarLoadCalculated } = useCalculator();
     const [height, setHeight] = React.useState("3");
-    const [axialLoad, setAxialLoad] = React.useState("5000");
+    const [axialLoad, setAxialLoad] = React.useState("0");
     const [steelType, setSteelType] = React.useState(tiposAco[0].nome);
     const [quantity, setQuantity] = React.useState("1");
     const [pricePerKg, setPricePerKg] = React.useState("8.50");
@@ -37,9 +37,19 @@ export function PilarCalculator() {
     const [analysisResult, setAnalysisResult] = React.useState<AnalyzePillarSelectionOutput | null>(null);
 
     React.useEffect(() => {
+        const totalReaction = supportReactions.vigaPrincipal + supportReactions.vigaSecundaria;
+        if (totalReaction > 0) {
+            setAxialLoad(totalReaction.toFixed(0));
+        }
+    }, [supportReactions]);
+
+
+    React.useEffect(() => {
         const load = parseFloat(axialLoad.replace(',', '.'));
         if (!isNaN(load) && load > 0) {
             onPillarLoadCalculated(load);
+        } else {
+            onPillarLoadCalculated(0);
         }
     }, [axialLoad, onPillarLoadCalculated]);
 
@@ -51,18 +61,6 @@ export function PilarCalculator() {
         }
     };
     
-    const handleApplyReaction = (reaction: number) => {
-        if (reaction > 0) {
-            const currentLoad = parseFloat(axialLoad.replace(',', '.')) || 0;
-            const newLoad = currentLoad + reaction;
-            setAxialLoad(newLoad.toFixed(0));
-            toast({
-                title: "Reação da Viga Aplicada!",
-                description: `A carga de ${reaction.toFixed(0)} kgf foi somada à carga axial do pilar.`
-            });
-        }
-    }
-
     const handleCalculate = () => {
         const H_m = parseFloat(height.replace(",", "."));
         const P_kgf = parseFloat(axialLoad.replace(",", "."));
@@ -235,26 +233,7 @@ export function PilarCalculator() {
                         </Select>
                     </div>
                 </div>
-
-                {(supportReactions.vigaPrincipal > 0 || supportReactions.vigaSecundaria > 0) && (
-                     <div className="space-y-2 rounded-md border p-2">
-                        <p className="text-sm font-medium">Reações de Apoio Calculadas</p>
-                        <div className="flex flex-col sm:flex-row gap-2">
-                             {supportReactions.vigaPrincipal > 0 && (
-                                <Button variant="outline" size="sm" onClick={() => handleApplyReaction(supportReactions.vigaPrincipal)} className="flex-1 gap-1">
-                                    <Send size={16}/> Enviar {supportReactions.vigaPrincipal.toFixed(0)} kgf (Viga Princ.)
-                                </Button>
-                            )}
-                            {supportReactions.vigaSecundaria > 0 && (
-                                <Button variant="outline" size="sm" onClick={() => handleApplyReaction(supportReactions.vigaSecundaria)} className="flex-1 gap-1">
-                                    <Send size={16}/> Enviar {supportReactions.vigaSecundaria.toFixed(0)} kgf (Viga Sec.)
-                                </Button>
-                            )}
-                        </div>
-                    </div>
-                )}
                 
-
                 <Button type="button" onClick={handleCalculate} className="w-full md:w-auto">
                     Calcular Pilar
                 </Button>

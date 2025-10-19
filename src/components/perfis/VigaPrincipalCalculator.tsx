@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle, PlusCircle, Sparkles, Loader, RefreshCw } from "lucide-react";
+import { CheckCircle, PlusCircle, Sparkles, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { perfisData, tiposAco, E_ACO_MPA, BudgetItem, Perfil } from "@/lib/data/index";
 import { interpretProfileSelection, InterpretProfileSelectionInput, InterpretProfileSelectionOutput } from "@/ai/flows/interpret-profile-selection";
@@ -40,9 +40,9 @@ export function VigaPrincipalCalculator() {
   const [span, setSpan] = React.useState("5");
   const [balanco1, setBalanco1] = React.useState("1.5");
   const [balanco2, setBalanco2] = React.useState("1.5");
-  const [load, setLoad] = React.useState("300");
+  const [distributedLoad, setDistributedLoad] = React.useState("");
   const [pointLoad, setPointLoad] = React.useState("");
-  const [pointLoadPosition, setPointLoadPosition] = React.useState("");
+  const [pointLoadPosition, setPointLoadPosition] = React.useState("2.5");
   const [steelType, setSteelType] = React.useState(tiposAco[0].nome);
   const [beamScheme, setBeamScheme] = React.useState<BeamScheme>("biapoiada");
   const [quantity, setQuantity] = React.useState("1");
@@ -50,11 +50,17 @@ export function VigaPrincipalCalculator() {
   
   const [recommendedProfile, setRecommendedProfile] = React.useState<CalculationResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
-  const [reaction, setReaction] = React.useState(0);
   const { toast } = useToast();
 
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
   const [analysisResult, setAnalysisResult] = React.useState<InterpretProfileSelectionOutput | null>(null);
+
+  React.useEffect(() => {
+    if (supportReactions.vigaSecundaria > 0) {
+      setPointLoad(supportReactions.vigaSecundaria.toFixed(0));
+    }
+  }, [supportReactions.vigaSecundaria]);
+
 
   const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -63,27 +69,17 @@ export function VigaPrincipalCalculator() {
     }
   };
 
-  const handleApplySecondaryReaction = () => {
-    if (supportReactions.vigaSecundaria > 0) {
-      setPointLoad(supportReactions.vigaSecundaria.toFixed(0));
-      toast({
-        title: "Reação Aplicada como Carga Pontual!",
-        description: `A reação de ${supportReactions.vigaSecundaria.toFixed(0)} kgf da viga secundária foi definida como carga pontual.`
-      });
-    }
-  };
-
   const handleCalculate = () => {
     const L_m = parseFloat(span.replace(",", "."));
     const L1_m = parseFloat(balanco1.replace(",", "."));
     const L2_m = parseFloat(balanco2.replace(",", "."));
-    const q_kgf_m = parseFloat(load.replace(",", ".")) || 0;
+    const q_kgf_m = parseFloat(distributedLoad.replace(",", ".")) || 0;
     const P_kgf = parseFloat(pointLoad.replace(",", ".")) || 0;
     let a_m = parseFloat(pointLoadPosition.replace(",", ".")) || 0;
 
     setError(null);
     setRecommendedProfile(null);
-    setReaction(0);
+    onVigaPrincipalReactionCalculated(0);
     setAnalysisResult(null);
 
     const checkNaN = (...vals: number[]) => vals.some(v => isNaN(v));
@@ -173,7 +169,6 @@ export function VigaPrincipalCalculator() {
       return;
     }
     
-    setReaction(reaction_kgf);
     onVigaPrincipalReactionCalculated(reaction_kgf);
     setRecommendedProfile(finalProfile);
     toast({ title: "Cálculo Concluído", description: `O perfil recomendado é ${finalProfile.profile.nome}.` });
@@ -185,13 +180,13 @@ export function VigaPrincipalCalculator() {
         return;
     }
     const L_central_m = parseFloat(span.replace(",", "."));
-    const q_kgf_m = parseFloat(load.replace(",", "."));
+    const q_kgf_m = parseFloat(distributedLoad.replace(",", "."));
     const P_kgf = parseFloat(pointLoad.replace(",", ".")) || undefined;
     const a_m = parseFloat(pointLoadPosition.replace(",", ".")) || undefined;
     
     const selectedSteel = tiposAco.find(s => s.nome === steelType);
 
-    if (!selectedSteel || isNaN(L_central_m) || isNaN(q_kgf_m)) return;
+    if (!selectedSteel || isNaN(L_central_m)) return;
 
     setIsAnalyzing(true);
     setAnalysisResult(null);
@@ -258,12 +253,10 @@ export function VigaPrincipalCalculator() {
 
     onAddToBudget(newItem);
     setRecommendedProfile(null); 
-    setReaction(0);
+    onVigaPrincipalReactionCalculated(0);
     setAnalysisResult(null);
     toast({ title: "Item Adicionado!", description: `${qty}x viga(s) ${recommendedProfile.profile.nome} adicionada(s) ao orçamento.` });
   }
-  
-  const isSecondaryReactionSynced = supportReactions.vigaSecundaria > 0 && supportReactions.vigaSecundaria.toFixed(0) === pointLoad;
 
   return (
     <div className="space-y-4">
@@ -317,18 +310,13 @@ export function VigaPrincipalCalculator() {
 
             <div className="space-y-2">
               <Label htmlFor="load">Carga Distribuída (kgf/m)</Label>
-              <Input id="load" type="text" inputMode="decimal" value={load} onChange={(e) => handleInputChange(setLoad, e.target.value)} placeholder="Ex: 300" />
+              <Input id="load" type="text" inputMode="decimal" value={distributedLoad} onChange={(e) => handleInputChange(setDistributedLoad, e.target.value)} placeholder="Peso próprio, etc." />
             </div>
              <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="vp-point-load">Carga Pontual (kgf)</Label>
-                  {supportReactions.vigaSecundaria > 0 && (
-                      <Button variant="ghost" size="icon" className="h-6 w-6 text-primary" onClick={handleApplySecondaryReaction} title="Aplicar reação da viga secundária">
-                          <RefreshCw className={`h-4 w-4 ${isSecondaryReactionSynced ? 'text-green-500' : 'animate-pulse'}`}/>
-                      </Button>
-                  )}
                 </div>
-                <Input id="vp-point-load" type="text" inputMode="decimal" value={pointLoad} onChange={e => handleInputChange(setPointLoad, e.target.value)} placeholder="Opcional" />
+                <Input id="vp-point-load" type="text" inputMode="decimal" value={pointLoad} onChange={e => handleInputChange(setPointLoad, e.target.value)} placeholder="Reação da viga secundária" />
             </div>
             <div className="space-y-2">
                 <Label htmlFor="vp-point-load-pos">Posição da Carga (m)</Label>
@@ -434,8 +422,8 @@ export function VigaPrincipalCalculator() {
                             <Input id="pricePerKg" type="text" inputMode="decimal" value={pricePerKg} onChange={(e) => handleInputChange(setPricePerKg, e.target.value)} placeholder="Ex: 8,50" />
                         </div>
                     </div>
-                    {reaction > 0 && (
-                        <div className="text-sm text-center text-muted-foreground">Reação de apoio máxima: <span className="font-bold text-foreground">{reaction.toFixed(0)} kgf</span></div>
+                    {recommendedProfile.shearCheck.vsd > 0 && (
+                        <div className="text-sm text-center text-muted-foreground">Reação de apoio máxima: <span className="font-bold text-foreground">{ (recommendedProfile.shearCheck.vsd / 0.009807).toFixed(0)} kgf</span></div>
                     )}
                     <Button type="button" onClick={handleAddToBudget} className="w-full gap-2"><PlusCircle/> Adicionar ao Orçamento</Button>
                 </CardContent>

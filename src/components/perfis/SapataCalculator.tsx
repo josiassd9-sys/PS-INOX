@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sparkles, Loader, RefreshCw, CheckCircle, Calculator } from "lucide-react";
+import { Sparkles, Loader, CheckCircle, Calculator } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { analyzeSapata, AnalyzeSapataInput, AnalyzeSapataOutput } from "@/ai/flows/sapata-analysis-flow";
 import { useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
@@ -38,24 +38,20 @@ export function SapataCalculator(props: SapataCalculatorProps) {
     const [steelPrice, setSteelPrice] = React.useState("8.50"); // R$/kg
     const [steelRatio, setSteelRatio] = React.useState("100"); // kg/m³
 
+     React.useEffect(() => {
+        if (finalPillarLoad > 0) {
+            setLoad(finalPillarLoad.toFixed(0));
+        } else {
+            setLoad("0");
+        }
+    }, [finalPillarLoad]);
+
     const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
         if (/^\d*\,?\d*$/.test(sanitizedValue)) {
             setter(sanitizedValue);
         }
     };
-
-    const handleApplyPillarLoad = () => {
-        if (finalPillarLoad > 0) {
-            setLoad(finalPillarLoad.toFixed(0));
-            toast({
-                title: "Carga do Pilar Aplicada!",
-                description: `A carga de ${finalPillarLoad.toFixed(0)} kgf foi inserida no campo.`
-            });
-        }
-    };
-    
-    const isPillarLoadSynced = finalPillarLoad > 0 && finalPillarLoad.toFixed(0) === load;
 
     const handleAnalyze = async () => {
         const totalLoadKgf = parseFloat(load.replace(',', '.'));
@@ -124,11 +120,6 @@ export function SapataCalculator(props: SapataCalculatorProps) {
                     <div className="space-y-2">
                          <div className="flex items-center justify-between">
                             <Label htmlFor="pillar-load">Carga Total do Pilar (kgf)</Label>
-                            {finalPillarLoad > 0 && (
-                            <Button variant="ghost" size="icon" className="h-6 w-6 text-primary" onClick={handleApplyPillarLoad} title="Aplicar carga calculada na aba de pilar">
-                                <RefreshCw className={`h-4 w-4 ${isPillarLoadSynced ? 'text-green-500' : 'animate-pulse'}`}/>
-                            </Button>
-                            )}
                         </div>
                         <Input id="pillar-load" type="text" inputMode="decimal" value={load} onChange={e => handleInputChange(setLoad, e.target.value)} placeholder="Ex: 12000" />
                     </div>

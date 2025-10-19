@@ -58,7 +58,7 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
         }
     }
 
-    const handleCalculate = async () => {
+    const handleCalculate = () => {
         const H_m = parseFloat(height.replace(",", "."));
         const P_kgf = parseFloat(axialLoad.replace(",", "."));
         setError(null);
@@ -129,16 +129,27 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
             title: "Cálculo do Pilar Concluído",
             description: `O perfil recomendado é ${bestProfileData.profile.nome}.`,
         });
+    };
 
+    const handleAnalyze = async () => {
+        if (!result) {
+            toast({ variant: "destructive", title: "Cálculo necessário", description: "Calcule o perfil antes de analisar."});
+            return;
+        }
+        
+        const H_m = parseFloat(height.replace(",", "."));
+        const P_kgf = parseFloat(axialLoad.replace(",", "."));
+        
         setIsAnalyzing(true);
+        setAnalysisResult(null);
         try {
             const aiInput: AnalyzePillarSelectionInput = {
                 pillarHeight: H_m,
                 axialLoad: P_kgf,
                 supportReactions,
-                recommendedProfile: bestProfileData.profile.nome,
-                actingStress: bestProfileData.actingStress,
-                allowableStress: bestProfileData.allowableStress
+                recommendedProfile: result.profile.nome,
+                actingStress: result.actingStress,
+                allowableStress: result.allowableStress
             };
             const analysis = await analyzePillarSelection(aiInput);
             setAnalysisResult(analysis);
@@ -149,6 +160,7 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
             setIsAnalyzing(false);
         }
     };
+
 
     const handleAddToBudget = () => {
         if (!result) {
@@ -238,8 +250,8 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
                 )}
                 
 
-                <Button type="button" onClick={handleCalculate} className="w-full md:w-auto" disabled={isAnalyzing}>
-                    {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : "Calcular Pilar"}
+                <Button type="button" onClick={handleCalculate} className="w-full md:w-auto">
+                    Calcular Pilar
                 </Button>
 
                 {error && <Alert variant="destructive"><AlertTitle>Erro</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
@@ -264,6 +276,9 @@ export function PilarCalculator({ onAddToBudget, supportReactions }: PilarCalcul
                             </AlertDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
+                             <Button type="button" onClick={handleAnalyze} className="w-full" disabled={isAnalyzing}>
+                                {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar com IA</>}
+                             </Button>
                             {isAnalyzing && (
                                 <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-4">
                                     <Loader className="animate-spin h-4 w-4" />

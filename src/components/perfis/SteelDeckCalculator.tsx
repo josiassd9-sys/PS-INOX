@@ -51,7 +51,7 @@ export function SteelDeckCalculator({ onCalculated, onAddToBudget }: SteelDeckCa
         }
     };
 
-    const handleCalculate = async () => {
+    const handleCalculate = () => {
         const deck = steelDeckData.find(d => d.nome === selectedDeckId);
         if (!deck) return;
 
@@ -67,32 +67,43 @@ export function SteelDeckCalculator({ onCalculated, onAddToBudget }: SteelDeckCa
             onCalculated(finalLoad);
             toast({
               title: "Cálculo da Laje Concluído!",
-              description: `A carga total é de ${finalLoad.toFixed(0)} kgf/m². Iniciando análise...`,
+              description: `A carga total é de ${finalLoad.toFixed(0)} kgf/m².`,
             });
-
-            // AI Analysis
-            setIsAnalyzing(true);
-            try {
-                const aiInput: AnalyzeSlabSelectionInput = {
-                    deckType: deck.tipo,
-                    deckThickness: deck.espessuraChapa,
-                    concreteSlabThickness: h_cm,
-                    liveLoad: S_kgf,
-                    totalLoad: finalLoad,
-                };
-                const analysis = await analyzeSlabSelection(aiInput);
-                setAnalysisResult(analysis);
-            } catch (e) {
-                console.error("AI slab analysis failed:", e);
-                setAnalysisResult({ analysis: "A análise da IA não pôde ser concluída no momento." });
-            } finally {
-                setIsAnalyzing(false);
-            }
-
         } else {
             setTotalLoad(0);
         }
     };
+
+    const handleAnalyze = async () => {
+        const deck = steelDeckData.find(d => d.nome === selectedDeckId);
+        if (!deck || totalLoad <= 0) {
+            toast({ variant: "destructive", title: "Cálculo necessário", description: "Calcule a carga antes de analisar."});
+            return;
+        };
+
+        const h_cm = parseFloat(concreteThickness.replace(',', '.')) || 0;
+        const S_kgf = parseFloat(extraLoad.replace(',', '.')) || 0;
+
+        setIsAnalyzing(true);
+        setAnalysisResult(null);
+        try {
+            const aiInput: AnalyzeSlabSelectionInput = {
+                deckType: deck.tipo,
+                deckThickness: deck.espessuraChapa,
+                concreteSlabThickness: h_cm,
+                liveLoad: S_kgf,
+                totalLoad: totalLoad,
+            };
+            const analysis = await analyzeSlabSelection(aiInput);
+            setAnalysisResult(analysis);
+        } catch (e) {
+            console.error("AI slab analysis failed:", e);
+            setAnalysisResult({ analysis: "A análise da IA não pôde ser concluída no momento." });
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
+
 
     const handleAddToBudget = () => {
         const deck = steelDeckData.find(d => d.nome === selectedDeckId);
@@ -254,8 +265,8 @@ export function SteelDeckCalculator({ onCalculated, onAddToBudget }: SteelDeckCa
                 </Accordion>
                 
 
-                 <Button type="button" onClick={handleCalculate} className="w-full md:w-auto" disabled={isAnalyzing}>
-                   {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : "Calcular Carga e Analisar"}
+                 <Button type="button" onClick={handleCalculate} className="w-full md:w-auto">
+                   Calcular Carga
                 </Button>
 
                 {totalLoad > 0 && selectedDeck && (
@@ -269,7 +280,10 @@ export function SteelDeckCalculator({ onCalculated, onAddToBudget }: SteelDeckCa
                                 <p className="text-4xl font-bold text-primary">{formatNumber(totalLoad, 0)}</p>
                                 <p className="text-xs text-muted-foreground mt-1">Use este valor na aba "Viga Secundária (IPE)".</p>
                             </div>
-
+                             
+                             <Button type="button" onClick={handleAnalyze} className="w-full" disabled={isAnalyzing}>
+                                {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar com IA</>}
+                             </Button>
                              {isAnalyzing && (
                                 <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-4">
                                     <Loader className="animate-spin h-4 w-4" />

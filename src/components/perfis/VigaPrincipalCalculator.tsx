@@ -56,7 +56,7 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
     }
   };
 
-  const handleCalculate = async () => {
+  const handleCalculate = () => {
     const L_central_m = parseFloat(span.replace(",", "."));
     const L_balanco1_m = parseFloat(balanco1.replace(",", "."));
     const L_balanco2_m = parseFloat(balanco2.replace(",", "."));
@@ -170,23 +170,36 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
     setRecommendedProfile(finalProfile);
     toast({
         title: "Cálculo Concluído",
-        description: `O perfil recomendado é ${finalProfile.profile.nome}. Iniciando análise da IA.`,
+        description: `O perfil recomendado é ${finalProfile.profile.nome}.`,
     });
+  };
+
+  const handleAnalyze = async () => {
+    if (!recommendedProfile) {
+        toast({ variant: "destructive", title: "Cálculo necessário", description: "Calcule o perfil antes de analisar."});
+        return;
+    }
+    const L_central_m = parseFloat(span.replace(",", "."));
+    const q_kgf_m = parseFloat(load.replace(",", "."));
+    const selectedSteel = tiposAco.find(s => s.nome === steelType);
+
+    if (!selectedSteel || isNaN(L_central_m) || isNaN(q_kgf_m)) return;
 
     setIsAnalyzing(true);
+    setAnalysisResult(null);
     try {
         const aiInput: InterpretProfileSelectionInput = {
-            span: mainSpan,
+            span: L_central_m,
             load: q_kgf_m,
             steelType: selectedSteel.nome,
             recommendedProfile: {
-                nome: finalProfile.profile.nome,
-                peso: finalProfile.profile.peso,
-                Wx: finalProfile.profile.Wx,
-                Ix: finalProfile.profile.Ix,
+                nome: recommendedProfile.profile.nome,
+                peso: recommendedProfile.profile.peso,
+                Wx: recommendedProfile.profile.Wx,
+                Ix: recommendedProfile.profile.Ix,
             },
-            requiredWx: requiredWx_cm3,
-            requiredIx: requiredIx_cm4,
+            requiredWx: recommendedProfile.requiredWx,
+            requiredIx: recommendedProfile.requiredIx,
         };
         const analysis = await interpretProfileSelection(aiInput);
         setAnalysisResult(analysis);
@@ -197,6 +210,7 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
         setIsAnalyzing(false);
     }
   };
+
   
   const handleAddToBudget = () => {
     if (!recommendedProfile) {
@@ -319,8 +333,8 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
               </Select>
             </div>
           </div>
-          <Button type="button" onClick={handleCalculate} className="w-full md:w-auto" disabled={isAnalyzing}>
-            {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : "Calcular Perfil"}
+          <Button type="button" onClick={handleCalculate} className="w-full md:w-auto">
+            Calcular Perfil
           </Button>
 
           {error && (
@@ -349,6 +363,9 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
                     </AlertDescription>
                 </CardHeader>
                  <CardContent className="space-y-4">
+                     <Button type="button" onClick={handleAnalyze} className="w-full" disabled={isAnalyzing}>
+                         {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar com IA</>}
+                      </Button>
                      {isAnalyzing && (
                          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-4">
                              <Loader className="animate-spin h-4 w-4" />
@@ -386,4 +403,3 @@ export function VigaPrincipalCalculator({ onAddToBudget, onReactionCalculated }:
     </div>
   );
 }
-

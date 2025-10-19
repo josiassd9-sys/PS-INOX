@@ -5,11 +5,16 @@ import * as React from "react";
 import { Dashboard } from "@/components/dashboard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useCollection } from "react-firebase-hooks/firestore";
-import { collection, query, orderBy, limit, getFirestore, Firestore } from "firebase/firestore";
+import { useCollection, useDocument } from "react-firebase-hooks/firestore";
+import { collection, query, orderBy, limit, getFirestore, doc, setDoc, Firestore } from "firebase/firestore";
 import { getFirebaseConfig } from "@/lib/firebase-config";
-import { Loader } from "lucide-react";
+import { Loader, Save } from "lucide-react";
 import { FirebaseApp, initializeApp } from "firebase/app";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // Componente para inicializar o Firebase e prover para os filhos
 function FirebaseProvider({ children }: { children: React.ReactNode }) {
@@ -18,13 +23,13 @@ function FirebaseProvider({ children }: { children: React.ReactNode }) {
     const [firestore, setFirestore] = React.useState<Firestore | null>(null);
 
     React.useEffect(() => {
-        if (firebaseConfig) {
-            const app = initializeApp(firebaseConfig);
-            const db = getFirestore(app);
-            setApp(app);
+        if (firebaseConfig && !app) {
+            const initializedApp = initializeApp(firebaseConfig);
+            const db = getFirestore(initializedApp);
+            setApp(initializedApp);
             setFirestore(db);
         }
-    }, [firebaseConfig]);
+    }, [firebaseConfig, app]);
 
     if (!app || !firestore) {
         const firebaseConfig = getFirebaseConfig();
@@ -49,6 +54,84 @@ const FirestoreContext = React.createContext<Firestore | null>(null);
 
 function useFirestore() {
     return React.useContext(FirestoreContext);
+}
+
+function ConfigManager() {
+    const firestore = useFirestore();
+    const { toast } = useToast();
+    const configRef = firestore ? doc(firestore, "configuracoes", "balanca") : null;
+    const [configSnapshot, loading, error] = useDocument(configRef);
+    const [serialPort, setSerialPort] = React.useState("");
+    const [databaseUrl, setDatabaseUrl] = React.useState("");
+
+    React.useEffect(() => {
+        if (configSnapshot?.exists()) {
+            const data = configSnapshot.data();
+            setSerialPort(data.serialPort || "");
+            setDatabaseUrl(data.databaseURL || "");
+        }
+    }, [configSnapshot]);
+
+    const handleSave = async () => {
+        if (!firestore || !configRef) return;
+        try {
+            await setDoc(configRef, { 
+                serialPort, 
+                databaseURL: databaseUrl 
+            }, { merge: true });
+            toast({
+                title: "Configuração Salva!",
+                description: "As configurações da balança foram salvas no Firestore.",
+            });
+        } catch (e) {
+            console.error(e);
+            toast({
+                variant: "destructive",
+                title: "Erro ao Salvar",
+                description: "Não foi possível salvar as configurações.",
+            });
+        }
+    };
+    
+    if (loading) {
+        return <div className="flex items-center justify-center p-4 gap-2"><Loader className="animate-spin h-4 w-4"/> Carregando configurações...</div>
+    }
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Configurações do Script da Balança</CardTitle>
+                <CardDescription>
+                    Gerencie os parâmetros que o script `balanca.js` utilizará para se conectar.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                 {error && <Alert variant="destructive"><AlertTitle>Erro</AlertTitle><AlertDescription>Não foi possível carregar as configurações do Firestore.</AlertDescription></Alert>}
+                <div className="space-y-2">
+                    <Label htmlFor="serialPort">Porta Serial</Label>
+                    <Input 
+                        id="serialPort" 
+                        value={serialPort}
+                        onChange={(e) => setSerialPort(e.target.value)}
+                        placeholder="Ex: /dev/ttyUSB0 ou COM3"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="databaseUrl">URL do Firebase Database</Label>
+                     <Input 
+                        id="databaseUrl" 
+                        value={databaseUrl}
+                        onChange={(e) => setDatabaseUrl(e.target.value)}
+                        placeholder="https://seu-projeto.firebaseio.com"
+                    />
+                </div>
+                <Button onClick={handleSave} className="gap-2">
+                    <Save className="h-4 w-4" />
+                    Salvar Configuração
+                </Button>
+            </CardContent>
+        </Card>
+    )
 }
 
 
@@ -106,7 +189,8 @@ export default function BalancaLivePage() {
   return (
     <FirebaseProvider>
        <Dashboard initialCategoryId="balanca-live">
-          <div className="container mx-auto p-4">
+          <div className="container mx-auto p-4 space-y-4">
+              <ConfigManager />
               <BalancaLiveComponent />
           </div>
        </Dashboard>

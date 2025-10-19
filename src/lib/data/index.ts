@@ -502,7 +502,7 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
         ]
     },
     {
-        title: 'Perfis de Aço',
+        title: 'PERFIS DE AÇO',
         items: [
             ALL_CATEGORIES.find(c => c.id === 'perfis/guia')!,
             ALL_CATEGORIES.find(c => c.id === 'perfis/calculadora')!,

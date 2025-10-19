@@ -299,6 +299,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                          selectedCategoryId === 'lista-sucatas' ||
                          selectedCategoryId?.startsWith('perfis/') ||
                          selectedCategoryId?.startsWith('informativos/') ||
+                         selectedCategoryId?.startsWith('mecanica/') ||
                          selectedCategoryId === 'print-preview';
 
   const renderContent = () => {

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle, PlusCircle, Sparkles, Loader } from "lucide-react";
+import { CheckCircle, PlusCircle, Sparkles, Loader, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { perfisData, tiposAco, E_ACO_MPA, BudgetItem, Perfil } from "@/lib/data/index";
 import { interpretProfileSelection, InterpretProfileSelectionInput, InterpretProfileSelectionOutput } from "@/ai/flows/interpret-profile-selection";
@@ -36,7 +36,7 @@ interface CalculationResult {
 type BeamScheme = "biapoiada" | "balanco" | "dois-balancos";
 
 export function VigaPrincipalCalculator() {
-  const { onAddToBudget, onVigaPrincipalReactionCalculated } = useCalculator();
+  const { onAddToBudget, onVigaPrincipalReactionCalculated, supportReactions } = useCalculator();
   const [span, setSpan] = React.useState("5");
   const [balanco1, setBalanco1] = React.useState("1.5");
   const [balanco2, setBalanco2] = React.useState("1.5");
@@ -60,6 +60,16 @@ export function VigaPrincipalCalculator() {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
     if (/^\d*[,.]?\d*$/.test(sanitizedValue)) {
       setter(sanitizedValue);
+    }
+  };
+
+  const handleApplySecondaryReaction = () => {
+    if (supportReactions.vigaSecundaria > 0) {
+      setPointLoad(supportReactions.vigaSecundaria.toFixed(0));
+      toast({
+        title: "Reação Aplicada como Carga Pontual!",
+        description: `A reação de ${supportReactions.vigaSecundaria.toFixed(0)} kgf da viga secundária foi definida como carga pontual.`
+      });
     }
   };
 
@@ -252,6 +262,8 @@ export function VigaPrincipalCalculator() {
     setAnalysisResult(null);
     toast({ title: "Item Adicionado!", description: `${qty}x viga(s) ${recommendedProfile.profile.nome} adicionada(s) ao orçamento.` });
   }
+  
+  const isSecondaryReactionSynced = supportReactions.vigaSecundaria > 0 && supportReactions.vigaSecundaria.toFixed(0) === pointLoad;
 
   return (
     <div className="space-y-4">
@@ -308,7 +320,14 @@ export function VigaPrincipalCalculator() {
               <Input id="load" type="text" inputMode="decimal" value={load} onChange={(e) => handleInputChange(setLoad, e.target.value)} placeholder="Ex: 300" />
             </div>
              <div className="space-y-2">
-                <Label htmlFor="vp-point-load">Carga Pontual (kgf)</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="vp-point-load">Carga Pontual (kgf)</Label>
+                  {supportReactions.vigaSecundaria > 0 && (
+                      <Button variant="ghost" size="icon" className="h-6 w-6 text-primary" onClick={handleApplySecondaryReaction} title="Aplicar reação da viga secundária">
+                          <RefreshCw className={`h-4 w-4 ${isSecondaryReactionSynced ? 'text-green-500' : 'animate-pulse'}`}/>
+                      </Button>
+                  )}
+                </div>
                 <Input id="vp-point-load" type="text" inputMode="decimal" value={pointLoad} onChange={e => handleInputChange(setPointLoad, e.target.value)} placeholder="Opcional" />
             </div>
             <div className="space-y-2">

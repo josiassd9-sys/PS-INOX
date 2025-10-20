@@ -202,10 +202,13 @@ const SideElevationView = () => {
     const deckInfo = laje.result?.deck;
     const deckHeight_mm = deckInfo ? (deckInfo.tipo === 'MD75' ? 75 : 57) : 57;
     const concreteH_cm = parseFloat(laje.concreteThickness.replace(',', '.')) || 12;
-    const lajeH_m = (deckHeight_mm / 1000) + (concreteH_cm / 100);
+    const lajeH_m = (deckHeight_mm + concreteH_cm * 10) / 1000;
     
-    const vigaPH = (vigaPrincipal.result?.profile.h || 300) / 1000;
-    const vigaSH = (vigaSecundaria.result?.profile.h || 200) / 1000;
+    const vigaPH_m = (vigaPrincipal.result?.profile.h || 300) / 1000;
+    
+    const vigaS = vigaSecundaria.result?.profile;
+    const vigaSH_m = (vigaS?.h || 200) / 1000;
+    const vigaSW_m = (vigaS?.b || 100) / 1000;
     
     const totalSpanY = parseFloat(slabAnalysis.spanY.replace(',', '.')) || 5;
     const cantileverFront = parseFloat(slabAnalysis.cantileverFront.replace(',', '.')) || 0;
@@ -219,15 +222,16 @@ const SideElevationView = () => {
 
     if (spanY <= 0) return <Alert variant="destructive">Vão Y inválido na Aba 1.</Alert>;
 
-    const totalDrawingHeight = totalPilarH + vigaPH + lajeH_m + sapataH;
+    const totalDrawingHeight = totalPilarH + vigaPH_m + lajeH_m + sapataH;
     const scale = Math.min((SVG_WIDTH - 2*PADDING) / totalSpanY, (SVG_HEIGHT - 2*PADDING) / totalDrawingHeight);
-    const scaledSpan = totalSpanY * scale;
-    const xOffset = (SVG_WIDTH - scaledSpan) / 2;
+    const scaledSpanY = totalSpanY * scale;
+    const xOffset = (SVG_WIDTH - scaledSpanY) / 2;
 
     const numVigasSecundarias = spacingVS > 0 ? Math.floor(spanY / spacingVS) : 0;
+    const realSpacing = numVigasSecundarias > 0 ? (spanY * scale) / (numVigasSecundarias + 1) : 0;
     
     const pilarHeight = pilarH * scale;
-    const vigaPHeight = vigaPH * scale;
+    const vigaPHeight = vigaPH_m * scale;
     const sapataHeight = sapataH * scale;
     const sapataWidth = sapataW * scale;
 
@@ -250,22 +254,25 @@ const SideElevationView = () => {
             <rect x={pilarX1 - sapataWidth/2} y={sapataY} width={sapataWidth} height={sapataHeight} fill="hsl(var(--muted))" />
             <rect x={pilarX2 - sapataWidth/2} y={sapataY} width={sapataWidth} height={sapataHeight} fill="hsl(var(--muted))" />
             
-            {/* Pilares */}
+            {/* Pilares (em corte) */}
             <rect x={pilarX1 - 10} y={pilarTopoY} width="20" height={totalPilarH * scale} fill="hsl(var(--foreground) / 0.8)" />
             <rect x={pilarX2 - 10} y={pilarTopoY} width="20" height={totalPilarH * scale} fill="hsl(var(--foreground) / 0.8)" />
             
-             {/* Viga Principal (em corte) */}
-            <rect x={pilarX1 - vigaPHeight*scale/2} y={vigaPY - vigaPHeight} width={vigaPHeight * scale} height={vigaPHeight} fill="hsl(var(--primary))" />
-            <rect x={pilarX2 - vigaPHeight*scale/2} y={vigaPY - vigaPHeight} width={vigaPHeight * scale} height={vigaPHeight} fill="hsl(var(--primary))" />
+             {/* Viga Principal */}
+            <rect x={pilarX1 - vigaPHeight/2} y={vigaPY - vigaPHeight} width={vigaPHeight} height={vigaPHeight} fill="hsl(var(--primary))" />
+            <rect x={pilarX2 - vigaPHeight/2} y={vigaPY - vigaPHeight} width={vigaPHeight} height={vigaPHeight} fill="hsl(var(--primary))" />
             
-            {/* Laje e Vigas Secundárias */}
-            <rect x={xOffset} y={lajeTopY - lajeH_m * scale} width={scaledSpan} height={lajeH_m * scale} fill="hsl(var(--muted)/0.5)" />
-            <rect x={xOffset} y={lajeTopY - vigaSH * scale} width={scaledSpan} height={vigaSH*scale} fill="hsl(var(--primary)/0.6)" />
+            {/* Laje */}
+            <rect x={xOffset} y={lajeTopY - lajeH_m * scale} width={scaledSpanY} height={lajeH_m * scale} fill="hsl(var(--muted)/0.5)" />
             
+            {/* Vigas Secundárias */}
+            {numVigasSecundarias > 0 && Array.from({ length: numVigasSecundarias + 2 }).map((_, i) => (
+                 <rect key={i} x={xOffset + i * realSpacing - (vigaSW_m * scale / 2)} y={lajeTopY - vigaSH_m * scale} width={vigaSW_m * scale} height={vigaSH_m * scale} fill="hsl(var(--primary)/0.6)" />
+            ))}
             
             <DimensionLine x1={xOffset} y1={vigaPY} x2={pilarX1} y2={vigaPY} label={`${cantileverFront.toFixed(2)}m`} offset={10} />
             <DimensionLine x1={pilarX1} y1={vigaPY} x2={pilarX2} y2={vigaPY} label={`${spanY.toFixed(2)}m`} offset={10} />
-            <DimensionLine x1={pilarX2} y1={vigaPY} x2={xOffset+scaledSpan} y2={vigaPY} label={`${cantileverBack.toFixed(2)}m`} offset={10} />
+            <DimensionLine x1={pilarX2} y1={vigaPY} x2={xOffset+scaledSpanY} y2={vigaPY} label={`${cantileverBack.toFixed(2)}m`} offset={10} />
 
             <DrawingText x={SVG_WIDTH / 2} y={baseY + 25}>Elevação Lateral (Vista ao longo do Eixo X)</DrawingText>
         </svg>
@@ -397,5 +404,6 @@ export function StructuralVisualizer() {
         </Card>
     );
 }
+
 
 

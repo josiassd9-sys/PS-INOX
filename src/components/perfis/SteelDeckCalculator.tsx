@@ -78,7 +78,7 @@ function getLocalAnalysis(
 }
 
 export function SteelDeckCalculator() {
-    const { onAddToBudget, updateLaje, laje, vigaSecundaria } = useCalculator();
+    const { onAddToBudget, updateLaje, laje, vigaSecundaria, slabAnalysis } = useCalculator();
     const { selectedDeckId, concreteThickness, selectedLoads, extraLoad, quantity, pricePerKg, concretePrice, result, analysis } = laje;
     
     const [isAnalyzing, setIsAnalyzing] = React.useState(false);
@@ -94,7 +94,16 @@ export function SteelDeckCalculator() {
         if (total !== extraLoadNum) {
             updateLaje({ extraLoad: total.toString() });
         }
-    }, [selectedLoads, extraLoad]);
+    }, [selectedLoads, extraLoad, updateLaje]);
+
+    React.useEffect(() => {
+        const totalX = parseFloat(slabAnalysis.spanX.replace(',', '.')) || 0;
+        const totalY = parseFloat(slabAnalysis.spanY.replace(',', '.')) || 0;
+        const area = totalX * totalY;
+        if (area > 0) {
+            updateLaje({ quantity: area.toFixed(2) });
+        }
+    }, [slabAnalysis.spanX, slabAnalysis.spanY, updateLaje]);
 
     const handleInputChange = (field: keyof LajeInputs, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -189,7 +198,7 @@ export function SteelDeckCalculator() {
 
     React.useEffect(() => {
         updateLaje({ result: null, analysis: null });
-    }, [selectedDeckId, concreteThickness, extraLoad]);
+    }, [selectedDeckId, concreteThickness, extraLoad, updateLaje]);
 
     const formatNumber = (value: number, decimals = 2) => new Intl.NumberFormat('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(value);
     
@@ -295,7 +304,7 @@ export function SteelDeckCalculator() {
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t pt-4">
                                <div className="space-y-2">
                                   <Label htmlFor="deck-quantity">Área da Laje (m²)</Label>
-                                  <Input id="deck-quantity" type="text" inputMode="numeric" value={quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} placeholder="Ex: 50" />
+                                  <Input id="deck-quantity" type="text" inputMode="numeric" value={quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} placeholder="Ex: 50" readOnly className="bg-muted/70"/>
                               </div>
                                <div className="space-y-2">
                                   <Label htmlFor="deck-pricePerKg">Preço Aço Galv. (R$/kg)</Label>

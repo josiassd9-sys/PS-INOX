@@ -21,8 +21,8 @@ interface VigaCalcResult {
 }
 interface PilarCalcResult {
     profile: Perfil;
-    actingStress: number;
-    allowableStress: number;
+    actingStress: number; 
+    allowableStress: number; 
 }
 interface LajeCalcResult {
     deck: SteelDeck,
@@ -211,9 +211,10 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
   const handleClearAllInputs = () => {
       setCalculatorState(initialState);
       setSupportReactions({ vigaPrincipal: 0, vigaSecundaria: 0, pilar: 0 });
+      setBudgetItems([]);
       toast({
           title: "Calculadora Limpa",
-          description: "Todos os dados de entrada foram resetados.",
+          description: "Todos os dados de entrada e o orçamento foram resetados.",
       })
   }
 

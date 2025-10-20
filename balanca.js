@@ -1,8 +1,9 @@
 
 require('dotenv').config();
-const SerialPort = require('serialport');
-const Readline = require('@serialport/parser-readline');
-const admin = require('firebase-admin');
+const { SerialPort } = require('serialport');
+const { ReadlineParser } = require('@serialport/parser-readline');
+const { initializeApp } = require('firebase/app');
+const { getFirestore, collection, addDoc, getDoc, doc, serverTimestamp } = require('firebase/firestore');
 
 // --- Início da Configuração ---
 const CONFIG_COLLECTION = 'configuracoes';
@@ -12,24 +13,33 @@ const CONFIG_DOCUMENT = 'balanca';
 let db;
 let port;
 
+// Configuração do Firebase a partir das variáveis de ambiente
+const firebaseConfig = {
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+};
+
 async function initializeFirebaseAndConnect() {
     try {
-        const serviceAccount = require('./serviceAccountKey.json');
-        
-        // Pega a URL do banco de dados do .env como um fallback
-        const fallbackDatabaseURL = process.env.FIREBASE_DATABASE_URL;
+        // Inicializa o Firebase com a configuração do ambiente
+        if (Object.values(firebaseConfig).some(v => !v)) {
+            console.error("Erro: As variáveis de ambiente do Firebase não estão completamente definidas no arquivo .env.");
+            console.error("Certifique-se de que todas as chaves NEXT_PUBLIC_FIREBASE_* estão corretas.");
+            process.exit(1);
+        }
 
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount),
-            databaseURL: fallbackDatabaseURL 
-        });
+        const app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        console.log("Firebase inicializado com o SDK web.");
 
-        db = admin.firestore();
-        console.log("Firebase Admin inicializado.");
+        const configDocRef = doc(db, CONFIG_COLLECTION, CONFIG_DOCUMENT);
+        const configDoc = await getDoc(configDocRef);
 
-        const configDoc = await db.collection(CONFIG_COLLECTION).doc(CONFIG_DOCUMENT).get();
-
-        if (!configDoc.exists) {
+        if (!configDoc.exists()) {
             console.error(`Erro: Documento de configuração não encontrado em '${CONFIG_COLLECTION}/${CONFIG_DOCUMENT}'.`);
             console.error("Por favor, salve uma configuração na página 'Balança Live' do aplicativo.");
             process.exit(1);
@@ -42,38 +52,21 @@ async function initializeFirebaseAndConnect() {
             console.error("Erro: A 'porta serial' não está definida no documento de configuração do Firestore.");
             process.exit(1);
         }
-        
-        // Se houver uma URL no Firestore, ela tem prioridade.
-        if (config.databaseURL && admin.app().options.databaseURL !== config.databaseURL) {
-             console.log("Reconfigurando com a URL do banco de dados do Firestore...");
-             // Não é possível re-inicializar, mas avisamos o usuário.
-             // A inicialização já deve conter a URL correta ou ser genérica.
-        }
-
 
         console.log(`Tentando conectar na porta serial: ${portPath}`);
         setupSerialPort(portPath);
 
     } catch (error) {
-        if (error.code === 'MODULE_NOT_FOUND') {
-            console.error("Erro: O arquivo 'serviceAccountKey.json' não foi encontrado. Certifique-se que ele existe no diretório raiz.");
-        } else {
-            console.error("Erro ao inicializar ou ler configuração do Firebase:", error);
-        }
+        console.error("Erro ao inicializar o Firebase ou ler a configuração:", error);
         process.exit(1);
     }
 }
 
 function setupSerialPort(portPath) {
     try {
-        port = new SerialPort(portPath, {
-            baudRate: 9600,
-            dataBits: 8,
-            parity: 'none',
-            stopBits: 1
-        });
+        port = new SerialPort({ path: portPath, baudRate: 9600 });
 
-        const parser = port.pipe(new Readline({ delimiter: '\r\n' }));
+        const parser = port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
 
         parser.on('data', async (line) => {
             // Remove todos os caracteres que não são dígitos, vírgula ou ponto.
@@ -85,9 +78,9 @@ function setupSerialPort(portPath) {
 
             if (numeroLimpo && db) {
                 try {
-                    await db.collection('pesagens').add({
+                    await addDoc(collection(db, "pesagens"), {
                         peso: numeroLimpo, // Envia o valor numérico limpo
-                        timestamp: admin.firestore.FieldValue.serverTimestamp()
+                        timestamp: serverTimestamp()
                     });
                     console.log('Peso enviado para o Firebase!');
                 } catch (err) {

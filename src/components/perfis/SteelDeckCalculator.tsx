@@ -95,7 +95,7 @@ export function SteelDeckCalculator() {
         if (total !== extraLoadNum) {
             updateLaje({ extraLoad: total.toString() });
         }
-    }, [selectedLoads, extraLoad, updateLaje]);
+    }, [selectedLoads, extraLoad]);
 
     React.useEffect(() => {
         const totalX = parseFloat(slabAnalysis.spanX.replace(',', '.')) || 0;
@@ -106,7 +106,7 @@ export function SteelDeckCalculator() {
         if (area > 0 && area.toFixed(2) !== currentQuantity.toFixed(2)) {
             updateLaje({ quantity: area.toFixed(2) });
         }
-    }, [slabAnalysis.spanX, slabAnalysis.spanY, quantity, updateLaje]);
+    }, [slabAnalysis.spanX, slabAnalysis.spanY, quantity]);
 
     const handleInputChange = (field: keyof LajeInputs, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');

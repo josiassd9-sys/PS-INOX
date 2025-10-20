@@ -81,7 +81,7 @@ export type SteelDeck = {
 
 export type BudgetItem = {
   id: string;
-  perfil: Perfil | PerfilIpe | SteelDeck;
+  perfil: Perfil | PerfilIpe | SteelDeck | { nome: string };
   span?: number; 
   height?: number; 
   quantity: number;
@@ -89,7 +89,7 @@ export type BudgetItem = {
   totalWeight: number;
   costPerUnit: number;
   totalCost: number;
-  type: 'Viga Principal' | 'Viga Secundária' | 'Steel Deck' | 'Pilar';
+  type: 'Viga Principal' | 'Viga Secundária' | 'Steel Deck' | 'Pilar' | 'Concreto';
 };
 
 export type SupportReaction = {

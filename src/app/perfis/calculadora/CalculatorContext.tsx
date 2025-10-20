@@ -64,6 +64,7 @@ export interface LajeInputs {
     extraLoad: string;
     quantity: string;
     pricePerKg: string;
+    concretePrice: string;
 }
 export interface VigaInputs {
     span: string;
@@ -151,6 +152,7 @@ const initialLajeState: CalculatorState['laje'] = {
     extraLoad: "200",
     quantity: "1",
     pricePerKg: "7.80",
+    concretePrice: "750",
     result: null,
     analysis: null,
 };

@@ -32,10 +32,11 @@ function getLocalAnalysis(
     concreteThickness: number, 
     liveLoad: number, 
     beamSpacing: number,
-    beamScheme: 'biapoiada' | 'balanco' | 'dois-balancos'
+    beamScheme: 'biapoiada' | 'balanco' | 'dois-balancos',
+    concreteVolume: number
 ): AnalysisResult {
-    let analysisText = `Análise para a chapa ${deck.nome} com carga de ${totalLoad.toFixed(0)} kgf/m² e vão de ${beamSpacing.toFixed(2)}m.\n\n`;
-
+    let analysisText = `A carga total de ${totalLoad.toFixed(0)} kgf/m² é coerente para a sobrecarga de ${liveLoad.toFixed(0)} kgf/m² e a espessura de concreto de ${concreteThickness} cm, resultando em um volume de ${concreteVolume.toFixed(2)} m³ de concreto.\n\n`;
+    
     // Determina a categoria de sobrecarga mais próxima para a verificação do vão
     let loadCategory: '150kgf' | '250kgf' | '400kgf' = '150kgf';
     if (liveLoad > 250) {
@@ -78,7 +79,7 @@ function getLocalAnalysis(
 
 export function SteelDeckCalculator() {
     const { onAddToBudget, updateLaje, laje, vigaSecundaria } = useCalculator();
-    const { selectedDeckId, concreteThickness, selectedLoads, extraLoad, quantity, pricePerKg, result, analysis } = laje;
+    const { selectedDeckId, concreteThickness, selectedLoads, extraLoad, quantity, pricePerKg, concretePrice, result, analysis } = laje;
     
     const [isAnalyzing, setIsAnalyzing] = React.useState(false);
     const { toast } = useToast();
@@ -93,7 +94,7 @@ export function SteelDeckCalculator() {
         if (total !== extraLoadNum) {
             updateLaje({ extraLoad: total.toString() });
         }
-    }, [selectedLoads, extraLoad]);
+    }, [selectedLoads, extraLoad, updateLaje]);
 
     const handleInputChange = (field: keyof LajeInputs, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -126,16 +127,19 @@ export function SteelDeckCalculator() {
         };
         const h_cm = parseFloat(concreteThickness.replace(',', '.')) || 0;
         const S_kgf = parseFloat(extraLoad.replace(',', '.')) || 0;
+        const qty_m2 = parseFloat(quantity.replace(',', '.')) || 0;
         const beamSpacingM = parseFloat(vigaSecundaria.spacing!.replace(',', '.')) || 0;
         if (beamSpacingM <= 0) {
             toast({ variant: "destructive", title: "Vão Inválido", description: "Por favor, insira um 'Espaçamento entre Vigas' válido na aba 'Viga Sec.' para realizar a análise."});
             return;
         }
 
+        const concreteVolume = qty_m2 * (h_cm / 100);
+
         setIsAnalyzing(true);
         updateLaje({ analysis: null });
         setTimeout(() => {
-            const analysisResult = getLocalAnalysis(result.deck, result.totalLoad, h_cm, S_kgf, beamSpacingM, vigaSecundaria.beamScheme);
+            const analysisResult = getLocalAnalysis(result.deck, result.totalLoad, h_cm, S_kgf, beamSpacingM, vigaSecundaria.beamScheme, concreteVolume);
             updateLaje({ analysis: analysisResult });
             setIsAnalyzing(false);
         }, 500);
@@ -143,27 +147,49 @@ export function SteelDeckCalculator() {
 
     const handleAddToBudget = () => {
         if (!result) return;
-        const qty = parseInt(quantity);
+        const qty = parseFloat(quantity.replace(",", "."));
         const price = parseFloat(pricePerKg.replace(",", "."));
-        if (isNaN(qty) || isNaN(price) || qty <= 0 || price <= 0) {
+        const concPrice = parseFloat(concretePrice.replace(",", "."));
+        const h_cm = parseFloat(concreteThickness.replace(",", "."));
+
+        if (isNaN(qty) || isNaN(price) || isNaN(concPrice) || qty <= 0 || price <= 0 || h_cm <= 0) {
             toast({ variant: "destructive", title: "Valores Inválidos para Orçamento" });
             return;
         }
+        
+        // Add Steel Deck
         const weightPerUnit = result.deck.pesoProprio;
         const totalWeight = weightPerUnit * qty; 
         const costPerUnit = weightPerUnit * price;
         const totalCost = totalWeight * price;
-        const newItem: BudgetItem = {
+        const deckItem: BudgetItem = {
             id: `${result.deck.nome}-${Date.now()}`, perfil: result.deck, quantity: qty,
             weightPerUnit, totalWeight, costPerUnit, totalCost, type: 'Steel Deck',
         };
-        onAddToBudget(newItem);
+        onAddToBudget(deckItem);
         toast({ title: "Item Adicionado!", description: `${qty}m² de ${result.deck.nome} adicionado(s) ao orçamento.` });
+        
+        // Add Concrete
+        const concreteVolume = qty * (h_cm / 100);
+        const concreteTotalCost = concreteVolume * concPrice;
+        const concreteWeight = concreteVolume * PESO_CONCRETO_KGF_M3;
+        const concreteItem: BudgetItem = {
+            id: `concreto-${Date.now()}`,
+            perfil: { nome: `Concreto ${h_cm}cm` } as any,
+            quantity: concreteVolume, // m³
+            weightPerUnit: PESO_CONCRETO_KGF_M3,
+            totalWeight: concreteWeight,
+            costPerUnit: concPrice,
+            totalCost: concreteTotalCost,
+            type: 'Concreto',
+        }
+        onAddToBudget(concreteItem);
+        toast({ title: "Item Adicionado!", description: `${concreteVolume.toFixed(2)}m³ de concreto adicionado(s) ao orçamento.` });
     };
 
     React.useEffect(() => {
         updateLaje({ result: null, analysis: null });
-    }, [selectedDeckId, concreteThickness, extraLoad]);
+    }, [selectedDeckId, concreteThickness, extraLoad, updateLaje]);
 
     const formatNumber = (value: number, decimals = 2) => new Intl.NumberFormat('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(value);
     
@@ -266,17 +292,21 @@ export function SteelDeckCalculator() {
                                 </Alert>
                             )}
                             <Separator />
-                            <div className="grid grid-cols-2 gap-4 border-t pt-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t pt-4">
                                <div className="space-y-2">
-                                  <Label htmlFor="deck-quantity">Quantidade (m²)</Label>
+                                  <Label htmlFor="deck-quantity">Área da Laje (m²)</Label>
                                   <Input id="deck-quantity" type="text" inputMode="numeric" value={quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} placeholder="Ex: 50" />
                               </div>
                                <div className="space-y-2">
-                                  <Label htmlFor="deck-pricePerKg">Preço Aço Galvanizado (R$/kg)</Label>
+                                  <Label htmlFor="deck-pricePerKg">Preço Aço Galv. (R$/kg)</Label>
                                   <Input id="deck-pricePerKg" type="text" inputMode="decimal" value={pricePerKg} onChange={(e) => handleInputChange('pricePerKg', e.target.value)} placeholder="Ex: 7,80" />
                               </div>
+                              <div className="space-y-2">
+                                  <Label htmlFor="concrete-price">Preço Concreto (R$/m³)</Label>
+                                  <Input id="concrete-price" type="text" inputMode="decimal" value={concretePrice} onChange={(e) => handleInputChange('concretePrice', e.target.value)} placeholder="Ex: 750,00" />
+                              </div>
                             </div>
-                            <Button onClick={handleAddToBudget} className="w-full gap-2"><PlusCircle/> Adicionar Steel Deck ao Orçamento</Button>
+                            <Button onClick={handleAddToBudget} className="w-full gap-2"><PlusCircle/> Adicionar ao Orçamento</Button>
                         </CardContent>
                     </Card>
                 )}

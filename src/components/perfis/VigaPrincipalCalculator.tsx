@@ -38,9 +38,9 @@ function getLocalAnalysis(result: VigaCalcResult, safetyFactor: number): Analysi
     analysisText += `Análise de Otimização:\n- Utilização (Flexão): ${flexao.toFixed(1)}%\n- Utilização (Deformação): ${deformacao.toFixed(1)}%\n- Utilização (Cortante): ${cortante.toFixed(1)}%\n\n`;
 
     if (flexao > 95 || deformacao > 95) {
-        analysisText += "**AVISO DE SEGURANÇA:** O perfil está trabalhando muito próximo do seu limite. Esta é uma solução otimizada, mas com margem de segurança mínima. Recomenda-se fortemente adicionar mais linhas de vigas secundárias para reduzir o vão da viga principal e aumentar a segurança.\n\n";
+        analysisText += "**AVISO DE SEGURANÇA:** O perfil está trabalhando muito próximo do seu limite. Esta é uma solução otimizada, mas com margem de segurança mínima. Recomenda-se fortemente a adição de mais apoios (pilares) para reduzir o vão da viga principal e aumentar a segurança.\n\n";
     } else if (flexao > 70 || deformacao > 70) {
-        analysisText += "**INSIGHT DE OTIMIZAÇÃO:** A taxa de utilização está acima de 70%. Embora segura, a estrutura pode ser otimizada. **Sugestão:** Considere adicionar mais linhas de vigas secundárias no seu projeto. Isso criará mais apoios para a viga principal, reduzindo o vão livre e permitindo o uso de um perfil mais leve e econômico.\n\n";
+        analysisText += "**INSIGHT DE OTIMIZAÇÃO:** A taxa de utilização está acima de 70%. Embora segura, a estrutura pode ser otimizada. **Sugestão:** Considere adicionar mais pilares de apoio em seu projeto. Isso reduzirá o vão livre da viga principal, permitindo o uso de um perfil mais leve e econômico.\n\n";
     } else if (flexao < 60 && deformacao < 60) {
         analysisText += "**INSIGHT DE OTIMIZAÇÃO:** O dimensionamento parece conservador, com taxas de utilização baixas. Há potencial para otimização com um perfil mais leve, caso os perfis intermediários não tenham passado por outros critérios (como flambagem lateral).\n\n";
     } else {
@@ -51,7 +51,7 @@ function getLocalAnalysis(result: VigaCalcResult, safetyFactor: number): Analysi
 }
 
 export function VigaPrincipalCalculator() {
-  const { onAddToBudget, onVigaPrincipalReactionCalculated, supportReactions, vigaPrincipal, updateVigaPrincipal, slabAnalysis } = useCalculator();
+  const { onAddToBudget, onVigaPrincipalReactionCalculated, supportReactions, vigaPrincipal, vigaSecundaria, updateVigaPrincipal, slabAnalysis } = useCalculator();
   const { span, balanco1, balanco2, distributedLoad, pointLoad, pointLoadPosition, steelType, beamScheme, quantity, pricePerKg, result, analysis, safetyFactor } = vigaPrincipal;
 
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
@@ -77,10 +77,17 @@ export function VigaPrincipalCalculator() {
     }, [slabAnalysis.spanX, slabAnalysis.cantileverLeft, slabAnalysis.cantileverRight, span, balanco1, balanco2]);
 
   React.useEffect(() => {
-    if (supportReactions.vigaSecundaria > 0 && supportReactions.vigaSecundaria.toFixed(0) !== pointLoad) {
-      updateVigaPrincipal({ pointLoad: supportReactions.vigaSecundaria.toFixed(0) });
+    const vsReaction = supportReactions.vigaSecundaria;
+    const vsSpacing = parseFloat(vigaSecundaria.spacing?.replace(',', '.')) || 0;
+
+    if (vsReaction > 0 && vsSpacing > 0) {
+        const loadFromVs = vsReaction / vsSpacing;
+        const currentDistLoad = parseFloat(distributedLoad.replace(',', '.')) || 0;
+        if (loadFromVs.toFixed(2) !== currentDistLoad.toFixed(2)) {
+             updateVigaPrincipal({ distributedLoad: loadFromVs.toFixed(2) });
+        }
     }
-  }, [supportReactions.vigaSecundaria, pointLoad, updateVigaPrincipal]);
+  }, [supportReactions.vigaSecundaria, vigaSecundaria.spacing, distributedLoad, updateVigaPrincipal]);
 
   const handleInputChange = (field: keyof VigaInputs, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -268,7 +275,7 @@ export function VigaPrincipalCalculator() {
                 <><div className="space-y-2"><Label htmlFor="vp-balanco1">Balanço 1 (m)</Label><Input id="vp-balanco1" type="text" inputMode="decimal" value={balanco1} onChange={(e) => handleInputChange('balanco1', e.target.value)} placeholder="Ex: 1,5"/></div><div className="space-y-2"><Label htmlFor="vp-span-central">Vão Central (m)</Label><Input id="vp-span-central" type="text" inputMode="decimal" value={span} onChange={(e) => handleInputChange('span', e.target.value)} placeholder="Ex: 5,0"/></div><div className="space-y-2"><Label htmlFor="vp-balanco2">Balanço 2 (m)</Label><Input id="vp-balanco2" type="text" inputMode="decimal" value={balanco2} onChange={(e) => handleInputChange('balanco2', e.target.value)} placeholder="Ex: 1,5"/></div></>
             )}
             <div className="space-y-2"><Label htmlFor="load">Carga Distribuída (kgf/m)</Label><Input id="load" type="text" inputMode="decimal" value={distributedLoad} onChange={(e) => handleInputChange('distributedLoad', e.target.value)} placeholder="Peso próprio, etc." /></div>
-            <div className="space-y-2"><div className="flex items-center justify-between"><Label htmlFor="vp-point-load">Carga Pontual (kgf)</Label></div><Input id="vp-point-load" type="text" inputMode="decimal" value={pointLoad} onChange={e => handleInputChange('pointLoad', e.target.value)} placeholder="Reação da viga secundária" /></div>
+            <div className="space-y-2"><div className="flex items-center justify-between"><Label htmlFor="vp-point-load">Carga Pontual (kgf)</Label></div><Input id="vp-point-load" type="text" inputMode="decimal" value={pointLoad} onChange={e => handleInputChange('pointLoad', e.target.value)} placeholder="Carga manual" /></div>
             <div className="space-y-2"><Label htmlFor="vp-point-load-pos">Posição da Carga (m)</Label><Input id="vp-point-load-pos" type="text" inputMode="decimal" value={pointLoadPosition} onChange={e => handleInputChange('pointLoadPosition', e.target.value)} placeholder="Dist. do apoio esquerdo" /></div>
             <div className="space-y-2"><Label htmlFor="beam-scheme">Esquema da Viga</Label><Select value={beamScheme} onValueChange={(value) => updateVigaPrincipal({ beamScheme: value as VigaInputs['beamScheme'] })}><SelectTrigger id="beam-scheme"><SelectValue placeholder="Selecione o esquema" /></SelectTrigger><SelectContent><SelectItem value="biapoiada">Viga Bi-apoiada</SelectItem><SelectItem value="balanco">Viga com Balanço</SelectItem><SelectItem value="dois-balancos">Viga com Dois Balanços</SelectItem></SelectContent></Select></div>
             <div className="space-y-2"><Label htmlFor="steel-type">Tipo de Aço</Label><Select value={steelType} onValueChange={value => updateVigaPrincipal({ steelType: value })}><SelectTrigger id="steel-type"><SelectValue placeholder="Selecione o aço" /></SelectTrigger><SelectContent>{tiposAco.map(aco => <SelectItem key={aco.nome} value={aco.nome}>{aco.nome}</SelectItem>)}</SelectContent></Select></div>

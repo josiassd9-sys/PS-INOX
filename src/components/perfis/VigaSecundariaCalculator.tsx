@@ -29,12 +29,12 @@ interface AnalysisResult {
   analysis: string;
 }
 
-function getLocalAnalysis(result: CalculationResult): AnalysisResult {
+function getLocalAnalysis(result: CalculationResult, safetyFactor: number): AnalysisResult {
     const { profile, optimizationData, connectorCount } = result;
     const flexao = optimizationData.find(d => d.name === 'Flexão (Wx)')?.utilization || 0;
     const deformacao = optimizationData.find(d => d.name === 'Deform. (Ix)')?.utilization || 0;
     const cortante = optimizationData.find(d => d.name === 'Cortante')?.utilization || 0;
-    let analysisText = `O perfil IPE ${profile.nome} foi selecionado como a opção mais leve que atende aos critérios.\n\n`;
+    let analysisText = `O perfil IPE ${profile.nome} foi selecionado como a opção mais leve que atende aos esforços já majorados pelo fator de segurança de ${safetyFactor.toFixed(2)}.\n\n`;
     analysisText += `Análise de Otimização:\n- Utilização (Flexão): ${flexao.toFixed(1)}%\n- Utilização (Deformação): ${deformacao.toFixed(1)}%\n- Utilização (Cortante): ${cortante.toFixed(1)}%\n\n`;
     
     if (flexao > 95 || deformacao > 95) {
@@ -55,7 +55,7 @@ function getLocalAnalysis(result: CalculationResult): AnalysisResult {
 
 export function VigaSecundariaCalculator() {
   const { onAddToBudget, onVigaSecundariaReactionCalculated, laje, vigaSecundaria, updateVigaSecundaria, slabAnalysis } = useCalculator();
-  const { span, balanco1, balanco2, spacing, slabLoad, distributedLoad, pointLoad, pointLoadPosition, steelType, beamScheme, quantity, pricePerKg, result, analysis } = vigaSecundaria;
+  const { span, balanco1, balanco2, spacing, slabLoad, distributedLoad, pointLoad, pointLoadPosition, steelType, beamScheme, quantity, pricePerKg, result, analysis, safetyFactor } = vigaSecundaria;
 
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -103,8 +103,7 @@ export function VigaSecundariaCalculator() {
     if (laje.result && laje.result.totalLoad.toFixed(0) !== slabLoad) {
       updateVigaSecundaria({ slabLoad: laje.result.totalLoad.toFixed(0) });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [laje.result]);
+  }, [laje.result, slabLoad, updateVigaSecundaria]);
 
   const handleInputChange = (field: keyof VigaInputs, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -120,6 +119,7 @@ export function VigaSecundariaCalculator() {
     const q_kgf_m = parseFloat(distributedLoad.replace(",", ".")) || 0;
     const P_kgf = parseFloat(pointLoad.replace(",", ".")) || 0;
     let a_m = parseFloat(pointLoadPosition.replace(",", ".")) || 0;
+    const sf = parseFloat(safetyFactor.replace(',', '.')) || 1.4;
     
     setError(null);
     updateVigaSecundaria({ result: null, analysis: null });
@@ -152,37 +152,39 @@ export function VigaSecundariaCalculator() {
     const q_kN_cm = q_kN_m / 100;
     const L_cm = L_m * 100;
 
-    let Msd_kNm = 0, Ix_req_dist = 0, Ix_req_pont = 0, Vsd_kN = 0;
+    let Msd_kNm_unfactored = 0, Ix_req_dist = 0, Ix_req_pont = 0, Vsd_kN_unfactored = 0;
 
     if (beamScheme === "biapoiada") {
-        Msd_kNm = (q_kN_m * L_m * L_m) / 8 + (P_kN * a_m * (L_m - a_m)) / L_m;
+        Msd_kNm_unfactored = (q_kN_m * L_m * L_m) / 8 + (P_kN * a_m * (L_m - a_m)) / L_m;
         Ix_req_dist = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * (L_cm / 360));
         const b_cm = L_cm - (a_m * 100);
         Ix_req_pont = (P_kN * (a_m*100) * b_cm * (L_cm + b_cm) * Math.sqrt(3 * (a_m*100) * (L_cm + b_cm))) / (27 * E_kN_cm2 * L_cm * (L_cm / 360));
-        Vsd_kN = (q_kN_m * L_m) / 2 + Math.max((P_kN * (L_m - a_m)) / L_m, (P_kN * a_m) / L_m);
+        Vsd_kN_unfactored = (q_kN_m * L_m) / 2 + Math.max((P_kN * (L_m - a_m)) / L_m, (P_kN * a_m) / L_m);
     } else if (beamScheme === "balanco") {
         const M_neg = (q_kN_m * L1_m * L1_m) / 2;
         const M_pos_dist = (q_kN_m * L_m * L_m) / 8 - M_neg / 2;
         const M_pos_pont = (P_kN * a_m * (L_m - a_m)) / L_m;
-        Msd_kNm = Math.max(M_neg, M_pos_dist + M_pos_pont);
+        Msd_kNm_unfactored = Math.max(M_neg, M_pos_dist + M_pos_pont);
         const R2 = q_kN_m * (L_m/2 + L1_m) + (q_kN_m*L1_m*L1_m)/(2*L_m) + (P_kN*a_m)/L_m;
-        Vsd_kN = R2; 
+        Vsd_kN_unfactored = R2; 
         Ix_req_dist = (q_kN_cm * Math.pow(L_cm, 4)) / (185 * E_kN_cm2 * (L_cm / 360));
     } else if (beamScheme === "dois-balancos") {
         const M_neg1 = (q_kN_m * L1_m * L1_m) / 2;
         const M_neg2 = (q_kN_m * L2_m * L2_m) / 2;
         const M_pos_dist = (q_kN_m * L_m * L_m) / 8 - (M_neg1 + M_neg2) / 2;
         const M_pos_pont = (P_kN * a_m * (L_m - a_m)) / L_m;
-        Msd_kNm = Math.max(M_neg1, M_neg2, M_pos_dist + M_pos_pont);
+        Msd_kNm_unfactored = Math.max(M_neg1, M_neg2, M_pos_dist + M_pos_pont);
         const R1 = (q_kN_m * L_m / 2) + (M_neg1 - M_neg2) / L_m + (P_kN * (L_m - a_m))/L_m;
         const R2 = (q_kN_m * L_m / 2) - (M_neg1 - M_neg2) / L_m + (P_kN*a_m)/L_m;
-        Vsd_kN = Math.max(R1 + q_kN_m*L1_m, R2 + q_kN_m*L2_m);
+        Vsd_kN_unfactored = Math.max(R1 + q_kN_m*L1_m, R2 + q_kN_m*L2_m);
         Ix_req_dist = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * (L_cm / 360)) - ( (M_neg1 + M_neg2)/2 * Math.pow(L_cm,2) ) / (16*E_kN_cm2);
     }
-
-    const requiredIx_cm4 = Ix_req_dist + Ix_req_pont;
+    
+    const Msd_kNm = Msd_kNm_unfactored * sf;
+    const Vsd_kN = Vsd_kN_unfactored * sf;
+    const requiredIx_cm4 = (Ix_req_dist + Ix_req_pont) * sf;
     const requiredWx_cm3 = (Msd_kNm * 100) / fy_kN_cm2;
-    const reaction_kgf = Vsd_kN / 0.009807;
+    const reaction_kgf = Vsd_kN_unfactored / 0.009807;
 
     const suitableProfiles = perfisIpeData.filter(p => p.Wx >= requiredWx_cm3 && p.Ix >= requiredIx_cm4).sort((a, b) => a.peso - b.peso);
     
@@ -222,8 +224,9 @@ export function VigaSecundariaCalculator() {
     if (!result) { toast({ variant: "destructive", title: "Cálculo necessário", description: "Calcule o perfil antes de analisar."}); return; }
     setIsAnalyzing(true);
     updateVigaSecundaria({ analysis: null });
+    const sf = parseFloat(safetyFactor.replace(',', '.')) || 1.4;
     setTimeout(() => {
-        const analysisResult = getLocalAnalysis(result);
+        const analysisResult = getLocalAnalysis(result, sf);
         updateVigaSecundaria({ analysis: analysisResult });
         setIsAnalyzing(false);
     }, 500);
@@ -276,6 +279,7 @@ export function VigaSecundariaCalculator() {
             <div className="space-y-2"><Label htmlFor="vs-point-load-pos">Posição da Carga (m)</Label><Input id="vs-point-load-pos" type="text" inputMode="decimal" value={pointLoadPosition} onChange={e => handleInputChange('pointLoadPosition', e.target.value)} placeholder="Dist. do apoio esquerdo" /></div>
             <div className="space-y-2"><Label htmlFor="vs-beam-scheme">Esquema da Viga</Label><Select value={beamScheme} onValueChange={(value) => updateVigaSecundaria({ beamScheme: value as VigaInputs['beamScheme'] })}><SelectTrigger id="vs-beam-scheme"><SelectValue placeholder="Selecione o esquema" /></SelectTrigger><SelectContent><SelectItem value="biapoiada">Viga Bi-apoiada</SelectItem><SelectItem value="balanco">Viga com Balanço</SelectItem><SelectItem value="dois-balancos">Viga com Dois Balanços</SelectItem></SelectContent></Select></div>
              <div className="space-y-2"><Label htmlFor="vs-steel-type">Tipo de Aço</Label><Select value={steelType} onValueChange={value => updateVigaSecundaria({ steelType: value })}><SelectTrigger id="vs-steel-type"><SelectValue placeholder="Selecione o aço" /></SelectTrigger><SelectContent>{tiposAco.map(aco => <SelectItem key={aco.nome} value={aco.nome}>{aco.nome}</SelectItem>)}</SelectContent></Select></div>
+             <div className="space-y-2"><Label htmlFor="safety-factor">Fator de Segurança</Label><Input id="safety-factor" type="text" inputMode="decimal" value={safetyFactor} onChange={e => handleInputChange('safetyFactor', e.target.value)} placeholder="Ex: 1,4"/></div>
           </div>
           <Button type="button" onClick={handleCalculate} className="w-full md:w-auto">Calcular Viga Secundária</Button>
           {error && <Alert variant="destructive"><AlertTitle>Erro</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
@@ -292,7 +296,7 @@ export function VigaSecundariaCalculator() {
                          <div className="space-y-2"><Label htmlFor="vs-quantity">Quantidade</Label><Input id="vs-quantity" type="text" inputMode="numeric" value={quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} placeholder="Ex: 1" /></div>
                          <div className="space-y-2"><Label htmlFor="vs-pricePerKg">Preço do Aço (R$/kg)</Label><Input id="vs-pricePerKg" type="text" inputMode="decimal" value={pricePerKg} onChange={(e) => handleInputChange('pricePerKg', e.target.value)} placeholder="Ex: 8,50" /></div>
                     </div>
-                     {result.shearCheck.vsd > 0 && <div className="text-sm text-center text-muted-foreground">Reação de apoio máxima: <span className="font-bold text-foreground">{ (result.shearCheck.vsd / 0.009807).toFixed(0)} kgf</span></div>}
+                     {result.shearCheck.vsd > 0 && <div className="text-sm text-center text-muted-foreground">Reação de apoio máxima (não majorada): <span className="font-bold text-foreground">{ (result.shearCheck.vsd / (parseFloat(safetyFactor.replace(',', '.')) || 1.4) / 0.009807).toFixed(0)} kgf</span></div>}
                     <Button type="button" onClick={handleAddToBudget} className="w-full gap-2"><PlusCircle/> Adicionar ao Orçamento</Button>
                 </CardContent>
             </Card>

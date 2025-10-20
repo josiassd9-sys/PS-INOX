@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CheckCircle, PlusCircle, Sparkles, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { perfisData, tiposAco, BudgetItem, Perfil, E_ACO_MPA } from "@/lib/data/index";
-import { useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
+import { useCalculator, PilarInputs } from "@/app/perfis/calculadora/CalculatorContext";
 
 interface PilarCalcResult {
     profile: Perfil;
@@ -23,10 +23,11 @@ interface AnalysisResult {
     analysis: string;
 }
 
-function getLocalAnalysis(result: PilarCalcResult, reactions: { vigaPrincipal: number, vigaSecundaria: number, pilar: number }): AnalysisResult {
+function getLocalAnalysis(result: PilarCalcResult, reactions: { vigaPrincipal: number, vigaSecundaria: number, pilar: number }, safetyFactor: number): AnalysisResult {
     const { profile, actingStress, allowableStress } = result;
     const utilization = (actingStress / allowableStress) * 100;
-    let analysisText = `O perfil ${profile.nome} está trabalhando com ${utilization.toFixed(1)}% de sua capacidade resistente à flambagem, indicando um dimensionamento seguro.\n\n`;
+    let analysisText = `O perfil ${profile.nome} está trabalhando com ${utilization.toFixed(1)}% de sua capacidade resistente à flambagem, indicando um dimensionamento seguro para a carga já majorada pelo fator de segurança de ${safetyFactor.toFixed(2)}.\n\n`;
+    
     const totalReactionKGF = reactions.vigaPrincipal + reactions.vigaSecundaria;
     if (totalReactionKGF > 5000) {
         analysisText += "Atenção: As reações de apoio das vigas são significativas. No projeto detalhado, será crucial verificar a alma do pilar quanto ao esmagamento e à flambagem local, podendo ser necessário o uso de enrijecedores para uma transferência segura dos esforços.\n\n";
@@ -39,7 +40,7 @@ function getLocalAnalysis(result: PilarCalcResult, reactions: { vigaPrincipal: n
 
 export function PilarCalculator() {
     const { onAddToBudget, supportReactions, onPillarLoadCalculated, pilar, updatePilar } = useCalculator();
-    const { height, axialLoad, steelType, quantity, pricePerKg, result, analysis } = pilar;
+    const { height, axialLoad, steelType, quantity, pricePerKg, result, analysis, safetyFactor } = pilar;
     
     const [isAnalyzing, setIsAnalyzing] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
@@ -57,7 +58,7 @@ export function PilarCalculator() {
         onPillarLoadCalculated(!isNaN(load) && load > 0 ? load : 0);
     }, [axialLoad, onPillarLoadCalculated]);
 
-    const handleInputChange = (field: keyof typeof pilar, value: string) => {
+    const handleInputChange = (field: keyof PilarInputs, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
         if (/^\d*\,?\d*$/.test(sanitizedValue)) {
             updatePilar({ [field]: sanitizedValue });
@@ -67,6 +68,7 @@ export function PilarCalculator() {
     const handleCalculate = () => {
         const H_m = parseFloat(height.replace(",", "."));
         const P_kgf = parseFloat(axialLoad.replace(",", "."));
+        const sf = parseFloat(safetyFactor.replace(",", ".")) || 1.4;
         setError(null);
         updatePilar({ result: null, analysis: null });
 
@@ -81,7 +83,7 @@ export function PilarCalculator() {
             return;
         }
 
-        const P_N = P_kgf * 9.807;
+        const P_N = (P_kgf * 9.807) * sf; // Majorando a carga
         const L_cm = H_m * 100;
         const K = 1.0;
         const E_MPa = E_ACO_MPA;
@@ -101,8 +103,8 @@ export function PilarCalculator() {
                 fcr_MPa = (0.877 * Math.pow(Math.PI, 2) * E_MPa) / Math.pow(slenderness, 2);
             }
 
-            const FATOR_SEGURANCA = 1.67;
-            const allowableStress_MPa = fcr_MPa / FATOR_SEGURANCA;
+            const FATOR_SEGURANCA_RESISTENCIA = 1.67; // Este é o fator de resistência, não o de carga
+            const allowableStress_MPa = fcr_MPa / FATOR_SEGURANCA_RESISTENCIA;
             const maxLoad_N = allowableStress_MPa * area_mm2;
             const actingStress_MPa = P_N / area_mm2;
 
@@ -130,8 +132,9 @@ export function PilarCalculator() {
         }
         setIsAnalyzing(true);
         updatePilar({ analysis: null });
+        const sf = parseFloat(safetyFactor.replace(',', '.')) || 1.4;
         setTimeout(() => {
-            const analysisResult = getLocalAnalysis(result, supportReactions);
+            const analysisResult = getLocalAnalysis(result, supportReactions, sf);
             updatePilar({ analysis: analysisResult });
             setIsAnalyzing(false);
         }, 500);
@@ -173,7 +176,7 @@ export function PilarCalculator() {
                 <CardDescription>Dimensione um perfil W para um pilar submetido à carga axial, com verificação de flambagem.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="pilar-height">Altura do Pilar (m)</Label>
                         <Input id="pilar-height" type="text" inputMode="decimal" value={height} onChange={e => handleInputChange('height', e.target.value)} placeholder="Ex: 3,0" />
@@ -189,6 +192,10 @@ export function PilarCalculator() {
                             <SelectContent>{tiposAco.map(aco => <SelectItem key={aco.nome} value={aco.nome}>{aco.nome}</SelectItem>)}</SelectContent>
                         </Select>
                     </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="safety-factor">Fator de Segurança</Label>
+                        <Input id="safety-factor" type="text" inputMode="decimal" value={safetyFactor} onChange={e => handleInputChange('safetyFactor', e.target.value)} placeholder="Ex: 1,4"/>
+                    </div>
                 </div>
                 <Button type="button" onClick={handleCalculate} className="w-full md:w-auto">Calcular Pilar</Button>
                 {error && <Alert variant="destructive"><AlertTitle>Erro</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
@@ -200,7 +207,7 @@ export function PilarCalculator() {
                                 <p>O perfil mais leve que atende à carga axial de <span className="font-semibold">{axialLoad} kgf</span> e altura de <span className="font-semibold">{height}m</span> é:</p>
                                 <div className="text-2xl font-bold text-center py-2 text-primary">{result.profile.nome}</div>
                                 <div className="grid grid-cols-2 gap-2 text-center text-sm">
-                                    <div><p className="text-muted-foreground">Tensão Atuante</p><p className="font-semibold">{result.actingStress.toFixed(1)} MPa</p></div>
+                                    <div><p className="text-muted-foreground">Tensão Atuante (Majorada)</p><p className="font-semibold">{result.actingStress.toFixed(1)} MPa</p></div>
                                     <div><p className="text-muted-foreground">Tensão Admissível</p><p className="font-semibold">{result.allowableStress.toFixed(1)} MPa</p></div>
                                 </div>
                             </AlertDescription>

@@ -65,6 +65,7 @@ export interface LajeInputs {
     quantity: string;
     pricePerKg: string;
     concretePrice: string;
+    safetyFactor: string;
 }
 export interface VigaInputs {
     span: string;
@@ -79,6 +80,7 @@ export interface VigaInputs {
     pricePerKg: string;
     spacing?: string; // Only for viga secundária
     slabLoad?: string; // Only for viga secundária
+    safetyFactor: string;
 }
 export interface PilarInputs {
     height: string;
@@ -86,6 +88,7 @@ export interface PilarInputs {
     steelType: string;
     quantity: string;
     pricePerKg: string;
+    safetyFactor: string;
 }
 export interface SapataInputs {
     load: string;
@@ -153,25 +156,28 @@ const initialLajeState: CalculatorState['laje'] = {
     quantity: "1",
     pricePerKg: "7.80",
     concretePrice: "750",
+    safetyFactor: "1.4",
     result: null,
     analysis: null,
 };
-const initialVigaState: VigaInputs = {
+const initialVigaState: Omit<VigaInputs, 'safetyFactor'> = {
     span: "4", balanco1: "1", balanco2: "1", distributedLoad: "", pointLoad: "",
     pointLoadPosition: "2", steelType: "ASTM A36", beamScheme: "biapoiada",
     quantity: "1", pricePerKg: "8.50"
 };
 const initialVigaSecundariaState: CalculatorState['vigaSecundaria'] = {
     ...initialVigaState,
+    safetyFactor: "1.4",
     spacing: "1.5", slabLoad: "0", result: null, analysis: null,
 };
 const initialVigaPrincipalState: CalculatorState['vigaPrincipal'] = {
     ...initialVigaState,
+    safetyFactor: "1.4",
     span: "5", pointLoadPosition: "2.5", result: null, analysis: null
 };
 const initialPilarState: CalculatorState['pilar'] = {
     height: "3", axialLoad: "0", steelType: "ASTM A36", quantity: "1", pricePerKg: "8.50",
-    result: null, analysis: null
+    safetyFactor: "1.4", result: null, analysis: null
 };
 const initialSapataState: CalculatorState['sapata'] = {
     load: "0", selectedSoil: "Argila Rija", concretePrice: "750", steelPrice: "8.50", steelRatio: "100",

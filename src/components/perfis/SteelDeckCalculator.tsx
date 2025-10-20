@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -32,9 +33,10 @@ function getLocalAnalysis(
     liveLoad: number, 
     beamSpacing: number,
     beamScheme: 'biapoiada' | 'balanco' | 'dois-balancos',
-    concreteVolume: number
+    concreteVolume: number,
+    safetyFactor: number
 ): AnalysisResult {
-    let analysisText = `A carga total de ${totalLoad.toFixed(0)} kgf/m² é coerente para a sobrecarga de ${liveLoad.toFixed(0)} kgf/m² e a espessura de concreto de ${concreteThickness} cm, resultando em um volume de ${concreteVolume.toFixed(2)} m³ de concreto.\n\n`;
+    let analysisText = `A carga total (sem majoração) de ${totalLoad.toFixed(0)} kgf/m² é coerente para a sobrecarga de ${liveLoad.toFixed(0)} kgf/m² e a espessura de concreto de ${concreteThickness} cm, resultando em um volume de ${concreteVolume.toFixed(2)} m³ de concreto. Foi aplicado um fator de segurança de ${safetyFactor.toFixed(2)}.\n\n`;
     
     // Determina a categoria de sobrecarga mais próxima para a verificação do vão
     let loadCategory: '150kgf' | '250kgf' | '400kgf' = '150kgf';
@@ -70,7 +72,7 @@ function getLocalAnalysis(
             analysisText += "Observação: Lajes com espessura superior a 20cm adicionam um peso próprio considerável à estrutura, o que impactará no dimensionamento de vigas e pilares.\n";
         }
 
-        analysisText += "Lembre-se de usar a carga total calculada para dimensionar as vigas secundárias que apoiarão esta laje.";
+        analysisText += "Lembre-se de usar a carga total majorada para dimensionar as vigas secundárias que apoiarão esta laje.";
     }
 
     return { analysis: analysisText };
@@ -78,7 +80,7 @@ function getLocalAnalysis(
 
 export function SteelDeckCalculator() {
     const { onAddToBudget, updateLaje, laje, vigaSecundaria, slabAnalysis } = useCalculator();
-    const { selectedDeckId, concreteThickness, selectedLoads, extraLoad, quantity, pricePerKg, concretePrice, result, analysis } = laje;
+    const { selectedDeckId, concreteThickness, selectedLoads, extraLoad, quantity, pricePerKg, concretePrice, result, analysis, safetyFactor } = laje;
     
     const [isAnalyzing, setIsAnalyzing] = React.useState(false);
     const { toast } = useToast();
@@ -118,13 +120,14 @@ export function SteelDeckCalculator() {
         if (!deck) return;
         const h_cm = parseFloat(concreteThickness.replace(',', '.')) || 0;
         const S_kgf = parseFloat(extraLoad.replace(',', '.')) || 0;
+        const sf = parseFloat(safetyFactor.replace(',', '.')) || 1.4;
         
         updateLaje({ analysis: null, result: null });
         if (h_cm > 0) {
             const concreteWeight = (h_cm / 100) * PESO_CONCRETO_KGF_M3;
-            const finalLoad = deck.pesoProprio + concreteWeight + S_kgf;
+            const finalLoad = (deck.pesoProprio + concreteWeight + S_kgf) * sf;
             updateLaje({ result: { deck, totalLoad: finalLoad } });
-            toast({ title: "Cálculo da Laje Concluído!", description: `A carga total é de ${finalLoad.toFixed(0)} kgf/m².` });
+            toast({ title: "Cálculo da Laje Concluído!", description: `A carga total (majorada) é de ${finalLoad.toFixed(0)} kgf/m².` });
         } else {
              updateLaje({ result: null });
         }
@@ -137,6 +140,7 @@ export function SteelDeckCalculator() {
         };
         const h_cm = parseFloat(concreteThickness.replace(',', '.')) || 0;
         const S_kgf = parseFloat(extraLoad.replace(',', '.')) || 0;
+        const sf = parseFloat(safetyFactor.replace(',', '.')) || 1.4;
         const qty_m2 = parseFloat(quantity.replace(',', '.')) || 0;
         const beamSpacingM = parseFloat(vigaSecundaria.spacing!.replace(',', '.')) || 0;
         if (beamSpacingM <= 0) {
@@ -144,12 +148,15 @@ export function SteelDeckCalculator() {
             return;
         }
 
+        const deck = steelDeckData.find(d => d.nome === selectedDeckId)!;
+        const concreteWeight = (h_cm / 100) * PESO_CONCRETO_KGF_M3;
+        const totalLoadUnfactored = deck.pesoProprio + concreteWeight + S_kgf;
         const concreteVolume = qty_m2 * (h_cm / 100);
 
         setIsAnalyzing(true);
         updateLaje({ analysis: null });
         setTimeout(() => {
-            const analysisResult = getLocalAnalysis(result.deck, result.totalLoad, h_cm, S_kgf, beamSpacingM, vigaSecundaria.beamScheme, concreteVolume);
+            const analysisResult = getLocalAnalysis(result.deck, totalLoadUnfactored, h_cm, S_kgf, beamSpacingM, vigaSecundaria.beamScheme, concreteVolume, sf);
             updateLaje({ analysis: analysisResult });
             setIsAnalyzing(false);
         }, 500);
@@ -200,7 +207,7 @@ export function SteelDeckCalculator() {
     React.useEffect(() => {
         updateLaje({ result: null, analysis: null });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedDeckId, concreteThickness, extraLoad]);
+    }, [selectedDeckId, concreteThickness, extraLoad, safetyFactor]);
 
     const formatNumber = (value: number, decimals = 2) => new Intl.NumberFormat('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(value);
     
@@ -242,7 +249,7 @@ export function SteelDeckCalculator() {
                 <CardDescription>Calcule a carga total (kgf/m²) da sua laje e adicione o material ao orçamento.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
                         <Label>Tipo de Steel Deck</Label>
                         <Select value={selectedDeckId} onValueChange={(value) => updateLaje({ selectedDeckId: value })}>
@@ -261,6 +268,10 @@ export function SteelDeckCalculator() {
                             </TooltipProvider>
                         </div>
                         <Input id="concrete-thickness" type="text" inputMode="decimal" value={concreteThickness} onChange={e => handleInputChange('concreteThickness', e.target.value)} placeholder="Ex: 10"/>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="safety-factor">Fator de Segurança</Label>
+                        <Input id="safety-factor" type="text" inputMode="decimal" value={safetyFactor} onChange={e => handleInputChange('safetyFactor', e.target.value)} placeholder="Ex: 1,4"/>
                     </div>
                 </div>
                 <Accordion type="single" collapsible className="w-full">
@@ -288,7 +299,7 @@ export function SteelDeckCalculator() {
                         </CardHeader>
                          <CardContent className="space-y-4">
                             <div className="text-center py-2">
-                                <p className="text-sm text-muted-foreground">Carga Total da Laje (kgf/m²)</p>
+                                <p className="text-sm text-muted-foreground">Carga Total Majorada da Laje (kgf/m²)</p>
                                 <p className="text-4xl font-bold text-primary">{formatNumber(result.totalLoad, 0)}</p>
                                 <p className="text-xs text-muted-foreground mt-1">Use este valor na aba "Viga Secundária (IPE)".</p>
                             </div>
@@ -325,7 +336,3 @@ export function SteelDeckCalculator() {
         </Card>
     );
 }
-
-    
-
-    

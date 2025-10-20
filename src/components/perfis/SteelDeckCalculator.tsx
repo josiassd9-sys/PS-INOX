@@ -13,10 +13,41 @@ import { CheckCircle, PlusCircle, Info, Sparkles, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { steelDeckData, PESO_CONCRETO_KGF_M3, BudgetItem, liveLoadOptions, LiveLoadOption } from "@/lib/data/index";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { analyzeSlabSelection, AnalyzeSlabSelectionInput, AnalyzeSlabSelectionOutput } from "@/ai/flows/slab-analysis-flow";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
+
+interface AnalysisResult {
+  analysis: string;
+}
+
+function getLocalAnalysis(deck: any, totalLoad: number, concreteThickness: number, liveLoad: number): AnalysisResult {
+    let analysisText = `A carga total de ~${totalLoad.toFixed(0)} kgf/m² é coerente para a sobrecarga de ${liveLoad} kgf/m² e a espessura de concreto de ${concreteThickness} cm.\n\n`;
+
+    if (liveLoad >= 400) {
+        analysisText += "Esta sobrecarga é adequada para depósitos leves ou áreas com equipamentos.\n";
+    } else if (liveLoad >= 200) {
+        analysisText += "Esta sobrecarga é comum para escritórios, áreas comerciais e residenciais com maior concentração de pessoas.\n";
+    } else {
+        analysisText += "Esta sobrecarga é típica para áreas residenciais com uso comum.\n";
+    }
+
+    if (deck.tipo === 'MD75' && concreteThickness > 15) {
+        analysisText += `O uso do ${deck.tipo} com uma laje de ${concreteThickness} cm é uma boa escolha para vencer vãos maiores entre as vigas, otimizando a estrutura secundária.\n`;
+    } else if (deck.tipo === 'MD57' && concreteThickness <= 12) {
+        analysisText += `A combinação de ${deck.tipo} com ${concreteThickness} cm é uma solução econômica e eficiente para vãos moderados.\n`;
+    }
+
+    if (concreteThickness < 8) {
+        analysisText += "ATENÇÃO: Uma espessura de concreto inferior a 8cm pode não ser suficiente para garantir o cobrimento adequado da armadura e a resistência ao fogo exigida por norma.\n";
+    } else if (concreteThickness > 20) {
+        analysisText += "Observação: Lajes com espessura superior a 20cm adicionam um peso próprio considerável à estrutura, o que impactará no dimensionamento de vigas e pilares.\n";
+    }
+
+    analysisText += "\nLembre-se de usar a carga total calculada para dimensionar as vigas secundárias que apoiarão esta laje.";
+    
+    return { analysis: analysisText };
+}
 
 export function SteelDeckCalculator() {
     const { setLastSlabLoad, onAddToBudget } = useCalculator();
@@ -31,7 +62,7 @@ export function SteelDeckCalculator() {
     const [pricePerKg, setPricePerKg] = React.useState("7.80"); 
 
     const [isAnalyzing, setIsAnalyzing] = React.useState(false);
-    const [analysisResult, setAnalysisResult] = React.useState<AnalyzeSlabSelectionOutput | null>(null);
+    const [analysisResult, setAnalysisResult] = React.useState<AnalysisResult | null>(null);
     
     React.useEffect(() => {
         const total = selectedLoads.reduce((acc, id) => {
@@ -71,7 +102,7 @@ export function SteelDeckCalculator() {
         }
     };
 
-    const handleAnalyze = async () => {
+    const handleAnalyze = () => {
         const deck = steelDeckData.find(d => d.nome === selectedDeckId);
         if (!deck || totalLoad <= 0) {
             toast({ variant: "destructive", title: "Cálculo necessário", description: "Calcule a carga antes de analisar."});
@@ -83,22 +114,12 @@ export function SteelDeckCalculator() {
 
         setIsAnalyzing(true);
         setAnalysisResult(null);
-        try {
-            const aiInput: AnalyzeSlabSelectionInput = {
-                deckType: deck.tipo,
-                deckThickness: deck.espessuraChapa,
-                concreteSlabThickness: h_cm,
-                liveLoad: S_kgf,
-                totalLoad: totalLoad,
-            };
-            const analysis = await analyzeSlabSelection(aiInput);
+        
+        setTimeout(() => {
+            const analysis = getLocalAnalysis(deck, totalLoad, h_cm, S_kgf);
             setAnalysisResult(analysis);
-        } catch (e) {
-            console.error("AI slab analysis failed:", e);
-            setAnalysisResult({ analysis: "A análise da IA não pôde ser concluída no momento." });
-        } finally {
             setIsAnalyzing(false);
-        }
+        }, 500);
     };
 
 
@@ -279,19 +300,19 @@ export function SteelDeckCalculator() {
                             </div>
                              
                              <Button type="button" onClick={handleAnalyze} className="w-full" disabled={isAnalyzing}>
-                                {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar com IA</>}
+                                {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar Seleção</>}
                              </Button>
                              {isAnalyzing && (
                                 <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-4">
                                     <Loader className="animate-spin h-4 w-4" />
-                                    IA está analisando a seleção...
+                                    Gerando análise local...
                                 </div>
                              )}
                              {analysisResult && (
                                 <Alert variant="default">
                                     <Sparkles className="h-4 w-4" />
-                                    <AlertTitle className="font-semibold">Análise da IA</AlertTitle>
-                                    <AlertDescription>
+                                    <AlertTitle className="font-semibold">Análise Lógica</AlertTitle>
+                                    <AlertDescription className="whitespace-pre-line">
                                         {analysisResult.analysis}
                                     </AlertDescription>
                                 </Alert>

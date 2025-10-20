@@ -192,3 +192,273 @@ Issues? Report them at https://github.com/firebase/firebase-tools/issues and att
 [debug] [2025-10-19T18:01:53.018Z] Eventarc emulator received unknown request at path / {"metadata":{"emulator":{"name":"eventarc"},"message":"Eventarc emulator received unknown request at path /"}}
 [debug] [2025-10-19T18:29:51.975Z] Functions emulator received unknown request at path /
 [debug] [2025-10-19T18:29:52.671Z] Eventarc emulator received unknown request at path / {"metadata":{"emulator":{"name":"eventarc"},"message":"Eventarc emulator received unknown request at path /"}}
+[debug] [2025-10-19T20:41:58.721Z] Eventarc emulator received unknown request at path / {"metadata":{"emulator":{"name":"eventarc"},"message":"Eventarc emulator received unknown request at path /"}}
+[debug] [2025-10-19T20:41:58.880Z] Eventarc emulator received unknown request at path / {"metadata":{"emulator":{"name":"eventarc"},"message":"Eventarc emulator received unknown request at path /"}}
+[debug] [2025-10-19T20:41:58.922Z] Functions emulator received unknown request at path /
+[debug] [2025-10-19T20:41:59.086Z] Functions emulator received unknown request at path /
+[debug] [2025-10-19T23:35:09.341Z] Functions emulator received unknown request at path /
+[debug] [2025-10-19T23:35:09.912Z] Eventarc emulator received unknown request at path / {"metadata":{"emulator":{"name":"eventarc"},"message":"Eventarc emulator received unknown request at path /"}}
+[debug] [2025-10-19T23:46:12.218Z] File /home/user/studio/functions/index.js changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File /home/user/studio/functions/index.js changed, reloading triggers"}}
+[debug] [2025-10-19T23:46:13.224Z] Validating nodejs source
+[debug] [2025-10-19T23:46:14.607Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "22"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "firebase-admin": "^12.6.0",
+    "firebase-functions": "^6.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.15.0",
+    "eslint-config-google": "^0.14.0",
+    "firebase-functions-test": "^3.1.0"
+  },
+  "private": true
+}
+[debug] [2025-10-19T23:46:14.607Z] Building nodejs source
+[debug] [2025-10-19T23:46:14.610Z] Failed to find version of module node: reached end of search path /home/user/studio/functions/node_modules
+[warn] ⚠  functions: Your requested "node" version "22" doesn't match your global version "20". Using node@20 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2025-10-19T23:46:14.625Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-10-19T23:46:14.671Z] Found firebase-functions binary at '/home/user/studio/functions/node_modules/.bin/firebase-functions'
+[info] Serving at port 8703
+
+[info] Chave da API está ativa? NÃO ENCONTRADA
+
+[debug] [2025-10-19T23:46:16.559Z] Got response from /__/functions.yaml {"endpoints":{},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[warn] ⚠  functions: Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful! {"metadata":{"emulator":{"name":"functions"},"message":"Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful!"}}
+[info] ✔  functions: Loaded functions definitions from source: . {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: ."}}
+[debug] [2025-10-19T23:46:19.152Z] File /home/user/studio/functions/index.js changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File /home/user/studio/functions/index.js changed, reloading triggers"}}
+[debug] [2025-10-19T23:46:20.152Z] Validating nodejs source
+[debug] [2025-10-19T23:46:22.520Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "22"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "firebase-admin": "^12.6.0",
+    "firebase-functions": "^6.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.15.0",
+    "eslint-config-google": "^0.14.0",
+    "firebase-functions-test": "^3.1.0"
+  },
+  "private": true
+}
+[debug] [2025-10-19T23:46:22.520Z] Building nodejs source
+[debug] [2025-10-19T23:46:22.521Z] Failed to find version of module node: reached end of search path /home/user/studio/functions/node_modules
+[warn] ⚠  functions: Your requested "node" version "22" doesn't match your global version "20". Using node@20 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2025-10-19T23:46:22.532Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-10-19T23:46:22.539Z] Found firebase-functions binary at '/home/user/studio/functions/node_modules/.bin/firebase-functions'
+[info] Serving at port 8459
+
+[info] [dotenv@17.2.3] injecting env (1) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+Gemini API Key carregada: AIzaSyCr_XPSGPsO6yZy7rChaVCu6r_hQ0K7-Ro
+
+[debug] [2025-10-19T23:46:25.280Z] Got response from /__/functions.yaml {"endpoints":{"helloGemini":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"httpsTrigger":{},"entryPoint":"helloGemini"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[warn] ⚠  functions: Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful! {"metadata":{"emulator":{"name":"functions"},"message":"Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful!"}}
+[info] ✔  functions: Loaded functions definitions from source: helloGemini. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: helloGemini."}}
+[debug] [2025-10-19T23:46:59.971Z] File /home/user/studio/functions/index.js changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File /home/user/studio/functions/index.js changed, reloading triggers"}}
+[debug] [2025-10-19T23:47:00.974Z] Validating nodejs source
+[debug] [2025-10-19T23:47:01.870Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "22"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "firebase-admin": "^12.6.0",
+    "firebase-functions": "^6.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.15.0",
+    "eslint-config-google": "^0.14.0",
+    "firebase-functions-test": "^3.1.0"
+  },
+  "private": true
+}
+[debug] [2025-10-19T23:47:01.870Z] Building nodejs source
+[debug] [2025-10-19T23:47:01.870Z] Failed to find version of module node: reached end of search path /home/user/studio/functions/node_modules
+[warn] ⚠  functions: Your requested "node" version "22" doesn't match your global version "20". Using node@20 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2025-10-19T23:47:01.873Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-10-19T23:47:01.876Z] Found firebase-functions binary at '/home/user/studio/functions/node_modules/.bin/firebase-functions'
+[info] Serving at port 8223
+
+[info] [dotenv@17.2.3] injecting env (1) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+Chave da API está ativa? OK
+
+[debug] [2025-10-19T23:47:02.376Z] Got response from /__/functions.yaml {"endpoints":{"helloGemini":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"httpsTrigger":{},"entryPoint":"helloGemini"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[warn] ⚠  functions: Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful! {"metadata":{"emulator":{"name":"functions"},"message":"Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful!"}}
+[info] ✔  functions: Loaded functions definitions from source: helloGemini. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: helloGemini."}}
+[debug] [2025-10-19T23:47:04.972Z] File /home/user/studio/functions/index.js changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File /home/user/studio/functions/index.js changed, reloading triggers"}}
+[debug] [2025-10-19T23:47:05.973Z] Validating nodejs source
+[debug] [2025-10-19T23:47:07.328Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "22"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "firebase-admin": "^12.6.0",
+    "firebase-functions": "^6.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.15.0",
+    "eslint-config-google": "^0.14.0",
+    "firebase-functions-test": "^3.1.0"
+  },
+  "private": true
+}
+[debug] [2025-10-19T23:47:07.329Z] Building nodejs source
+[debug] [2025-10-19T23:47:07.329Z] Failed to find version of module node: reached end of search path /home/user/studio/functions/node_modules
+[warn] ⚠  functions: Your requested "node" version "22" doesn't match your global version "20". Using node@20 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2025-10-19T23:47:07.331Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-10-19T23:47:07.333Z] Found firebase-functions binary at '/home/user/studio/functions/node_modules/.bin/firebase-functions'
+[info] Serving at port 8830
+
+[info] [dotenv@17.2.3] injecting env (1) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+Chave da API está ativa? OK
+
+[debug] [2025-10-19T23:47:08.190Z] Got response from /__/functions.yaml {"endpoints":{"helloGemini":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"httpsTrigger":{},"entryPoint":"helloGemini"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[warn] ⚠  functions: Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful! {"metadata":{"emulator":{"name":"functions"},"message":"Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful!"}}
+[info] ✔  functions: Loaded functions definitions from source: helloGemini. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: helloGemini."}}
+[debug] [2025-10-19T23:49:14.827Z] File /home/user/studio/functions/index.js changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File /home/user/studio/functions/index.js changed, reloading triggers"}}
+[debug] [2025-10-19T23:49:15.828Z] Validating nodejs source
+[debug] [2025-10-19T23:49:16.729Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "22"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "firebase-admin": "^12.6.0",
+    "firebase-functions": "^6.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.15.0",
+    "eslint-config-google": "^0.14.0",
+    "firebase-functions-test": "^3.1.0"
+  },
+  "private": true
+}
+[debug] [2025-10-19T23:49:16.730Z] Building nodejs source
+[debug] [2025-10-19T23:49:16.730Z] Failed to find version of module node: reached end of search path /home/user/studio/functions/node_modules
+[warn] ⚠  functions: Your requested "node" version "22" doesn't match your global version "20". Using node@20 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2025-10-19T23:49:16.731Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-10-19T23:49:16.734Z] Found firebase-functions binary at '/home/user/studio/functions/node_modules/.bin/firebase-functions'
+[info] Serving at port 8051
+
+[info] [dotenv@17.2.3] injecting env (1) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+Chave da API está ativa? OK
+
+[debug] [2025-10-19T23:49:17.252Z] Got response from /__/functions.yaml {"endpoints":{"helloGemini":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"httpsTrigger":{},"entryPoint":"helloGemini"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[warn] ⚠  functions: Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful! {"metadata":{"emulator":{"name":"functions"},"message":"Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful!"}}
+[info] ✔  functions: Loaded functions definitions from source: helloGemini. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: helloGemini."}}
+[debug] [2025-10-19T23:49:18.257Z] File /home/user/studio/functions/index.js changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File /home/user/studio/functions/index.js changed, reloading triggers"}}
+[debug] [2025-10-19T23:49:19.259Z] Validating nodejs source
+[debug] [2025-10-19T23:49:20.000Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "22"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "firebase-admin": "^12.6.0",
+    "firebase-functions": "^6.0.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.15.0",
+    "eslint-config-google": "^0.14.0",
+    "firebase-functions-test": "^3.1.0"
+  },
+  "private": true
+}
+[debug] [2025-10-19T23:49:20.000Z] Building nodejs source
+[debug] [2025-10-19T23:49:20.000Z] Failed to find version of module node: reached end of search path /home/user/studio/functions/node_modules
+[warn] ⚠  functions: Your requested "node" version "22" doesn't match your global version "20". Using node@20 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2025-10-19T23:49:20.002Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-10-19T23:49:20.006Z] Found firebase-functions binary at '/home/user/studio/functions/node_modules/.bin/firebase-functions'
+[info] Serving at port 8829
+
+[info] [dotenv@17.2.3] injecting env (1) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+
+[info] Chave da API está ativa? OK
+
+[debug] [2025-10-19T23:49:20.496Z] Got response from /__/functions.yaml {"endpoints":{"helloGemini":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"httpsTrigger":{},"entryPoint":"helloGemini"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[warn] ⚠  functions: Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful! {"metadata":{"emulator":{"name":"functions"},"message":"Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful!"}}
+[info] ✔  functions: Loaded functions definitions from source: helloGemini. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: helloGemini."}}
+[debug] [2025-10-20T01:13:07.971Z] Postgres client disconnected
+[debug] [2025-10-20T01:13:08.134Z] Postgres client disconnected
+[debug] [2025-10-20T01:13:08.134Z] Postgres client disconnected
+[debug] [2025-10-20T01:13:08.137Z] Postgres client disconnected
+[debug] [2025-10-20T01:13:08.137Z] Postgres client disconnected
+[debug] [2025-10-20T01:13:08.137Z] Postgres client disconnected

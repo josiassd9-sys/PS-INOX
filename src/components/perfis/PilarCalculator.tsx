@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CheckCircle, PlusCircle, Sparkles, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { perfisData, tiposAco, BudgetItem, Perfil, E_ACO_MPA } from "@/lib/data/index";
-import { analyzePillarSelection, AnalyzePillarSelectionInput, AnalyzePillarSelectionOutput } from "@/ai/flows/pilar-analysis-flow";
 import { useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
 
 
@@ -20,6 +19,31 @@ interface CalculationResult {
     actingStress: number; // Tensão atuante
     allowableStress: number; // Tensão admissível
 }
+
+interface AnalysisResult {
+    analysis: string;
+}
+
+
+function getLocalAnalysis(result: CalculationResult, reactions: { vigaPrincipal: number, vigaSecundaria: number }): AnalysisResult {
+    const { profile, actingStress, allowableStress } = result;
+
+    const utilization = (actingStress / allowableStress) * 100;
+
+    let analysisText = `O perfil ${profile.nome} está trabalhando com ${utilization.toFixed(1)}% de sua capacidade resistente à flambagem, indicando um dimensionamento seguro.\n\n`;
+
+    const totalReactionKGF = reactions.vigaPrincipal + reactions.vigaSecundaria;
+    if (totalReactionKGF > 5000) { // 5 toneladas-força
+        analysisText += "Atenção: As reações de apoio das vigas são significativas. No projeto detalhado, será crucial verificar a alma do pilar quanto ao esmagamento e à flambagem local, podendo ser necessário o uso de enrijecedores para uma transferência segura dos esforços.\n\n";
+    } else {
+        analysisText += "As reações de apoio são moderadas, sugerindo que uma conexão padrão viga-pilar provavelmente será suficiente, mas a verificação formal ainda é necessária no projeto executivo.\n\n";
+    }
+
+    analysisText += `Resumo: O sistema pré-dimensionado aparenta ser coerente. As cargas foram transferidas adequadamente e o pilar ${profile.nome} foi dimensionado com uma margem de segurança adequada. Este resultado serve como uma excelente base para o projeto executivo final.`;
+
+    return { analysis: analysisText };
+}
+
 
 export function PilarCalculator() {
     const { onAddToBudget, supportReactions, onPillarLoadCalculated } = useCalculator();
@@ -34,7 +58,7 @@ export function PilarCalculator() {
     const { toast } = useToast();
     
     const [isAnalyzing, setIsAnalyzing] = React.useState(false);
-    const [analysisResult, setAnalysisResult] = React.useState<AnalyzePillarSelectionOutput | null>(null);
+    const [analysisResult, setAnalysisResult] = React.useState<AnalysisResult | null>(null);
 
     React.useEffect(() => {
         const totalReaction = supportReactions.vigaPrincipal + supportReactions.vigaSecundaria;
@@ -134,34 +158,20 @@ export function PilarCalculator() {
         });
     };
 
-    const handleAnalyze = async () => {
+    const handleAnalyze = () => {
         if (!result) {
             toast({ variant: "destructive", title: "Cálculo necessário", description: "Calcule o perfil antes de analisar."});
             return;
         }
         
-        const H_m = parseFloat(height.replace(",", "."));
-        const P_kgf = parseFloat(axialLoad.replace(",", "."));
-        
         setIsAnalyzing(true);
         setAnalysisResult(null);
-        try {
-            const aiInput: AnalyzePillarSelectionInput = {
-                pillarHeight: H_m,
-                axialLoad: P_kgf,
-                supportReactions,
-                recommendedProfile: result.profile.nome,
-                actingStress: result.actingStress,
-                allowableStress: result.allowableStress
-            };
-            const analysis = await analyzePillarSelection(aiInput);
+
+        setTimeout(() => {
+            const analysis = getLocalAnalysis(result, supportReactions);
             setAnalysisResult(analysis);
-        } catch (e) {
-            console.error("AI pillar analysis failed:", e);
-            setAnalysisResult({ analysis: "A análise da IA não pôde ser concluída no momento." });
-        } finally {
             setIsAnalyzing(false);
-        }
+        }, 500);
     };
 
 
@@ -261,19 +271,19 @@ export function PilarCalculator() {
                         </CardHeader>
                         <CardContent className="space-y-4">
                              <Button type="button" onClick={handleAnalyze} className="w-full" disabled={isAnalyzing}>
-                                {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar com IA</>}
+                                {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar Resultado</>}
                              </Button>
                             {isAnalyzing && (
                                 <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-4">
                                     <Loader className="animate-spin h-4 w-4" />
-                                    IA está gerando a análise final...
+                                    Gerando análise local...
                                 </div>
                             )}
                             {analysisResult && (
                                 <Alert variant="default">
                                     <Sparkles className="h-4 w-4" />
-                                    <AlertTitle className="font-semibold">Análise Final da IA</AlertTitle>
-                                    <AlertDescription>
+                                    <AlertTitle className="font-semibold">Análise Lógica</AlertTitle>
+                                    <AlertDescription className="whitespace-pre-line">
                                         {analysisResult.analysis}
                                     </AlertDescription>
                                 </Alert>

@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CheckCircle, PlusCircle, Sparkles, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { perfisData, tiposAco, E_ACO_MPA, BudgetItem, Perfil } from "@/lib/data/index";
-import { interpretProfileSelection, InterpretProfileSelectionInput, InterpretProfileSelectionOutput } from "@/ai/flows/interpret-profile-selection";
 import { BeamSchemeDiagram } from "./BeamSchemeDiagram";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
 import { useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
@@ -33,7 +32,36 @@ interface CalculationResult {
     optimizationData: { name: string; utilization: number }[];
 }
 
+interface AnalysisResult {
+  analysis: string;
+}
+
 type BeamScheme = "biapoiada" | "balanco" | "dois-balancos";
+
+function getLocalAnalysis(result: CalculationResult): AnalysisResult {
+    const { profile, optimizationData, shearCheck } = result;
+
+    const flexao = optimizationData.find(d => d.name === 'Flexão (Wx)')?.utilization || 0;
+    const deformacao = optimizationData.find(d => d.name === 'Deform. (Ix)')?.utilization || 0;
+    const cortante = optimizationData.find(d => d.name === 'Cortante')?.utilization || 0;
+
+    let analysisText = `O perfil ${profile.nome} foi selecionado por ser a opção mais leve que atendeu a todos os critérios de segurança e serviço.\n\n`;
+    analysisText += `Análise de Otimização:\n`;
+    analysisText += `- Resistência à Flexão: O perfil está com ${flexao.toFixed(1)}% de sua capacidade utilizada.\n`;
+    analysisText += `- Limite de Deformação: O perfil está com ${deformacao.toFixed(1)}% de sua capacidade utilizada.\n`;
+    analysisText += `- Esforço Cortante: A viga utiliza ${cortante.toFixed(1)}% de sua resistência ao cisalhamento.\n\n`;
+
+    if (flexao > 95 || deformacao > 95 || cortante > 95) {
+        analysisText += "AVISO: O perfil está trabalhando muito próximo do seu limite. Considere revisar as cargas ou o esquema estrutural.\n\n";
+    } else if (flexao < 60 && deformacao < 60) {
+        analysisText += "INSIGHT: O dimensionamento parece conservador. Há potencial para otimizar e utilizar um perfil mais leve, reduzindo custos.\n\n";
+    } else {
+        analysisText += "CONCLUSÃO: O dimensionamento aparenta estar seguro e bem otimizado.\n\n";
+    }
+
+    return { analysis: analysisText };
+}
+
 
 export function VigaPrincipalCalculator() {
   const { onAddToBudget, onVigaPrincipalReactionCalculated, supportReactions } = useCalculator();
@@ -53,7 +81,7 @@ export function VigaPrincipalCalculator() {
   const { toast } = useToast();
 
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
-  const [analysisResult, setAnalysisResult] = React.useState<InterpretProfileSelectionOutput | null>(null);
+  const [analysisResult, setAnalysisResult] = React.useState<AnalysisResult | null>(null);
 
   React.useEffect(() => {
     if (supportReactions.vigaSecundaria > 0) {
@@ -174,51 +202,21 @@ export function VigaPrincipalCalculator() {
     toast({ title: "Cálculo Concluído", description: `O perfil recomendado é ${finalProfile.profile.nome}.` });
   };
 
-  const handleAnalyze = async () => {
+  const handleAnalyze = () => {
     if (!recommendedProfile) {
         toast({ variant: "destructive", title: "Cálculo necessário", description: "Calcule o perfil antes de analisar."});
         return;
     }
-    const L_central_m = parseFloat(span.replace(",", "."));
-    const q_kgf_m = parseFloat(distributedLoad.replace(",", "."));
-    const P_kgf = parseFloat(pointLoad.replace(",", ".")) || undefined;
-    const a_m = parseFloat(pointLoadPosition.replace(",", ".")) || undefined;
-    
-    const selectedSteel = tiposAco.find(s => s.nome === steelType);
-
-    if (!selectedSteel || isNaN(L_central_m)) return;
 
     setIsAnalyzing(true);
     setAnalysisResult(null);
-    try {
-        const aiInput: InterpretProfileSelectionInput = {
-            span: L_central_m,
-            load: q_kgf_m,
-            pointLoad: P_kgf,
-            pointLoadPosition: a_m,
-            beamScheme: beamScheme,
-            steelType: selectedSteel.nome,
-            recommendedProfile: {
-                nome: recommendedProfile.profile.nome,
-                peso: recommendedProfile.profile.peso,
-                Wx: recommendedProfile.profile.Wx,
-                Ix: recommendedProfile.profile.Ix,
-            },
-            requiredWx: recommendedProfile.requiredWx,
-            requiredIx: recommendedProfile.requiredIx,
-            shearCheck: {
-                vsd: recommendedProfile.shearCheck.vsd,
-                vrd: recommendedProfile.shearCheck.vrd,
-            }
-        };
-        const analysis = await interpretProfileSelection(aiInput);
+
+    // Simulate async operation for local analysis
+    setTimeout(() => {
+        const analysis = getLocalAnalysis(recommendedProfile);
         setAnalysisResult(analysis);
-    } catch (e) {
-        console.error("AI analysis failed:", e);
-        setAnalysisResult({ analysis: "A análise da IA não pôde ser concluída no momento." });
-    } finally {
         setIsAnalyzing(false);
-    }
+    }, 500); // 500ms delay to simulate processing
   };
 
   
@@ -395,19 +393,19 @@ export function VigaPrincipalCalculator() {
                         </ResponsiveContainer>
                      </div>
                      <Button type="button" onClick={handleAnalyze} className="w-full" disabled={isAnalyzing}>
-                         {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar com IA</>}
+                         {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar Resultado</>}
                       </Button>
                      {isAnalyzing && (
                          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-4">
                              <Loader className="animate-spin h-4 w-4" />
-                             IA está analisando o resultado...
+                             Gerando análise local...
                          </div>
                      )}
                      {analysisResult && (
                         <Alert variant="default">
                             <Sparkles className="h-4 w-4" />
-                            <AlertTitle className="font-semibold">Análise da IA</AlertTitle>
-                            <AlertDescription>
+                            <AlertTitle className="font-semibold">Análise Lógica</AlertTitle>
+                            <AlertDescription className="whitespace-pre-line">
                                 {analysisResult.analysis}
                             </AlertDescription>
                         </Alert>

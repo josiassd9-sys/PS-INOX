@@ -11,7 +11,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CheckCircle, PlusCircle, Sparkles, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { perfisIpeData, tiposAco, E_ACO_MPA, BudgetItem, PerfilIpe, RESISTENCIA_CALCULO_CONECTOR_KN } from "@/lib/data/index";
-import { interpretProfileSelection, InterpretProfileSelectionInput, InterpretProfileSelectionOutput } from "@/ai/flows/interpret-profile-selection";
 import { BeamSchemeDiagram } from "./BeamSchemeDiagram";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
 import { useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
@@ -34,7 +33,40 @@ interface CalculationResult {
     optimizationData: { name: string; utilization: number }[];
 }
 
+interface AnalysisResult {
+  analysis: string;
+}
+
 type BeamScheme = "biapoiada" | "balanco" | "dois-balancos";
+
+function getLocalAnalysis(result: CalculationResult): AnalysisResult {
+    const { profile, optimizationData, connectorCount, shearCheck } = result;
+
+    const flexao = optimizationData.find(d => d.name === 'Flexão (Wx)')?.utilization || 0;
+    const deformacao = optimizationData.find(d => d.name === 'Deform. (Ix)')?.utilization || 0;
+    const cortante = optimizationData.find(d => d.name === 'Cortante')?.utilization || 0;
+
+    let analysisText = `O perfil IPE ${profile.nome} foi selecionado por atender aos critérios de resistência e rigidez.\n\n`;
+    analysisText += `Análise de Otimização:\n`;
+    analysisText += `- Resistência à Flexão: O perfil está com ${flexao.toFixed(1)}% de sua capacidade utilizada.\n`;
+    analysisText += `- Limite de Deformação: O perfil está com ${deformacao.toFixed(1)}% de sua capacidade utilizada.\n`;
+    analysisText += `- Esforço Cortante: A viga utiliza ${cortante.toFixed(1)}% de sua resistência ao cisalhamento.\n\n`;
+
+    if (flexao > 95 || deformacao > 95 || cortante > 95) {
+        analysisText += "AVISO: O perfil está trabalhando muito próximo do seu limite. Considere revisar as cargas ou o esquema estrutural.\n\n";
+    } else if (flexao < 60 && deformacao < 60) {
+        analysisText += "INSIGHT: O dimensionamento parece conservador. Há potencial para otimizar e utilizar um perfil mais leve, reduzindo custos.\n\n";
+    } else {
+        analysisText += "CONCLUSÃO: O dimensionamento aparenta estar seguro e bem otimizado.\n\n";
+    }
+
+    if (connectorCount > 0) {
+        analysisText += `Ação Mista: Foram calculados ${connectorCount} conectores de cisalhamento (stud bolts). A correta instalação destes é vital para garantir a ação mista viga-laje, aumentando a rigidez e capacidade do sistema.`;
+    }
+
+    return { analysis: analysisText };
+}
+
 
 export function VigaSecundariaCalculator() {
   const { onAddToBudget, lastSlabLoad, onVigaSecundariaReactionCalculated } = useCalculator();
@@ -56,7 +88,7 @@ export function VigaSecundariaCalculator() {
   const { toast } = useToast();
 
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
-  const [analysisResult, setAnalysisResult] = React.useState<InterpretProfileSelectionOutput | null>(null);
+  const [analysisResult, setAnalysisResult] = React.useState<AnalysisResult | null>(null);
   
   React.useEffect(() => {
     const E_m = parseFloat(spacing.replace(",", "."));
@@ -199,51 +231,21 @@ export function VigaSecundariaCalculator() {
     toast({ title: "Cálculo de Viga Secundária Concluído", description: `O perfil recomendado é ${finalProfile.profile.nome}.` });
   };
 
-  const handleAnalyze = async () => {
+  const handleAnalyze = () => {
     if (!recommendedProfile) {
         toast({ variant: "destructive", title: "Cálculo necessário", description: "Calcule o perfil antes de analisar."});
         return;
     }
-    const L_central_m = parseFloat(span.replace(",", "."));
-    const q_dist_kgf_m = parseFloat(distributedLoad.replace(",", "."));
-    const P_kgf = parseFloat(pointLoad.replace(",", ".")) || undefined;
-    const a_m = parseFloat(pointLoadPosition.replace(",", ".")) || undefined;
-    const selectedSteel = tiposAco.find(s => s.nome === steelType);
-
-    if (!selectedSteel || isNaN(L_central_m) || isNaN(q_dist_kgf_m)) return;
-
+    
     setIsAnalyzing(true);
     setAnalysisResult(null);
-    try {
-        const aiInput: InterpretProfileSelectionInput = {
-            span: L_central_m,
-            load: q_dist_kgf_m,
-            pointLoad: P_kgf,
-            pointLoadPosition: a_m,
-            beamScheme: beamScheme,
-            steelType: selectedSteel.nome,
-            recommendedProfile: {
-                nome: recommendedProfile.profile.nome,
-                peso: recommendedProfile.profile.peso,
-                Wx: recommendedProfile.profile.Wx,
-                Ix: recommendedProfile.profile.Ix,
-            },
-            requiredWx: recommendedProfile.requiredWx,
-            requiredIx: recommendedProfile.requiredIx,
-            shearCheck: {
-                vsd: recommendedProfile.shearCheck.vsd,
-                vrd: recommendedProfile.shearCheck.vrd,
-            },
-            connectorCount: recommendedProfile.connectorCount
-        };
-        const analysis = await interpretProfileSelection(aiInput);
+
+    // Simulate async operation
+    setTimeout(() => {
+        const analysis = getLocalAnalysis(recommendedProfile);
         setAnalysisResult(analysis);
-    } catch (e) {
-        console.error("AI analysis failed:", e);
-        setAnalysisResult({ analysis: "A análise da IA não pôde ser concluída no momento." });
-    } finally {
         setIsAnalyzing(false);
-    }
+    }, 500);
   };
   
   const handleAddToBudget = () => {
@@ -428,19 +430,19 @@ export function VigaSecundariaCalculator() {
                         <p className="text-xs text-center text-muted-foreground">({(recommendedProfile.connectorCount / (beamScheme === 'biapoiada' ? parseFloat(span.replace(',', '.')) : parseFloat(span.replace(',', '.')) + parseFloat(balanco1.replace(',', '.')) + (beamScheme === 'dois-balancos' ? parseFloat(balanco2.replace(',', '.')) : 0))).toFixed(1)} un/m)</p>
                       </div>
                       <Button type="button" onClick={handleAnalyze} className="w-full" disabled={isAnalyzing}>
-                         {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar com IA</>}
+                         {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar Resultado</>}
                       </Button>
                      {isAnalyzing && (
                         <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-4">
                            <Loader className="animate-spin h-4 w-4" />
-                           IA está analisando o resultado...
+                           Gerando análise local...
                         </div>
                      )}
                      {analysisResult && (
                         <Alert variant="default">
                            <Sparkles className="h-4 w-4" />
-                           <AlertTitle className="font-semibold">Análise da IA</AlertTitle>
-                           <AlertDescription>
+                           <AlertTitle className="font-semibold">Análise Lógica</AlertTitle>
+                           <AlertDescription className="whitespace-pre-line">
                                {analysisResult.analysis}
                            </AlertDescription>
                         </Alert>

@@ -10,8 +10,16 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sparkles, Loader, CheckCircle, Calculator } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { analyzeSapata, AnalyzeSapataInput, AnalyzeSapataOutput } from "@/ai/flows/sapata-analysis-flow";
 import { useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
+
+interface AnalysisResult {
+  analysis: string;
+  footingDimensions: {
+    requiredAreaM2: number;
+    sideLengthM: number;
+    recommendedHeightCm: number;
+  };
+}
 
 interface SapataCalculatorProps {}
 
@@ -23,13 +31,34 @@ const soilTypes = [
     { name: "Areia Fofa", pressure: 1.0 },
 ];
 
+function getLocalAnalysis(totalLoadKgf: number, soilName: string, soilPressure: number): AnalysisResult {
+    const soilPressureKgfM2 = soilPressure * 10000;
+    const requiredAreaM2 = totalLoadKgf / soilPressureKgfM2;
+    const sideLengthM = Math.sqrt(requiredAreaM2);
+    const recommendedHeightCm = Math.max(30, Math.ceil((sideLengthM * 100) / 3 / 5) * 5); // h = L/3, min 30cm, round to 5cm
+
+    let analysisText = `Para suportar a carga de ${totalLoadKgf} kgf sobre um solo do tipo "${soilName}" (tensão admissível de ${soilPressure} kgf/cm²), a sapata precisa de uma área mínima de ${requiredAreaM2.toFixed(2)} m² para distribuir a carga adequadamente.\n\n`;
+    analysisText += `Isso resulta em uma sapata quadrada pré-dimensionada de ${sideLengthM.toFixed(2)}m x ${sideLengthM.toFixed(2)}m, com uma altura recomendada de ${recommendedHeightCm.toFixed(0)}cm. Esta altura é crucial para resistir aos esforços de punção e flexão. Recomenda-se um "colarinho" de concreto sobre a sapata para embutir a base do pilar metálico.\n\n`;
+    analysisText += `Lembre-se: este é um pré-dimensionamento. O projeto executivo final, incluindo o detalhamento das armaduras de aço, deve ser realizado por um engenheiro calculista, em conformidade com as normas NBR 6118 e NBR 6122.`;
+
+    return {
+        analysis: analysisText,
+        footingDimensions: {
+            requiredAreaM2,
+            sideLengthM,
+            recommendedHeightCm,
+        }
+    };
+}
+
+
 export function SapataCalculator(props: SapataCalculatorProps) {
     const { finalPillarLoad } = useCalculator();
     const [load, setLoad] = React.useState("0");
     const [selectedSoil, setSelectedSoil] = React.useState(soilTypes[2].name); // Argila Rija
     
     const [isAnalyzing, setIsAnalyzing] = React.useState(false);
-    const [analysisResult, setAnalysisResult] = React.useState<AnalyzeSapataOutput | null>(null);
+    const [analysisResult, setAnalysisResult] = React.useState<AnalysisResult | null>(null);
     const [error, setError] = React.useState<string | null>(null);
     const { toast } = useToast();
 
@@ -53,7 +82,7 @@ export function SapataCalculator(props: SapataCalculatorProps) {
         }
     };
 
-    const handleAnalyze = async () => {
+    const handleAnalyze = () => {
         const totalLoadKgf = parseFloat(load.replace(',', '.'));
         const soilInfo = soilTypes.find(s => s.name === selectedSoil);
 
@@ -65,20 +94,12 @@ export function SapataCalculator(props: SapataCalculatorProps) {
         setError(null);
         setAnalysisResult(null);
         setIsAnalyzing(true);
-        try {
-            const input: AnalyzeSapataInput = {
-                totalLoadKgf: totalLoadKgf,
-                soilType: soilInfo.name,
-                allowableSoilPressure: soilInfo.pressure
-            };
-            const result = await analyzeSapata(input);
+        
+        setTimeout(() => {
+            const result = getLocalAnalysis(totalLoadKgf, soilInfo.name, soilInfo.pressure);
             setAnalysisResult(result);
-        } catch (e) {
-            console.error("AI sapata analysis failed:", e);
-            setError("A análise da IA não pôde ser concluída. Tente novamente.");
-        } finally {
             setIsAnalyzing(false);
-        }
+        }, 500);
     };
     
     const { volumeM3, concreteCost, steelCost, totalCost } = React.useMemo(() => {
@@ -147,7 +168,7 @@ export function SapataCalculator(props: SapataCalculatorProps) {
                  {isAnalyzing && (
                     <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-4">
                         <Loader className="animate-spin h-4 w-4" />
-                        IA está dimensionando a fundação...
+                        Dimensionando a fundação...
                     </div>
                 )}
 
@@ -173,8 +194,8 @@ export function SapataCalculator(props: SapataCalculatorProps) {
                             </div>
                             <Alert variant="default" className="bg-background">
                                 <Sparkles className="h-4 w-4" />
-                                <AlertTitle className="font-semibold">Análise da IA</AlertTitle>
-                                <AlertDescription className="whitespace-pre-wrap">
+                                <AlertTitle className="font-semibold">Análise Lógica</AlertTitle>
+                                <AlertDescription className="whitespace-pre-line">
                                     {analysisResult.analysis}
                                 </AlertDescription>
                             </Alert>

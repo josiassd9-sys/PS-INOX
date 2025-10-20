@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
-import { Calculator, Printer, Save, Trash2 } from "lucide-react";
+import { Calculator, Printer, Save, Trash2, Eraser } from "lucide-react";
 import type { BudgetItem } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
 
 interface BudgetTableProps {
     items: BudgetItem[];
@@ -18,6 +19,8 @@ interface BudgetTableProps {
 }
 
 export function BudgetTable({ items, onClear, onSave, onPrint }: BudgetTableProps) {
+    const { clearAllInputs } = useCalculator();
+
     const formatCurrency = (value: number) => {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
     }
@@ -45,6 +48,9 @@ export function BudgetTable({ items, onClear, onSave, onPrint }: BudgetTableProp
                         <CardDescription>Lista de itens calculados para o projeto.</CardDescription>
                     </div>
                     <div className="flex items-center gap-1 print:hidden">
+                        <Button variant="ghost" size="icon" onClick={clearAllInputs} className="text-muted-foreground hover:text-primary">
+                            <Eraser className="h-5 w-5"/>
+                        </Button>
                         <Button variant="ghost" size="icon" onClick={onSave} className="text-muted-foreground hover:text-primary">
                             <Save className="h-5 w-5"/>
                         </Button>

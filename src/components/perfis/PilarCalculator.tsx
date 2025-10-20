@@ -13,75 +13,54 @@ import { useToast } from "@/hooks/use-toast";
 import { perfisData, tiposAco, BudgetItem, Perfil, E_ACO_MPA } from "@/lib/data/index";
 import { useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
 
-
-interface CalculationResult {
+interface PilarCalcResult {
     profile: Perfil;
-    actingStress: number; // Tensão atuante
-    allowableStress: number; // Tensão admissível
+    actingStress: number; 
+    allowableStress: number; 
 }
 
 interface AnalysisResult {
     analysis: string;
 }
 
-
-function getLocalAnalysis(result: CalculationResult, reactions: { vigaPrincipal: number, vigaSecundaria: number }): AnalysisResult {
+function getLocalAnalysis(result: PilarCalcResult, reactions: { vigaPrincipal: number, vigaSecundaria: number }): AnalysisResult {
     const { profile, actingStress, allowableStress } = result;
-
     const utilization = (actingStress / allowableStress) * 100;
-
     let analysisText = `O perfil ${profile.nome} está trabalhando com ${utilization.toFixed(1)}% de sua capacidade resistente à flambagem, indicando um dimensionamento seguro.\n\n`;
-
     const totalReactionKGF = reactions.vigaPrincipal + reactions.vigaSecundaria;
-    if (totalReactionKGF > 5000) { // 5 toneladas-força
+    if (totalReactionKGF > 5000) {
         analysisText += "Atenção: As reações de apoio das vigas são significativas. No projeto detalhado, será crucial verificar a alma do pilar quanto ao esmagamento e à flambagem local, podendo ser necessário o uso de enrijecedores para uma transferência segura dos esforços.\n\n";
     } else {
         analysisText += "As reações de apoio são moderadas, sugerindo que uma conexão padrão viga-pilar provavelmente será suficiente, mas a verificação formal ainda é necessária no projeto executivo.\n\n";
     }
-
     analysisText += `Resumo: O sistema pré-dimensionado aparenta ser coerente. As cargas foram transferidas adequadamente e o pilar ${profile.nome} foi dimensionado com uma margem de segurança adequada. Este resultado serve como uma excelente base para o projeto executivo final.`;
-
     return { analysis: analysisText };
 }
 
-
 export function PilarCalculator() {
-    const { onAddToBudget, supportReactions, onPillarLoadCalculated } = useCalculator();
-    const [height, setHeight] = React.useState("3");
-    const [axialLoad, setAxialLoad] = React.useState("0");
-    const [steelType, setSteelType] = React.useState(tiposAco[0].nome);
-    const [quantity, setQuantity] = React.useState("1");
-    const [pricePerKg, setPricePerKg] = React.useState("8.50");
-
-    const [result, setResult] = React.useState<CalculationResult | null>(null);
+    const { onAddToBudget, supportReactions, onPillarLoadCalculated, pilar, updatePilar } = useCalculator();
+    const { height, axialLoad, steelType, quantity, pricePerKg, result, analysis } = pilar;
+    
+    const [isAnalyzing, setIsAnalyzing] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
     const { toast } = useToast();
     
-    const [isAnalyzing, setIsAnalyzing] = React.useState(false);
-    const [analysisResult, setAnalysisResult] = React.useState<AnalysisResult | null>(null);
-
     React.useEffect(() => {
-        const totalReaction = supportReactions.vigaPrincipal + supportReactions.vigaSecundaria;
+        const totalReaction = supportReactions.vigaPrincipal;
         if (totalReaction > 0) {
-            setAxialLoad(totalReaction.toFixed(0));
+            updatePilar({ axialLoad: totalReaction.toFixed(0) });
         }
-    }, [supportReactions]);
-
+    }, [supportReactions.vigaPrincipal, updatePilar]);
 
     React.useEffect(() => {
         const load = parseFloat(axialLoad.replace(',', '.'));
-        if (!isNaN(load) && load > 0) {
-            onPillarLoadCalculated(load);
-        } else {
-            onPillarLoadCalculated(0);
-        }
+        onPillarLoadCalculated(!isNaN(load) && load > 0 ? load : 0);
     }, [axialLoad, onPillarLoadCalculated]);
 
-
-    const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
+    const handleInputChange = (field: keyof typeof pilar, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
         if (/^\d*\,?\d*$/.test(sanitizedValue)) {
-            setter(sanitizedValue);
+            updatePilar({ [field]: sanitizedValue });
         }
     };
     
@@ -89,8 +68,7 @@ export function PilarCalculator() {
         const H_m = parseFloat(height.replace(",", "."));
         const P_kgf = parseFloat(axialLoad.replace(",", "."));
         setError(null);
-        setResult(null);
-        setAnalysisResult(null);
+        updatePilar({ result: null, analysis: null });
 
         if (isNaN(H_m) || isNaN(P_kgf) || H_m <= 0 || P_kgf <= 0) {
             setError("Por favor, insira valores válidos para altura e carga axial.");
@@ -103,59 +81,46 @@ export function PilarCalculator() {
             return;
         }
 
-        const P_N = P_kgf * 9.807; // Força em Newtons
-        const L_cm = H_m * 100; // Altura em cm
-        const K = 1.0; // Fator de comprimento efetivo (pilar bi-rotulado, simplificação conservadora)
+        const P_N = P_kgf * 9.807;
+        const L_cm = H_m * 100;
+        const K = 1.0;
         const E_MPa = E_ACO_MPA;
         const fy_MPa = selectedSteel.fy;
 
-        const suitableProfiles = perfisData
-            .map(profile => {
-                const area_cm2 = profile.area;
-                const area_mm2 = area_cm2 * 100;
-                
-                const slenderness = (K * L_cm) / profile.ry;
-                const slendernessLimit = 4.71 * Math.sqrt(E_MPa / fy_MPa);
+        const suitableProfiles = perfisData.map(profile => {
+            const area_cm2 = profile.area;
+            const area_mm2 = area_cm2 * 100;
+            const slenderness = (K * L_cm) / profile.ry;
+            const slendernessLimit = 4.71 * Math.sqrt(E_MPa / fy_MPa);
 
-                let fcr_MPa: number;
-                if (slenderness <= slendernessLimit) {
-                    const fe_MPa = (Math.pow(Math.PI, 2) * E_MPa) / Math.pow(slenderness, 2);
-                    fcr_MPa = Math.pow(0.658, fy_MPa / fe_MPa) * fy_MPa;
-                } else {
-                    fcr_MPa = (0.877 * Math.pow(Math.PI, 2) * E_MPa) / Math.pow(slenderness, 2);
-                }
+            let fcr_MPa: number;
+            if (slenderness <= slendernessLimit) {
+                const fe_MPa = (Math.pow(Math.PI, 2) * E_MPa) / Math.pow(slenderness, 2);
+                fcr_MPa = Math.pow(0.658, fy_MPa / fe_MPa) * fy_MPa;
+            } else {
+                fcr_MPa = (0.877 * Math.pow(Math.PI, 2) * E_MPa) / Math.pow(slenderness, 2);
+            }
 
-                const FATOR_SEGURANCA = 1.67;
-                const allowableStress_MPa = fcr_MPa / FATOR_SEGURANCA;
-                const maxLoad_N = allowableStress_MPa * area_mm2;
-                
-                const actingStress_MPa = P_N / area_mm2;
+            const FATOR_SEGURANCA = 1.67;
+            const allowableStress_MPa = fcr_MPa / FATOR_SEGURANCA;
+            const maxLoad_N = allowableStress_MPa * area_mm2;
+            const actingStress_MPa = P_N / area_mm2;
 
-                if (maxLoad_N >= P_N) {
-                    return {
-                        profile,
-                        allowableStress: allowableStress_MPa,
-                        actingStress: actingStress_MPa,
-                    };
-                }
-                return null;
-            })
-            .filter(p => p !== null) as { profile: Perfil, allowableStress: number, actingStress: number }[];
+            if (maxLoad_N >= P_N) {
+                return { profile, allowableStress: allowableStress_MPa, actingStress: actingStress_MPa };
+            }
+            return null;
+        }).filter(p => p !== null) as { profile: Perfil, allowableStress: number, actingStress: number }[];
         
         if (suitableProfiles.length === 0) {
-            setError("Nenhum perfil W atende aos requisitos de flambagem para a carga e altura especificadas. Tente uma carga menor ou verifique os parâmetros.");
+            setError("Nenhum perfil W atende aos requisitos. Tente uma carga menor ou verifique os parâmetros.");
             return;
         }
 
-        const bestProfileData = suitableProfiles.reduce((lightest, current) => 
-            current.profile.peso < lightest.profile.peso ? current : lightest
-        );
+        const bestProfileData = suitableProfiles.reduce((lightest, current) => current.profile.peso < lightest.profile.peso ? current : lightest);
 
-        setResult(bestProfileData);
-        toast({
-            title: "Cálculo do Pilar Concluído",
-            description: `O perfil recomendado é ${bestProfileData.profile.nome}.`,
-        });
+        updatePilar({ result: bestProfileData });
+        toast({ title: "Cálculo do Pilar Concluído", description: `O perfil recomendado é ${bestProfileData.profile.nome}.` });
     };
 
     const handleAnalyze = () => {
@@ -163,17 +128,14 @@ export function PilarCalculator() {
             toast({ variant: "destructive", title: "Cálculo necessário", description: "Calcule o perfil antes de analisar."});
             return;
         }
-        
         setIsAnalyzing(true);
-        setAnalysisResult(null);
-
+        updatePilar({ analysis: null });
         setTimeout(() => {
-            const analysis = getLocalAnalysis(result, supportReactions);
-            setAnalysisResult(analysis);
+            const analysisResult = getLocalAnalysis(result, supportReactions);
+            updatePilar({ analysis: analysisResult });
             setIsAnalyzing(false);
         }, 500);
     };
-
 
     const handleAddToBudget = () => {
         if (!result) {
@@ -196,18 +158,11 @@ export function PilarCalculator() {
 
         const newItem: BudgetItem = {
             id: `${result.profile.nome}-pilar-${Date.now()}`,
-            perfil: result.profile,
-            height: H,
-            quantity: qty,
-            weightPerUnit,
-            totalWeight,
-            costPerUnit,
-            totalCost,
-            type: 'Pilar',
+            perfil: result.profile, height: H, quantity: qty,
+            weightPerUnit, totalWeight, costPerUnit, totalCost, type: 'Pilar',
         };
 
         onAddToBudget(newItem);
-        setResult(null);
         toast({ title: "Pilar Adicionado!", description: `${qty}x pilar(es) ${result.profile.nome} adicionado(s).` });
     };
 
@@ -215,41 +170,28 @@ export function PilarCalculator() {
         <Card>
             <CardHeader>
                 <CardTitle>Calculadora de Pilar (Coluna)</CardTitle>
-                <CardDescription>
-                    Dimensione um perfil W para um pilar submetido à carga axial, com verificação de flambagem.
-                </CardDescription>
+                <CardDescription>Dimensione um perfil W para um pilar submetido à carga axial, com verificação de flambagem.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="pilar-height">Altura do Pilar (m)</Label>
-                        <Input id="pilar-height" type="text" inputMode="decimal" value={height} onChange={e => handleInputChange(setHeight, e.target.value)} placeholder="Ex: 3,0" />
+                        <Input id="pilar-height" type="text" inputMode="decimal" value={height} onChange={e => handleInputChange('height', e.target.value)} placeholder="Ex: 3,0" />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="pilar-load">Carga Axial (kgf)</Label>
-                        <Input id="pilar-load" type="text" inputMode="decimal" value={axialLoad} onChange={e => handleInputChange(setAxialLoad, e.target.value)} placeholder="Ex: 5000" />
+                        <Input id="pilar-load" type="text" inputMode="decimal" value={axialLoad} onChange={e => handleInputChange('axialLoad', e.target.value)} placeholder="Ex: 5000" />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="pilar-steel-type">Tipo de Aço</Label>
-                        <Select value={steelType} onValueChange={setSteelType}>
-                            <SelectTrigger id="pilar-steel-type">
-                                <SelectValue placeholder="Selecione o aço" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {tiposAco.map(aco => (
-                                    <SelectItem key={aco.nome} value={aco.nome}>{aco.nome}</SelectItem>
-                                ))}
-                            </SelectContent>
+                        <Select value={steelType} onValueChange={value => updatePilar({ steelType: value })}>
+                            <SelectTrigger id="pilar-steel-type"><SelectValue placeholder="Selecione o aço" /></SelectTrigger>
+                            <SelectContent>{tiposAco.map(aco => <SelectItem key={aco.nome} value={aco.nome}>{aco.nome}</SelectItem>)}</SelectContent>
                         </Select>
                     </div>
                 </div>
-                
-                <Button type="button" onClick={handleCalculate} className="w-full md:w-auto">
-                    Calcular Pilar
-                </Button>
-
+                <Button type="button" onClick={handleCalculate} className="w-full md:w-auto">Calcular Pilar</Button>
                 {error && <Alert variant="destructive"><AlertTitle>Erro</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
-                
                 {result && (
                      <Card className="mt-4 bg-primary/5 border-primary/20">
                         <CardHeader>
@@ -257,45 +199,31 @@ export function PilarCalculator() {
                             <AlertDescription className="space-y-2 pt-2">
                                 <p>O perfil mais leve que atende à carga axial de <span className="font-semibold">{axialLoad} kgf</span> e altura de <span className="font-semibold">{height}m</span> é:</p>
                                 <div className="text-2xl font-bold text-center py-2 text-primary">{result.profile.nome}</div>
-                                 <div className="grid grid-cols-2 gap-2 text-center text-sm">
-                                    <div>
-                                        <p className="text-muted-foreground">Tensão Atuante</p>
-                                        <p className="font-semibold">{result.actingStress.toFixed(1)} MPa</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-muted-foreground">Tensão Admissível</p>
-                                        <p className="font-semibold">{result.allowableStress.toFixed(1)} MPa</p>
-                                    </div>
+                                <div className="grid grid-cols-2 gap-2 text-center text-sm">
+                                    <div><p className="text-muted-foreground">Tensão Atuante</p><p className="font-semibold">{result.actingStress.toFixed(1)} MPa</p></div>
+                                    <div><p className="text-muted-foreground">Tensão Admissível</p><p className="font-semibold">{result.allowableStress.toFixed(1)} MPa</p></div>
                                 </div>
                             </AlertDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                             <Button type="button" onClick={handleAnalyze} className="w-full" disabled={isAnalyzing}>
+                            <Button type="button" onClick={handleAnalyze} className="w-full" disabled={isAnalyzing}>
                                 {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar Resultado</>}
-                             </Button>
-                            {isAnalyzing && (
-                                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-4">
-                                    <Loader className="animate-spin h-4 w-4" />
-                                    Gerando análise local...
-                                </div>
-                            )}
-                            {analysisResult && (
+                            </Button>
+                            {isAnalyzing && <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-4"><Loader className="animate-spin h-4 w-4" />Gerando análise local...</div>}
+                            {analysis && (
                                 <Alert variant="default">
-                                    <Sparkles className="h-4 w-4" />
-                                    <AlertTitle className="font-semibold">Análise Lógica</AlertTitle>
-                                    <AlertDescription className="whitespace-pre-line">
-                                        {analysisResult.analysis}
-                                    </AlertDescription>
+                                    <Sparkles className="h-4 w-4" /><AlertTitle className="font-semibold">Análise Lógica</AlertTitle>
+                                    <AlertDescription className="whitespace-pre-line">{analysis.analysis}</AlertDescription>
                                 </Alert>
                             )}
                             <div className="grid grid-cols-2 gap-4 border-t pt-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="pilar-quantity">Quantidade</Label>
-                                    <Input id="pilar-quantity" type="text" inputMode="numeric" value={quantity} onChange={e => handleInputChange(setQuantity, e.target.value)} />
+                                    <Input id="pilar-quantity" type="text" inputMode="numeric" value={quantity} onChange={e => handleInputChange('quantity', e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="pilar-pricePerKg">Preço Aço (R$/kg)</Label>
-                                    <Input id="pilar-pricePerKg" type="text" inputMode="decimal" value={pricePerKg} onChange={e => handleInputChange(setPricePerKg, e.target.value)} />
+                                    <Input id="pilar-pricePerKg" type="text" inputMode="decimal" value={pricePerKg} onChange={e => handleInputChange('pricePerKg', e.target.value)} />
                                 </div>
                             </div>
                             <Button onClick={handleAddToBudget} className="w-full gap-2"><PlusCircle/> Adicionar ao Orçamento</Button>

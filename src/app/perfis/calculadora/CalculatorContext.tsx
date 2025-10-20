@@ -2,29 +2,173 @@
 "use client";
 
 import * as React from 'react';
-import { BudgetItem, SupportReaction } from '@/lib/data';
+import { BudgetItem, SupportReaction, Perfil, PerfilIpe, SteelDeck } from '@/lib/data';
+import { useToast } from "@/hooks/use-toast";
 
-interface CalculatorContextType {
+
+// --- Tipos para Resultados ---
+interface VigaCalcResult {
+    profile: Perfil | PerfilIpe;
+    requiredWx: number;
+    requiredIx: number;
+    ltbCheck: { msd: number; mrd: number; passed: boolean; };
+    shearCheck: { vsd: number; vrd: number; passed: boolean; };
+    connectorCount?: number;
+    optimizationData: { name: string; utilization: number }[];
+}
+interface PilarCalcResult {
+    profile: Perfil;
+    actingStress: number;
+    allowableStress: number;
+}
+interface LajeCalcResult {
+    deck: SteelDeck,
+    totalLoad: number;
+}
+interface SapataAnalysisResult {
+  analysis: string;
+  footingDimensions: {
+    requiredAreaM2: number;
+    sideLengthM: number;
+    recommendedHeightCm: number;
+  };
+}
+interface AnalysisResult {
+    analysis: string;
+}
+
+// --- Tipos para Inputs ---
+export interface LajeInputs {
+    selectedDeckId: string;
+    concreteThickness: string;
+    selectedLoads: string[];
+    extraLoad: string;
+    quantity: string;
+    pricePerKg: string;
+}
+export interface VigaInputs {
+    span: string;
+    balanco1: string;
+    balanco2: string;
+    distributedLoad: string;
+    pointLoad: string;
+    pointLoadPosition: string;
+    steelType: string;
+    beamScheme: "biapoiada" | "balanco" | "dois-balancos";
+    quantity: string;
+    pricePerKg: string;
+    spacing?: string; // Only for viga secundária
+    slabLoad?: string; // Only for viga secundária
+}
+export interface PilarInputs {
+    height: string;
+    axialLoad: string;
+    steelType: string;
+    quantity: string;
+    pricePerKg: string;
+}
+export interface SapataInputs {
+    load: string;
+    selectedSoil: string;
+    concretePrice: string;
+    steelPrice: string;
+    steelRatio: string;
+}
+
+
+interface CalculatorState {
+    laje: LajeInputs & { result: LajeCalcResult | null, analysis: AnalysisResult | null };
+    vigaSecundaria: VigaInputs & { result: VigaCalcResult | null, analysis: AnalysisResult | null };
+    vigaPrincipal: VigaInputs & { result: VigaCalcResult | null, analysis: AnalysisResult | null };
+    pilar: PilarInputs & { result: PilarCalcResult | null, analysis: AnalysisResult | null };
+    sapata: SapataInputs & { result: SapataAnalysisResult | null };
+}
+
+interface CalculatorContextType extends CalculatorState {
   budgetItems: BudgetItem[];
-  lastSlabLoad: number;
   supportReactions: SupportReaction;
-  finalPillarLoad: number;
+  
   onAddToBudget: (item: BudgetItem) => void;
-  setLastSlabLoad: (load: number) => void;
+  onClearBudget: () => void;
+  onSaveBudget: () => void;
+  onPrintBudget: () => void;
+  
   onVigaPrincipalReactionCalculated: (reaction: number) => void;
   onVigaSecundariaReactionCalculated: (reaction: number) => void;
-  onPillarLoadCalculated: (load: number) => void;
+  
+  updateLaje: (update: Partial<CalculatorState['laje']>) => void;
+  updateVigaSecundaria: (update: Partial<CalculatorState['vigaSecundaria']>) => void;
+  updateVigaPrincipal: (update: Partial<CalculatorState['vigaPrincipal']>) => void;
+  updatePilar: (update: Partial<CalculatorState['pilar']>) => void;
+  updateSapata: (update: Partial<CalculatorState['sapata']>) => void;
+
+  clearAllInputs: () => void;
 }
 
 const CalculatorContext = React.createContext<CalculatorContextType | undefined>(undefined);
 
+const initialLajeState: CalculatorState['laje'] = {
+    selectedDeckId: "MD57 - Chapa 0.80mm",
+    concreteThickness: "12",
+    selectedLoads: ['office'],
+    extraLoad: "200",
+    quantity: "1",
+    pricePerKg: "7.80",
+    result: null,
+    analysis: null,
+};
+const initialVigaState: VigaInputs = {
+    span: "4", balanco1: "1", balanco2: "1", distributedLoad: "", pointLoad: "",
+    pointLoadPosition: "2", steelType: "ASTM A36", beamScheme: "biapoiada",
+    quantity: "1", pricePerKg: "8.50"
+};
+const initialVigaSecundariaState: CalculatorState['vigaSecundaria'] = {
+    ...initialVigaState,
+    spacing: "1.5", slabLoad: "0", result: null, analysis: null,
+};
+const initialVigaPrincipalState: CalculatorState['vigaPrincipal'] = {
+    ...initialVigaState,
+    span: "5", pointLoadPosition: "2.5", result: null, analysis: null
+};
+const initialPilarState: CalculatorState['pilar'] = {
+    height: "3", axialLoad: "0", steelType: "ASTM A36", quantity: "1", pricePerKg: "8.50",
+    result: null, analysis: null
+};
+const initialSapataState: CalculatorState['sapata'] = {
+    load: "0", selectedSoil: "Argila Rija", concretePrice: "750", steelPrice: "8.50", steelRatio: "100",
+    result: null
+}
+
+const initialState: CalculatorState = {
+    laje: initialLajeState,
+    vigaSecundaria: initialVigaSecundariaState,
+    vigaPrincipal: initialVigaPrincipalState,
+    pilar: initialPilarState,
+    sapata: initialSapataState,
+};
+
+
 export function CalculatorProvider({ children }: { children: React.ReactNode }) {
   const [budgetItems, setBudgetItems] = React.useState<BudgetItem[]>([]);
-  const [lastSlabLoad, setLastSlabLoad] = React.useState(0);
   const [supportReactions, setSupportReactions] = React.useState<SupportReaction>({ vigaPrincipal: 0, vigaSecundaria: 0 });
-  const [finalPillarLoad, setFinalPillarLoad] = React.useState(0);
-  const { toast } = React.useContext(ToastContext);
+  const [calculatorState, setCalculatorState] = React.useState<CalculatorState>(initialState);
+  const { toast } = useToast();
 
+  const handleUpdate = <T extends keyof CalculatorState>(key: T, update: Partial<CalculatorState[T]>) => {
+      setCalculatorState(prev => ({
+          ...prev,
+          [key]: { ...prev[key], ...update }
+      }))
+  }
+
+  const handleClearAllInputs = () => {
+      setCalculatorState(initialState);
+      setSupportReactions({ vigaPrincipal: 0, vigaSecundaria: 0 });
+      toast({
+          title: "Calculadora Limpa",
+          description: "Todos os dados de entrada foram resetados.",
+      })
+  }
 
   const handleAddToBudget = (item: BudgetItem) => {
     setBudgetItems(prev => [...prev, item]);
@@ -37,11 +181,7 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
     setSupportReactions(prev => ({...prev, vigaSecundaria: reaction}));
   }
 
-  const handlePillarLoadCalculated = (load: number) => {
-      setFinalPillarLoad(load);
-  }
-
-   const handleClearBudget = () => {
+  const handleClearBudget = () => {
       setBudgetItems([]);
       toast({
           title: "Orçamento Limpo",
@@ -61,19 +201,22 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
   }
 
 
-  const contextValue = {
+  const contextValue: CalculatorContextType = {
+    ...calculatorState,
     budgetItems,
-    lastSlabLoad,
     supportReactions,
-    finalPillarLoad,
     onAddToBudget: handleAddToBudget,
-    setLastSlabLoad,
-    onVigaPrincipalReactionCalculated: handleVigaPrincipalReaction,
-    onVigaSecundariaReactionCalculated: handleVigaSecundariaReaction,
-    onPillarLoadCalculated: handlePillarLoadCalculated,
     onClearBudget: handleClearBudget,
     onSaveBudget: handleSaveBudget,
     onPrintBudget: handlePrintBudget,
+    onVigaPrincipalReactionCalculated: handleVigaPrincipalReaction,
+    onVigaSecundariaReactionCalculated: handleVigaSecundariaReaction,
+    updateLaje: (update) => handleUpdate('laje', update),
+    updateVigaSecundaria: (update) => handleUpdate('vigaSecundaria', update),
+    updateVigaPrincipal: (update) => handleUpdate('vigaPrincipal', update),
+    updatePilar: (update) => handleUpdate('pilar', update),
+    updateSapata: (update) => handleUpdate('sapata', update),
+    clearAllInputs: handleClearAllInputs,
   };
 
   return (
@@ -82,9 +225,6 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
     </CalculatorContext.Provider>
   );
 }
-
-// Dummy ToastContext to avoid breaking changes if not present
-const ToastContext = React.createContext({ toast: (options: any) => {} });
 
 export function useCalculator() {
   const context = React.useContext(CalculatorContext);

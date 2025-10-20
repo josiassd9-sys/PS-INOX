@@ -59,7 +59,7 @@ export function SapataCalculator() {
                  updateSapata({ load: pilarLoad.toFixed(0) });
             }
         }
-    }, [pilar.axialLoad, updateSapata]);
+    }, [pilar.axialLoad]);
 
 
     const handleInputChange = (field: keyof SapataInputs, value: string) => {
@@ -175,3 +175,5 @@ export function SapataCalculator() {
         </Card>
     );
 }
+
+    

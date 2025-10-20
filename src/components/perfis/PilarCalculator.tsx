@@ -50,7 +50,7 @@ export function PilarCalculator() {
         if (totalReaction > 0) {
             updatePilar({ axialLoad: totalReaction.toFixed(0) });
         }
-    }, [supportReactions.vigaPrincipal, updatePilar]);
+    }, [supportReactions.vigaPrincipal]);
 
     React.useEffect(() => {
         const load = parseFloat(axialLoad.replace(',', '.'));
@@ -234,5 +234,3 @@ export function PilarCalculator() {
         </Card>
     );
 }
-
-    

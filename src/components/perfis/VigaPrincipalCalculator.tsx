@@ -63,7 +63,7 @@ export function VigaPrincipalCalculator() {
     if (supportReactions.vigaSecundaria > 0) {
       updateVigaPrincipal({ pointLoad: supportReactions.vigaSecundaria.toFixed(0) });
     }
-  }, [supportReactions.vigaSecundaria, updateVigaPrincipal]);
+  }, [supportReactions.vigaSecundaria]);
 
   const handleInputChange = (field: keyof VigaInputs, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');

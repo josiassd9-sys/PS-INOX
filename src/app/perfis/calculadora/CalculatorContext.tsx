@@ -7,6 +7,9 @@ import { useToast } from "@/hooks/use-toast";
 
 
 // --- Tipos para Resultados ---
+interface SlabAnalysisResult {
+    analysis: string;
+}
 interface VigaCalcResult {
     profile: Perfil | PerfilIpe;
     requiredWx: number;
@@ -45,6 +48,15 @@ interface AnalysisResult {
 }
 
 // --- Tipos para Inputs ---
+export interface SlabAnalysisInputs {
+    spanX: string;
+    spanY: string;
+    cantileverLeft: string;
+    cantileverRight: string;
+    cantileverFront: string;
+    cantileverBack: string;
+    result: SlabAnalysisResult | null;
+}
 export interface LajeInputs {
     selectedDeckId: string;
     concreteThickness: string;
@@ -88,6 +100,7 @@ export interface SapataArmaduraInputs {
 }
 
 interface CalculatorState {
+    slabAnalysis: SlabAnalysisInputs & { result: SlabAnalysisResult | null };
     laje: LajeInputs & { result: LajeCalcResult | null, analysis: AnalysisResult | null };
     vigaSecundaria: VigaInputs & { result: VigaCalcResult | null, analysis: AnalysisResult | null };
     vigaPrincipal: VigaInputs & { result: VigaCalcResult | null, analysis: AnalysisResult | null };
@@ -109,6 +122,7 @@ interface CalculatorContextType extends CalculatorState {
   onVigaSecundariaReactionCalculated: (reaction: number) => void;
   onPillarLoadCalculated: (load: number) => void;
   
+  updateSlabAnalysis: (update: Partial<CalculatorState['slabAnalysis']>) => void;
   updateLaje: (update: Partial<CalculatorState['laje']>) => void;
   updateVigaSecundaria: (update: Partial<CalculatorState['vigaSecundaria']>) => void;
   updateVigaPrincipal: (update: Partial<CalculatorState['vigaPrincipal']>) => void;
@@ -121,6 +135,15 @@ interface CalculatorContextType extends CalculatorState {
 
 const CalculatorContext = React.createContext<CalculatorContextType | undefined>(undefined);
 
+const initialSlabAnalysisState: CalculatorState['slabAnalysis'] = {
+    spanX: "10",
+    spanY: "5.5",
+    cantileverLeft: "1.5",
+    cantileverRight: "1.7",
+    cantileverFront: "1.0",
+    cantileverBack: "0.5",
+    result: null,
+};
 const initialLajeState: CalculatorState['laje'] = {
     selectedDeckId: "MD57 - Chapa 0.80mm",
     concreteThickness: "12",
@@ -160,6 +183,7 @@ const initialSapataArmaduraState: CalculatorState['sapataArmadura'] = {
 };
 
 const initialState: CalculatorState = {
+    slabAnalysis: initialSlabAnalysisState,
     laje: initialLajeState,
     vigaSecundaria: initialVigaSecundariaState,
     vigaPrincipal: initialVigaPrincipalState,
@@ -238,6 +262,7 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
     onVigaPrincipalReactionCalculated: handleVigaPrincipalReaction,
     onVigaSecundariaReactionCalculated: handleVigaSecundariaReaction,
     onPillarLoadCalculated: handlePillarLoad,
+    updateSlabAnalysis: (update) => handleUpdate('slabAnalysis', update),
     updateLaje: (update) => handleUpdate('laje', update),
     updateVigaSecundaria: (update) => handleUpdate('vigaSecundaria', update),
     updateVigaPrincipal: (update) => handleUpdate('vigaPrincipal', update),

@@ -52,12 +52,19 @@ function getLocalAnalysis(result: VigaCalcResult): AnalysisResult {
 }
 
 export function VigaPrincipalCalculator() {
-  const { onAddToBudget, onVigaPrincipalReactionCalculated, supportReactions, vigaPrincipal, updateVigaPrincipal } = useCalculator();
+  const { onAddToBudget, onVigaPrincipalReactionCalculated, supportReactions, vigaPrincipal, updateVigaPrincipal, slabAnalysis } = useCalculator();
   const { span, balanco1, balanco2, distributedLoad, pointLoad, pointLoadPosition, steelType, beamScheme, quantity, pricePerKg, result, analysis } = vigaPrincipal;
 
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const { toast } = useToast();
+
+  React.useEffect(() => {
+    const spanX = parseFloat(slabAnalysis.spanX.replace(',', '.'));
+    if (!isNaN(spanX) && spanX > 0) {
+      updateVigaPrincipal({ span: slabAnalysis.spanX });
+    }
+  }, [slabAnalysis.spanX]);
 
   React.useEffect(() => {
     if (supportReactions.vigaSecundaria > 0) {

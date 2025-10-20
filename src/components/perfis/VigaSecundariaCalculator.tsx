@@ -44,12 +44,19 @@ function getLocalAnalysis(result: CalculationResult): AnalysisResult {
 }
 
 export function VigaSecundariaCalculator() {
-  const { onAddToBudget, onVigaSecundariaReactionCalculated, laje, vigaSecundaria, updateVigaSecundaria } = useCalculator();
+  const { onAddToBudget, onVigaSecundariaReactionCalculated, laje, vigaSecundaria, updateVigaSecundaria, slabAnalysis } = useCalculator();
   const { span, balanco1, balanco2, spacing, slabLoad, distributedLoad, pointLoad, pointLoadPosition, steelType, beamScheme, quantity, pricePerKg, result, analysis } = vigaSecundaria;
 
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const { toast } = useToast();
+
+  React.useEffect(() => {
+    const spanY = parseFloat(slabAnalysis.spanY.replace(',', '.'));
+    if (!isNaN(spanY) && spanY > 0) {
+      updateVigaSecundaria({ span: slabAnalysis.spanY });
+    }
+  }, [slabAnalysis.spanY]);
   
   React.useEffect(() => {
     const E_m = parseFloat(spacing!.replace(",", "."));

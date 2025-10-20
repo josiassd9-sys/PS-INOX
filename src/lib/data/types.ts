@@ -105,3 +105,7 @@ export type LiveLoadOption = {
   exclusive?: boolean;
   group: 'uso' | 'cobertura' | 'adicional';
 };
+
+export type SlabAnalysisResult = {
+    analysis: string;
+}

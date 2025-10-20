@@ -1,6 +1,5 @@
 
 
-
 import type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction, LiveLoadOption } from './types';
 import { perfisData, tiposAco, PESO_CONCRETO_KGF_M3, E_ACO_MPA, RESISTENCIA_CALCULO_CONECTOR_KN } from './perfis';
 import { perfisIpeData } from './perfis-ipe';
@@ -353,7 +352,7 @@ const ALL_CATEGORIES: Category[] = [
     icon: 'Calculator',
     unit: 'calc',
     items: [],
-    path: '/perfis/calculadora/laje'
+    path: '/perfis/calculadora/geometria'
   },
   {
     id: 'perfis/guia',

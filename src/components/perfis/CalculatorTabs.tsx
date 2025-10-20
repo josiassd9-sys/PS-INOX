@@ -8,19 +8,20 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 
 const tabs = [
-    { name: "1. Laje", href: "/perfis/calculadora/laje" },
-    { name: "2. Viga Sec.", href: "/perfis/calculadora/viga-secundaria" },
-    { name: "3. Viga Princ.", href: "/perfis/calculadora/viga-principal" },
-    { name: "4. Pilar", href: "/perfis/calculadora/pilar" },
-    { name: "5. Sapata", href: "/perfis/calculadora/sapata" },
-    { name: "6. Armadura", href: "/perfis/calculadora/armadura-sapata" },
+    { name: "1. Geometria", href: "/perfis/calculadora/geometria" },
+    { name: "2. Laje", href: "/perfis/calculadora/laje" },
+    { name: "3. Viga Sec.", href: "/perfis/calculadora/viga-secundaria" },
+    { name: "4. Viga Princ.", href: "/perfis/calculadora/viga-principal" },
+    { name: "5. Pilar", href: "/perfis/calculadora/pilar" },
+    { name: "6. Sapata", href: "/perfis/calculadora/sapata" },
+    { name: "7. Armadura", href: "/perfis/calculadora/armadura-sapata" },
 ];
 
 export function CalculatorTabs() {
     const pathname = usePathname();
 
     return (
-        <div className="grid w-full grid-cols-6 gap-1 p-1 rounded-md bg-muted print:hidden">
+        <div className="grid w-full grid-cols-4 md:grid-cols-7 gap-1 p-1 rounded-md bg-muted print:hidden">
             {tabs.map((tab) => (
                 <Link
                     key={tab.name}

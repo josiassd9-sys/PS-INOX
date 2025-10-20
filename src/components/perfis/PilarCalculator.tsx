@@ -40,7 +40,7 @@ function getLocalAnalysis(result: PilarCalcResult, reactions: { vigaPrincipal: n
 
 export function PilarCalculator() {
     const { onAddToBudget, supportReactions, onPillarLoadCalculated, pilar, updatePilar } = useCalculator();
-    const { height, axialLoad, steelType, quantity, pricePerKg, result, analysis, safetyFactor } = pilar;
+    const { height, axialLoad, steelType, quantity, pricePerKg, result, analysis, safetyFactor, additionalHeight } = pilar;
     
     const [isAnalyzing, setIsAnalyzing] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
@@ -51,7 +51,7 @@ export function PilarCalculator() {
         if (totalReaction > 0) {
             updatePilar({ axialLoad: totalReaction.toFixed(0) });
         }
-    }, [supportReactions.vigaPrincipal, supportReactions.vigaSecundaria]);
+    }, [supportReactions.vigaPrincipal, supportReactions.vigaSecundaria, updatePilar]);
 
     React.useEffect(() => {
         const load = parseFloat(axialLoad.replace(',', '.'));
@@ -146,27 +146,30 @@ export function PilarCalculator() {
             return;
         }
         const H = parseFloat(height.replace(",", "."));
+        const addH = parseFloat(additionalHeight?.replace(",", ".")) || 0;
+        const totalHeight = H + addH;
+
         const qty = parseInt(quantity);
         const price = parseFloat(pricePerKg.replace(",", "."));
 
-        if (isNaN(H) || isNaN(qty) || isNaN(price) || H <= 0 || qty <= 0 || price <= 0) {
+        if (isNaN(totalHeight) || isNaN(qty) || isNaN(price) || totalHeight <= 0 || qty <= 0 || price <= 0) {
             toast({ variant: "destructive", title: "Valores Inválidos" });
             return;
         }
 
-        const weightPerUnit = result.profile.peso * H;
+        const weightPerUnit = result.profile.peso * totalHeight;
         const totalWeight = weightPerUnit * qty;
         const costPerUnit = weightPerUnit * price;
         const totalCost = totalWeight * price;
 
         const newItem: BudgetItem = {
             id: `${result.profile.nome}-pilar-${Date.now()}`,
-            perfil: result.profile, height: H, quantity: qty,
+            perfil: result.profile, height: totalHeight, quantity: qty,
             weightPerUnit, totalWeight, costPerUnit, totalCost, type: 'Pilar',
         };
 
         onAddToBudget(newItem);
-        toast({ title: "Pilar Adicionado!", description: `${qty}x pilar(es) ${result.profile.nome} adicionado(s).` });
+        toast({ title: "Pilar Adicionado!", description: `${qty}x pilar(es) ${result.profile.nome} com ${totalHeight}m adicionado(s).` });
     };
 
     return (
@@ -176,10 +179,14 @@ export function PilarCalculator() {
                 <CardDescription>Dimensione um perfil W para um pilar submetido à carga axial, com verificação de flambagem.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <Label htmlFor="pilar-height">Altura do Pilar (m)</Label>
+                        <Label htmlFor="pilar-height">Pé-Direito (Altura de Flambagem) (m)</Label>
                         <Input id="pilar-height" type="text" inputMode="decimal" value={height} onChange={e => handleInputChange('height', e.target.value)} placeholder="Ex: 3,0" />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="pilar-additional-height">Comp. Adicional Acima (m)</Label>
+                        <Input id="pilar-additional-height" type="text" inputMode="decimal" value={additionalHeight} onChange={e => handleInputChange('additionalHeight', e.target.value)} placeholder="Ex: 3,0" />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="pilar-load">Carga Axial (kgf)</Label>
@@ -204,7 +211,7 @@ export function PilarCalculator() {
                         <CardHeader>
                             <AlertTitle className="text-primary font-bold flex items-center gap-2"><CheckCircle className="h-5 w-5"/> Perfil Recomendado para Pilar</AlertTitle>
                             <AlertDescription className="space-y-2 pt-2">
-                                <p>O perfil mais leve que atende à carga axial de <span className="font-semibold">{axialLoad} kgf</span> e altura de <span className="font-semibold">{height}m</span> é:</p>
+                                <p>O perfil mais leve que atende à carga axial de <span className="font-semibold">{axialLoad} kgf</span> e pé-direito de <span className="font-semibold">{height}m</span> é:</p>
                                 <div className="text-2xl font-bold text-center py-2 text-primary">{result.profile.nome}</div>
                                 <div className="grid grid-cols-2 gap-2 text-center text-sm">
                                     <div><p className="text-muted-foreground">Tensão Atuante (Majorada)</p><p className="font-semibold">{result.actingStress.toFixed(1)} MPa</p></div>

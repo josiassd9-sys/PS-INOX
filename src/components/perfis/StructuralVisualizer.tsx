@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -80,12 +81,12 @@ const PlanView = () => {
 };
 
 const FrontElevationView = () => {
-    const { slabAnalysis, laje, vigaSecundaria, vigaPrincipal, pilar, sapata } = useCalculator();
+    const { slabAnalysis, laje, vigaPrincipal, pilar, sapata } = useCalculator();
 
     const pilarH = parseFloat(pilar.height.replace(',', '.')) || 3;
+    const addPilarH = parseFloat(pilar.additionalHeight?.replace(',', '.')) || pilarH;
     const lajeH = parseFloat(laje.concreteThickness.replace(',', '.')) / 100 || 0.12;
     const vigaPH = (vigaPrincipal.result?.profile.h || 300) / 1000;
-    const vigaSH = (vigaSecundaria.result?.profile.h || 200) / 1000;
     const spanY = parseFloat(slabAnalysis.spanY.replace(',', '.')) || 5;
 
     const sapataResult = sapata.result?.footingDimensions;
@@ -94,21 +95,23 @@ const FrontElevationView = () => {
     
     if (spanY <= 0) return <Alert variant="destructive">Vão Y inválido na Aba 1.</Alert>;
 
-    const totalHeight = pilarH + vigaPH + sapataH;
+    const totalHeight = pilarH + vigaPH + sapataH + addPilarH;
     const scale = Math.min(SVG_WIDTH * 0.9 / spanY, SVG_HEIGHT * 0.9 / totalHeight);
     
     const scaledSpan = spanY * scale;
     const xOffset = (SVG_WIDTH - scaledSpan) / 2;
     
     const pilarHeight = pilarH * scale;
+    const addPilarHeight = addPilarH * scale;
     const vigaPHeight = vigaPH * scale;
     const sapataHeight = sapataH * scale;
     const sapataWidth = sapataW * scale;
     
     const baseY = SVG_HEIGHT - 30;
     const sapataY = baseY - sapataHeight;
-    const pilarY = sapataY - pilarHeight;
-    const vigaPY = pilarY - vigaPHeight;
+    const pilarBaseY = sapataY - pilarHeight;
+    const pilarTopoY = pilarBaseY - addPilarHeight;
+    const vigaPY = pilarBaseY - vigaPHeight;
 
     return (
          <svg viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`} className="w-full h-auto">
@@ -117,8 +120,8 @@ const FrontElevationView = () => {
              <rect x={xOffset + scaledSpan - sapataWidth/2} y={sapataY} width={sapataWidth} height={sapataHeight} fill="hsl(var(--muted))" />
              
              {/* Pilares */}
-             <rect x={xOffset - 10} y={pilarY} width="20" height={pilarHeight} fill="hsl(var(--foreground) / 0.8)" />
-             <rect x={xOffset + scaledSpan - 10} y={pilarY} width="20" height={pilarHeight} fill="hsl(var(--foreground) / 0.8)" />
+             <rect x={xOffset - 10} y={pilarTopoY} width="20" height={pilarHeight + addPilarHeight} fill="hsl(var(--foreground) / 0.8)" />
+             <rect x={xOffset + scaledSpan - 10} y={pilarTopoY} width="20" height={pilarHeight + addPilarHeight} fill="hsl(var(--foreground) / 0.8)" />
 
              {/* Viga Principal */}
              <rect x={xOffset - 10} y={vigaPY} width={scaledSpan + 20} height={vigaPHeight} fill="hsl(var(--primary))" />
@@ -131,7 +134,7 @@ const FrontElevationView = () => {
 
              {/* Labels */}
              <DrawingText x={xOffset + scaledSpan / 2} y={vigaPY + vigaPHeight / 2} fill="hsl(var(--primary-foreground))">{vigaPrincipal.result?.profile.nome || "Viga Principal"}</DrawingText>
-             <DrawingText x={xOffset - 40} y={pilarY + pilarHeight / 2} transform={`rotate(-90, ${xOffset-40}, ${pilarY + pilarHeight/2})`}>Pilar: {pilar.result?.profile.nome || "N/C"} (H: {pilar.height}m)</DrawingText>
+             <DrawingText x={xOffset - 40} y={pilarBaseY + pilarHeight / 2} transform={`rotate(-90, ${xOffset-40}, ${pilarBaseY + pilarHeight/2})`}>Pilar: {pilar.result?.profile.nome || "N/C"}</DrawingText>
              <DrawingText x={SVG_WIDTH / 2} y={baseY + 15}>Elevação Frontal (Vista ao longo do Eixo X)</DrawingText>
          </svg>
     )
@@ -141,6 +144,7 @@ const SideElevationView = () => {
     const { slabAnalysis, laje, vigaSecundaria, vigaPrincipal, pilar, sapata } = useCalculator();
 
     const pilarH = parseFloat(pilar.height.replace(',', '.')) || 3;
+    const addPilarH = parseFloat(pilar.additionalHeight?.replace(',', '.')) || pilarH;
     const lajeH = (laje.result?.deck ? (laje.result.deck.tipo === 'MD75' ? 7.5 : 5.7) : 5.7) + (parseFloat(laje.concreteThickness.replace(',', '.')) || 12);
     const vigaPH = (vigaPrincipal.result?.profile.h || 300) / 1000;
     const vigaSH = (vigaSecundaria.result?.profile.h || 200) / 1000;
@@ -155,15 +159,16 @@ const SideElevationView = () => {
 
     if (spanX <= 0) return <Alert variant="destructive">Vão X inválido na Aba 1.</Alert>;
 
-    const totalHeight = pilarH + vigaPH + sapataH;
+    const totalHeight = pilarH + vigaPH + sapataH + addPilarH;
     const scale = Math.min(SVG_WIDTH * 0.9 / spanX, SVG_HEIGHT * 0.9 / totalHeight);
     const scaledSpan = spanX * scale;
     const xOffset = (SVG_WIDTH - scaledSpan) / 2;
 
-    const numVigasSecundarias = spacingVS > 0 ? Math.floor(spanX / spacingVS) + 1 : 0;
-    const realSpacing = numVigasSecundarias > 1 ? scaledSpan / (numVigasSecundarias - 1) : 0;
+    const numVigasSecundarias = spacingVS > 0 ? Math.floor(spanX / spacingVS) : 0;
+    const realSpacing = numVigasSecundarias > 0 ? scaledSpan / numVigasSecundarias : 0;
 
     const pilarHeight = pilarH * scale;
+    const addPilarHeight = addPilarH * scale;
     const vigaPHeight = vigaPH * scale;
     const vigaSHeight = vigaSH * scale;
     const vigaSWidth = vigaSW * scale;
@@ -174,8 +179,9 @@ const SideElevationView = () => {
 
     const baseY = SVG_HEIGHT - 30;
     const sapataY = baseY - sapataHeight;
-    const pilarY = sapataY - pilarHeight;
-    const vigaPY = pilarY - vigaPHeight;
+    const pilarBaseY = sapataY - pilarHeight;
+    const pilarTopoY = pilarBaseY - addPilarHeight;
+    const vigaPY = pilarBaseY - vigaPHeight;
     const vigaSY = vigaPY - vigaSHeight;
     const lajeY = vigaSY - lajeHeight;
 
@@ -186,8 +192,8 @@ const SideElevationView = () => {
             <rect x={xOffset + scaledSpan - sapataWidth/2} y={sapataY} width={sapataWidth} height={sapataHeight} fill="hsl(var(--muted))" />
             
             {/* Pilares nos cantos */}
-            <rect x={xOffset - 10} y={pilarY} width="20" height={pilarHeight} fill="hsl(var(--foreground) / 0.8)" />
-            <rect x={xOffset + scaledSpan - 10} y={pilarY} width="20" height={pilarHeight} fill="hsl(var(--foreground) / 0.8)" />
+            <rect x={xOffset - 10} y={pilarTopoY} width="20" height={pilarHeight + addPilarHeight} fill="hsl(var(--foreground) / 0.8)" />
+            <rect x={xOffset + scaledSpan - 10} y={pilarTopoY} width="20" height={pilarHeight + addPilarHeight} fill="hsl(var(--foreground) / 0.8)" />
             
              {/* Viga Principal (em vista de elevação) */}
             <rect x={xOffset} y={vigaPY} width={scaledSpan} height={vigaPHeight} fill="hsl(var(--primary))" />
@@ -196,7 +202,7 @@ const SideElevationView = () => {
             <rect x={xOffset} y={vigaSY - lajeHeight} width={scaledSpan} height={lajeHeight} fill="hsl(var(--muted)/0.7)" />
 
             {/* Vigas Secundárias (em corte) */}
-            {numVigasSecundarias > 0 && Array.from({ length: numVigasSecundarias }).map((_, i) => (
+            {numVigasSecundarias > 0 && Array.from({ length: numVigasSecundarias + 1 }).map((_, i) => (
                 <rect
                     key={i}
                     x={xOffset + i * realSpacing - (vigaSWidth / 2)}

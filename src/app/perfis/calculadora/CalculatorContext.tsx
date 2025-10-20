@@ -84,12 +84,14 @@ export interface VigaInputs {
 }
 export interface PilarInputs {
     height: string;
+    additionalHeight?: string;
     axialLoad: string;
     steelType: string;
     quantity: string;
     pricePerKg: string;
     safetyFactor: string;
 }
+
 export interface SapataInputs {
     load: string;
     selectedSoil: string;
@@ -176,7 +178,7 @@ const initialVigaPrincipalState: CalculatorState['vigaPrincipal'] = {
     span: "5", pointLoadPosition: "2.5", result: null, analysis: null
 };
 const initialPilarState: CalculatorState['pilar'] = {
-    height: "3", axialLoad: "0", steelType: "ASTM A36", quantity: "1", pricePerKg: "8.50",
+    height: "3", additionalHeight: "3", axialLoad: "0", steelType: "ASTM A36", quantity: "1", pricePerKg: "8.50",
     safetyFactor: "1.4", result: null, analysis: null
 };
 const initialSapataState: CalculatorState['sapata'] = {

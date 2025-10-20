@@ -95,6 +95,7 @@ interface CalculatorContextType extends CalculatorState {
   
   onVigaPrincipalReactionCalculated: (reaction: number) => void;
   onVigaSecundariaReactionCalculated: (reaction: number) => void;
+  onPillarLoadCalculated: (load: number) => void;
   
   updateLaje: (update: Partial<CalculatorState['laje']>) => void;
   updateVigaSecundaria: (update: Partial<CalculatorState['vigaSecundaria']>) => void;
@@ -150,7 +151,7 @@ const initialState: CalculatorState = {
 
 export function CalculatorProvider({ children }: { children: React.ReactNode }) {
   const [budgetItems, setBudgetItems] = React.useState<BudgetItem[]>([]);
-  const [supportReactions, setSupportReactions] = React.useState<SupportReaction>({ vigaPrincipal: 0, vigaSecundaria: 0 });
+  const [supportReactions, setSupportReactions] = React.useState<SupportReaction>({ vigaPrincipal: 0, vigaSecundaria: 0, pilar: 0 });
   const [calculatorState, setCalculatorState] = React.useState<CalculatorState>(initialState);
   const { toast } = useToast();
 
@@ -163,7 +164,7 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
 
   const handleClearAllInputs = () => {
       setCalculatorState(initialState);
-      setSupportReactions({ vigaPrincipal: 0, vigaSecundaria: 0 });
+      setSupportReactions({ vigaPrincipal: 0, vigaSecundaria: 0, pilar: 0 });
       toast({
           title: "Calculadora Limpa",
           description: "Todos os dados de entrada foram resetados.",
@@ -180,6 +181,11 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
   const handleVigaSecundariaReaction = (reaction: number) => {
     setSupportReactions(prev => ({...prev, vigaSecundaria: reaction}));
   }
+
+  const handlePillarLoad = (load: number) => {
+    setSupportReactions(prev => ({...prev, pilar: load}));
+  }
+
 
   const handleClearBudget = () => {
       setBudgetItems([]);
@@ -211,6 +217,7 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
     onPrintBudget: handlePrintBudget,
     onVigaPrincipalReactionCalculated: handleVigaPrincipalReaction,
     onVigaSecundariaReactionCalculated: handleVigaSecundariaReaction,
+    onPillarLoadCalculated: handlePillarLoad,
     updateLaje: (update) => handleUpdate('laje', update),
     updateVigaSecundaria: (update) => handleUpdate('vigaSecundaria', update),
     updateVigaPrincipal: (update) => handleUpdate('vigaPrincipal', update),

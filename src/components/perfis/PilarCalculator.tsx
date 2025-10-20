@@ -23,7 +23,7 @@ interface AnalysisResult {
     analysis: string;
 }
 
-function getLocalAnalysis(result: PilarCalcResult, reactions: { vigaPrincipal: number, vigaSecundaria: number }): AnalysisResult {
+function getLocalAnalysis(result: PilarCalcResult, reactions: { vigaPrincipal: number, vigaSecundaria: number, pilar: number }): AnalysisResult {
     const { profile, actingStress, allowableStress } = result;
     const utilization = (actingStress / allowableStress) * 100;
     let analysisText = `O perfil ${profile.nome} está trabalhando com ${utilization.toFixed(1)}% de sua capacidade resistente à flambagem, indicando um dimensionamento seguro.\n\n`;
@@ -50,12 +50,12 @@ export function PilarCalculator() {
         if (totalReaction > 0) {
             updatePilar({ axialLoad: totalReaction.toFixed(0) });
         }
-    }, [supportReactions.vigaPrincipal]);
+    }, [supportReactions.vigaPrincipal, updatePilar]);
 
     React.useEffect(() => {
         const load = parseFloat(axialLoad.replace(',', '.'));
         onPillarLoadCalculated(!isNaN(load) && load > 0 ? load : 0);
-    }, [axialLoad, onPillarLoadCalculated]);
+    }, [axialLoad]);
 
     const handleInputChange = (field: keyof typeof pilar, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');

@@ -101,12 +101,12 @@ const PlanView = () => {
             <rect x={pilarX2 - pilar_b_scaled / 2} y={pilarY2 - pilar_b_scaled / 2} width={pilar_b_scaled} height={pilar_b_scaled} fill="hsl(var(--foreground))" />
 
             {/* Dimensions */}
-            <DimensionLine x1={xOffset} y1={yOffset} x2={xOffset + scaledWidth} y2={yOffset} label={`Total X: ${totalSpanX} m`} offset={-30} />
-            {cantileverLeft > 0 && <DimensionLine x1={xOffset} y1={yOffset} x2={pilarX1} y2={yOffset} label={`${cantileverLeft}m`} offset={-15} />}
+            <DimensionLine x1={xOffset} y1={yOffset} x2={xOffset + scaledWidth} y2={yOffset} label={`Total X: ${totalSpanX.toFixed(2)} m`} offset={-30} />
+            {cantileverLeft > 0 && <DimensionLine x1={xOffset} y1={yOffset} x2={pilarX1} y2={yOffset} label={`${cantileverLeft.toFixed(2)}m`} offset={-15} />}
             <DimensionLine x1={pilarX1} y1={yOffset} x2={pilarX2} y2={yOffset} label={`${spanX.toFixed(2)}m`} offset={-15} />
-            {cantileverRight > 0 && <DimensionLine x1={pilarX2} y1={yOffset} x2={xOffset + scaledWidth} y2={yOffset} label={`${cantileverRight}m`} offset={-15} />}
+            {cantileverRight > 0 && <DimensionLine x1={pilarX2} y1={yOffset} x2={xOffset + scaledWidth} y2={yOffset} label={`${cantileverRight.toFixed(2)}m`} offset={-15} />}
             
-            <DimensionLine x1={xOffset + scaledWidth} y1={yOffset} x2={xOffset + scaledWidth} y2={yOffset + scaledHeight} label={`Total Y: ${totalSpanY} m`} offset={45} vertical />
+            <DimensionLine x1={xOffset + scaledWidth} y1={yOffset} x2={xOffset + scaledWidth} y2={yOffset + scaledHeight} label={`Total Y: ${totalSpanY.toFixed(2)} m`} offset={45} vertical />
         </svg>
     );
 };
@@ -168,6 +168,8 @@ const FrontElevationView = () => {
     
     const vigaS_h_scaled = vigaSH_m * scale;
     const lajeH_scaled = lajeH_m * scale;
+    const concreteH_scaled = (concreteH_cm / 100) * scale;
+    const lajeBaseY = vigaPY-vigaPHeight;
 
     return (
          <svg viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`} className="w-full h-auto">
@@ -186,7 +188,7 @@ const FrontElevationView = () => {
              <rect x={xOffset} y={vigaPY - vigaPHeight} width={scaledSpanX} height={vigaPHeight} fill="hsl(var(--primary))" />
              
              {/* Laje e Vigas Secundárias em corte */}
-             <rect x={xOffset} y={vigaPY-vigaPHeight-lajeH_scaled+vigaS_h_scaled} width={scaledSpanX} height={lajeH_scaled - vigaS_h_scaled} fill="hsl(var(--muted)/0.5)" />
+             <rect x={xOffset} y={lajeBaseY - concreteH_scaled} width={scaledSpanX} height={concreteH_scaled} fill="hsl(var(--muted)/0.5)" />
              {vigaS && numVigasSecundarias > 0 && Array.from({ length: numVigasSecundarias }).map((_, i) => {
                 const vigaSX = pilarX1 + i * realSpacing;
                 const vigaS_b_scaled = (vigaS.b / 1000) * scale;
@@ -194,7 +196,7 @@ const FrontElevationView = () => {
                 const vigaS_tw_scaled = (vigaS.tw / 1000) * scale;
                 
                 return (
-                    <g key={i} transform={`translate(${vigaSX}, ${vigaPY - vigaPHeight})`}>
+                    <g key={i} transform={`translate(${vigaSX}, ${lajeBaseY - vigaS_h_scaled})`}>
                        <rect x={-vigaS_b_scaled/2} y={0} width={vigaS_b_scaled} height={vigaS_tf_scaled} fill="hsl(var(--primary) / 0.6)" />
                        <rect x={-vigaS_tw_scaled/2} y={vigaS_tf_scaled} width={vigaS_tw_scaled} height={vigaS_h_scaled - 2*vigaS_tf_scaled} fill="hsl(var(--primary) / 0.6)" />
                        <rect x={-vigaS_b_scaled/2} y={vigaS_h_scaled - vigaS_tf_scaled} width={vigaS_b_scaled} height={vigaS_tf_scaled} fill="hsl(var(--primary) / 0.6)" />
@@ -208,7 +210,7 @@ const FrontElevationView = () => {
              <DimensionLine x1={pilarX1} y1={vigaPY} x2={pilarX2} y2={vigaPY} label={`${spanX.toFixed(2)}m`} offset={10} />
              {cantileverRight > 0 && <DimensionLine x1={pilarX2} y1={vigaPY} x2={xOffset+scaledSpanX} y2={vigaPY} label={`${cantileverRight.toFixed(2)}m`} offset={10} />}
 
-             <DimensionLine x1={pilarX1} y1={sapataY} x2={pilarX1} y2={vigaPY} label={`Pé-Direito: ${pilarH.toFixed(2)}m`} offset={-25} vertical/>
+             <DimensionLine x1={pilarX1} y1={sapataY} x2={pilarX1} y2={vigaPY} label={`Pé-Direito: ${pilarH.toFixed(2)}m`} offset={-pilarWidth - 5} vertical/>
          </svg>
     )
 }

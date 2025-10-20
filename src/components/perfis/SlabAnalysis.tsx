@@ -12,8 +12,7 @@ import { CheckCircle } from "lucide-react";
 
 export function SlabAnalysis() {
     const { slabAnalysis, updateSlabAnalysis } = useCalculator();
-    const { spanX, spanY, cantileverLeft, cantileverRight, cantileverFront, cantileverBack } = slabAnalysis;
-    const [analysis, setAnalysis] = React.useState<string | null>(null);
+    const { spanX, spanY, cantileverLeft, cantileverRight, cantileverFront, cantileverBack, result } = slabAnalysis;
 
     const handleInputChange = (field: keyof SlabAnalysisInputs, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -29,7 +28,7 @@ export function SlabAnalysis() {
         let text = `Geometria definida com sucesso. O vão principal (X) é de ${x}m e o vão secundário (Y) é de ${y}m.\n\n`;
         text += `Isso significa que as vigas secundárias (IPE) vencerão o vão de ${y}m, e as vigas principais (W) vencerão o vão de ${x}m.\n\n`;
         text += `Estes valores foram enviados automaticamente para as próximas abas para agilizar o seu projeto.`;
-        setAnalysis(text);
+        updateSlabAnalysis({ result: { analysis: text } });
     };
     
     React.useEffect(() => {
@@ -61,30 +60,30 @@ export function SlabAnalysis() {
                     <h3 className="font-semibold mb-2">Balanços (Opcional)</h3>
                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="cantilever-left">Balanço Esquerda (X)</Label>
+                            <Label htmlFor="cantilever-left">Balanço em X (Esquerda)</Label>
                             <Input id="cantilever-left" type="text" inputMode="decimal" value={cantileverLeft} onChange={e => handleInputChange('cantileverLeft', e.target.value)} placeholder="m" />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="cantilever-right">Balanço Direita (X)</Label>
+                            <Label htmlFor="cantilever-right">Balanço em X (Direita)</Label>
                             <Input id="cantilever-right" type="text" inputMode="decimal" value={cantileverRight} onChange={e => handleInputChange('cantileverRight', e.target.value)} placeholder="m" />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="cantilever-front">Balanço Frente (Y)</Label>
+                            <Label htmlFor="cantilever-front">Balanço em Y (Frente)</Label>
                             <Input id="cantilever-front" type="text" inputMode="decimal" value={cantileverFront} onChange={e => handleInputChange('cantileverFront', e.target.value)} placeholder="m" />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="cantilever-back">Balanço Trás (Y)</Label>
+                            <Label htmlFor="cantilever-back">Balanço em Y (Atrás)</Label>
                             <Input id="cantilever-back" type="text" inputMode="decimal" value={cantileverBack} onChange={e => handleInputChange('cantileverBack', e.target.value)} placeholder="m" />
                         </div>
                     </div>
                 </div>
 
-                {analysis && (
+                {result && (
                     <Alert variant="default" className="mt-4 bg-primary/5 border-primary/20">
                        <CheckCircle className="h-4 w-4 text-primary" />
                       <AlertTitle className="text-primary font-bold">Análise da Geometria</AlertTitle>
                       <AlertDescription className="space-y-2 mt-2 whitespace-pre-line">
-                          {analysis}
+                          {result.analysis}
                       </AlertDescription>
                   </Alert>
                 )}

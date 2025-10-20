@@ -26,21 +26,58 @@ interface LajeCalcResult {
     totalLoad: number;
 }
 
-function getLocalAnalysis(deck: any, totalLoad: number, concreteThickness: number, liveLoad: number): AnalysisResult {
-    let analysisText = `A carga total de ~${totalLoad.toFixed(0)} kgf/m² é coerente para a sobrecarga de ${liveLoad} kgf/m² e a espessura de concreto de ${concreteThickness} cm.\n\n`;
-    if (liveLoad >= 400) analysisText += "Esta sobrecarga é adequada para depósitos leves ou áreas com equipamentos.\n";
-    else if (liveLoad >= 200) analysisText += "Esta sobrecarga é comum para escritórios, áreas comerciais e residenciais com maior concentração de pessoas.\n";
-    else analysisText += "Esta sobrecarga é típica para áreas residenciais com uso comum.\n";
-    if (deck.tipo === 'MD75' && concreteThickness > 15) analysisText += `O uso do ${deck.tipo} com uma laje de ${concreteThickness} cm é uma boa escolha para vencer vãos maiores entre as vigas, otimizando a estrutura secundária.\n`;
-    else if (deck.tipo === 'MD57' && concreteThickness <= 12) analysisText += `A combinação de ${deck.tipo} com ${concreteThickness} cm é uma solução econômica e eficiente para vãos moderados.\n`;
-    if (concreteThickness < 8) analysisText += "ATENÇÃO: Uma espessura de concreto inferior a 8cm pode não ser suficiente para garantir o cobrimento adequado da armadura e a resistência ao fogo exigida por norma.\n";
-    else if (concreteThickness > 20) analysisText += "Observação: Lajes com espessura superior a 20cm adicionam um peso próprio considerável à estrutura, o que impactará no dimensionamento de vigas e pilares.\n";
-    analysisText += "\nLembre-se de usar a carga total calculada para dimensionar as vigas secundárias que apoiarão esta laje.";
+function getLocalAnalysis(
+    deck: SteelDeck, 
+    totalLoad: number, 
+    concreteThickness: number, 
+    liveLoad: number, 
+    beamSpacing: number,
+    beamScheme: 'biapoiada' | 'balanco' | 'dois-balancos'
+): AnalysisResult {
+    let analysisText = `Análise para a chapa ${deck.nome} com carga de ${totalLoad.toFixed(0)} kgf/m² e vão de ${beamSpacing.toFixed(2)}m.\n\n`;
+
+    // Determina a categoria de sobrecarga mais próxima para a verificação do vão
+    let loadCategory: '150kgf' | '250kgf' | '400kgf' = '150kgf';
+    if (liveLoad > 250) {
+        loadCategory = '400kgf';
+    } else if (liveLoad > 150) {
+        loadCategory = '250kgf';
+    }
+
+    // Determina se o esquema é de vão simples ou duplo
+    const spanType = (beamScheme === 'biapoiada') ? 'simples' : 'duplo';
+    const maxSpan = deck.vaosMaximos[spanType][loadCategory];
+
+    analysisText += `Para a sobrecarga de ${liveLoad} kgf/m² (~${loadCategory}) e um esquema de laje ${spanType}, o vão máximo permitido para esta chapa é de ${maxSpan.toFixed(2)}m.\n\n`;
+
+    // Comparação e Geração do Insight
+    if (beamSpacing > maxSpan) {
+        const utilization = (beamSpacing / maxSpan) * 100;
+        analysisText += `**ALERTA DE SEGURANÇA:** O vão de ${beamSpacing.toFixed(2)}m excede o máximo permitido de ${maxSpan.toFixed(2)}m em ${(utilization - 100).toFixed(0)}%. A chapa selecionada **NÃO É ADEQUADA** para esta aplicação.\n\n**Ações Recomendadas:**\n- Reduza o espaçamento entre as vigas secundárias.\n- Escolha uma chapa de Steel Deck com maior espessura ou de um modelo superior (ex: MD75).`;
+    } else {
+        const utilization = (beamSpacing / maxSpan) * 100;
+        analysisText += `**VERIFICAÇÃO DE VÃO:** O dimensionamento é **SEGURO**. O vão de ${beamSpacing.toFixed(2)}m está utilizando ${utilization.toFixed(0)}% da capacidade máxima de vão da chapa.\n\n`;
+
+        if (utilization < 70) {
+            analysisText += `**INSIGHT DE OTIMIZAÇÃO:** A chapa selecionada está com uma folga considerável. É uma escolha muito segura, mas pode haver uma opção mais econômica (uma chapa mais fina) que ainda atenda aos requisitos de segurança. Verifique a tabela para comparar.\n\n`;
+        } else {
+            analysisText += `**INSIGHT DE OTIMIZAÇÃO:** O perfil está bem dimensionado, com uma boa relação entre segurança e economia.\n\n`;
+        }
+        
+        if (concreteThickness < 8) {
+            analysisText += "ATENÇÃO: Uma espessura de concreto inferior a 8cm pode não ser suficiente para garantir o cobrimento adequado da armadura e a resistência ao fogo exigida por norma.\n";
+        } else if (concreteThickness > 20) {
+            analysisText += "Observação: Lajes com espessura superior a 20cm adicionam um peso próprio considerável à estrutura, o que impactará no dimensionamento de vigas e pilares.\n";
+        }
+
+        analysisText += "Lembre-se de usar a carga total calculada para dimensionar as vigas secundárias que apoiarão esta laje.";
+    }
+
     return { analysis: analysisText };
 }
 
 export function SteelDeckCalculator() {
-    const { onAddToBudget, updateLaje, laje } = useCalculator();
+    const { onAddToBudget, updateLaje, laje, vigaSecundaria } = useCalculator();
     const { selectedDeckId, concreteThickness, selectedLoads, extraLoad, quantity, pricePerKg, result, analysis } = laje;
     
     const [isAnalyzing, setIsAnalyzing] = React.useState(false);
@@ -51,10 +88,12 @@ export function SteelDeckCalculator() {
             const load = liveLoadOptions.find(o => o.id === id);
             return acc + (load?.value || 0);
         }, 0);
-        if (total.toString() !== extraLoad) {
+        
+        const extraLoadNum = parseFloat(extraLoad.replace(',', '.')) || 0;
+        if (total !== extraLoadNum) {
             updateLaje({ extraLoad: total.toString() });
         }
-    }, [selectedLoads, extraLoad, updateLaje]);
+    }, [selectedLoads, extraLoad]);
 
     const handleInputChange = (field: keyof LajeInputs, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -87,10 +126,16 @@ export function SteelDeckCalculator() {
         };
         const h_cm = parseFloat(concreteThickness.replace(',', '.')) || 0;
         const S_kgf = parseFloat(extraLoad.replace(',', '.')) || 0;
+        const beamSpacingM = parseFloat(vigaSecundaria.spacing!.replace(',', '.')) || 0;
+        if (beamSpacingM <= 0) {
+            toast({ variant: "destructive", title: "Vão Inválido", description: "Por favor, insira um 'Espaçamento entre Vigas' válido na aba 'Viga Sec.' para realizar a análise."});
+            return;
+        }
+
         setIsAnalyzing(true);
         updateLaje({ analysis: null });
         setTimeout(() => {
-            const analysisResult = getLocalAnalysis(result.deck, result.totalLoad, h_cm, S_kgf);
+            const analysisResult = getLocalAnalysis(result.deck, result.totalLoad, h_cm, S_kgf, beamSpacingM, vigaSecundaria.beamScheme);
             updateLaje({ analysis: analysisResult });
             setIsAnalyzing(false);
         }, 500);
@@ -213,7 +258,7 @@ export function SteelDeckCalculator() {
                             <Button type="button" onClick={handleAnalyze} className="w-full" disabled={isAnalyzing}>
                                 {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar Seleção</>}
                             </Button>
-                            {isAnalyzing && <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-4"><Loader className="animate-spin h-4 w-4" />Gerando análise local...</div>}
+                            {isAnalyzing && <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-4"><Loader className="animate-spin h-4 w-4" />Gerando análise...</div>}
                             {analysis && (
                                 <Alert variant="default">
                                     <Sparkles className="h-4 w-4" /><AlertTitle className="font-semibold">Análise Lógica</AlertTitle>
@@ -239,5 +284,3 @@ export function SteelDeckCalculator() {
         </Card>
     );
 }
-
-    

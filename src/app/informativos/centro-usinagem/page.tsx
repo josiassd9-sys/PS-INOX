@@ -2,8 +2,14 @@
 "use client";
 
 import * as React from "react";
+import dynamic from 'next/dynamic';
 import { Dashboard } from "@/components/dashboard";
-import { MachiningCenterGuide } from "@/components/machining-center-guide";
+import { Loader } from "lucide-react";
+
+const MachiningCenterGuide = dynamic(() => import('@/components/machining-center-guide').then(m => m.MachiningCenterGuide), {
+  loading: () => <div className="flex justify-center items-center p-4"><Loader className="animate-spin" /></div>,
+  ssr: false,
+});
 
 export default function MachiningCenterPage() {
   return (
@@ -14,5 +20,3 @@ export default function MachiningCenterPage() {
     </Dashboard>
   );
 }
-
-    

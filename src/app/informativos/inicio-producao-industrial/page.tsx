@@ -2,8 +2,15 @@
 "use client";
 
 import * as React from "react";
+import dynamic from 'next/dynamic';
 import { Dashboard } from "@/components/dashboard";
-import { IndustrialRevolutionGuide } from "@/components/industrial-revolution-guide";
+import { Loader } from "lucide-react";
+
+const IndustrialRevolutionGuide = dynamic(() => import('@/components/industrial-revolution-guide').then(m => m.IndustrialRevolutionGuide), {
+  loading: () => <div className="flex justify-center items-center p-4"><Loader className="animate-spin" /></div>,
+  ssr: false,
+});
+
 
 export default function IndustrialRevolutionPage() {
   return (

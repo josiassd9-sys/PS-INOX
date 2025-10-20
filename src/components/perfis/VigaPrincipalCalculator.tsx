@@ -62,9 +62,16 @@ export function VigaPrincipalCalculator() {
     React.useEffect(() => {
         const { spanX, cantileverLeft, cantileverRight } = slabAnalysis;
         const updates: Partial<VigaInputs> = {};
-        if (spanX) updates.span = spanX;
+        
+        const totalX = parseFloat(spanX.replace(',', '.')) || 0;
+        const balancoX_E = parseFloat(cantileverLeft.replace(',', '.')) || 0;
+        const balancoX_D = parseFloat(cantileverRight.replace(',', '.')) || 0;
+        const vaoX = totalX - balancoX_E - balancoX_D;
+
+        if (vaoX > 0) updates.span = vaoX.toFixed(2);
         if (cantileverLeft) updates.balanco1 = cantileverLeft;
         if (cantileverRight) updates.balanco2 = cantileverRight;
+        
         if (Object.keys(updates).length > 0) {
             updateVigaPrincipal(updates);
         }
@@ -74,7 +81,7 @@ export function VigaPrincipalCalculator() {
     if (supportReactions.vigaSecundaria > 0) {
       updateVigaPrincipal({ pointLoad: supportReactions.vigaSecundaria.toFixed(0) });
     }
-  }, [supportReactions.vigaSecundaria, updateVigaPrincipal]);
+  }, [supportReactions.vigaSecundaria]);
 
   const handleInputChange = (field: keyof VigaInputs, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -144,7 +151,9 @@ export function VigaPrincipalCalculator() {
         const M_neg_dist = (q_kN_m * L1_m * L1_m) / 2;
         const M_pos_dist = (q_kN_m * L_m * L_m) / 8 - M_neg_dist / 2;
         const M_pont = (P_kN * a_m * (L_m - a_m)) / L_m;
-        Msd_kNm = Math.max(M_neg_dist, M_pos_dist + M_pont);
+        Msd_kNm = M_pos_dist + M_pont;
+        if(L1_m > 0) Msd_kNm = Math.max(M_neg_dist, Msd_kNm);
+
         Vsd_kN = q_kN_m * L_m / 2 + (q_kN_m * L1_m * L1_m) / (2 * L_m) + q_kN_m * L1_m + (P_kN * a_m)/L_m;
         Ix_req_dist = (q_kN_cm * Math.pow(L_cm, 4)) / (185 * E_kN_cm2 * (L_cm / 360));
     
@@ -153,7 +162,9 @@ export function VigaPrincipalCalculator() {
         const M_neg2_dist = (q_kN_m * L2_m * L2_m) / 2;
         const M_pos_dist = (q_kN_m * L_m * L_m) / 8 - (M_neg1_dist + M_neg2_dist) / 2;
         const M_pont = (P_kN * a_m * (L_m - a_m)) / L_m;
-        Msd_kNm = Math.max(M_neg1_dist, M_neg2_dist, M_pos_dist + M_pont);
+        Msd_kNm = M_pos_dist + M_pont;
+        if(L1_m > 0) Msd_kNm = Math.max(M_neg1_dist, Msd_kNm);
+        if(L2_m > 0) Msd_kNm = Math.max(M_neg2_dist, Msd_kNm);
 
         const R1 = (q_kN_m * L_m / 2) + (M_neg1_dist - M_neg2_dist) / L_m + (P_kN * (L_m-a_m))/L_m;
         const R2 = (q_kN_m * L_m / 2) - (M_neg1_dist - M_neg2_dist) / L_m + (P_kN * a_m)/L_m;

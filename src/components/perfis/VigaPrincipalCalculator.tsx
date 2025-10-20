@@ -74,8 +74,8 @@ export function VigaPrincipalCalculator() {
 
   const handleCalculate = () => {
     const L_m = parseFloat(span.replace(",", "."));
-    const L1_m = parseFloat(balanco1.replace(",", "."));
-    const L2_m = parseFloat(balanco2.replace(",", "."));
+    const L1_m = parseFloat(balanco1.replace(",", ".")) || 0;
+    const L2_m = parseFloat(balanco2.replace(",", ".")) || 0;
     const q_kgf_m = parseFloat(distributedLoad.replace(",", ".")) || 0;
     const P_kgf = parseFloat(pointLoad.replace(",", ".")) || 0;
     let a_m = parseFloat(pointLoadPosition.replace(",", ".")) || 0;
@@ -85,8 +85,8 @@ export function VigaPrincipalCalculator() {
     onVigaPrincipalReactionCalculated(0);
 
     const checkNaN = (...vals: number[]) => vals.some(v => isNaN(v));
-    if (checkNaN(L_m) || (beamScheme === 'balanco' && checkNaN(L1_m)) || (beamScheme === 'dois-balancos' && checkNaN(L1_m, L2_m))) {
-        setError("Por favor, insira valores válidos para todos os vãos e balanços.");
+    if (checkNaN(L_m)) {
+        setError("Por favor, insira um valor válido para o vão.");
         return;
     }
     if (q_kgf_m === 0 && P_kgf === 0) {
@@ -114,28 +114,42 @@ export function VigaPrincipalCalculator() {
     let Msd_kNm = 0, Ix_req_dist = 0, Ix_req_pont = 0, Vsd_kN = 0;
 
     if (beamScheme === "biapoiada") {
-        Msd_kNm = (q_kN_m * L_m * L_m) / 8 + (P_kN * a_m * (L_m - a_m)) / L_m;
+        const M_dist = (q_kN_m * L_m * L_m) / 8;
+        const M_pont = (P_kN * a_m * (L_m - a_m)) / L_m;
+        Msd_kNm = M_dist + M_pont;
+        
         Ix_req_dist = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * (L_cm / 360));
-        const b_cm = L_cm - (a_m * 100);
-        Ix_req_pont = (P_kN * (a_m*100) * b_cm * (L_cm + b_cm) * Math.sqrt(3 * (a_m*100) * (L_cm + b_cm))) / (27 * E_kN_cm2 * L_cm * (L_cm / 360));
-        Vsd_kN = (q_kN_m * L_m) / 2 + Math.max((P_kN * (L_m - a_m)) / L_m, (P_kN * a_m) / L_m);
-    } else if (beamScheme === "balanco") {
-        const M_neg = (q_kN_m * L1_m * L1_m) / 2;
-        const M_pos_max_span = (q_kN_m * L_m * L_m) / 8 - M_neg / 2;
-        Msd_kNm = Math.max(M_neg, M_pos_max_span);
-        Vsd_kN = q_kN_m * L_m / 2 + (q_kN_m * L1_m * L1_m) / (2 * L_m) + q_kN_m * L1_m;
-        Ix_req_dist = (q_kN_cm * Math.pow(L_cm, 4)) / (185 * E_kN_cm2 * (L_cm / 360));
-    } else if (beamScheme === "dois-balancos") {
-        const M_neg1 = (q_kN_m * L1_m * L1_m) / 2;
-        const M_neg2 = (q_kN_m * L2_m * L2_m) / 2;
-        const M_pos_max_span = (q_kN_m * L_m * L_m) / 8 - (M_neg1 + M_neg2) / 2;
-        Msd_kNm = Math.max(M_neg1, M_neg2, M_pos_max_span);
-        const R1 = (q_kN_m * L_m / 2) + (M_neg1 - M_neg2) / L_m;
-        const R2 = (q_kN_m * L_m / 2) - (M_neg1 - M_neg2) / L_m;
-        Vsd_kN = Math.max(R1 + q_kN_m*L1_m, R2 + q_kN_m*L2_m);
-        Ix_req_dist = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * (L_cm / 360)) - ( (M_neg1 + M_neg2)/2 * Math.pow(L_cm,2) ) / (16*E_kN_cm2);
-    }
+        const a_cm = a_m * 100;
+        const b_cm = L_cm - a_cm;
+        if(P_kN > 0 && a_cm > 0 && b_cm > 0) {
+            Ix_req_pont = (P_kN * a_cm * b_cm * (L_cm + b_cm) * Math.sqrt(3 * a_cm * (L_cm + b_cm))) / (27 * E_kN_cm2 * L_cm * (L_cm / 360));
+        }
 
+        const V_dist = (q_kN_m * L_m) / 2;
+        const V_pont = Math.max((P_kN * (L_m - a_m)) / L_m, (P_kN * a_m) / L_m);
+        Vsd_kN = V_dist + V_pont;
+
+    } else if (beamScheme === "balanco") {
+        const M_neg_dist = (q_kN_m * L1_m * L1_m) / 2;
+        const M_pos_dist = (q_kN_m * L_m * L_m) / 8 - M_neg_dist / 2;
+        const M_pont = (P_kN * a_m * (L_m - a_m)) / L_m;
+        Msd_kNm = Math.max(M_neg_dist, M_pos_dist + M_pont);
+        Vsd_kN = q_kN_m * L_m / 2 + (q_kN_m * L1_m * L1_m) / (2 * L_m) + q_kN_m * L1_m + (P_kN * a_m)/L_m;
+        Ix_req_dist = (q_kN_cm * Math.pow(L_cm, 4)) / (185 * E_kN_cm2 * (L_cm / 360));
+    
+    } else if (beamScheme === "dois-balancos") {
+        const M_neg1_dist = (q_kN_m * L1_m * L1_m) / 2;
+        const M_neg2_dist = (q_kN_m * L2_m * L2_m) / 2;
+        const M_pos_dist = (q_kN_m * L_m * L_m) / 8 - (M_neg1_dist + M_neg2_dist) / 2;
+        const M_pont = (P_kN * a_m * (L_m - a_m)) / L_m;
+        Msd_kNm = Math.max(M_neg1_dist, M_neg2_dist, M_pos_dist + M_pont);
+
+        const R1 = (q_kN_m * L_m / 2) + (M_neg1_dist - M_neg2_dist) / L_m + (P_kN * (L_m-a_m))/L_m;
+        const R2 = (q_kN_m * L_m / 2) - (M_neg1_dist - M_neg2_dist) / L_m + (P_kN * a_m)/L_m;
+        Vsd_kN = Math.max(R1 + q_kN_m * L1_m, R2 + q_kN_m * L2_m);
+        Ix_req_dist = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * (L_cm / 360)) - ( (M_neg1_dist + M_neg2_dist)/2 * Math.pow(L_cm,2) ) / (16*E_kN_cm2);
+    }
+    
     const requiredIx_cm4 = Ix_req_dist + Ix_req_pont;
     const requiredWx_cm3 = (Msd_kNm * 100) / fy_kN_cm2;
     const reaction_kgf = Vsd_kN / 0.009807;

@@ -33,6 +33,13 @@ interface SapataAnalysisResult {
     recommendedHeightCm: number;
   };
 }
+interface SapataArmaduraResult {
+    requiredSteelAreaCm2: number;
+    barDiameter: number;
+    barSpacing: number;
+    totalBars: number;
+    analysis: string;
+}
 interface AnalysisResult {
     analysis: string;
 }
@@ -74,7 +81,11 @@ export interface SapataInputs {
     steelPrice: string;
     steelRatio: string;
 }
-
+export interface SapataArmaduraInputs {
+    concreteStrength: string;
+    steelStrength: string;
+    barDiameter: string;
+}
 
 interface CalculatorState {
     laje: LajeInputs & { result: LajeCalcResult | null, analysis: AnalysisResult | null };
@@ -82,6 +93,7 @@ interface CalculatorState {
     vigaPrincipal: VigaInputs & { result: VigaCalcResult | null, analysis: AnalysisResult | null };
     pilar: PilarInputs & { result: PilarCalcResult | null, analysis: AnalysisResult | null };
     sapata: SapataInputs & { result: SapataAnalysisResult | null };
+    sapataArmadura: SapataArmaduraInputs & { result: SapataArmaduraResult | null };
 }
 
 interface CalculatorContextType extends CalculatorState {
@@ -102,6 +114,7 @@ interface CalculatorContextType extends CalculatorState {
   updateVigaPrincipal: (update: Partial<CalculatorState['vigaPrincipal']>) => void;
   updatePilar: (update: Partial<CalculatorState['pilar']>) => void;
   updateSapata: (update: Partial<CalculatorState['sapata']>) => void;
+  updateSapataArmadura: (update: Partial<CalculatorState['sapataArmadura']>) => void;
 
   clearAllInputs: () => void;
 }
@@ -138,7 +151,13 @@ const initialPilarState: CalculatorState['pilar'] = {
 const initialSapataState: CalculatorState['sapata'] = {
     load: "0", selectedSoil: "Argila Rija", concretePrice: "750", steelPrice: "8.50", steelRatio: "100",
     result: null
-}
+};
+const initialSapataArmaduraState: CalculatorState['sapataArmadura'] = {
+    concreteStrength: "25",
+    steelStrength: "50",
+    barDiameter: "10",
+    result: null,
+};
 
 const initialState: CalculatorState = {
     laje: initialLajeState,
@@ -146,6 +165,7 @@ const initialState: CalculatorState = {
     vigaPrincipal: initialVigaPrincipalState,
     pilar: initialPilarState,
     sapata: initialSapataState,
+    sapataArmadura: initialSapataArmaduraState,
 };
 
 
@@ -223,6 +243,7 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
     updateVigaPrincipal: (update) => handleUpdate('vigaPrincipal', update),
     updatePilar: (update) => handleUpdate('pilar', update),
     updateSapata: (update) => handleUpdate('sapata', update),
+    updateSapataArmadura: (update) => handleUpdate('sapataArmadura', update),
     clearAllInputs: handleClearAllInputs,
   };
 

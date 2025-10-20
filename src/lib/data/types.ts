@@ -95,6 +95,7 @@ export type BudgetItem = {
 export type SupportReaction = {
   vigaPrincipal: number;
   vigaSecundaria: number;
+  pilar: number;
 };
 
 export type LiveLoadOption = {

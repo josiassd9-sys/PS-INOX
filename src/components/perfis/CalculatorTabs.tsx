@@ -15,13 +15,14 @@ const tabs = [
     { name: "5. Pilar", href: "/perfis/calculadora/pilar" },
     { name: "6. Sapata", href: "/perfis/calculadora/sapata" },
     { name: "7. Armadura", href: "/perfis/calculadora/armadura-sapata" },
+    { name: "8. Visualização", href: "/perfis/calculadora/visualizacao" },
 ];
 
 export function CalculatorTabs() {
     const pathname = usePathname();
 
     return (
-        <div className="grid w-full grid-cols-4 md:grid-cols-7 gap-1 p-1 rounded-md bg-muted print:hidden">
+        <div className="grid w-full grid-cols-4 md:grid-cols-8 gap-1 p-1 rounded-md bg-muted print:hidden">
             {tabs.map((tab) => (
                 <Link
                     key={tab.name}

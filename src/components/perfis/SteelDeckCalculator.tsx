@@ -95,18 +95,18 @@ export function SteelDeckCalculator() {
         if (total !== extraLoadNum) {
             updateLaje({ extraLoad: total.toString() });
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedLoads, extraLoad]);
+    }, [selectedLoads, extraLoad, updateLaje]);
 
     React.useEffect(() => {
         const totalX = parseFloat(slabAnalysis.spanX.replace(',', '.')) || 0;
         const totalY = parseFloat(slabAnalysis.spanY.replace(',', '.')) || 0;
         const area = totalX * totalY;
-        if (area > 0 && area.toFixed(2) !== quantity) {
+        const currentQuantity = parseFloat(quantity.replace(',', '.')) || 0;
+
+        if (area > 0 && area.toFixed(2) !== currentQuantity.toFixed(2)) {
             updateLaje({ quantity: area.toFixed(2) });
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [slabAnalysis.spanX, slabAnalysis.spanY]);
+    }, [slabAnalysis.spanX, slabAnalysis.spanY, quantity, updateLaje]);
 
     const handleInputChange = (field: keyof LajeInputs, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -336,3 +336,5 @@ export function SteelDeckCalculator() {
         </Card>
     );
 }
+
+    

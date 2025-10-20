@@ -94,7 +94,7 @@ export function SteelDeckCalculator() {
         if (total !== extraLoadNum) {
             updateLaje({ extraLoad: total.toString() });
         }
-    }, [selectedLoads, extraLoad, updateLaje]);
+    }, [selectedLoads, extraLoad]);
 
     const handleInputChange = (field: keyof LajeInputs, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -189,7 +189,7 @@ export function SteelDeckCalculator() {
 
     React.useEffect(() => {
         updateLaje({ result: null, analysis: null });
-    }, [selectedDeckId, concreteThickness, extraLoad, updateLaje]);
+    }, [selectedDeckId, concreteThickness, extraLoad]);
 
     const formatNumber = (value: number, decimals = 2) => new Intl.NumberFormat('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(value);
     

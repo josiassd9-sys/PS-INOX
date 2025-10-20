@@ -94,7 +94,7 @@ export function SteelDeckCalculator() {
         if (total !== extraLoadNum) {
             updateLaje({ extraLoad: total.toString() });
         }
-    }, [selectedLoads, extraLoad, updateLaje]);
+    }, [selectedLoads, extraLoad]);
 
     React.useEffect(() => {
         const totalX = parseFloat(slabAnalysis.spanX.replace(',', '.')) || 0;
@@ -103,7 +103,7 @@ export function SteelDeckCalculator() {
         if (area > 0) {
             updateLaje({ quantity: area.toFixed(2) });
         }
-    }, [slabAnalysis.spanX, slabAnalysis.spanY, updateLaje]);
+    }, [slabAnalysis.spanX, slabAnalysis.spanY]);
 
     const handleInputChange = (field: keyof LajeInputs, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -198,7 +198,7 @@ export function SteelDeckCalculator() {
 
     React.useEffect(() => {
         updateLaje({ result: null, analysis: null });
-    }, [selectedDeckId, concreteThickness, extraLoad, updateLaje]);
+    }, [selectedDeckId, concreteThickness, extraLoad]);
 
     const formatNumber = (value: number, decimals = 2) => new Intl.NumberFormat('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(value);
     
@@ -323,3 +323,5 @@ export function SteelDeckCalculator() {
         </Card>
     );
 }
+
+    

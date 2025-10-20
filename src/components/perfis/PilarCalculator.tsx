@@ -48,10 +48,10 @@ export function PilarCalculator() {
     
     React.useEffect(() => {
         const totalReaction = supportReactions.vigaPrincipal + supportReactions.vigaSecundaria;
-        if (totalReaction > 0) {
+        if (totalReaction > 0 && totalReaction.toFixed(0) !== axialLoad) {
             updatePilar({ axialLoad: totalReaction.toFixed(0) });
         }
-    }, [supportReactions.vigaPrincipal, supportReactions.vigaSecundaria, updatePilar]);
+    }, [supportReactions.vigaPrincipal, supportReactions.vigaSecundaria, axialLoad]);
 
     React.useEffect(() => {
         const load = parseFloat(axialLoad.replace(',', '.'));

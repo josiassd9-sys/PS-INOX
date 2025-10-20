@@ -8,7 +8,22 @@ import { Label } from "@/components/ui/label";
 import { useCalculator, SlabAnalysisInputs } from "@/app/perfis/calculadora/CalculatorContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle, Sparkles, Loader } from "lucide-react";
-import { SlabAnalysisInput, analyzeSlabGeometry } from "@/ai/flows/slab-analysis-flow";
+
+function getLocalAnalysis(totalX: number, totalY: number, balancoX_E: number, balancoX_D: number, balancoY_F: number, balancoY_A: number) {
+    const vaoX = totalX - balancoX_E - balancoX_D;
+    const vaoY = totalY - balancoY_F - balancoY_A;
+
+    if (vaoX <= 0 || vaoY <= 0) {
+        return { analysis: "Erro: Os balanços não podem ser maiores que o comprimento total. Verifique as dimensões." };
+    }
+
+    let analysisText = `Geometria definida com sucesso. As dimensões totais da laje são ${totalX}m (direção X) por ${totalY}m (direção Y).\n\n`;
+    analysisText += `• Eixo X (Viga Principal): Comprimento total de ${totalX}m, com apoios posicionados para criar um vão livre de ${vaoX.toFixed(2)}m.\n`;
+    analysisText += `• Eixo Y (Viga Secundária): Comprimento total de ${totalY}m, com apoios posicionados para criar um vão livre de ${vaoY.toFixed(2)}m.\n\n`;
+    analysisText += "Estes vãos e balanços foram enviados para as calculadoras de viga correspondentes.";
+    
+    return { analysis: analysisText };
+}
 
 export function SlabAnalysis() {
     const { slabAnalysis, updateSlabAnalysis } = useCalculator();
@@ -34,27 +49,13 @@ export function SlabAnalysis() {
 
         setIsAnalyzing(true);
         updateSlabAnalysis({ result: null });
-        try {
-            const input: SlabAnalysisInput = {
-                totalSpanX: totalX,
-                totalSpanY: totalY,
-                cantileverX_Left: balancoX_E,
-                cantileverX_Right: balancoX_D,
-                cantileverY_Front: balancoY_F,
-                cantileverY_Back: balancoY_A,
-            };
-            const analysisResult = await analyzeSlabGeometry(input);
+        
+        // Simulating a short delay for local analysis
+        setTimeout(() => {
+            const analysisResult = getLocalAnalysis(totalX, totalY, balancoX_E, balancoX_D, balancoY_F, balancoY_A);
             updateSlabAnalysis({ result: { analysis: analysisResult.analysis } });
-        } catch (e) {
-            console.error("AI analysis failed", e);
-            // Fallback to local analysis in case of AI error
-            const vaoX = totalX - balancoX_E - balancoX_D;
-            const vaoY = totalY - balancoY_F - balancoY_A;
-            const fallbackText = `Falha na análise de IA. Usando análise local:\nGeometria definida com sucesso. As dimensões totais são ${totalX}m (X) por ${totalY}m (Y).\n\n• Eixo X: Vão livre de ${vaoX.toFixed(2)}m.\n• Eixo Y: Vão livre de ${vaoY.toFixed(2)}m.\n\nEstes valores foram enviados para as próximas abas.`;
-            updateSlabAnalysis({ result: { analysis: fallbackText } });
-        } finally {
             setIsAnalyzing(false);
-        }
+        }, 300);
     };
 
     return (

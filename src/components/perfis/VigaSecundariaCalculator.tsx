@@ -74,7 +74,7 @@ export function VigaSecundariaCalculator() {
         if (Object.keys(updates).length > 0) {
             updateVigaSecundaria(updates);
         }
-    }, [slabAnalysis, spacing, updateVigaSecundaria]);
+    }, [slabAnalysis, spacing]);
   
   React.useEffect(() => {
     const E_m = parseFloat(spacing!.replace(",", "."));
@@ -83,7 +83,7 @@ export function VigaSecundariaCalculator() {
       const q_dist_kgf_m = S_kgf_m2 * E_m;
       updateVigaSecundaria({ distributedLoad: q_dist_kgf_m.toFixed(2).replace('.',',') });
     }
-  }, [slabLoad, spacing, updateVigaSecundaria]);
+  }, [slabLoad, spacing]);
 
   React.useEffect(() => {
     if (laje.result) {
@@ -100,8 +100,8 @@ export function VigaSecundariaCalculator() {
 
   const handleCalculate = () => {
     const L_m = parseFloat(span.replace(",", "."));
-    const L1_m = parseFloat(balanco1.replace(",", "."));
-    const L2_m = parseFloat(balanco2.replace(",", "."));
+    const L1_m = parseFloat(balanco1.replace(",", ".")) || 0;
+    const L2_m = parseFloat(balanco2.replace(",", ".")) || 0;
     const q_kgf_m = parseFloat(distributedLoad.replace(",", ".")) || 0;
     const P_kgf = parseFloat(pointLoad.replace(",", ".")) || 0;
     let a_m = parseFloat(pointLoadPosition.replace(",", ".")) || 0;
@@ -287,3 +287,5 @@ export function VigaSecundariaCalculator() {
     </div>
   );
 }
+
+    

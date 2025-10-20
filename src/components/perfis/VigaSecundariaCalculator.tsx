@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -33,16 +34,22 @@ function getLocalAnalysis(result: CalculationResult): AnalysisResult {
     const flexao = optimizationData.find(d => d.name === 'Flexão (Wx)')?.utilization || 0;
     const deformacao = optimizationData.find(d => d.name === 'Deform. (Ix)')?.utilization || 0;
     const cortante = optimizationData.find(d => d.name === 'Cortante')?.utilization || 0;
-    let analysisText = `O perfil IPE ${profile.nome} foi selecionado por ser a opção mais leve que atendeu a todos os critérios de resistência (flexão, cortante) e deformação (flexa).\n\n`;
-    analysisText += `Análise de Otimização:\n- Resistência à Flexão (Momento Fletor): ${flexao.toFixed(1)}% de utilização.\n- Limite de Deformação (Flexa): ${deformacao.toFixed(1)}% de utilização.\n- Esforço Cortante: ${cortante.toFixed(1)}% de utilização.\n\n`;
+    let analysisText = `O perfil IPE ${profile.nome} foi selecionado como a opção mais leve que atende aos critérios.\n\n`;
+    analysisText += `Análise de Otimização:\n- Utilização (Flexão): ${flexao.toFixed(1)}%\n- Utilização (Deformação): ${deformacao.toFixed(1)}%\n- Utilização (Cortante): ${cortante.toFixed(1)}%\n\n`;
+    
     if (flexao > 95 || deformacao > 95) {
-      analysisText += "**AVISO:** O perfil está trabalhando muito próximo de seu limite para flexão ou deformação. Esta é uma solução otimizada, mas com pouca margem. Considere revisar as cargas ou o esquema estrutural se houver incertezas no projeto.\n\n";
+        analysisText += "**AVISO DE SEGURANÇA:** O perfil está trabalhando muito próximo do seu limite. Esta é uma solução otimizada, mas com margem de segurança mínima. Recomenda-se fortemente diminuir o espaçamento entre as vigas secundárias para aumentar a segurança.\n\n";
+    } else if (flexao > 70 || deformacao > 70) {
+        analysisText += "**INSIGHT DE OTIMIZAÇÃO:** A taxa de utilização está acima de 70%. Embora segura, a estrutura pode ser otimizada para maior segurança. **Sugestão:** Tente diminuir o 'Espaçamento entre Vigas' para reduzir a carga em cada viga e aumentar a margem de segurança do sistema.\n\n";
     } else if (flexao < 60 && deformacao < 60) {
-      analysisText += "**INSIGHT:** O dimensionamento parece conservador, com taxas de utilização abaixo de 60%. Há um potencial significativo para otimização com um perfil mais leve, caso os perfis intermediários não tenham passado por outros critérios (como flambagem lateral).\n\n";
+        analysisText += "**INSIGHT DE OTIMIZAÇÃO:** O dimensionamento é conservador, com taxas de utilização baixas. Há potencial para usar um perfil mais leve, o que poderia reduzir custos.\n\n";
     } else {
         analysisText += "**CONCLUSÃO:** O dimensionamento aparenta estar seguro e bem otimizado, com um bom equilíbrio entre o uso da capacidade do material e as margens de segurança.\n\n";
     }
-    if (connectorCount > 0) analysisText += `Ação Mista: Foram calculados ${connectorCount} conectores de cisalhamento (stud bolts). A correta instalação destes componentes é vital para garantir que a laje e a viga trabalhem em conjunto (ação mista), conforme previsto no cálculo.`;
+
+    if (connectorCount > 0) {
+        analysisText += `Ação Mista: Foram calculados ${connectorCount} conectores de cisalhamento (stud bolts). A correta instalação destes componentes é vital para garantir que a laje e a viga trabalhem em conjunto, conforme previsto no cálculo.`;
+    }
     return { analysis: analysisText };
 }
 
@@ -295,5 +302,3 @@ export function VigaSecundariaCalculator() {
     </div>
   );
 }
-
-    

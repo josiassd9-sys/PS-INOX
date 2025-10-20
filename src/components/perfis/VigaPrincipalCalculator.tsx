@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -33,16 +34,15 @@ function getLocalAnalysis(result: VigaCalcResult): AnalysisResult {
     const deformacao = optimizationData.find(d => d.name === 'Deform. (Ix)')?.utilization || 0;
     const cortante = optimizationData.find(d => d.name === 'Cortante')?.utilization || 0;
 
-    let analysisText = `O perfil ${profile.nome} foi selecionado por ser a opção mais leve que atendeu a todos os critérios de resistência e deformação.\n\n`;
-    analysisText += `Análise de Otimização:\n`;
-    analysisText += `- Resistência à Flexão (Momento Fletor): ${flexao.toFixed(1)}% de utilização.\n`;
-    analysisText += `- Limite de Deformação (Flexa): ${deformacao.toFixed(1)}% de utilização.\n`;
-    analysisText += `- Esforço Cortante: ${cortante.toFixed(1)}% de utilização.\n\n`;
+    let analysisText = `O perfil ${profile.nome} foi selecionado como a opção mais leve que atende aos critérios.\n\n`;
+    analysisText += `Análise de Otimização:\n- Utilização (Flexão): ${flexao.toFixed(1)}%\n- Utilização (Deformação): ${deformacao.toFixed(1)}%\n- Utilização (Cortante): ${cortante.toFixed(1)}%\n\n`;
 
     if (flexao > 95 || deformacao > 95) {
-        analysisText += "**AVISO:** O perfil está trabalhando muito próximo de seu limite para flexão ou deformação. Esta é uma solução otimizada, mas com pouca margem. Considere revisar as cargas ou o esquema estrutural se houver incertezas no projeto.\n\n";
+        analysisText += "**AVISO DE SEGURANÇA:** O perfil está trabalhando muito próximo do seu limite. Esta é uma solução otimizada, mas com margem de segurança mínima. Recomenda-se fortemente adicionar mais linhas de vigas secundárias para reduzir o vão da viga principal e aumentar a segurança.\n\n";
+    } else if (flexao > 70 || deformacao > 70) {
+        analysisText += "**INSIGHT DE OTIMIZAÇÃO:** A taxa de utilização está acima de 70%. Embora segura, a estrutura pode ser otimizada. **Sugestão:** Considere adicionar mais linhas de vigas secundárias no seu projeto. Isso criará mais apoios para a viga principal, reduzindo o vão livre e permitindo o uso de um perfil mais leve e econômico.\n\n";
     } else if (flexao < 60 && deformacao < 60) {
-        analysisText += "**INSIGHT:** O dimensionamento parece conservador, com taxas de utilização abaixo de 60%. Há um potencial significativo para otimização com um perfil mais leve, caso os perfis intermediários não tenham passado por outros critérios (como flambagem lateral).\n\n";
+        analysisText += "**INSIGHT DE OTIMIZAÇÃO:** O dimensionamento parece conservador, com taxas de utilização baixas. Há potencial para otimização com um perfil mais leve, caso os perfis intermediários não tenham passado por outros critérios (como flambagem lateral).\n\n";
     } else {
         analysisText += "**CONCLUSÃO:** O dimensionamento aparenta estar seguro e bem otimizado, com um bom equilíbrio entre o uso da capacidade do material e as margens de segurança.\n\n";
     }
@@ -168,7 +168,7 @@ export function VigaPrincipalCalculator() {
         if(L2_m > 0) Msd_kNm = Math.max(M_neg2_dist, Msd_kNm);
 
         const R1 = (q_kN_m * L_m / 2) + (M_neg1_dist - M_neg2_dist) / L_m + (P_kN * (L_m - a_m))/L_m;
-        const R2 = (q_kN_m * L_m / 2) - (M_neg1_dist - M_neg2_dist) / L_m + (P_kN * a_m)/L_m;
+        const R2 = (q_kN_m * L_m / 2) - (M_neg1_dist - M_neg2_dist) / L_m + (P_kN*a_m)/L_m;
         Vsd_kN = Math.max(R1 + q_kN_m * L1_m, R2 + q_kN_m * L2_m);
         Ix_req_dist = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * (L_cm / 360)) - ( (M_neg1_dist + M_neg2_dist)/2 * Math.pow(L_cm,2) ) / (16*E_kN_cm2);
     }

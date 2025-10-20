@@ -64,7 +64,7 @@ export function VigaSecundariaCalculator() {
     if (laje.result) {
       updateVigaSecundaria({ slabLoad: laje.result.totalLoad.toFixed(0) });
     }
-  }, [laje.result, updateVigaSecundaria]);
+  }, [laje.result]);
 
   const handleInputChange = (field: keyof VigaInputs, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -262,5 +262,3 @@ export function VigaSecundariaCalculator() {
     </div>
   );
 }
-
-    

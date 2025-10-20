@@ -51,12 +51,25 @@ export function VigaSecundariaCalculator() {
   const [error, setError] = React.useState<string | null>(null);
   const { toast } = useToast();
 
-  React.useEffect(() => {
-    const spanY = parseFloat(slabAnalysis.spanY.replace(',', '.'));
-    if (!isNaN(spanY) && spanY > 0) {
-      updateVigaSecundaria({ span: slabAnalysis.spanY });
-    }
-  }, [slabAnalysis.spanY]);
+    React.useEffect(() => {
+        const { spanY, spanX, cantileverFront, cantileverBack } = slabAnalysis;
+        const updates: Partial<VigaInputs> = {};
+        
+        if (spanY) updates.span = spanY;
+        if (cantileverFront) updates.balanco1 = cantileverFront;
+        if (cantileverBack) updates.balanco2 = cantileverBack;
+        
+        const E_m = parseFloat(spacing!.replace(",", "."));
+        const L_total_m = parseFloat(spanX.replace(",", "."));
+        if (!isNaN(E_m) && E_m > 0 && !isNaN(L_total_m) && L_total_m > 0) {
+            const numVigas = Math.ceil(L_total_m / E_m) + 1;
+            updates.quantity = numVigas.toString();
+        }
+
+        if (Object.keys(updates).length > 0) {
+            updateVigaSecundaria(updates);
+        }
+    }, [slabAnalysis, spacing, updateVigaSecundaria]);
   
   React.useEffect(() => {
     const E_m = parseFloat(spacing!.replace(",", "."));
@@ -65,13 +78,13 @@ export function VigaSecundariaCalculator() {
       const q_dist_kgf_m = S_kgf_m2 * E_m;
       updateVigaSecundaria({ distributedLoad: q_dist_kgf_m.toFixed(2).replace('.',',') });
     }
-  }, [slabLoad, spacing]);
+  }, [slabLoad, spacing, updateVigaSecundaria]);
 
   React.useEffect(() => {
     if (laje.result) {
       updateVigaSecundaria({ slabLoad: laje.result.totalLoad.toFixed(0) });
     }
-  }, [laje.result]);
+  }, [laje.result, updateVigaSecundaria]);
 
   const handleInputChange = (field: keyof VigaInputs, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');

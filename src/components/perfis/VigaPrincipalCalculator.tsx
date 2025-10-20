@@ -59,18 +59,22 @@ export function VigaPrincipalCalculator() {
   const [error, setError] = React.useState<string | null>(null);
   const { toast } = useToast();
 
-  React.useEffect(() => {
-    const spanX = parseFloat(slabAnalysis.spanX.replace(',', '.'));
-    if (!isNaN(spanX) && spanX > 0) {
-      updateVigaPrincipal({ span: slabAnalysis.spanX });
-    }
-  }, [slabAnalysis.spanX]);
+    React.useEffect(() => {
+        const { spanX, cantileverLeft, cantileverRight } = slabAnalysis;
+        const updates: Partial<VigaInputs> = {};
+        if (spanX) updates.span = spanX;
+        if (cantileverLeft) updates.balanco1 = cantileverLeft;
+        if (cantileverRight) updates.balanco2 = cantileverRight;
+        if (Object.keys(updates).length > 0) {
+            updateVigaPrincipal(updates);
+        }
+    }, [slabAnalysis, updateVigaPrincipal]);
 
   React.useEffect(() => {
     if (supportReactions.vigaSecundaria > 0) {
       updateVigaPrincipal({ pointLoad: supportReactions.vigaSecundaria.toFixed(0) });
     }
-  }, [supportReactions.vigaSecundaria]);
+  }, [supportReactions.vigaSecundaria, updateVigaPrincipal]);
 
   const handleInputChange = (field: keyof VigaInputs, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');

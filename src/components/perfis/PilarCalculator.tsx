@@ -51,7 +51,7 @@ export function PilarCalculator() {
         if (totalReaction > 0) {
             updatePilar({ axialLoad: totalReaction.toFixed(0) });
         }
-    }, [supportReactions.vigaPrincipal, supportReactions.vigaSecundaria, updatePilar]);
+    }, [supportReactions.vigaPrincipal, supportReactions.vigaSecundaria]);
 
     React.useEffect(() => {
         const load = parseFloat(axialLoad.replace(',', '.'));

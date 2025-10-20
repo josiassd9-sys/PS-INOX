@@ -206,8 +206,7 @@ export function SteelDeckCalculator() {
 
     React.useEffect(() => {
         updateLaje({ result: null, analysis: null });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedDeckId, concreteThickness, extraLoad, safetyFactor]);
+    }, [selectedDeckId, concreteThickness, extraLoad, safetyFactor, updateLaje]);
 
     const formatNumber = (value: number, decimals = 2) => new Intl.NumberFormat('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(value);
     
@@ -336,5 +335,3 @@ export function SteelDeckCalculator() {
         </Card>
     );
 }
-
-    

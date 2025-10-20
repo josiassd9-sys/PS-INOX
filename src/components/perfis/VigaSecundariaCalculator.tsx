@@ -84,8 +84,7 @@ export function VigaSecundariaCalculator() {
         if (Object.keys(updates).length > 0) {
             updateVigaSecundaria(updates);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [slabAnalysis, spacing]);
+    }, [slabAnalysis, spacing, span, balanco1, balanco2, quantity, updateVigaSecundaria]);
   
   React.useEffect(() => {
     const E_m = parseFloat(spacing!.replace(",", "."));
@@ -96,8 +95,7 @@ export function VigaSecundariaCalculator() {
            updateVigaSecundaria({ distributedLoad: q_dist_kgf_m.toFixed(2).replace('.',',') });
        }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slabLoad, spacing]);
+  }, [slabLoad, spacing, distributedLoad, updateVigaSecundaria]);
 
   React.useEffect(() => {
     if (laje.result && laje.result.totalLoad.toFixed(0) !== slabLoad) {

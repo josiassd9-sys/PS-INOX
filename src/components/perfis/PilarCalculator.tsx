@@ -183,7 +183,7 @@ export function PilarCalculator() {
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="pilar-load">Carga Axial (kgf)</Label>
-                        <Input id="pilar-load" type="text" inputMode="decimal" value={axialLoad} onChange={e => handleInputChange('axialLoad', e.target.value)} placeholder="Ex: 5000" />
+                        <Input id="pilar-load" type="text" inputMode="decimal" value={axialLoad} onChange={e => handleInputChange('axialLoad', e.target.value)} placeholder="Ex: 5000" readOnly className="bg-muted/70"/>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="pilar-steel-type">Tipo de Aço</Label>

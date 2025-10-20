@@ -74,15 +74,13 @@ export function VigaPrincipalCalculator() {
         if (Object.keys(updates).length > 0) {
             updateVigaPrincipal(updates);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [slabAnalysis.spanX, slabAnalysis.cantileverLeft, slabAnalysis.cantileverRight]);
+    }, [slabAnalysis.spanX, slabAnalysis.cantileverLeft, slabAnalysis.cantileverRight, span, balanco1, balanco2]);
 
   React.useEffect(() => {
     if (supportReactions.vigaSecundaria > 0 && supportReactions.vigaSecundaria.toFixed(0) !== pointLoad) {
       updateVigaPrincipal({ pointLoad: supportReactions.vigaSecundaria.toFixed(0) });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supportReactions.vigaSecundaria]);
+  }, [supportReactions.vigaSecundaria, pointLoad, updateVigaPrincipal]);
 
   const handleInputChange = (field: keyof VigaInputs, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');

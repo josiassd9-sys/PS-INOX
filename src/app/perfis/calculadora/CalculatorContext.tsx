@@ -207,14 +207,14 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
   const [calculatorState, setCalculatorState] = React.useState<CalculatorState>(initialState);
   const { toast } = useToast();
 
-  const handleUpdate = <T extends keyof CalculatorState>(key: T, update: Partial<CalculatorState[T]>) => {
+  const handleUpdate = React.useCallback(<T extends keyof CalculatorState>(key: T, update: Partial<CalculatorState[T]>) => {
       setCalculatorState(prev => ({
           ...prev,
           [key]: { ...prev[key], ...update }
       }))
-  }
+  }, []);
 
-  const handleClearAllInputs = () => {
+  const handleClearAllInputs = React.useCallback(() => {
       setCalculatorState(initialState);
       setSupportReactions({ vigaPrincipal: 0, vigaSecundaria: 0, pilar: 0 });
       setBudgetItems([]);
@@ -222,45 +222,45 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
           title: "Calculadora Limpa",
           description: "Todos os dados de entrada e o orçamento foram resetados.",
       })
-  }
+  }, [toast]);
 
-  const handleAddToBudget = (item: BudgetItem) => {
+  const handleAddToBudget = React.useCallback((item: BudgetItem) => {
     setBudgetItems(prev => [...prev, item]);
-  };
+  }, []);
   
-  const handleVigaPrincipalReaction = (reaction: number) => {
+  const handleVigaPrincipalReaction = React.useCallback((reaction: number) => {
     setSupportReactions(prev => ({...prev, vigaPrincipal: reaction}));
-  }
-  const handleVigaSecundariaReaction = (reaction: number) => {
+  }, [])
+  const handleVigaSecundariaReaction = React.useCallback((reaction: number) => {
     setSupportReactions(prev => ({...prev, vigaSecundaria: reaction}));
-  }
+  }, [])
 
-  const handlePillarLoad = (load: number) => {
+  const handlePillarLoad = React.useCallback((load: number) => {
     setSupportReactions(prev => ({...prev, pilar: load}));
-  }
+  }, [])
 
 
-  const handleClearBudget = () => {
+  const handleClearBudget = React.useCallback(() => {
       setBudgetItems([]);
       toast({
           title: "Orçamento Limpo",
           description: "A lista de itens foi removida.",
       })
-  }
+  }, [toast])
   
-  const handleSaveBudget = () => {
+  const handleSaveBudget = React.useCallback(() => {
     toast({
         title: "Orçamento Salvo!",
         description: "Seu orçamento foi salvo com sucesso (simulação).",
     })
-  }
+  }, [toast])
 
   const handlePrintBudget = () => {
       window.print();
   }
 
 
-  const contextValue: CalculatorContextType = {
+  const contextValue: CalculatorContextType = React.useMemo(() => ({
     ...calculatorState,
     budgetItems,
     supportReactions,
@@ -279,7 +279,7 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
     updateSapata: (update) => handleUpdate('sapata', update),
     updateSapataArmadura: (update) => handleUpdate('sapataArmadura', update),
     clearAllInputs: handleClearAllInputs,
-  };
+  }), [calculatorState, budgetItems, supportReactions, handleAddToBudget, handleClearBudget, handleSaveBudget, handleVigaPrincipalReaction, handleVigaSecundariaReaction, handlePillarLoad, handleUpdate, handleClearAllInputs]);
 
   return (
     <CalculatorContext.Provider value={contextValue}>

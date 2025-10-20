@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -31,12 +30,14 @@ function getLocalAnalysis(result: SapataArmaduraResult): string {
     analysis += `Para atender a este requisito, sugerimos uma malha de vergalhões de ${barDiameter} mm espaçados a cada ${barSpacing.toFixed(1)} cm em ambas as direções. Isso resulta em um total de ${totalBars} barras por direção.\n\n`;
     
     if (barSpacing < 7) {
-        analysis += "ATENÇÃO: O espaçamento entre barras está muito pequeno, o que pode dificultar a concretagem. Considere usar um diâmetro de barra maior para aumentar o espaçamento.\n\n";
+        analysis += "ATENÇÃO: O espaçamento entre barras está muito pequeno (< 7cm), o que pode dificultar a vibração e a passagem do concreto entre as barras. Considere usar um diâmetro de barra maior (ex: 12.5mm) para aumentar o espaçamento.\n\n";
     } else if (barSpacing > 20) {
-        analysis += "OBSERVAÇÃO: O espaçamento está relativamente grande. É uma solução econômica, mas verifique se atende aos requisitos de controle de fissuração da NBR 6118.\n\n";
+        analysis += "OBSERVAÇÃO: O espaçamento está relativamente grande (> 20cm). É uma solução econômica, mas a NBR 6118 recomenda espaçamentos máximos (geralmente 20cm ou 2x a altura da sapata) para garantir o controle de fissuração. Verifique se esta solução atende a todos os requisitos normativos para o seu projeto.\n\n";
+    } else {
+        analysis += "O espaçamento calculado está dentro dos limites práticos e normativos, representando uma boa solução inicial.\n\n"
     }
 
-    analysis += "Esta é uma sugestão de pré-dimensionamento. O detalhamento final, incluindo comprimentos de ancoragem e dobras, deve ser realizado por um engenheiro estrutural.";
+    analysis += "Esta é uma sugestão de pré-dimensionamento. O detalhamento final, incluindo comprimentos de ancoragem, dobras e verificação de punção, deve ser realizado por um engenheiro estrutural.";
     return analysis;
 }
 

@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -94,15 +93,17 @@ export function SteelDeckCalculator() {
         if (total !== extraLoadNum) {
             updateLaje({ extraLoad: total.toString() });
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedLoads, extraLoad]);
 
     React.useEffect(() => {
         const totalX = parseFloat(slabAnalysis.spanX.replace(',', '.')) || 0;
         const totalY = parseFloat(slabAnalysis.spanY.replace(',', '.')) || 0;
         const area = totalX * totalY;
-        if (area > 0) {
+        if (area > 0 && area.toFixed(2) !== quantity) {
             updateLaje({ quantity: area.toFixed(2) });
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [slabAnalysis.spanX, slabAnalysis.spanY]);
 
     const handleInputChange = (field: keyof LajeInputs, value: string) => {

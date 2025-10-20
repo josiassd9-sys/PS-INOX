@@ -17,10 +17,47 @@ function getLocalAnalysis(totalX: number, totalY: number, balancoX_E: number, ba
         return { analysis: "Erro: Os balanços não podem ser maiores que o comprimento total. Verifique as dimensões." };
     }
 
-    let analysisText = `Geometria definida com sucesso. As dimensões totais da laje são ${totalX}m (direção X) por ${totalY}m (direção Y).\n\n`;
-    analysisText += `• Eixo X (Viga Principal): Comprimento total de ${totalX}m, com apoios posicionados para criar um vão livre de ${vaoX.toFixed(2)}m.\n`;
-    analysisText += `• Eixo Y (Viga Secundária): Comprimento total de ${totalY}m, com apoios posicionados para criar um vão livre de ${vaoY.toFixed(2)}m.\n\n`;
-    analysisText += "Estes vãos e balanços foram enviados para as calculadoras de viga correspondentes.";
+    let analysisText = `Análise da Geometria da Laje:\n\n`;
+    
+    // Análise do Vão X
+    analysisText += `1. Eixo X (Vigas Principais):\n`;
+    analysisText += `   - Vão Livre Principal: ${vaoX.toFixed(2)}m.\n`;
+    if (vaoX > 12) {
+         analysisText += `   - Insight: Vão grande. A deformação (flexa) será um fator crítico no dimensionamento da viga principal. Perfis mais altos (maior inércia) serão necessários.\n`;
+    } else if (vaoX > 6) {
+         analysisText += `   - Insight: Vão médio. Um bom equilíbrio entre resistência e deformação será necessário.\n`;
+    } else {
+         analysisText += `   - Insight: Vão pequeno. O dimensionamento provavelmente será governado pela resistência (momento fletor) em vez da deformação.\n`;
+    }
+    const balancoXTotal = balancoX_E + balancoX_D;
+    if (balancoXTotal > 0) {
+        const proporcaoX_E = (balancoX_E / vaoX) * 100;
+        const proporcaoX_D = (balancoX_D / vaoX) * 100;
+        if(proporcaoX_E > 35 || proporcaoX_D > 35) {
+             analysisText += `   - Alerta de Balanço: Um dos balanços em X excede 35% do vão livre. Isso pode gerar momentos fletores negativos elevados sobre os apoios e exigir uma viga principal mais robusta.\n`;
+        } else if (proporcaoX_E > 15 || proporcaoX_D > 15) {
+             analysisText += `   - Otimização: Os balanços em X são moderados (entre 15-35% do vão), o que é eficiente para otimizar os momentos fletores da viga principal (efeito de viga contínua).\n`;
+        }
+    }
+    analysisText += `\n`;
+
+    // Análise do Vão Y
+    analysisText += `2. Eixo Y (Vigas Secundárias):\n`;
+    analysisText += `   - Vão Livre Principal: ${vaoY.toFixed(2)}m.\n`;
+     if (vaoY > 8) {
+         analysisText += `   - Insight: Vão relativamente grande para vigas secundárias. A eficiência do sistema de laje (steel deck) será importante.\n`;
+    }
+    const balancoYTotal = balancoY_F + balancoY_A;
+     if (balancoYTotal > 0) {
+        const proporcaoY_F = (balancoY_F / vaoY) * 100;
+        const proporcaoY_A = (balancoY_A / vaoY) * 100;
+        if(proporcaoY_F > 35 || proporcaoY_A > 35) {
+             analysisText += `   - Alerta de Balanço: Um dos balanços em Y excede 35% do vão livre, o que é incomum para vigas secundárias e pode exigir uma análise mais detalhada.\n`;
+        }
+    }
+    analysisText += `\n`;
+
+    analysisText += "Conclusão: A geometria é coerente. As dimensões de vãos e balanços foram calculadas e enviadas para as próximas abas.";
     
     return { analysis: analysisText };
 }

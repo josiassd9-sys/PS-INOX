@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -34,18 +33,18 @@ function getLocalAnalysis(result: VigaCalcResult): AnalysisResult {
     const deformacao = optimizationData.find(d => d.name === 'Deform. (Ix)')?.utilization || 0;
     const cortante = optimizationData.find(d => d.name === 'Cortante')?.utilization || 0;
 
-    let analysisText = `O perfil ${profile.nome} foi selecionado por ser a opção mais leve que atendeu a todos os critérios.\n\n`;
+    let analysisText = `O perfil ${profile.nome} foi selecionado por ser a opção mais leve que atendeu a todos os critérios de resistência e deformação.\n\n`;
     analysisText += `Análise de Otimização:\n`;
-    analysisText += `- Resistência à Flexão: ${flexao.toFixed(1)}% de utilização.\n`;
-    analysisText += `- Limite de Deformação: ${deformacao.toFixed(1)}% de utilização.\n`;
+    analysisText += `- Resistência à Flexão (Momento Fletor): ${flexao.toFixed(1)}% de utilização.\n`;
+    analysisText += `- Limite de Deformação (Flexa): ${deformacao.toFixed(1)}% de utilização.\n`;
     analysisText += `- Esforço Cortante: ${cortante.toFixed(1)}% de utilização.\n\n`;
 
-    if (flexao > 95 || deformacao > 95 || cortante > 95) {
-        analysisText += "AVISO: O perfil está trabalhando muito próximo do seu limite. Considere revisar as cargas.\n\n";
+    if (flexao > 95 || deformacao > 95) {
+        analysisText += "**AVISO:** O perfil está trabalhando muito próximo de seu limite para flexão ou deformação. Esta é uma solução otimizada, mas com pouca margem. Considere revisar as cargas ou o esquema estrutural se houver incertezas no projeto.\n\n";
     } else if (flexao < 60 && deformacao < 60) {
-        analysisText += "INSIGHT: O dimensionamento parece conservador. Há potencial para otimização.\n\n";
+        analysisText += "**INSIGHT:** O dimensionamento parece conservador, com taxas de utilização abaixo de 60%. Há um potencial significativo para otimização com um perfil mais leve, caso os perfis intermediários não tenham passado por outros critérios (como flambagem lateral).\n\n";
     } else {
-        analysisText += "CONCLUSÃO: O dimensionamento aparenta estar seguro e bem otimizado.\n\n";
+        analysisText += "**CONCLUSÃO:** O dimensionamento aparenta estar seguro e bem otimizado, com um bom equilíbrio entre o uso da capacidade do material e as margens de segurança.\n\n";
     }
 
     return { analysis: analysisText };
@@ -68,20 +67,22 @@ export function VigaPrincipalCalculator() {
         const balancoX_D = parseFloat(cantileverRight.replace(',', '.')) || 0;
         const vaoX = totalX - balancoX_E - balancoX_D;
 
-        if (vaoX > 0) updates.span = vaoX.toFixed(2);
-        if (cantileverLeft) updates.balanco1 = cantileverLeft;
-        if (cantileverRight) updates.balanco2 = cantileverRight;
+        if (vaoX > 0 && vaoX.toFixed(2) !== span) updates.span = vaoX.toFixed(2);
+        if (cantileverLeft && cantileverLeft !== balanco1) updates.balanco1 = cantileverLeft;
+        if (cantileverRight && cantileverRight !== balanco2) updates.balanco2 = cantileverRight;
         
         if (Object.keys(updates).length > 0) {
             updateVigaPrincipal(updates);
         }
-    }, [slabAnalysis.spanX, slabAnalysis.cantileverLeft, slabAnalysis.cantileverRight, updateVigaPrincipal]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [slabAnalysis.spanX, slabAnalysis.cantileverLeft, slabAnalysis.cantileverRight]);
 
   React.useEffect(() => {
-    if (supportReactions.vigaSecundaria > 0) {
+    if (supportReactions.vigaSecundaria > 0 && supportReactions.vigaSecundaria.toFixed(0) !== pointLoad) {
       updateVigaPrincipal({ pointLoad: supportReactions.vigaSecundaria.toFixed(0) });
     }
-  }, [supportReactions.vigaSecundaria, updateVigaPrincipal]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [supportReactions.vigaSecundaria]);
 
   const handleInputChange = (field: keyof VigaInputs, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -166,7 +167,7 @@ export function VigaPrincipalCalculator() {
         if(L1_m > 0) Msd_kNm = Math.max(M_neg1_dist, Msd_kNm);
         if(L2_m > 0) Msd_kNm = Math.max(M_neg2_dist, Msd_kNm);
 
-        const R1 = (q_kN_m * L_m / 2) + (M_neg1_dist - M_neg2_dist) / L_m + (P_kN * (L_m-a_m))/L_m;
+        const R1 = (q_kN_m * L_m / 2) + (M_neg1_dist - M_neg2_dist) / L_m + (P_kN * (L_m - a_m))/L_m;
         const R2 = (q_kN_m * L_m / 2) - (M_neg1_dist - M_neg2_dist) / L_m + (P_kN * a_m)/L_m;
         Vsd_kN = Math.max(R1 + q_kN_m * L1_m, R2 + q_kN_m * L2_m);
         Ix_req_dist = (5 * q_kN_cm * Math.pow(L_cm, 4)) / (384 * E_kN_cm2 * (L_cm / 360)) - ( (M_neg1_dist + M_neg2_dist)/2 * Math.pow(L_cm,2) ) / (16*E_kN_cm2);

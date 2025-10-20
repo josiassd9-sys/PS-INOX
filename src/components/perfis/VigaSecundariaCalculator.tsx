@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -34,12 +33,16 @@ function getLocalAnalysis(result: CalculationResult): AnalysisResult {
     const flexao = optimizationData.find(d => d.name === 'Flexão (Wx)')?.utilization || 0;
     const deformacao = optimizationData.find(d => d.name === 'Deform. (Ix)')?.utilization || 0;
     const cortante = optimizationData.find(d => d.name === 'Cortante')?.utilization || 0;
-    let analysisText = `O perfil IPE ${profile.nome} foi selecionado por atender aos critérios de resistência e rigidez.\n\n`;
-    analysisText += `Análise de Otimização:\n- Resistência à Flexão: ${flexao.toFixed(1)}% de utilização.\n- Limite de Deformação: ${deformacao.toFixed(1)}% de utilização.\n- Esforço Cortante: ${cortante.toFixed(1)}% de utilização.\n\n`;
-    if (flexao > 95 || deformacao > 95 || cortante > 95) analysisText += "AVISO: O perfil está trabalhando muito próximo do seu limite.\n\n";
-    else if (flexao < 60 && deformacao < 60) analysisText += "INSIGHT: O dimensionamento parece conservador. Há potencial para otimização.\n\n";
-    else analysisText += "CONCLUSÃO: O dimensionamento aparenta estar seguro e bem otimizado.\n\n";
-    if (connectorCount > 0) analysisText += `Ação Mista: Foram calculados ${connectorCount} conectores de cisalhamento. A correta instalação é vital para garantir a ação mista viga-laje.`;
+    let analysisText = `O perfil IPE ${profile.nome} foi selecionado por ser a opção mais leve que atendeu a todos os critérios de resistência (flexão, cortante) e deformação (flexa).\n\n`;
+    analysisText += `Análise de Otimização:\n- Resistência à Flexão (Momento Fletor): ${flexao.toFixed(1)}% de utilização.\n- Limite de Deformação (Flexa): ${deformacao.toFixed(1)}% de utilização.\n- Esforço Cortante: ${cortante.toFixed(1)}% de utilização.\n\n`;
+    if (flexao > 95 || deformacao > 95) {
+      analysisText += "**AVISO:** O perfil está trabalhando muito próximo de seu limite para flexão ou deformação. Esta é uma solução otimizada, mas com pouca margem. Considere revisar as cargas ou o esquema estrutural se houver incertezas no projeto.\n\n";
+    } else if (flexao < 60 && deformacao < 60) {
+      analysisText += "**INSIGHT:** O dimensionamento parece conservador, com taxas de utilização abaixo de 60%. Há um potencial significativo para otimização com um perfil mais leve, caso os perfis intermediários não tenham passado por outros critérios (como flambagem lateral).\n\n";
+    } else {
+        analysisText += "**CONCLUSÃO:** O dimensionamento aparenta estar seguro e bem otimizado, com um bom equilíbrio entre o uso da capacidade do material e as margens de segurança.\n\n";
+    }
+    if (connectorCount > 0) analysisText += `Ação Mista: Foram calculados ${connectorCount} conectores de cisalhamento (stud bolts). A correta instalação destes componentes é vital para garantir que a laje e a viga trabalhem em conjunto (ação mista), conforme previsto no cálculo.`;
     return { analysis: analysisText };
 }
 
@@ -60,20 +63,21 @@ export function VigaSecundariaCalculator() {
         const balancoY_A = parseFloat(cantileverBack.replace(',', '.')) || 0;
         const vaoY = totalY - balancoY_F - balancoY_A;
 
-        if (vaoY > 0) updates.span = vaoY.toFixed(2);
-        if (cantileverFront) updates.balanco1 = cantileverFront;
-        if (cantileverBack) updates.balanco2 = cantileverBack;
+        if (vaoY > 0 && vaoY.toFixed(2) !== span) updates.span = vaoY.toFixed(2);
+        if (cantileverFront && cantileverFront !== balanco1) updates.balanco1 = cantileverFront;
+        if (cantileverBack && cantileverBack !== balanco2) updates.balanco2 = cantileverBack;
         
         const E_m = parseFloat(spacing!.replace(",", "."));
         const L_total_m = parseFloat(spanX.replace(",", "."));
         if (!isNaN(E_m) && E_m > 0 && !isNaN(L_total_m) && L_total_m > 0) {
             const numVigas = Math.ceil(L_total_m / E_m) + 1;
-            updates.quantity = numVigas.toString();
+            if (numVigas.toString() !== quantity) updates.quantity = numVigas.toString();
         }
 
         if (Object.keys(updates).length > 0) {
             updateVigaSecundaria(updates);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [slabAnalysis, spacing]);
   
   React.useEffect(() => {
@@ -81,14 +85,18 @@ export function VigaSecundariaCalculator() {
     const S_kgf_m2 = parseFloat(slabLoad!.replace(",", "."));
     if (!isNaN(E_m) && !isNaN(S_kgf_m2) && E_m > 0 && S_kgf_m2 > 0) {
       const q_dist_kgf_m = S_kgf_m2 * E_m;
-      updateVigaSecundaria({ distributedLoad: q_dist_kgf_m.toFixed(2).replace('.',',') });
+       if (q_dist_kgf_m.toFixed(2) !== distributedLoad.replace(',', '.')) {
+           updateVigaSecundaria({ distributedLoad: q_dist_kgf_m.toFixed(2).replace('.',',') });
+       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slabLoad, spacing]);
 
   React.useEffect(() => {
-    if (laje.result) {
+    if (laje.result && laje.result.totalLoad.toFixed(0) !== slabLoad) {
       updateVigaSecundaria({ slabLoad: laje.result.totalLoad.toFixed(0) });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [laje.result]);
 
   const handleInputChange = (field: keyof VigaInputs, value: string) => {
@@ -217,14 +225,14 @@ export function VigaSecundariaCalculator() {
   const handleAddToBudget = () => {
     if (!result) { toast({ variant: "destructive", title: "Nenhum Perfil Calculado" }); return; }
     const L_central_m = parseFloat(span.replace(",", "."));
-    const L_balanco1_m = parseFloat(balanco1.replace(",", "."));
-    const L_balanco2_m = parseFloat(balanco2.replace(",", "."));
+    const L_balanco1_m = parseFloat(balanco1.replace(",", ".")) || 0;
+    const L_balanco2_m = parseFloat(balanco2.replace(",", ".")) || 0;
     const qty = parseInt(quantity);
     const price = parseFloat(pricePerKg.replace(",", "."));
     let totalLengthForBudget = 0;
     if (beamScheme === 'biapoiada') totalLengthForBudget = L_central_m;
     if (beamScheme === 'balanco') totalLengthForBudget = L_central_m + L_balanco1_m;
-    if (beamScheme === 'dois-balancos') totalLengthForBudget = L_central_m + L_central_m + L_balanco2_m;
+    if (beamScheme === 'dois-balancos') totalLengthForBudget = L_central_m + L_balanco1_m + L_balanco2_m;
     if (isNaN(totalLengthForBudget) || isNaN(qty) || isNaN(price) || totalLengthForBudget <= 0 || qty <= 0 || price <= 0) {
         toast({ variant: "destructive", title: "Valores Inválidos" }); return;
     }

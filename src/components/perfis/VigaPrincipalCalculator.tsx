@@ -75,7 +75,7 @@ export function VigaPrincipalCalculator() {
         if (Object.keys(updates).length > 0) {
             updateVigaPrincipal(updates);
         }
-    }, [slabAnalysis, updateVigaPrincipal]);
+    }, [slabAnalysis.spanX, slabAnalysis.cantileverLeft, slabAnalysis.cantileverRight]);
 
   React.useEffect(() => {
     if (supportReactions.vigaSecundaria > 0) {
@@ -294,3 +294,5 @@ export function VigaPrincipalCalculator() {
     </div>
   );
 }
+
+    

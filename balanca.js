@@ -1,3 +1,5 @@
+// Para instruções de como executar este script em um computador separado,
+// consulte o arquivo README.md na raiz do projeto.
 
 require('dotenv').config();
 const { SerialPort } = require('serialport');

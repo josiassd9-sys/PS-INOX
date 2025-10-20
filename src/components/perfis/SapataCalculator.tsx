@@ -53,13 +53,13 @@ export function SapataCalculator() {
     const [error, setError] = React.useState<string | null>(null);
 
      React.useEffect(() => {
-        if (pilar.result) {
+        if (pilar.axialLoad) {
             const pilarLoad = parseFloat(pilar.axialLoad.replace(',', '.'));
             if (!isNaN(pilarLoad) && pilarLoad > 0) {
                  updateSapata({ load: pilarLoad.toFixed(0) });
             }
         }
-    }, [pilar.result, pilar.axialLoad]);
+    }, [pilar.axialLoad, updateSapata]);
 
 
     const handleInputChange = (field: keyof SapataInputs, value: string) => {

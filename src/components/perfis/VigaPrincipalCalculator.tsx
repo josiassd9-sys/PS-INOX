@@ -75,13 +75,13 @@ export function VigaPrincipalCalculator() {
         if (Object.keys(updates).length > 0) {
             updateVigaPrincipal(updates);
         }
-    }, [slabAnalysis.spanX, slabAnalysis.cantileverLeft, slabAnalysis.cantileverRight]);
+    }, [slabAnalysis.spanX, slabAnalysis.cantileverLeft, slabAnalysis.cantileverRight, updateVigaPrincipal]);
 
   React.useEffect(() => {
     if (supportReactions.vigaSecundaria > 0) {
       updateVigaPrincipal({ pointLoad: supportReactions.vigaSecundaria.toFixed(0) });
     }
-  }, [supportReactions.vigaSecundaria]);
+  }, [supportReactions.vigaSecundaria, updateVigaPrincipal]);
 
   const handleInputChange = (field: keyof VigaInputs, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -226,14 +226,14 @@ export function VigaPrincipalCalculator() {
   const handleAddToBudget = () => {
     if (!result) { toast({ variant: "destructive", title: "Nenhum Perfil Calculado" }); return; }
     const L_central_m = parseFloat(span.replace(",", "."));
-    const L_balanco1_m = parseFloat(balanco1.replace(",", "."));
-    const L_balanco2_m = parseFloat(balanco2.replace(",", "."));
+    const L_balanco1_m = parseFloat(balanco1.replace(",", ".")) || 0;
+    const L_balanco2_m = parseFloat(balanco2.replace(",", ".")) || 0;
     const qty = parseInt(quantity);
     const price = parseFloat(pricePerKg.replace(",", "."));
     let totalLengthForBudget = 0;
     if (beamScheme === 'biapoiada') totalLengthForBudget = L_central_m;
     if (beamScheme === 'balanco') totalLengthForBudget = L_central_m + L_balanco1_m;
-    if (beamScheme === 'dois-balancos') totalLengthForBudget = L_central_m + L_central_m + L_balanco2_m;
+    if (beamScheme === 'dois-balancos') totalLengthForBudget = L_central_m + L_balanco1_m + L_balanco2_m;
     if (isNaN(totalLengthForBudget) || isNaN(qty) || isNaN(price) || totalLengthForBudget <= 0 || qty <= 0 || price <= 0) {
         toast({ variant: "destructive", title: "Valores Inválidos para Orçamento" });
         return;
@@ -294,5 +294,3 @@ export function VigaPrincipalCalculator() {
     </div>
   );
 }
-
-    

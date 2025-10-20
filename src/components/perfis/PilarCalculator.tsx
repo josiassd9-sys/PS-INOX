@@ -46,16 +46,16 @@ export function PilarCalculator() {
     const { toast } = useToast();
     
     React.useEffect(() => {
-        const totalReaction = supportReactions.vigaPrincipal;
+        const totalReaction = supportReactions.vigaPrincipal + supportReactions.vigaSecundaria;
         if (totalReaction > 0) {
             updatePilar({ axialLoad: totalReaction.toFixed(0) });
         }
-    }, [supportReactions.vigaPrincipal, updatePilar]);
+    }, [supportReactions.vigaPrincipal, supportReactions.vigaSecundaria, updatePilar]);
 
     React.useEffect(() => {
         const load = parseFloat(axialLoad.replace(',', '.'));
         onPillarLoadCalculated(!isNaN(load) && load > 0 ? load : 0);
-    }, [axialLoad]);
+    }, [axialLoad, onPillarLoadCalculated]);
 
     const handleInputChange = (field: keyof typeof pilar, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');

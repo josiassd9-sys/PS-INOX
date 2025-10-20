@@ -47,11 +47,11 @@ export function SlabAnalysis() {
                     <h3 className="font-semibold mb-2">Vãos Principais</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="span-x">Vão na direção X (m)</Label>
+                            <Label htmlFor="span-x">Vão na direção X (m) - (Viga Principal)</Label>
                             <Input id="span-x" type="text" inputMode="decimal" value={spanX} onChange={e => handleInputChange('spanX', e.target.value)} placeholder="Ex: 10,0" />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="span-y">Vão na direção Y (m)</Label>
+                            <Label htmlFor="span-y">Vão na direção Y (m) - (Viga Secundária)</Label>
                             <Input id="span-y" type="text" inputMode="decimal" value={spanY} onChange={e => handleInputChange('spanY', e.target.value)} placeholder="Ex: 5,5" />
                         </div>
                     </div>

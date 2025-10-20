@@ -83,7 +83,7 @@ export function VigaSecundariaCalculator() {
       const q_dist_kgf_m = S_kgf_m2 * E_m;
       updateVigaSecundaria({ distributedLoad: q_dist_kgf_m.toFixed(2).replace('.',',') });
     }
-  }, [slabLoad, spacing]);
+  }, [slabLoad, spacing, updateVigaSecundaria]);
 
   React.useEffect(() => {
     if (laje.result) {

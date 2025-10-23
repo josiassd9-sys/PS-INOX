@@ -148,19 +148,20 @@ const ScaleCalculator = forwardRef((props, ref) => {
   
   const addNewMaterial = (setId: string) => {
     setWeighingSets(prevSets =>
-      prevSets.map((set, setIndex) => {
+      prevSets.map(set => {
         if (set.id === setId) {
           const lastItem = set.items[set.items.length - 1];
-          
           let newBruto = 0;
           let newTara = 0;
-
+  
           if (operationType === 'loading') {
             newBruto = lastItem ? lastItem.tara : 0;
+            // newTara fica 0 para o usuário preencher
           } else { // unloading
-             if (lastItem) {
+            if (lastItem) {
               newTara = lastItem.bruto;
-             }
+            }
+             // newBruto fica 0 para o usuário preencher
           }
            
           const newItem: WeighingItem = {
@@ -169,7 +170,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
             bruto: newBruto,
             tara: newTara,
             descontos: 0,
-            liquido: 0,
+            liquido: newBruto - newTara,
           };
           return { ...set, items: [...set.items, newItem] };
         }
@@ -357,7 +358,10 @@ const ScaleCalculator = forwardRef((props, ref) => {
             <CardContent className="p-0 overflow-x-auto">
               {/* Mobile Layout */}
               <div className="sm:hidden">
-                  {set.items.map((item, itemIndex) => (
+                  {set.items.map((item, itemIndex) => {
+                      const isBrutoDisabled = (operationType === 'loading' && itemIndex > 0) || (setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'loading');
+                      const isTaraDisabled = (operationType === 'unloading' && itemIndex > 0) || (setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading');
+                      return (
                       <div key={item.id} className="border-b p-0.5 space-y-0.5">
                           <div className="space-y-px">
                             <Label className="text-xs text-muted-foreground">Material</Label>
@@ -369,12 +373,12 @@ const ScaleCalculator = forwardRef((props, ref) => {
                           <div className="grid grid-cols-4 gap-0.5">
                               <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">Bruto (kg)</Label>
-                                  <Input type="text" placeholder="0" value={formatNumber(item.bruto)} onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)} className="text-right h-8 print:hidden w-full" disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')} />
+                                  <Input type="text" placeholder="0" value={formatNumber(item.bruto)} onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)} className="text-right h-8 print:hidden w-full" disabled={isBrutoDisabled} />
                                    <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
                               </div>
                                <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">Tara (kg)</Label>
-                                   <Input type="text" placeholder="0" value={formatNumber(item.tara)} onChange={(e) => handleInputChange(set.id, item.id, 'tara', e.target.value)} className="text-right h-8 print:hidden w-full" disabled={(setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading')} />
+                                   <Input type="text" placeholder="0" value={formatNumber(item.tara)} onChange={(e) => handleInputChange(set.id, item.id, 'tara', e.target.value)} className="text-right h-8 print:hidden w-full" disabled={isTaraDisabled} />
                                    <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
                               </div>
                                <div className="space-y-px">
@@ -390,7 +394,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                               </div>
                           </div>
                       </div>
-                  ))}
+                  )})}
               </div>
               {/* Desktop Layout */}
               <Table className="hidden sm:table table-fixed">
@@ -404,7 +408,10 @@ const ScaleCalculator = forwardRef((props, ref) => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {set.items.map((item, itemIndex) => (
+                  {set.items.map((item, itemIndex) => {
+                      const isBrutoDisabled = (operationType === 'loading' && itemIndex > 0) || (setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'loading');
+                      const isTaraDisabled = (operationType === 'unloading' && itemIndex > 0) || (setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading');
+                      return (
                     <TableRow key={item.id} className="print:text-black">
                       <TableCell className="w-[30%] font-medium p-0 sm:p-px">
                           <MaterialSearchInput
@@ -420,7 +427,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                                 value={formatNumber(item.bruto)}
                                 onChange={(e) => handleInputChange(set.id, item.id, 'bruto', e.target.value)}
                                 className="text-right h-8 print:hidden w-24"
-                                disabled={itemIndex > 0 || (setIndex === 0 && !!headerData.initialWeight && operationType === 'loading')}
+                                disabled={isBrutoDisabled}
                                 />
                             </div>
                             <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
@@ -433,7 +440,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                                 value={formatNumber(item.tara)}
                                 onChange={(e) => handleInputChange(set.id, item.id, 'tara', e.target.value)}
                                 className="text-right h-8 print:hidden w-24"
-                                disabled={(setIndex === 0 && itemIndex === 0 && !!headerData.initialWeight && operationType === 'unloading')}
+                                disabled={isTaraDisabled}
                                 />
                             </div>
                             <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
@@ -456,7 +463,7 @@ const ScaleCalculator = forwardRef((props, ref) => {
                             </div>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )})}
                 </TableBody>
               </Table>
             </CardContent>

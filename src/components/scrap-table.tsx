@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import type { Category, ScrapItem } from "@/lib/data/index";
 import { Button } from "./ui/button";
-import { Eye, EyeOff, Trash2 } from "lucide-react";
+import { Eye, EyeOff, Trash2, RotateCcw } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -81,6 +81,19 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
   const updateHiddenItems = (newHiddenIds: Set<string>) => {
     setHiddenItemIds(newHiddenIds);
     saveData(allItems, newHiddenIds);
+  };
+
+  const handleRestoreDefaults = () => {
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_ITEMS_KEY);
+      localStorage.removeItem(LOCAL_STORAGE_HIDDEN_KEY);
+      setAllItems(category.items as ScrapItem[]);
+      setHiddenItemIds(new Set());
+      toast({ title: "Tabela Restaurada", description: "A tabela foi restaurada para o estado original." });
+    } catch (error) {
+      console.error("Failed to restore default data", error);
+      toast({ title: "Erro", description: "Não foi possível restaurar a tabela.", variant: "destructive" });
+    }
   };
 
   const toggleItemVisibility = (id: string) => {
@@ -165,7 +178,7 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
   return (
     <>
       <div className="flex items-center justify-between mb-1">
-        <div>
+        <div className="flex items-center gap-2">
           {hasHiddenItems && (
             <Button size="sm" className="h-8 gap-1" variant="outline" onClick={showAllItems}>
               <Eye className="h-3.5 w-3.5" />
@@ -174,6 +187,12 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
               </span>
             </Button>
           )}
+          <Button size="sm" className="h-8 gap-1" variant="outline" onClick={handleRestoreDefaults}>
+            <RotateCcw className="h-3.5 w-3.5" />
+            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+              Restaurar Padrão
+            </span>
+          </Button>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogContent>

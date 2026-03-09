@@ -1,0 +1,38 @@
+type User @table {
+  displayName: String!
+  email: String!
+  role: String!
+  phoneNumber: String
+  createdAt: Timestamp
+}
+
+type Vehicle @table {
+  licensePlate: String!
+  vehicleType: String!
+  make: String
+  model: String
+  year: Int
+  ownerCompanyName: String
+}
+
+type WeighingSession @table {
+  user: User
+  vehicle: Vehicle
+  timestamp: Timestamp!
+  grossWeight: Float!
+  status: String!
+  tareWeight: Float
+  netWeight: Float
+  origin: String
+  destination: String
+  cargoDescription: String
+  notes: String
+}
+
+type Company @table {
+  companyName: String!
+  address: String
+  contactPerson: String
+  phoneNumber: String
+  email: String
+}

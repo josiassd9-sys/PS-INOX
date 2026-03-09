@@ -1,0 +1,16 @@
+mutation CreateSeedData @transaction @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public") {
+  # Replace with actual insertMany mutations for your specific types
+  # Example:
+  # movie_insertMany(data: [
+  #   {
+  #     id: "movie1",
+  #     title: "Example Movie 1",
+  #     genre: "Action"
+  #   },
+  #   {
+  #     id: "movie2",
+  #     title: "Example Movie 2",
+  #     genre: "Comedy"
+  #   }
+  # ])
+}

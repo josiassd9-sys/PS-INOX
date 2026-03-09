@@ -1,0 +1,450 @@
+extend type Mutation {
+  """
+  ✨ Insert a single `Company` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  company_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: Company_Data!
+  ): Company_KeyOutput! @fdc_generated(from: "Company", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `User` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  user_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: User_Data!
+  ): User_KeyOutput! @fdc_generated(from: "User", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `Vehicle` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  vehicle_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: Vehicle_Data!
+  ): Vehicle_KeyOutput! @fdc_generated(from: "Vehicle", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `WeighingSession` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  weighingSession_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: WeighingSession_Data!
+  ): WeighingSession_KeyOutput! @fdc_generated(from: "WeighingSession", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert `Company` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  company_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [Company_Data!]!
+  ): [Company_KeyOutput!]! @fdc_generated(from: "Company", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `User` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  user_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [User_Data!]!
+  ): [User_KeyOutput!]! @fdc_generated(from: "User", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `Vehicle` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  vehicle_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [Vehicle_Data!]!
+  ): [Vehicle_KeyOutput!]! @fdc_generated(from: "Vehicle", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `WeighingSession` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  weighingSession_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [WeighingSession_Data!]!
+  ): [WeighingSession_KeyOutput!]! @fdc_generated(from: "WeighingSession", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert or update a single `Company` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Company`.
+  """
+  company_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: Company_Data!
+  ): Company_KeyOutput! @fdc_generated(from: "Company", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `User` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `User`.
+  """
+  user_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: User_Data!
+  ): User_KeyOutput! @fdc_generated(from: "User", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `Vehicle` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Vehicle`.
+  """
+  vehicle_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: Vehicle_Data!
+  ): Vehicle_KeyOutput! @fdc_generated(from: "Vehicle", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `WeighingSession` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `WeighingSession`.
+  """
+  weighingSession_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: WeighingSession_Data!
+  ): WeighingSession_KeyOutput! @fdc_generated(from: "WeighingSession", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update `Company` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Company`.
+  """
+  company_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [Company_Data!]!
+  ): [Company_KeyOutput!]! @fdc_generated(from: "Company", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `User` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `User`.
+  """
+  user_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [User_Data!]!
+  ): [User_KeyOutput!]! @fdc_generated(from: "User", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `Vehicle` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Vehicle`.
+  """
+  vehicle_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [Vehicle_Data!]!
+  ): [Vehicle_KeyOutput!]! @fdc_generated(from: "Vehicle", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `WeighingSession` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `WeighingSession`.
+  """
+  weighingSession_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [WeighingSession_Data!]!
+  ): [WeighingSession_KeyOutput!]! @fdc_generated(from: "WeighingSession", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Update a single `Company` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `Company` or `null` if not found.
+  """
+  company_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Company_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Company_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: Company_Data!
+  ): Company_KeyOutput @fdc_generated(from: "Company", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `User` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `User` or `null` if not found.
+  """
+  user_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: User_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: User_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: User_Data!
+  ): User_KeyOutput @fdc_generated(from: "User", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `Vehicle` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `Vehicle` or `null` if not found.
+  """
+  vehicle_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Vehicle_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Vehicle_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: Vehicle_Data!
+  ): Vehicle_KeyOutput @fdc_generated(from: "Vehicle", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `WeighingSession` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `WeighingSession` or `null` if not found.
+  """
+  weighingSession_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: WeighingSession_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: WeighingSession_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: WeighingSession_Data!
+  ): WeighingSession_KeyOutput @fdc_generated(from: "WeighingSession", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update `Company` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  company_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: Company_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: Company_Data!
+  ): Int! @fdc_generated(from: "Company", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `User` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  user_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: User_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: User_Data!
+  ): Int! @fdc_generated(from: "User", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `Vehicle` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  vehicle_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: Vehicle_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: Vehicle_Data!
+  ): Int! @fdc_generated(from: "Vehicle", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `WeighingSession` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  weighingSession_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: WeighingSession_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: WeighingSession_Data!
+  ): Int! @fdc_generated(from: "WeighingSession", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Delete a single `Company` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  company_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Company_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Company_FirstRow
+  ): Company_KeyOutput @fdc_generated(from: "Company", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `User` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  user_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: User_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: User_FirstRow
+  ): User_KeyOutput @fdc_generated(from: "User", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `Vehicle` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  vehicle_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Vehicle_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Vehicle_FirstRow
+  ): Vehicle_KeyOutput @fdc_generated(from: "Vehicle", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `WeighingSession` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  weighingSession_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: WeighingSession_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: WeighingSession_FirstRow
+  ): WeighingSession_KeyOutput @fdc_generated(from: "WeighingSession", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete `Company` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  company_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: Company_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "Company", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `User` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  user_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: User_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "User", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `Vehicle` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  vehicle_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: Vehicle_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "Vehicle", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `WeighingSession` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  weighingSession_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: WeighingSession_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "WeighingSession", purpose: DELETE_MULTIPLE)
+}

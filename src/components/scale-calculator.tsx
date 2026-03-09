@@ -9,7 +9,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "./ui/table";
-import { PlusCircle, Tractor, ArrowDownToLine, ArrowUpFromLine, Trash2, Save, Printer, Weight, Wifi, Keyboard } from "lucide-react";
+import { PlusCircle, Tractor, ArrowDownToLine, ArrowUpFromLine, Trash2, Save, Printer, Weight, Keyboard } from "lucide-react";
 import { scrapItems } from "@/lib/data/sucata";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "./ui/command";
@@ -17,10 +17,10 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "./ui/tooltip";
 import { cn } from "@/lib/utils";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
-import { FirebaseApp, initializeApp } from "firebase/app";
-import { Firestore, getFirestore, collection, query, orderBy, limit, getDocs } from "firebase/firestore";
-import { getFirebaseConfig } from "@/lib/firebase-config";
-import { Loader } from "lucide-react";
+// import { FirebaseApp, initializeApp } from "firebase/app";
+// import { Firestore, getFirestore, collection, query, orderBy, limit, getDocs } from "firebase/firestore";
+// import { getFirebaseConfig } from "@/lib/firebase-config";
+// import { Loader } from "lucide-react";
 
 
 type WeighingItem = {
@@ -48,35 +48,15 @@ const initialWeighingSet: WeighingSet = { id: uuidv4(), name: "CAÇAMBA 1", item
 
 
 function FirebaseProvider({ children }: { children: React.ReactNode }) {
-    const firebaseConfig = getFirebaseConfig();
-    const [app, setApp] = React.useState<FirebaseApp | null>(null);
-    const [firestore, setFirestore] = React.useState<Firestore | null>(null);
-
-    React.useEffect(() => {
-        if (firebaseConfig && !app) {
-            try {
-                const initializedApp = initializeApp(firebaseConfig);
-                const db = getFirestore(initializedApp);
-                setApp(initializedApp);
-                setFirestore(db);
-            } catch (error) {
-                console.error("Firebase initialization error:", error);
-            }
-        }
-    }, [firebaseConfig, app]);
-
-    if (!app || !firestore) {
-        return <div className="flex items-center justify-center p-8 gap-2"><Loader className="animate-spin h-5 w-5 text-primary"/><span>Inicializando Firebase...</span></div>;
-    }
-
+    // The Firebase functionality is temporarily disabled.
     return (
-        <FirestoreContext.Provider value={firestore}>
+        <FirestoreContext.Provider value={null}>
             {children}
         </FirestoreContext.Provider>
     );
 }
 
-const FirestoreContext = React.createContext<Firestore | null>(null);
+const FirestoreContext = React.createContext<any | null>(null);
 const useFirestore = () => React.useContext(FirestoreContext);
 
 
@@ -193,20 +173,20 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
       return;
     }
     try {
-      const pesagensRef = collection(firestore, 'pesagens');
-      const q = query(pesagensRef, orderBy('timestamp', 'desc'), limit(1));
-      const querySnapshot = await getDocs(q);
+    //   const pesagensRef = collection(firestore, 'pesagens');
+    //   const q = query(pesagensRef, orderBy('timestamp', 'desc'), limit(1));
+    //   const querySnapshot = await getDocs(q);
 
-      if (querySnapshot.empty) {
-        toast({ variant: 'destructive', title: 'Sem Dados', description: 'Nenhuma pesagem encontrada na balança eletrônica.' });
-      } else {
-        const latestDoc = querySnapshot.docs[0];
-        const pesoString = latestDoc.data().peso;
-        const pesoNumerico = parseFloat(pesoString.replace(',', '.')) || 0;
+    //   if (querySnapshot.empty) {
+    //     toast({ variant: 'destructive', title: 'Sem Dados', description: 'Nenhuma pesagem encontrada na balança eletrônica.' });
+    //   } else {
+    //     const latestDoc = querySnapshot.docs[0];
+    //     const pesoString = latestDoc.data().peso;
+    //     const pesoNumerico = parseFloat(pesoString.replace(',', '.')) || 0;
         
-        callback(pesoNumerico);
-        toast({ title: 'Peso Capturado!', description: `Peso de ${pesoNumerico} kg recebido da balança.` });
-      }
+    //     callback(pesoNumerico);
+    //     toast({ title: 'Peso Capturado!', description: `Peso de ${pesoNumerico} kg recebido da balança.` });
+    //   }
     } catch (error) {
       console.error(error);
       toast({ variant: 'destructive', title: 'Erro ao Buscar Peso', description: 'Falha ao comunicar com o Firestore.' });
@@ -393,14 +373,10 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
             <div className="flex justify-between items-center gap-1">
                   <Label htmlFor="cliente" className="font-semibold text-sm md:text-base">Cliente</Label>
                    <div className="flex items-center gap-1 print:hidden">
-                        <ToggleGroup type="single" value={weighingMode} onValueChange={(value: WeighingMode) => value && setWeighingMode(value)} size="sm">
-                            <ToggleGroupItem value="manual" aria-label="Manual"><Keyboard className="h-4 w-4"/></ToggleGroupItem>
-                            <ToggleGroupItem value="electronic" aria-label="Eletrônico"><Wifi className="h-4 w-4"/></ToggleGroupItem>
-                        </ToggleGroup>
-                        <div className="h-6 w-px bg-border"/>
-                       <ToggleGroup type="single" value={operationType} onValueChange={(value: OperationType) => value && setOperationType(value)} size="sm">
+                        
+                        <ToggleGroup type="single" value={operationType} onValueChange={(value: OperationType) => value && setOperationType(value)} size="sm">
                             <ToggleGroupItem value="loading" aria-label="Carregamento"><ArrowDownToLine className="h-4 w-4" /></ToggleGroupItem>
-                            <ToggleGroupItem value="unloading" aria-label="Descarregamento"><ArrowUpFromLine className="h-4 w-4"/></ToggleGroupItem>
+                            <ToggleGroupItem value="unloading" aria-label="Descarregamento"><ArrowUpFromLine className="h-4 w-4" /></ToggleGroupItem>
                         </ToggleGroup>
                    </div>
               </div>
@@ -686,4 +662,3 @@ const ScaleCalculator = forwardRef((props, ref) => (
 ScaleCalculator.displayName = 'ScaleCalculator';
 
 export default ScaleCalculator;
-

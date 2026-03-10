@@ -50,7 +50,7 @@ export default function PrintableScaleTicket({ autoPrint = true }: PrintableScal
       <div className="p-0">
         {/* HEADER */}
         <div className="text-center mb-2">
-          <div className="text-[40pt]">PS INOX</div>
+          <div className="text-[32pt] font-silkscreen">PS INOX</div>
           <h1 className="text-xl font-bold uppercase text-center">
             PSINOX COMERCIO DE AÇO LTDA
           </h1>

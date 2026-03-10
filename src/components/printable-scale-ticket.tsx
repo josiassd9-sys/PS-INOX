@@ -49,12 +49,14 @@ export default function PrintableScaleTicket({ autoPrint = true }: PrintableScal
     >
       <div className="p-0">
         {/* HEADER */}
-        <div className="text-center mb-2">
-          <div className="text-[32pt] font-silkscreen">PS INOX</div>
-          <h1 className="text-xl font-bold uppercase text-center">
-            PSINOX COMERCIO DE AÇO LTDA
-          </h1>
-          <p>Fone: (16) 3761-9564 - Cel:(16) 99788-7055</p>
+        <div className="text-center">
+          <div className="flex flex-col items-center gap-4">
+            <div className="text-[32pt] font-silkscreen">PS INOX</div>
+            <h1 className="text-xl font-bold uppercase">
+              PSINOX COMERCIO DE AÇO LTDA
+            </h1>
+          </div>
+          <p className="mt-4">Fone: (16) 3761-9564 - Cel:(16) 99788-7055</p>
         </div>
 
         {/* INFO */}

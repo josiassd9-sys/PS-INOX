@@ -9,7 +9,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Table, TableBody, TableCell, TableHeader, TableRow, TableHead } from "./ui/table";
-import { PlusCircle, Tractor, ArrowDownToLine, ArrowUpFromLine, Trash2, Save, Printer, Weight, Keyboard } from "lucide-react";
+import { PlusCircle, Tractor, ArrowDownToLine, ArrowUpFromLine, Trash2, Save, Printer } from "lucide-react";
 import { scrapItems } from "@/lib/data/sucata";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "./ui/command";
@@ -17,18 +17,13 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "./ui/tooltip";
 import { cn } from "@/lib/utils";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
-// import { FirebaseApp, initializeApp } from "firebase/app";
-// import { Firestore, getFirestore, collection, query, orderBy, limit, getDocs } from "firebase/firestore";
-// import { getFirebaseConfig } from "@/lib/firebase-config";
-// import { Loader } from "lucide-react";
-
 
 type WeighingItem = {
   id: string;
   material: string;
-  bruto: number;
-  tara: number;
-  descontos: number;
+  bruto: string;
+  tara: string;
+  descontos: string;
   liquido: number;
 };
 
@@ -36,29 +31,12 @@ type WeighingSet = {
   id: string;
   name: string;
   items: WeighingItem[];
-  descontoCacamba: number;
+  descontoCacamba: string;
 };
 
 type OperationType = 'loading' | 'unloading';
-type WeighingMode = 'manual' | 'electronic';
 
-
-const initialItem: WeighingItem = { id: '', material: '', bruto: 0, tara: 0, descontos: 0, liquido: 0 };
-const initialWeighingSet: WeighingSet = { id: uuidv4(), name: "CAÇAMBA 1", items: [], descontoCacamba: 0 };
-
-
-function FirebaseProvider({ children }: { children: React.ReactNode }) {
-    // The Firebase functionality is temporarily disabled.
-    return (
-        <FirestoreContext.Provider value={null}>
-            {children}
-        </FirestoreContext.Provider>
-    );
-}
-
-const FirestoreContext = React.createContext<any | null>(null);
-const useFirestore = () => React.useContext(FirestoreContext);
-
+const initialWeighingSet: WeighingSet = { id: uuidv4(), name: "CAÇAMBA 1", items: [], descontoCacamba: "" };
 
 const ScaleCalculatorComponent = forwardRef((props, ref) => {
   const [headerData, setHeaderData] = useState({
@@ -71,9 +49,6 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
   const [activeSetId, setActiveSetId] = useState<string>(initialWeighingSet.id);
   const { toast } = useToast();
   const [operationType, setOperationType] = useState<OperationType>('loading');
-  const [weighingMode, setWeighingMode] = useState<WeighingMode>('manual');
-
-  const firestore = useFirestore();
 
   const handleHeaderChange = (field: keyof typeof headerData, value: string) => {
     if (field === 'initialWeight') {
@@ -87,74 +62,17 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
     }
   };
 
-  useEffect(() => {
-    const initialWeightValue = parseFloat(headerData.initialWeight) || 0;
-    
-    if (initialWeightValue > 0 && weighingSets.length > 0 && weighingSets[0].items.length === 0) {
-       const newItem: WeighingItem = {
-            id: uuidv4(),
-            material: "SUCATA INOX",
-            bruto: operationType === 'loading' ? 0 : initialWeightValue,
-            tara: operationType === 'unloading' ? 0 : initialWeightValue,
-            descontos: 0,
-            liquido: 0
-       };
-
-        if (operationType === 'loading') {
-            newItem.tara = initialWeightValue;
-        } else { // unloading
-            newItem.bruto = initialWeightValue;
-        }
-       
-       newItem.liquido = newItem.bruto - newItem.tara - newItem.descontos;
-       
-       setWeighingSets(prev => {
-           const newSets = [...prev];
-           newSets[0] = { ...newSets[0], items: [newItem] };
-           return newSets;
-       });
-
-    } else if (initialWeightValue > 0 && weighingSets.length > 0 && weighingSets[0].items.length > 0) {
-      setWeighingSets(prevSets => {
-        const newSets = [...prevSets];
-        const firstSet = { ...newSets[0] };
-        
-        const firstItem = { ...firstSet.items[0] };
-        let needsUpdate = false;
-        if (operationType === 'loading' && firstItem.tara !== initialWeightValue) {
-          firstItem.tara = initialWeightValue;
-          needsUpdate = true;
-        } else if (operationType === 'unloading' && firstItem.bruto !== initialWeightValue) {
-          firstItem.bruto = initialWeightValue;
-          needsUpdate = true;
-        }
-
-        if (needsUpdate) {
-            firstItem.liquido = firstItem.bruto - firstItem.tara - firstItem.descontos;
-            
-            firstSet.items = [firstItem, ...firstSet.items.slice(1)];
-            newSets[0] = firstSet;
-            
-            return newSets;
-        }
-        
-        return prevSets;
-      });
-    }
-  }, [headerData.initialWeight, operationType]);
-
-
-  const handleInputChange = (setId: string, itemId: string, field: keyof WeighingItem, value: string) => {
-    const numValue = parseInt(value.replace(/\D/g, ''), 10) || 0;
+  const handleInputChange = (setId: string, itemId: string, field: keyof Omit<WeighingItem, 'id' | 'material' | 'liquido'>, value: string) => {
+    const sanitizedValue = value.replace(/\D/g, '');
     setWeighingSets(prevSets =>
       prevSets.map(set => {
         if (set.id === setId) {
           const newItems = set.items.map(item => {
             if (item.id === itemId) {
-              const updatedItem = { ...item, [field]: numValue };
-              const bruto = updatedItem.bruto;
-              const tara = updatedItem.tara;
-              const descontos = updatedItem.descontos;
+              const updatedItem = { ...item, [field]: sanitizedValue };
+              const bruto = parseFloat(updatedItem.bruto) || 0;
+              const tara = parseFloat(updatedItem.tara) || 0;
+              const descontos = parseFloat(updatedItem.descontos) || 0;
               updatedItem.liquido = bruto - tara - descontos;
               return updatedItem;
             }
@@ -167,44 +85,6 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
     );
   };
 
-  const fetchLatestWeightAndApply = async (callback: (weight: number) => void) => {
-    if (!firestore) {
-      toast({ variant: 'destructive', title: 'Erro de Conexão', description: 'Não foi possível conectar ao Firestore.' });
-      return;
-    }
-    try {
-    //   const pesagensRef = collection(firestore, 'pesagens');
-    //   const q = query(pesagensRef, orderBy('timestamp', 'desc'), limit(1));
-    //   const querySnapshot = await getDocs(q);
-
-    //   if (querySnapshot.empty) {
-    //     toast({ variant: 'destructive', title: 'Sem Dados', description: 'Nenhuma pesagem encontrada na balança eletrônica.' });
-    //   } else {
-    //     const latestDoc = querySnapshot.docs[0];
-    //     const pesoString = latestDoc.data().peso;
-    //     const pesoNumerico = parseFloat(pesoString.replace(',', '.')) || 0;
-        
-    //     callback(pesoNumerico);
-    //     toast({ title: 'Peso Capturado!', description: `Peso de ${pesoNumerico} kg recebido da balança.` });
-    //   }
-    } catch (error) {
-      console.error(error);
-      toast({ variant: 'destructive', title: 'Erro ao Buscar Peso', description: 'Falha ao comunicar com o Firestore.' });
-    }
-  };
-
-  const fetchInitialWeight = () => {
-    fetchLatestWeightAndApply((weight) => {
-        setHeaderData(prev => ({...prev, initialWeight: String(Math.round(weight))}));
-    });
-  };
-
-  const fetchItemWeight = (setId: string, itemId: string, field: keyof WeighingItem) => {
-    fetchLatestWeightAndApply((weight) => {
-        handleInputChange(setId, itemId, field, String(Math.round(weight)));
-    });
-  };
-  
   const handleMaterialChange = (setId: string, itemId: string, newMaterial: string) => {
     setWeighingSets(prevSets =>
       prevSets.map(set => {
@@ -228,42 +108,55 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
   };
 
   const handleCacambaDiscount = (setId: string, value: string) => {
-     const numValue = parseInt(value.replace(/\D/g, ''), 10) || 0;
-     setWeighingSets(prev => prev.map(set => set.id === setId ? {...set, descontoCacamba: numValue} : set));
+     const sanitizedValue = value.replace(/\D/g, '');
+     setWeighingSets(prev => prev.map(set => set.id === setId ? {...set, descontoCacamba: sanitizedValue} : set));
   };
   
- const addNewMaterial = (setId: string) => {
+  const addNewMaterial = (setId: string) => {
     setWeighingSets(prevSets =>
       prevSets.map(set => {
         if (set.id === setId) {
-          const lastItem = set.items.length > 0 ? set.items[set.items.length - 1] : null;
-          let newBruto = 0;
-          let newTara = 0;
-  
-          if (operationType === 'loading') {
-            newBruto = lastItem ? lastItem.tara : 0; 
-          } else { // unloading
-            newTara = lastItem ? lastItem.bruto : 0;
-          }
-           
-          const newItem: WeighingItem = {
-            id: uuidv4(),
-            material: "SUCATA INOX",
-            bruto: newBruto,
-            tara: newTara,
-            descontos: 0,
-            liquido: newBruto - newTara,
-          };
-          return { ...set, items: [...set.items, newItem] };
+            const isFirstItem = set.items.length === 0;
+            const lastItem = isFirstItem ? null : set.items[set.items.length - 1];
+            const initialWeightValue = parseFloat(headerData.initialWeight) || 0;
+
+            let newBruto = 0;
+            let newTara = 0;
+
+            if (isFirstItem) {
+                if (initialWeightValue === 0) {
+                    toast({ variant: "destructive", title: "Peso Inicial Necessário", description: "Por favor, insira o peso inicial antes de adicionar um material." });
+                    return set; // Abort
+                }
+                if (operationType === 'loading') {
+                    newTara = initialWeightValue;
+                } else { // unloading
+                    newBruto = initialWeightValue;
+                }
+            } else {
+                if (operationType === 'loading') {
+                    newTara = parseFloat(lastItem!.bruto) || 0;
+                } else { // unloading
+                    newBruto = parseFloat(lastItem!.tara) || 0;
+                }
+            }
+            
+            const newItem: WeighingItem = {
+                id: uuidv4(),
+                material: "SUCATA INOX",
+                bruto: newBruto > 0 ? String(newBruto) : "",
+                tara: newTara > 0 ? String(newTara) : "",
+                descontos: "",
+                liquido: newBruto - newTara,
+            };
+            return { ...set, items: [...set.items, newItem] };
         }
         return set;
       })
     );
   };
   
-  const addBitrem = () => {
-    if (weighingSets.length >= 2) return;
-
+  const addCacamba = () => {
     const firstSet = weighingSets[0];
     const firstItemOfFirstSet = firstSet.items[0];
 
@@ -271,34 +164,37 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
         toast({
             variant: "destructive",
             title: "Primeira caçamba vazia",
-            description: "Adicione e pese pelo menos um material na Caçamba 1 antes de adicionar o bitrem.",
+            description: "Adicione e pese pelo menos um material na Caçamba 1 antes de adicionar outra.",
         });
         return;
     }
 
-    const truckTara = operationType === 'loading' ? firstItemOfFirstSet.tara : firstItemOfFirstSet.bruto;
+    const truckTara = operationType === 'loading' ? (parseFloat(firstItemOfFirstSet.tara) || 0) : (parseFloat(firstItemOfFirstSet.bruto) || 0);
+
+    const brutoValue = operationType === 'loading' ? 0 : truckTara;
+    const taraValue = operationType === 'unloading' ? 0 : truckTara;
 
     const newSet: WeighingSet = {
         id: uuidv4(),
-        name: "BITREM / CAÇAMBA 2",
+        name: `CAÇAMBA ${weighingSets.length + 1}`,
         items: [{
             id: uuidv4(),
             material: "SUCATA INOX",
-            bruto: operationType === 'loading' ? 0 : truckTara,
-            tara: operationType === 'unloading' ? 0 : truckTara,
-            descontos: 0,
+            bruto: brutoValue > 0 ? String(brutoValue) : "",
+            tara: taraValue > 0 ? String(taraValue) : "",
+            descontos: "",
             liquido: 0,
         }],
-        descontoCacamba: 0
+        descontoCacamba: ""
     };
-    newSet.items[0].liquido = newSet.items[0].bruto - newSet.items[0].tara;
+    newSet.items[0].liquido = (parseFloat(newSet.items[0].bruto) || 0) - (parseFloat(newSet.items[0].tara) || 0);
 
     setWeighingSets(prev => [...prev, newSet]);
     setActiveSetId(newSet.id);
   };
 
   const handleClear = () => {
-    const newWeighingSet: WeighingSet = { id: uuidv4(), name: "CAÇAMBA 1", items: [], descontoCacamba: 0 };
+    const newWeighingSet: WeighingSet = { id: uuidv4(), name: "CAÇAMBA 1", items: [], descontoCacamba: "" };
     setWeighingSets([newWeighingSet]);
     setActiveSetId(newWeighingSet.id);
     setHeaderData({ client: "", plate: "", driver: "", initialWeight: "" });
@@ -348,21 +244,14 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
   }));
 
   const formatNumber = (num: number) => {
-    if (isNaN(num) || num === 0) return "";
+    if (isNaN(num) || num === 0) return "0";
     return new Intl.NumberFormat('pt-BR', {useGrouping: false}).format(num);
   }
   
   const grandTotalLiquido = weighingSets.reduce((total, set) => {
     const setItemsTotal = set.items.reduce((acc, item) => acc + item.liquido, 0);
-    return total + (setItemsTotal - set.descontoCacamba);
+    return total + (setItemsTotal - (parseFloat(set.descontoCacamba) || 0));
   }, 0);
-
-  const WeightInput = ({value, onChange, disabled, onFetch, showFetchButton}: {value: number, onChange: (val: string) => void, disabled: boolean, onFetch?: () => void, showFetchButton: boolean}) => {
-    if (showFetchButton && !disabled) {
-      return <Button variant="outline" className="h-8 w-full print:hidden" onClick={onFetch}><Weight className="mr-2 h-4 w-4"/> Buscar Peso</Button>
-    }
-    return <Input type="text" placeholder="0" value={formatNumber(value)} onChange={(e) => onChange(e.target.value)} className="text-right h-8 print:hidden w-full" disabled={disabled} />
-  }
 
   return (
     <div className="p-px bg-background max-w-7xl mx-auto" id="scale-calculator-printable-area">
@@ -399,12 +288,13 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
                         <Label htmlFor="initial-weight" className="text-xs sm:text-sm">
                           {operationType === 'loading' ? 'Tara' : 'Bruto'} Inicial
                         </Label>
-                         <WeightInput
-                            value={parseFloat(headerData.initialWeight)}
-                            onChange={v => handleHeaderChange('initialWeight', v)}
-                            disabled={false}
-                            onFetch={fetchInitialWeight}
-                            showFetchButton={weighingMode === 'electronic'}
+                         <Input
+                            id="initial-weight"
+                            type="text"
+                            placeholder="0"
+                            value={headerData.initialWeight}
+                            onChange={e => handleHeaderChange('initialWeight', e.target.value)}
+                            className="text-right h-8 print:hidden w-full"
                         />
                         <span className="hidden print:block">{headerData.initialWeight || 'N/A'}</span>
                     </div>
@@ -416,7 +306,7 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
 
       {weighingSets.map((set, setIndex) => {
          const subtotalLiquido = set.items.reduce((acc, item) => acc + item.liquido, 0);
-         const totalLiquidoSet = subtotalLiquido - set.descontoCacamba;
+         const totalLiquidoSet = subtotalLiquido - (parseFloat(set.descontoCacamba) || 0);
 
          return (
           <Card key={set.id} className="mb-px print:border-none print:shadow-none print:p-0 print:mb-0.5">
@@ -441,8 +331,8 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
               {/* Mobile Layout */}
               <div className="sm:hidden">
                   {set.items.map((item, itemIndex) => {
-                      const isBrutoEditable = operationType === 'loading' && itemIndex > 0;
-                      const isTaraEditable = operationType === 'unloading' && itemIndex > 0;
+                      const isBrutoEditable = operationType === 'loading';
+                      const isTaraEditable = operationType === 'unloading';
                       return (
                       <div key={item.id} className="border-b p-0.5 space-y-0.5">
                           <div className="space-y-px">
@@ -455,18 +345,18 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
                           <div className="grid grid-cols-4 gap-0.5">
                               <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">Bruto (kg)</Label>
-                                  <WeightInput value={item.bruto} onChange={v => handleInputChange(set.id, item.id, 'bruto', v)} disabled={!isBrutoEditable} onFetch={() => fetchItemWeight(set.id, item.id, 'bruto')} showFetchButton={weighingMode === 'electronic'} />
-                                   <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
+                                  <Input type="text" placeholder="0" value={item.bruto} onChange={e => handleInputChange(set.id, item.id, 'bruto', e.target.value)} disabled={!isBrutoEditable} className="text-right h-8 print:hidden w-full"/>
+                                   <span className="hidden print:block text-right">{formatNumber(parseFloat(item.bruto))}</span>
                               </div>
                                <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">Tara (kg)</Label>
-                                  <WeightInput value={item.tara} onChange={v => handleInputChange(set.id, item.id, 'tara', v)} disabled={!isTaraEditable} onFetch={() => fetchItemWeight(set.id, item.id, 'tara')} showFetchButton={weighingMode === 'electronic'} />
-                                   <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
+                                  <Input type="text" placeholder="0" value={item.tara} onChange={e => handleInputChange(set.id, item.id, 'tara', e.target.value)} disabled={!isTaraEditable} className="text-right h-8 print:hidden w-full"/>
+                                   <span className="hidden print:block text-right">{formatNumber(parseFloat(item.tara))}</span>
                               </div>
                                <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">A/L (kg)</Label>
-                                  <Input type="text" placeholder="0" value={formatNumber(item.descontos)} onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)} className="text-right h-8 print:hidden w-full" />
-                                   <span className="hidden print:block text-right">{formatNumber(item.descontos)}</span>
+                                  <Input type="text" placeholder="0" value={item.descontos} onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)} className="text-right h-8 print:hidden w-full" />
+                                   <span className="hidden print:block text-right">{formatNumber(parseFloat(item.descontos))}</span>
                               </div>
                                <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">Líquido (kg)</Label>
@@ -491,8 +381,8 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
                 </TableHeader>
                 <TableBody>
                   {set.items.map((item, itemIndex) => {
-                      const isBrutoEditable = operationType === 'loading' && itemIndex > 0;
-                      const isTaraEditable = operationType === 'unloading' && itemIndex > 0;
+                      const isBrutoEditable = operationType === 'loading';
+                      const isTaraEditable = operationType === 'unloading';
                       return (
                     <TableRow key={item.id} className="print:text-black">
                       <TableCell className="w-[30%] font-medium p-0 sm:p-px">
@@ -503,27 +393,27 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
                       </TableCell>
                       <TableCell className="w-[17.5%] p-0 sm:p-px">
                             <div className="flex justify-end">
-                                <WeightInput value={item.bruto} onChange={v => handleInputChange(set.id, item.id, 'bruto', v)} disabled={!isBrutoEditable} onFetch={() => fetchItemWeight(set.id, item.id, 'bruto')} showFetchButton={weighingMode === 'electronic'} />
+                                <Input type="text" placeholder="0" value={item.bruto} onChange={e => handleInputChange(set.id, item.id, 'bruto', e.target.value)} disabled={!isBrutoEditable} className="text-right h-8 print:hidden w-full"/>
                             </div>
-                            <span className="hidden print:block text-right">{formatNumber(item.bruto)}</span>
+                            <span className="hidden print:block text-right">{formatNumber(parseFloat(item.bruto))}</span>
                       </TableCell>
                       <TableCell className="w-[17.5%] p-0 sm:p-px">
                             <div className="flex justify-end">
-                                <WeightInput value={item.tara} onChange={v => handleInputChange(set.id, item.id, 'tara', v)} disabled={!isTaraEditable} onFetch={() => fetchItemWeight(set.id, item.id, 'tara')} showFetchButton={weighingMode === 'electronic'} />
+                                <Input type="text" placeholder="0" value={item.tara} onChange={e => handleInputChange(set.id, item.id, 'tara', e.target.value)} disabled={!isTaraEditable} className="text-right h-8 print:hidden w-full"/>
                             </div>
-                            <span className="hidden print:block text-right">{formatNumber(item.tara)}</span>
+                            <span className="hidden print:block text-right">{formatNumber(parseFloat(item.tara))}</span>
                       </TableCell>
                       <TableCell className="w-[17.5%] p-0 sm:p-px">
                             <div className="flex justify-end">
                                 <Input
                                 type="text"
                                 placeholder="0"
-                                value={formatNumber(item.descontos)}
+                                value={item.descontos}
                                 onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)}
                                 className="text-right h-8 print:hidden w-24"
                                 />
                             </div>
-                            <span className="hidden print:block text-right">{formatNumber(item.descontos)}</span>
+                            <span className="hidden print:block text-right">{formatNumber(parseFloat(item.descontos))}</span>
                       </TableCell>
                       <TableCell className="w-[17.5%] text-right font-semibold p-0 sm:p-px">
                             <div className="h-8 sm:h-full flex items-center justify-end">
@@ -543,18 +433,18 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
                              id={`desconto-cacamba-${set.id}`}
                              type="text"
                              placeholder="0"
-                             value={formatNumber(set.descontoCacamba)}
+                             value={set.descontoCacamba}
                              onChange={(e) => handleCacambaDiscount(set.id, e.target.value)}
                              className="h-8 text-right print:hidden flex-1 min-w-[90px] w-14"
                           />
-                          <span className="hidden print:block font-semibold">{formatNumber(set.descontoCacamba)}</span>
+                          <span className="hidden print:block font-semibold">{formatNumber(parseFloat(set.descontoCacamba))}</span>
                      </div>
                      <div className="text-right flex-shrink-0">
                          <p className="text-sm text-muted-foreground">Subtotal</p>
                          <p className="text-lg font-bold print:text-black">{formatNumber(subtotalLiquido)} kg</p>
                      </div>
                       <div className="text-right flex-shrink-0">
-                         <p className="text-sm text-muted-foreground">{setIndex === 0 ? "Caçamba 1" : "Bitrem / Caçamba 2"}</p>
+                         <p className="text-sm text-muted-foreground">{set.name}</p>
                          <p className="text-xl font-bold text-primary print:text-black">{formatNumber(totalLiquidoSet)} kg</p>
                      </div>
                  </div>
@@ -563,11 +453,9 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
         );
       })}
 
-      {weighingSets.length < 2 && (
-        <div className="flex justify-center my-px print:hidden">
-          <Button variant="secondary" onClick={addBitrem} size="sm" className="h-8 px-2"><Tractor className="mr-2 h-4 w-4" /> + Bitrem / Caçamba 2</Button>
-        </div>
-      )}
+      <div className="flex justify-center my-px print:hidden">
+        <Button variant="secondary" onClick={addCacamba} size="sm" className="h-8 px-2"><Tractor className="mr-2 h-4 w-4" /> + Adicionar Caçamba</Button>
+      </div>
 
       <Card className="mt-px bg-primary/10 border-primary/20 print:border print:border-accent-price print:shadow-none print:p-0.5">
          <CardContent className="p-px flex justify-end items-center">
@@ -577,7 +465,7 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
             </div>
          </CardContent>
       </Card>
-      <div className="flex items-center gap-1 justify-center pt-1 print:hidden">
+      <div className="flex items-center justify-evenly pt-1 print:hidden">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -587,13 +475,13 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
           </Tooltip>
             <Tooltip>
             <TooltipTrigger asChild>
-              <Button onClick={handleSave} variant="outline" size="icon" className="h-8 w-8"><Save className="h-4 w-4"/></Button>
+              <Button onClick={handleSave} variant="outline" size="icon" className="h-8 w-8"><Save className="h-4 w-4" /></Button>
             </TooltipTrigger>
             <TooltipContent><p>Salvar Pesagem</p></TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button onClick={handleLoad} variant="outline" size="icon" className="h-8 w-8"><ArrowUpFromLine className="h-4 w-4"/></Button>
+              <Button onClick={handleLoad} variant="outline" size="icon" className="h-8 w-8"><ArrowUpFromLine className="h-4 w-4" /></Button>
             </TooltipTrigger>
             <TooltipContent><p>Carregar Última Pesagem</p></TooltipContent>
           </Tooltip>
@@ -609,7 +497,6 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
   );
 });
 ScaleCalculatorComponent.displayName = 'ScaleCalculatorComponent';
-
 
 function MaterialSearchInput({ value, onValueChange }: { value: string, onValueChange: (value: string) => void }) {
   const [open, setOpen] = useState(false)
@@ -654,9 +541,7 @@ function MaterialSearchInput({ value, onValueChange }: { value: string, onValueC
 }
 
 const ScaleCalculator = forwardRef((props, ref) => (
-    <FirebaseProvider>
-        <ScaleCalculatorComponent {...props} ref={ref} />
-    </FirebaseProvider>
+    <ScaleCalculatorComponent {...props} ref={ref} />
 ));
 
 ScaleCalculator.displayName = 'ScaleCalculator';

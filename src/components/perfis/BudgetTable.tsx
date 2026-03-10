@@ -47,7 +47,7 @@ export function BudgetTable({ items, onClear, onSave, onPrint }: BudgetTableProp
                         <CardTitle className="flex items-center gap-2"><Calculator className="h-6 w-6"/> Orçamento de Perfis Estruturais</CardTitle>
                         <CardDescription>Lista de itens calculados para o projeto.</CardDescription>
                     </div>
-                    <div className="flex items-center gap-1 print:hidden">
+                    <div className="flex items-center gap-8 print:hidden">
                         <Button variant="ghost" size="icon" onClick={clearAllInputs} className="text-muted-foreground hover:text-primary">
                             <Eraser className="h-5 w-5"/>
                         </Button>

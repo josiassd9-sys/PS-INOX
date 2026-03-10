@@ -291,6 +291,8 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
                          <Input
                             id="initial-weight"
                             type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
                             placeholder="0"
                             value={headerData.initialWeight}
                             onChange={e => handleHeaderChange('initialWeight', e.target.value)}
@@ -345,17 +347,17 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
                           <div className="grid grid-cols-4 gap-0.5">
                               <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">Bruto (kg)</Label>
-                                  <Input type="text" placeholder="0" value={item.bruto} onChange={e => handleInputChange(set.id, item.id, 'bruto', e.target.value)} disabled={!isBrutoEditable} className="text-right h-8 print:hidden w-full"/>
+                                  <Input type="text" inputMode="numeric" pattern="[0-9]*" placeholder="0" value={item.bruto} onChange={e => handleInputChange(set.id, item.id, 'bruto', e.target.value)} disabled={!isBrutoEditable} className="text-right h-8 print:hidden w-full"/>
                                    <span className="hidden print:block text-right">{formatNumber(parseFloat(item.bruto))}</span>
                               </div>
                                <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">Tara (kg)</Label>
-                                  <Input type="text" placeholder="0" value={item.tara} onChange={e => handleInputChange(set.id, item.id, 'tara', e.target.value)} disabled={!isTaraEditable} className="text-right h-8 print:hidden w-full"/>
+                                  <Input type="text" inputMode="numeric" pattern="[0-9]*" placeholder="0" value={item.tara} onChange={e => handleInputChange(set.id, item.id, 'tara', e.target.value)} disabled={!isTaraEditable} className="text-right h-8 print:hidden w-full"/>
                                    <span className="hidden print:block text-right">{formatNumber(parseFloat(item.tara))}</span>
                               </div>
                                <div className="space-y-px">
                                   <Label className="text-xs text-muted-foreground">A/L (kg)</Label>
-                                  <Input type="text" placeholder="0" value={item.descontos} onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)} className="text-right h-8 print:hidden w-full" />
+                                  <Input type="text" inputMode="numeric" pattern="[0-9]*" placeholder="0" value={item.descontos} onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)} className="text-right h-8 print:hidden w-full" />
                                    <span className="hidden print:block text-right">{formatNumber(parseFloat(item.descontos))}</span>
                               </div>
                                <div className="space-y-px">
@@ -393,13 +395,13 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
                       </TableCell>
                       <TableCell className="w-[17.5%] p-0 sm:p-px">
                             <div className="flex justify-end">
-                                <Input type="text" placeholder="0" value={item.bruto} onChange={e => handleInputChange(set.id, item.id, 'bruto', e.target.value)} disabled={!isBrutoEditable} className="text-right h-8 print:hidden w-full"/>
+                                <Input type="text" inputMode="numeric" pattern="[0-9]*" placeholder="0" value={item.bruto} onChange={e => handleInputChange(set.id, item.id, 'bruto', e.target.value)} disabled={!isBrutoEditable} className="text-right h-8 print:hidden w-full"/>
                             </div>
                             <span className="hidden print:block text-right">{formatNumber(parseFloat(item.bruto))}</span>
                       </TableCell>
                       <TableCell className="w-[17.5%] p-0 sm:p-px">
                             <div className="flex justify-end">
-                                <Input type="text" placeholder="0" value={item.tara} onChange={e => handleInputChange(set.id, item.id, 'tara', e.target.value)} disabled={!isTaraEditable} className="text-right h-8 print:hidden w-full"/>
+                                <Input type="text" inputMode="numeric" pattern="[0-9]*" placeholder="0" value={item.tara} onChange={e => handleInputChange(set.id, item.id, 'tara', e.target.value)} disabled={!isTaraEditable} className="text-right h-8 print:hidden w-full"/>
                             </div>
                             <span className="hidden print:block text-right">{formatNumber(parseFloat(item.tara))}</span>
                       </TableCell>
@@ -407,6 +409,8 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
                             <div className="flex justify-end">
                                 <Input
                                 type="text"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                                 placeholder="0"
                                 value={item.descontos}
                                 onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)}
@@ -432,6 +436,8 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
                          <Input
                              id={`desconto-cacamba-${set.id}`}
                              type="text"
+                             inputMode="numeric"
+                             pattern="[0-9]*"
                              placeholder="0"
                              value={set.descontoCacamba}
                              onChange={(e) => handleCacambaDiscount(set.id, e.target.value)}

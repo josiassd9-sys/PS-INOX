@@ -108,13 +108,13 @@ export default function PrintableScaleTicket({ autoPrint = true }: PrintableScal
                     ))}
                     
                     <tr className="border-t border-dashed border-black">
-                       <td colSpan={3} className="text-left">DESCONTO CAÇAMBA</td>
+                       <td colSpan={3} className="text-right">DESCONTO CAÇAMBA</td>
                        <td colSpan={2} className="text-right"> -{formatNumber(set.descontoCacamba)}</td>
                     </tr>
 
                     {/* Linha de Total da Caçamba */}
                     <tr className="font-bold">
-                      <td colSpan={3} className="text-left">
+                      <td colSpan={3} className="text-right">
                         TOTAL CAÇAMBA
                       </td>
                       <td className="text-right"></td>

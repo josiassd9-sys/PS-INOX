@@ -107,9 +107,14 @@ export default function PrintableScaleTicket({ autoPrint = true }: PrintableScal
                       </tr>
                     ))}
                     
+                    {/* Empty row for spacing */}
+                    <tr className="h-4">
+                      <td colSpan={5}></td>
+                    </tr>
+
                     <tr className="border-t border-dashed border-black">
-                       <td colSpan={3} className="text-right pt-2">DESCONTO CAÇAMBA</td>
-                       <td colSpan={2} className="text-right pt-2"> -{formatNumber(set.descontoCacamba)}</td>
+                       <td colSpan={3} className="text-right">DESCONTO CAÇAMBA</td>
+                       <td colSpan={2} className="text-right"> -{formatNumber(set.descontoCacamba)}</td>
                     </tr>
 
                     {/* Linha de Total da Caçamba */}

@@ -15,6 +15,7 @@ export default {
         body: ['Inter', 'sans-serif'],
         headline: ['"Teko"', 'sans-serif'],
         code: ['monospace'],
+        "chakra-petch": ['"Chakra Petch"', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -114,7 +115,7 @@ export default {
           from: {
             height: 'var(--radix-accordion-content-height)',
           },
-to: {
+          to: {
             height: '0',
           },
         },

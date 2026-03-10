@@ -229,7 +229,20 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
 
   const handlePrint = () => {
     try {
-        localStorage.setItem("scaleData", JSON.stringify({ weighingSets, headerData, operationType }));
+        const dataToPrint = {
+            ...{weighingSets, headerData, operationType},
+            weighingSets: weighingSets.map(set => ({
+                ...set,
+                descontoCacamba: parseFloat(set.descontoCacamba) || 0,
+                items: set.items.map(item => ({
+                    ...item,
+                    bruto: parseFloat(item.bruto) || 0,
+                    tara: parseFloat(item.tara) || 0,
+                    descontos: parseFloat(item.descontos) || 0,
+                }))
+            }))
+        };
+        localStorage.setItem("scaleData", JSON.stringify(dataToPrint));
         window.open('/calculator/balanca/print', '_blank');
     } catch (e) {
         toast({ variant: "destructive", title: "Erro ao Imprimir", description: "Não foi possível preparar os dados para impressão." });

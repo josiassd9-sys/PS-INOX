@@ -1,36 +1,8 @@
+
 "use client";
 
 import React, { useState, useEffect } from "react";
-
-type WeighingItem = {
-  id: string;
-  material: string;
-  bruto: number;
-  tara: number;
-  descontos: number;
-  liquido: number;
-};
-
-type WeighingSet = {
-  id: string;
-  name: string;
-  items: WeighingItem[];
-  descontoCacamba: number;
-};
-
-interface ScaleData {
-  weighingSets: WeighingSet[];
-  headerData: {
-    client: string;
-    plate: string;
-    driver: string;
-  };
-  operationType: "loading" | "unloading";
-}
-
-interface PrintableScaleTicketProps {
-  autoPrint?: boolean;
-}
+import type { ScaleData, PrintableScaleTicketProps } from "@/lib/data/types";
 
 export default function PrintableScaleTicket({ autoPrint = true }: PrintableScaleTicketProps) {
   const [data, setData] = useState<ScaleData | null>(null);
@@ -73,12 +45,12 @@ export default function PrintableScaleTicket({ autoPrint = true }: PrintableScal
   return (
     <div
       id="printable-ticket-body"
-      className="bg-white text-black font-sans text-xs w-full"
+      className="bg-white text-black font-sans text-xs w-full pt-4"
     >
       <div className="p-0">
         {/* HEADER */}
         <div className="text-center mb-2">
-          <div className="text-[20pt]">PS INOX</div>
+          <div className="text-[40pt]">PS INOX</div>
           <h1 className="text-xl font-bold uppercase text-center">
             PSINOX COMERCIO DE AÇO LTDA
           </h1>
@@ -159,7 +131,7 @@ export default function PrintableScaleTicket({ autoPrint = true }: PrintableScal
         <div className="mt-4 pt-1">
           <div className="flex justify-between font-bold text-sm">
             <span>PESO LÍQUIDO TOTAL:</span>
-            <span>{formatNumber(grandTotalLiquido)} KG</span>
+            <span>{formatNumber(grandTotalLiquido, true)} KG</span>
           </div>
         </div>
       </div>

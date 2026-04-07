@@ -8,9 +8,15 @@ const withPWA = createPWA({
   disable: process.env.NODE_ENV === 'development',
 });
 
+const isCapacitorBuild = process.env.CAPACITOR_BUILD === 'true';
 
 const nextConfig: NextConfig = {
   /* config options here */
+  ...(isCapacitorBuild
+    ? {
+        output: 'export',
+      }
+    : {}),
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -18,6 +24,11 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
+    ...(isCapacitorBuild
+      ? {
+          unoptimized: true,
+        }
+      : {}),
     remotePatterns: [
       {
         protocol: 'https',

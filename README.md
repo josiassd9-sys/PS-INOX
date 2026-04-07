@@ -2,6 +2,43 @@
 
 Este projeto é uma aplicação Next.js desenvolvida no Firebase Studio.
 
+## Web (Vercel) + Android (Capacitor) no Mesmo Repositorio
+
+Voce pode manter um unico repositorio sem perder o deploy atual na Vercel.
+Os arquivos do Capacitor convivem com o projeto web e nao interrompem o pipeline da Vercel.
+
+### Estrategia recomendada
+
+1. Continue usando o mesmo repositorio no GitHub.
+2. Mantenha `android/` e `capacitor.config.ts` versionados no Git.
+3. Use dois modos de execucao mobile:
+
+- Modo live (espelho da Vercel): app carrega pela URL publicada.
+- Modo local (embutido): app usa arquivos locais no Android.
+
+### Modo live (espelho da Vercel)
+
+No PowerShell, execute:
+
+```powershell
+$env:CAP_SERVER_URL="https://seu-app.vercel.app"
+npm run mobile:sync:live
+npm run cap:open:android
+```
+
+### Modo local (embutido)
+
+No PowerShell, execute:
+
+```powershell
+Remove-Item Env:CAP_SERVER_URL -ErrorAction SilentlyContinue
+npm run mobile:sync:local
+npm run cap:open:android
+```
+
+Observacao: hoje o modo local pode falhar se houver recursos do Next.js que nao suportam export estatico.
+Nesse caso, use o modo live para nao bloquear o app Android e manter a Vercel como fonte principal.
+
 ## Como Executar o Script da Balança (`balanca.js`)
 
 Este script é projetado para ser executado em um computador separado que está fisicamente conectado à balança via porta serial. Ele captura os dados da balança e os envia para o Firestore.

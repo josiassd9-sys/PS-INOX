@@ -49,6 +49,7 @@ import { CostAdjustmentCalculator } from "./cost-adjustment-calculator";
 import Link from "next/link";
 import { GaugeStandards } from "./gauge-standards";
 import { MaterialListBuilder } from "./material-list-builder";
+import { ThemeSettings } from "./theme-settings";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "./ui/tooltip";
 
 interface PriceParams {
@@ -304,6 +305,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                          selectedCategoryId === 'conexoes' ||
                          selectedCategoryId === 'gauge' ||
                          selectedCategoryId === 'ai-assistant' ||
+                         selectedCategoryId === 'configuracoes' ||
                          selectedCategoryId === 'lista-materiais' ||
                          selectedCategoryId === 'lista-sucatas' ||
                          selectedCategoryId?.startsWith('perfis/') ||
@@ -348,6 +350,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
       case 'tabela-sucata': return <ScrapTable category={selectedCategory as any} isDialogOpen={isScrapItemDialogOpen} setIsDialogOpen={setIsScrapItemDialogOpen} searchTerm={searchTerm} />;
       case 'conexoes': return <ConnectionsTable category={selectedCategory as any} sellingPrice={currentPriceParams.sellingPrice} editedWeights={editedWeights} onWeightChange={handleWeightChange} />;
       case 'gauge': return <GaugeStandards />;
+      case 'configuracoes': return <ThemeSettings />;
       case 'lista-materiais': return <MaterialListBuilder />;
       case 'lista-sucatas': return <div/>;
       default:

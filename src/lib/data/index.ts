@@ -364,6 +364,15 @@ const ALL_CATEGORIES: Category[] = [
     path: '/lista-sucatas'
   },
   {
+    id: 'configuracoes',
+    name: 'Configurações',
+    description: 'Ajuste tema e preferências visuais do aplicativo.',
+    icon: 'Cog',
+    unit: 'calc',
+    items: [],
+    path: '/configuracoes',
+  },
+  {
     id: 'informativos/centro-usinagem',
     name: 'Centro de Usinagem',
     description: 'Guia sobre centros de usinagem CNC, suas operações e aplicações.',
@@ -474,6 +483,7 @@ const CATEGORY_GROUPS: CategoryGroup[] = [
             ALL_CATEGORIES.find(c => c.id === 'print-preview')!,
             ALL_CATEGORIES.find(c => c.id === 'tabela-sucata')!,
             ALL_CATEGORIES.find(c => c.id === 'lista-sucatas')!,
+            ALL_CATEGORIES.find(c => c.id === 'configuracoes')!,
         ]
     },
     {

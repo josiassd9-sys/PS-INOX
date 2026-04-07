@@ -10,6 +10,7 @@ import { Calculator, Printer, Save, Trash2, Eraser } from "lucide-react";
 import type { BudgetItem } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
+import { RefinedButton, RefinedCard } from "@/components/refined-components";
 
 interface BudgetTableProps {
     items: BudgetItem[];
@@ -40,7 +41,7 @@ export function BudgetTable({ items, onClear, onSave, onPrint }: BudgetTableProp
     );
 
     return (
-        <Card className="print:shadow-none print:border-none">
+        <RefinedCard hover="subtle" className="print:shadow-none print:border-none p-0 overflow-hidden">
             <CardHeader>
                 <div className="flex justify-between items-start">
                     <div className="space-y-1">
@@ -48,18 +49,18 @@ export function BudgetTable({ items, onClear, onSave, onPrint }: BudgetTableProp
                         <CardDescription>Lista de itens calculados para o projeto.</CardDescription>
                     </div>
                     <div className="flex items-center gap-8 print:hidden">
-                        <Button variant="ghost" size="icon" onClick={clearAllInputs} className="text-muted-foreground hover:text-primary">
+                        <RefinedButton variant="ghost" size="sm" animation="scale" onClick={clearAllInputs} className="h-10 w-10 p-0 text-muted-foreground hover:text-primary">
                             <Eraser className="h-5 w-5"/>
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={onSave} className="text-muted-foreground hover:text-primary">
+                        </RefinedButton>
+                        <RefinedButton variant="ghost" size="sm" animation="scale" onClick={onSave} className="h-10 w-10 p-0 text-muted-foreground hover:text-primary">
                             <Save className="h-5 w-5"/>
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={onPrint} className="text-muted-foreground hover:text-primary">
+                        </RefinedButton>
+                        <RefinedButton variant="ghost" size="sm" animation="scale" onClick={onPrint} className="h-10 w-10 p-0 text-muted-foreground hover:text-primary">
                             <Printer className="h-5 w-5"/>
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={onClear} className="text-destructive/70 hover:text-destructive">
+                        </RefinedButton>
+                        <RefinedButton variant="ghost" size="sm" animation="scale" onClick={onClear} className="h-10 w-10 p-0 text-destructive/70 hover:text-destructive">
                             <Trash2 className="h-5 w-5"/>
-                        </Button>
+                        </RefinedButton>
                     </div>
                 </div>
             </CardHeader>
@@ -101,7 +102,7 @@ export function BudgetTable({ items, onClear, onSave, onPrint }: BudgetTableProp
                 {/* Mobile View */}
                 <div className="space-y-2 md:hidden print:hidden">
                     {items.map(item => (
-                        <Card key={item.id} className="bg-muted/50">
+                        <Card key={item.id} className="bg-muted/50 border-border/70 shadow-sm">
                             <CardContent className="p-2">
                                 <dl>
                                     <DataRow label="Item" value={item.type} />
@@ -130,6 +131,6 @@ export function BudgetTable({ items, onClear, onSave, onPrint }: BudgetTableProp
                     </div>
                 </div>
             </CardContent>
-        </Card>
+        </RefinedCard>
     );
 }

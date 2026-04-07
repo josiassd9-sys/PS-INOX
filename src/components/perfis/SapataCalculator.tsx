@@ -11,6 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sparkles, Loader, CheckCircle, Calculator } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useCalculator, SapataInputs } from "@/app/perfis/calculadora/CalculatorContext";
+import { RefinedButton, RefinedCard } from "@/components/refined-components";
+import { FormSkeleton } from "@/components/skeleton";
 
 interface SapataAnalysisResult {
   analysis: string;
@@ -109,7 +111,7 @@ export function SapataCalculator() {
     const formatCurrency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
     return (
-        <Card>
+        <RefinedCard hover="subtle" className="p-0 overflow-hidden">
             <CardHeader>
                 <CardTitle>Assistente de Fundação (Sapata)</CardTitle>
                 <CardDescription>Obtenha uma recomendação de pré-dimensionamento para a sapata de concreto do pilar.</CardDescription>
@@ -131,12 +133,17 @@ export function SapataCalculator() {
                     </div>
                 </div>
 
-                <Button type="button" onClick={handleAnalyze} className="w-full md:w-auto" disabled={isAnalyzing}>
+                <RefinedButton type="button" onClick={handleAnalyze} className="w-full md:w-auto" disabled={isAnalyzing}>
                     {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar Fundação</>}
-                </Button>
+                </RefinedButton>
 
                 {error && <Alert variant="destructive"><AlertTitle>Erro</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
-                {isAnalyzing && <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-4"><Loader className="animate-spin h-4 w-4" />Dimensionando...</div>}
+                {isAnalyzing && (
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-2"><Loader className="animate-spin h-4 w-4" />Dimensionando...</div>
+                        <FormSkeleton />
+                    </div>
+                )}
                 {result && (
                     <Card className="mt-4 bg-primary/5 border-primary/20">
                         <CardHeader>
@@ -172,7 +179,7 @@ export function SapataCalculator() {
                     </Card>
                 )}
             </CardContent>
-        </Card>
+        </RefinedCard>
     );
 }
 

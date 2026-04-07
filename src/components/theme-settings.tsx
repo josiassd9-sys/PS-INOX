@@ -18,6 +18,7 @@ const THEME_PREVIEWS: Record<AppTheme, string[]> = {
   "industrial-light": ["bg-[hsl(211_100%_30%)]", "bg-[hsl(39_89%_55%)]", "bg-[hsl(220_10%_94%)]"],
   "industrial-dark": ["bg-[hsl(211_25%_18%)]", "bg-[hsl(39_89%_55%)]", "bg-[hsl(211_25%_30%)]"],
   sheet: ["bg-[hsl(211_100%_30%)]", "bg-[hsl(39_89%_55%)]", "bg-[hsl(210_45%_96%)]"],
+  "minimal-gray": ["bg-[hsl(0_0%_10%)]", "bg-[hsl(152_58%_30%)]", "bg-[hsl(0_0%_95%)]"],
 };
 
 export function ThemeSettings() {
@@ -46,6 +47,11 @@ export function ThemeSettings() {
           <div className="grid gap-3 sm:grid-cols-3">
             {THEMES.map((themeOption) => {
               const isActive = theme === themeOption;
+              const previewSwatches = THEME_PREVIEWS[themeOption] ?? [
+                "bg-[hsl(0_0%_12%)]",
+                "bg-[hsl(0_0%_72%)]",
+                "bg-[hsl(0_0%_95%)]",
+              ];
               return (
                 <RefinedButton
                   key={themeOption}
@@ -60,7 +66,7 @@ export function ThemeSettings() {
                       {isActive ? <Check className="h-4 w-4" /> : null}
                     </span>
                     <span className="flex gap-2">
-                      {THEME_PREVIEWS[themeOption].map((previewClass) => (
+                      {previewSwatches.map((previewClass) => (
                         <span key={previewClass} className={`h-3 flex-1 rounded-full border border-black/10 ${previewClass}`} />
                       ))}
                     </span>

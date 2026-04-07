@@ -2,8 +2,7 @@
 
 import * as React from "react";
 import { Check } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   applyTheme,
   getStoredTheme,
@@ -12,7 +11,14 @@ import {
   THEMES,
   type AppTheme,
 } from "@/lib/theme";
+import { RefinedButton, RefinedCard } from "./refined-components";
 import { DesignSelector } from "./design-selector";
+
+const THEME_PREVIEWS: Record<AppTheme, string[]> = {
+  "industrial-light": ["bg-[hsl(211_100%_30%)]", "bg-[hsl(39_89%_55%)]", "bg-[hsl(220_10%_94%)]"],
+  "industrial-dark": ["bg-[hsl(211_25%_18%)]", "bg-[hsl(39_89%_55%)]", "bg-[hsl(211_25%_30%)]"],
+  sheet: ["bg-[hsl(211_100%_30%)]", "bg-[hsl(39_89%_55%)]", "bg-[hsl(210_45%_96%)]"],
+};
 
 export function ThemeSettings() {
   const [theme, setTheme] = React.useState<AppTheme>("industrial-light");
@@ -29,7 +35,7 @@ export function ThemeSettings() {
 
   return (
     <div className="mx-auto max-w-3xl p-2 space-y-6">
-      <Card>
+      <RefinedCard hover="subtle" className="overflow-hidden p-0">
         <CardHeader>
           <CardTitle>Tema de Cores</CardTitle>
           <CardDescription>
@@ -41,20 +47,30 @@ export function ThemeSettings() {
             {THEMES.map((themeOption) => {
               const isActive = theme === themeOption;
               return (
-                <Button
+                <RefinedButton
                   key={themeOption}
-                  variant={isActive ? "default" : "outline"}
-                  className="h-auto min-h-20 justify-between p-4 text-left"
+                  variant={isActive ? "primary" : "outline"}
+                  animation={isActive ? "lift" : "scale"}
+                  className="h-auto min-h-28 w-full justify-between p-4 text-left"
                   onClick={() => handleSelectTheme(themeOption)}
                 >
-                  <span className="font-medium">{THEME_LABELS[themeOption]}</span>
-                  {isActive ? <Check className="h-4 w-4" /> : null}
-                </Button>
+                  <span className="flex flex-col gap-3 w-full">
+                    <span className="flex items-center justify-between gap-3">
+                      <span className="font-medium">{THEME_LABELS[themeOption]}</span>
+                      {isActive ? <Check className="h-4 w-4" /> : null}
+                    </span>
+                    <span className="flex gap-2">
+                      {THEME_PREVIEWS[themeOption].map((previewClass) => (
+                        <span key={previewClass} className={`h-3 flex-1 rounded-full border border-black/10 ${previewClass}`} />
+                      ))}
+                    </span>
+                  </span>
+                </RefinedButton>
               );
             })}
           </div>
         </CardContent>
-      </Card>
+      </RefinedCard>
 
       <DesignSelector />
     </div>

@@ -51,6 +51,9 @@ import { GaugeStandards } from "./gauge-standards";
 import { SidebarLogo } from "./sidebar-logo";
 import { MaterialListBuilder } from "./material-list-builder";
 import { ThemeSettings } from "./theme-settings";
+import { LoadingScreen } from "./loading-screen";
+import { PageTransition } from "./page-transition";
+import { ListSkeleton, TableSkeleton } from "./skeleton";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "./ui/tooltip";
 
 interface PriceParams {
@@ -102,6 +105,7 @@ const initializePriceParams = (): Record<string, PriceParams> => {
 function DashboardComponent({ initialCategoryId, children }: { initialCategoryId: string | null, children?: React.ReactNode }) {
   const { toast } = useToast();
   const [priceParams, setPriceParams] = React.useState<Record<string, PriceParams>>({});
+  const [isBooting, setIsBooting] = React.useState(true);
   
   const [selectedCategoryId, setSelectedCategoryId] = React.useState<string | null>(initialCategoryId);
   const [searchTerm, setSearchTerm] = React.useState("");
@@ -138,6 +142,11 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
     } catch (error) {
       console.error("Failed to load data from localStorage", error);
     }
+  }, []);
+
+  React.useEffect(() => {
+    const timer = window.setTimeout(() => setIsBooting(false), 650);
+    return () => window.clearTimeout(timer);
   }, []);
   
   const savePriceParams = () => {
@@ -323,8 +332,9 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
 
     if (!currentPriceParams) {
       return (
-        <div className="flex items-center justify-center h-full">
-          <p>Carregando...</p>
+        <div className="space-y-4 p-4">
+          <ListSkeleton items={3} />
+          <TableSkeleton rows={6} />
         </div>
       );
     }
@@ -374,6 +384,10 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
       if (searchTerm) return `Buscando por \"${searchTerm}\"`;
       if (selectedCategory) return selectedCategory.description;
       return "Selecione uma categoria no menu para começar.";
+  }
+
+  if (isBooting) {
+    return <LoadingScreen />;
   }
 
   return (
@@ -488,7 +502,9 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
             
             <div className="flex-1 flex flex-col overflow-hidden">
               <div className={cn("p-1 flex-1 overflow-y-auto", (selectedCategoryId === 'tabela-sucata' || selectedCategoryId === 'conexoes') && "p-0 md:p-0", selectedCategoryId?.startsWith('perfis/calculadora') && 'p-0')}>
-                 {renderContent()}
+                 <PageTransition variant={selectedCategoryId?.startsWith('perfis/') ? 'scale' : searchTerm ? 'fade' : 'slide'}>
+                   {renderContent()}
+                 </PageTransition>
               </div>
             </div>
           </div>

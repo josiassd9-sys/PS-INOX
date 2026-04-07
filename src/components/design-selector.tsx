@@ -2,8 +2,7 @@
 
 import * as React from "react";
 import { Check } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   applyDesignLevel,
   getStoredDesignLevel,
@@ -13,6 +12,7 @@ import {
   DESIGN_LEVELS,
   type DesignLevel,
 } from "@/lib/design";
+import { RefinedButton, RefinedCard } from "./refined-components";
 
 export function DesignSelector() {
   const [designLevel, setDesignLevel] = React.useState<DesignLevel>(4);
@@ -28,7 +28,7 @@ export function DesignSelector() {
   }, []);
 
   return (
-    <Card>
+    <RefinedCard hover="subtle" className="overflow-hidden p-0">
       <CardHeader>
         <CardTitle>Nível de Design</CardTitle>
         <CardDescription>
@@ -40,22 +40,25 @@ export function DesignSelector() {
           {DESIGN_LEVELS.map((level) => {
             const isActive = designLevel === level;
             return (
-              <Button
+              <RefinedButton
                 key={level}
-                variant={isActive ? "default" : "outline"}
+                variant={isActive ? "primary" : "outline"}
+                animation={isActive ? "lift" : "scale"}
                 className="w-full justify-between p-4 text-left h-auto"
                 onClick={() => handleSelectDesign(level)}
               >
-                <div className="flex flex-col gap-1">
-                  <span className="font-medium">{DESIGN_LABELS[level]}</span>
-                  <span className="text-xs opacity-70">{DESIGN_DESCRIPTIONS[level]}</span>
-                </div>
-                {isActive ? <Check className="h-4 w-4 flex-shrink-0" /> : null}
-              </Button>
+                <span className="flex items-start justify-between gap-4 w-full">
+                  <span className="flex flex-col gap-1">
+                    <span className="font-medium">{DESIGN_LABELS[level]}</span>
+                    <span className="text-xs opacity-70">{DESIGN_DESCRIPTIONS[level]}</span>
+                  </span>
+                  {isActive ? <Check className="h-4 w-4 flex-shrink-0 mt-0.5" /> : null}
+                </span>
+              </RefinedButton>
             );
           })}
         </div>
       </CardContent>
-    </Card>
+    </RefinedCard>
   );
 }

@@ -752,13 +752,30 @@
     margin-bottom: var(--space-md);
   }
 
+  /* Links herdam a cor do container — garante alto contraste em qualquer contexto
+     (sidebar, menus, cards, botões). A cor primary só é aplicada em links
+     dentro de texto corrido/prosa. */
   a {
     @apply transition-colors duration-200;
-    color: hsl(var(--primary));
+    color: inherit;
   }
 
   a:hover {
+    opacity: 0.8;
+  }
+
+  /* Links em prosa/texto corrido recebem a cor de destaque */
+  p a,
+  li a,
+  .prose a {
+    color: hsl(var(--primary));
+  }
+
+  p a:hover,
+  li a:hover,
+  .prose a:hover {
     color: hsl(var(--primary) / 0.8);
+    opacity: 1;
   }
 
   button, input, textarea, select {

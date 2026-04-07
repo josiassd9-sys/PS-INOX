@@ -5,6 +5,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { GlobalMenuTrigger } from '@/components/global-menu-trigger';
 import { ThemeInitializer } from '@/components/theme-initializer';
 import type { Viewport } from 'next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata: Metadata = {
   manifest: "/manifest.json",
@@ -44,6 +45,7 @@ export default function RootLayout({
           {children}
         </SidebarProvider>
         <Toaster />
+        <SpeedInsights />
       </body>
     </html>
   );

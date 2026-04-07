@@ -267,12 +267,12 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
   }, 0);
 
   return (
-    <div className="p-px bg-background max-w-7xl mx-auto" id="scale-calculator-printable-area">
+    <div className="p-1 sm:p-px bg-background max-w-7xl mx-auto space-y-1 sm:space-y-px" id="scale-calculator-printable-area">
       
-      <Card className="mb-px print:border-none print:shadow-none print:p-0">
-        <CardContent className="p-px print:p-0">
+      <Card className="mb-1 sm:mb-px print:border-none print:shadow-none print:p-0 scale-hero-card">
+        <CardContent className="p-2 sm:p-px print:p-0">
           <div className="w-full space-y-0.5">
-            <div className="flex justify-between items-center gap-1">
+            <div className="flex justify-between items-center gap-2">
                   <Label htmlFor="cliente" className="font-semibold text-sm md:text-base">Cliente</Label>
                    <div className="flex items-center gap-1 print:hidden">
                         
@@ -286,15 +286,15 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
                 <Input id="cliente" value={headerData.client} onChange={e => handleHeaderChange('client', e.target.value)} className="h-8 print:hidden"/>
                 <span className="hidden print:block">{headerData.client || 'N/A'}</span>
                 
-                 <div className="flex w-full items-end gap-0.5 text-xs sm:text-sm flex-nowrap">
+                 <div className="flex w-full items-end gap-1 text-xs sm:text-sm flex-nowrap">
                     <div className="space-y-px flex-1 min-w-0">
                         <Label htmlFor="motorista" className="text-xs sm:text-sm">Motorista</Label>
-                        <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-8 print:hidden text-sm"/>
+                        <Input id="motorista" value={headerData.driver} onChange={e => handleHeaderChange('driver', e.target.value)} className="h-10 md:h-8 print:hidden text-sm"/>
                         <span className="hidden print:block">{headerData.driver || 'N/A'}</span>
                     </div>
                     <div className="space-y-px flex-none">
                         <Label htmlFor="placa" className="text-xs sm:text-sm">Placa</Label>
-                        <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-8 print:hidden text-sm text-center w-24"/>
+                        <Input id="placa" value={headerData.plate} onChange={e => handleHeaderChange('plate', e.target.value)} className="h-10 md:h-8 print:hidden text-sm text-center w-24"/>
                         <span className="hidden print:block">{headerData.plate || 'N/A'}</span>
                     </div>
                     <div className="space-y-px flex-none w-24">
@@ -309,7 +309,7 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
                             placeholder="0"
                             value={headerData.initialWeight}
                             onChange={e => handleHeaderChange('initialWeight', e.target.value)}
-                            className="text-right h-8 print:hidden w-full"
+                            className="text-right h-10 md:h-8 print:hidden w-full"
                         />
                         <span className="hidden print:block">{headerData.initialWeight || 'N/A'}</span>
                     </div>
@@ -324,8 +324,12 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
          const totalLiquidoSet = subtotalLiquido - (parseFloat(set.descontoCacamba) || 0);
 
          return (
-          <Card key={set.id} className="mb-px print:border-none print:shadow-none print:p-0 print:mb-0.5">
-            <CardHeader className="p-px flex flex-row items-center justify-between print:p-0 print:mb-0.5">
+          <Card
+            key={set.id}
+            className="mb-2 sm:mb-px print:border-none print:shadow-none print:p-0 print:mb-0.5 scale-set-card"
+            style={{ animationDelay: `${Math.min(setIndex, 6) * 70}ms` }}
+          >
+            <CardHeader className="p-2 sm:p-px flex flex-row items-center justify-between gap-2 print:p-0 print:mb-0.5">
               <Input 
                 value={set.name}
                 onChange={(e) => handleSetNameChange(set.id, e.target.value)}
@@ -334,7 +338,7 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
               <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" onClick={() => addNewMaterial(set.id)} className="h-8 w-8 print:hidden">
+                        <Button variant="ghost" size="icon" onClick={() => addNewMaterial(set.id)} className="h-10 w-10 md:h-8 md:w-8 print:hidden">
                             <PlusCircle className="h-5 w-5" />
                         </Button>
                     </TooltipTrigger>
@@ -342,40 +346,40 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
                 </Tooltip>
               </TooltipProvider>
             </CardHeader>
-            <CardContent className="p-0 overflow-x-auto">
+            <CardContent className="p-0 sm:p-0 overflow-x-auto">
               {/* Mobile Layout */}
               <div className="sm:hidden">
                   {set.items.map((item, itemIndex) => {
                       const isBrutoEditable = operationType === 'loading';
                       const isTaraEditable = operationType === 'unloading';
                       return (
-                      <div key={item.id} className="border-b p-0.5 space-y-0.5">
-                          <div className="space-y-px">
+                      <div key={item.id} className="border-b last:border-b-0 p-2 space-y-1.5 bg-card/60 rounded-md mx-1 my-1">
+                          <div className="space-y-1">
                             <Label className="text-xs text-muted-foreground">Material</Label>
                             <MaterialSearchInput
                               value={item.material}
                               onValueChange={(newMaterial) => handleMaterialChange(set.id, item.id, newMaterial)}
                             />
                           </div>
-                          <div className="grid grid-cols-4 gap-0.5">
-                              <div className="space-y-px">
+                            <div className="grid grid-cols-4 gap-1">
+                              <div className="space-y-1">
                                   <Label className="text-xs text-muted-foreground">Bruto (kg)</Label>
-                                  <Input type="text" inputMode="numeric" pattern="[0-9]*" placeholder="0" value={item.bruto} onChange={e => handleInputChange(set.id, item.id, 'bruto', e.target.value)} disabled={!isBrutoEditable} className="text-right h-8 print:hidden w-full"/>
+                                 <Input type="text" inputMode="numeric" pattern="[0-9]*" placeholder="0" value={item.bruto} onChange={e => handleInputChange(set.id, item.id, 'bruto', e.target.value)} disabled={!isBrutoEditable} className="text-right h-10 print:hidden w-full"/>
                                    <span className="hidden print:block text-right">{formatNumber(parseFloat(item.bruto))}</span>
                               </div>
-                               <div className="space-y-px">
+                               <div className="space-y-1">
                                   <Label className="text-xs text-muted-foreground">Tara (kg)</Label>
-                                  <Input type="text" inputMode="numeric" pattern="[0-9]*" placeholder="0" value={item.tara} onChange={e => handleInputChange(set.id, item.id, 'tara', e.target.value)} disabled={!isTaraEditable} className="text-right h-8 print:hidden w-full"/>
+                                 <Input type="text" inputMode="numeric" pattern="[0-9]*" placeholder="0" value={item.tara} onChange={e => handleInputChange(set.id, item.id, 'tara', e.target.value)} disabled={!isTaraEditable} className="text-right h-10 print:hidden w-full"/>
                                    <span className="hidden print:block text-right">{formatNumber(parseFloat(item.tara))}</span>
                               </div>
-                               <div className="space-y-px">
+                               <div className="space-y-1">
                                   <Label className="text-xs text-muted-foreground">A/L (kg)</Label>
-                                  <Input type="text" inputMode="numeric" pattern="[0-9]*" placeholder="0" value={item.descontos} onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)} className="text-right h-8 print:hidden w-full" />
+                                 <Input type="text" inputMode="numeric" pattern="[0-9]*" placeholder="0" value={item.descontos} onChange={(e) => handleInputChange(set.id, item.id, 'descontos', e.target.value)} className="text-right h-10 print:hidden w-full" />
                                    <span className="hidden print:block text-right">{formatNumber(parseFloat(item.descontos))}</span>
                               </div>
-                               <div className="space-y-px">
+                               <div className="space-y-1">
                                   <Label className="text-xs text-muted-foreground">Líquido (kg)</Label>
-                                  <div className="h-8 flex items-center justify-end font-semibold">
+                                 <div className="h-10 flex items-center justify-end font-semibold text-base">
                                       <span className="print:text-black">{formatNumber(item.liquido)}</span>
                                   </div>
                               </div>
@@ -442,9 +446,9 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
                 </TableBody>
               </Table>
             </CardContent>
-            <CardContent className="p-px border-t print:border-t print:border-border print:p-0 print:pt-0.5">
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-1">
-                     <div className="flex items-center gap-0.5">
+            <CardContent className="p-2 sm:p-px border-t print:border-t print:border-border print:p-0 print:pt-0.5">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-1">
+                 <div className="flex items-center gap-1">
                          <Label htmlFor={`desconto-cacamba-${set.id}`} className="shrink-0 text-sm md:text-base">Caçamba (kg)</Label>
                          <Input
                              id={`desconto-cacamba-${set.id}`}
@@ -454,15 +458,15 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
                              placeholder="0"
                              value={set.descontoCacamba}
                              onChange={(e) => handleCacambaDiscount(set.id, e.target.value)}
-                             className="h-8 text-right print:hidden flex-1 min-w-[90px] w-14"
+                              className="h-10 md:h-8 text-right print:hidden flex-1 min-w-[110px] w-20"
                           />
                           <span className="hidden print:block font-semibold">{formatNumber(parseFloat(set.descontoCacamba))}</span>
                      </div>
-                     <div className="text-right flex-shrink-0">
+                     <div className="text-right flex-shrink-0 rounded-md bg-muted/30 px-2 py-1">
                          <p className="text-sm text-muted-foreground">Subtotal</p>
                          <p className="text-lg font-bold print:text-black">{formatNumber(subtotalLiquido)} kg</p>
                      </div>
-                      <div className="text-right flex-shrink-0">
+                      <div className="text-right flex-shrink-0 rounded-md bg-primary/5 px-2 py-1">
                          <p className="text-sm text-muted-foreground">{set.name}</p>
                          <p className="text-xl font-bold text-primary print:text-black">{formatNumber(totalLiquidoSet)} kg</p>
                      </div>
@@ -472,41 +476,41 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
         );
       })}
 
-      <div className="flex justify-center my-px print:hidden">
-        <Button variant="secondary" onClick={addCacamba} size="sm" className="h-8 px-2"><Tractor className="mr-2 h-4 w-4" /> + Adicionar Caçamba</Button>
+      <div className="flex justify-center my-1 sm:my-px print:hidden scale-add-set-row">
+        <Button variant="secondary" onClick={addCacamba} size="sm" className="h-10 md:h-8 px-3"><Tractor className="mr-2 h-4 w-4" /> + Adicionar Caçamba</Button>
       </div>
 
-      <Card className="mt-px bg-primary/10 border-primary/20 print:border print:border-accent-price print:shadow-none print:p-0.5">
-         <CardContent className="p-px flex justify-end items-center">
-             <div className="text-right">
-                <p className="text-lg font-semibold text-primary print:text-2xl print:mb-0.5">Peso Líquido Total</p>
-                <p className="text-4xl font-bold text-primary print:text-black">{new Intl.NumberFormat('pt-BR').format(grandTotalLiquido)} kg</p>
+      <Card className="mt-1 sm:mt-px bg-primary/10 border-primary/20 print:border print:border-accent-price print:shadow-none print:p-0.5 scale-total-card">
+         <CardContent className="p-2 sm:p-px flex justify-between items-end gap-2">
+             <div className="text-left">
+                <p className="text-sm uppercase tracking-wide text-muted-foreground">Peso Líquido Total</p>
+                <p className="text-4xl sm:text-4xl font-bold text-primary print:text-black">{new Intl.NumberFormat('pt-BR').format(grandTotalLiquido)} kg</p>
             </div>
          </CardContent>
       </Card>
-      <div className="flex items-center justify-evenly pt-1 print:hidden">
+      <div className="grid grid-cols-2 sm:flex sm:items-center sm:justify-evenly gap-2 pt-2 sm:pt-1 print:hidden scale-actions-bar">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button onClick={handleClear} variant="outline" size="icon" className="h-8 w-8"><Trash2 className="h-4 w-4" /></Button>
+              <Button onClick={handleClear} variant="outline" className="h-11 sm:h-8 w-full sm:w-auto px-3 sm:px-2 gap-2"><Trash2 className="h-4 w-4" /><span className="text-sm sm:hidden">Limpar</span></Button>
             </TooltipTrigger>
             <TooltipContent><p>Limpar Tudo</p></TooltipContent>
           </Tooltip>
             <Tooltip>
             <TooltipTrigger asChild>
-              <Button onClick={handleSave} variant="outline" size="icon" className="h-8 w-8"><Save className="h-4 w-4" /></Button>
+              <Button onClick={handleSave} variant="outline" className="h-11 sm:h-8 w-full sm:w-auto px-3 sm:px-2 gap-2"><Save className="h-4 w-4" /><span className="text-sm sm:hidden">Salvar</span></Button>
             </TooltipTrigger>
             <TooltipContent><p>Salvar Pesagem</p></TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button onClick={handleLoad} variant="outline" size="icon" className="h-8 w-8"><ArrowUpFromLine className="h-4 w-4" /></Button>
+              <Button onClick={handleLoad} variant="outline" className="h-11 sm:h-8 w-full sm:w-auto px-3 sm:px-2 gap-2"><ArrowUpFromLine className="h-4 w-4" /><span className="text-sm sm:hidden">Carregar</span></Button>
             </TooltipTrigger>
             <TooltipContent><p>Carregar Última Pesagem</p></TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button onClick={handlePrint} variant="outline" size="icon" className="h-8 w-8"><Printer className="h-4 w-4" /></Button>
+              <Button onClick={handlePrint} variant="outline" className="h-11 sm:h-8 w-full sm:w-auto px-3 sm:px-2 gap-2"><Printer className="h-4 w-4" /><span className="text-sm sm:hidden">Imprimir</span></Button>
             </TooltipTrigger>
             <TooltipContent><p>Imprimir</p></TooltipContent>
           </Tooltip>

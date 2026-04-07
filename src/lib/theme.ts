@@ -1,6 +1,6 @@
 export const THEME_STORAGE_KEY = "psinox-theme";
 
-export const THEMES = ["industrial-light", "industrial-dark", "sheet"] as const;
+export const THEMES = ["industrial-light", "industrial-dark", "sheet", "minimal-gray"] as const;
 
 export type AppTheme = (typeof THEMES)[number];
 
@@ -8,6 +8,7 @@ export const THEME_LABELS: Record<AppTheme, string> = {
   "industrial-light": "Industrial Claro",
   "industrial-dark": "Industrial Escuro",
   sheet: "Lista de Materiais",
+  "minimal-gray": "Cinza Minimalista",
 };
 
 export function isAppTheme(value: string | null): value is AppTheme {

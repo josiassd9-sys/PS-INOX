@@ -210,10 +210,254 @@
     --sheet-total-price-bg: 39 89% 90%;
     --sheet-total-price-fg: 39 89% 30%;
   }
+
+  :root[data-theme='minimal-gray'] {
+    --background: 0 0% 95%;
+    --foreground: 0 0% 9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 9%;
+    --primary: 0 0% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 91%;
+    --secondary-foreground: 0 0% 10%;
+    --muted: 0 0% 93%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 152 58% 30%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 87%;
+    --input: 0 0% 87%;
+    --ring: 0 0% 10%;
+    --radius: 0.875rem;
+    --radius-compact: 0.625rem;
+    --radius-standard: 0.875rem;
+    --radius-pill: 9999px;
+
+    --gray-surface: 0 0% 100%;
+    --gray-surface-soft: 0 0% 98%;
+    --gray-border-soft: 0 0% 90%;
+    --gray-border-strong: 0 0% 83%;
+
+    --elevation-card-rest: 0 1px 2px rgba(0, 0, 0, 0.05),
+      0 4px 12px rgba(0, 0, 0, 0.04);
+    --elevation-card-hover: 0 2px 4px rgba(0, 0, 0, 0.06),
+      0 8px 18px rgba(0, 0, 0, 0.06);
+    --elevation-control-rest: 0 1px 1px rgba(0, 0, 0, 0.06),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+    --elevation-control-hover: 0 2px 5px rgba(0, 0, 0, 0.09),
+      inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+
+    --accent-price: 152 58% 30%;
+
+    --sidebar-background: 0 0% 9%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 152 58% 42%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 0 0% 17%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 17%;
+    --sidebar-ring: 0 0% 60%;
+
+    --sheet-header-bg: 0 0% 10%;
+    --sheet-header-fg: 0 0% 100%;
+    --sheet-table-header-bg: 0 0% 20%;
+    --sheet-table-header-fg: 0 0% 100%;
+    --row-odd-bg: 0 0% 100%;
+    --row-even-bg: 0 0% 96%;
+    --row-pmq-bg: 152 58% 94%;
+    --text-item-pink: 152 55% 26%;
+    --sheet-total-bg: 0 0% 10%;
+    --sheet-total-price-bg: 152 58% 92%;
+    --sheet-total-price-fg: 152 55% 24%;
+  }
 }
 
 /* ==================== DESIGN LEVELS ==================== */
 @layer components {
+  /* ==================== TEMA CINZA MINIMALISTA ==================== */
+
+  @keyframes minimal-gray-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.995);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes minimal-gray-soft-rise {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Sistema de profundidade premium em superfícies principais */
+  :root[data-theme='minimal-gray'] .card {
+    background-color: hsl(var(--gray-surface));
+    border-color: hsl(var(--gray-border-soft));
+    box-shadow: var(--elevation-card-rest);
+    transition: box-shadow var(--transition-fast), transform var(--transition-fast),
+      border-color var(--transition-fast);
+  }
+
+  :root[data-theme='minimal-gray'] .card:hover {
+    border-color: hsl(var(--gray-border-strong));
+    box-shadow: var(--elevation-card-hover);
+    transform: translateY(-1px);
+  }
+
+  /* Entrada em cascata para secoes da balanca */
+  :root[data-theme='minimal-gray'] .scale-hero-card {
+    animation: minimal-gray-reveal 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  :root[data-theme='minimal-gray'] .scale-set-card {
+    opacity: 0;
+    animation: minimal-gray-reveal 360ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+
+  :root[data-theme='minimal-gray'] .scale-add-set-row,
+  :root[data-theme='minimal-gray'] .scale-total-card,
+  :root[data-theme='minimal-gray'] .scale-actions-bar {
+    animation: minimal-gray-soft-rise 300ms ease-out both;
+  }
+
+  :root[data-theme='minimal-gray'] .scale-total-card {
+    animation-delay: 120ms;
+  }
+
+  :root[data-theme='minimal-gray'] .scale-actions-bar {
+    animation-delay: 180ms;
+  }
+
+  /* Botões com acabamento moderno e feedback tátil */
+  :root[data-theme='minimal-gray'] button,
+  :root[data-theme='minimal-gray'] .button {
+    border-radius: var(--radius-pill);
+    box-shadow: var(--elevation-control-rest);
+    transition: box-shadow var(--transition-fast), transform var(--transition-fast),
+      filter var(--transition-fast);
+  }
+
+  :root[data-theme='minimal-gray'] button:hover,
+  :root[data-theme='minimal-gray'] .button:hover {
+    box-shadow: var(--elevation-control-hover);
+  }
+
+  :root[data-theme='minimal-gray'] .scale-actions-bar button:hover {
+    transform: translateY(-1px);
+  }
+
+  :root[data-theme='minimal-gray'] button:active,
+  :root[data-theme='minimal-gray'] .button:active {
+    transform: translateY(1px) scale(0.985);
+  }
+
+  :root[data-theme='minimal-gray'] button:disabled,
+  :root[data-theme='minimal-gray'] .button:disabled {
+    box-shadow: none;
+    filter: saturate(0.4);
+  }
+
+  /* Inputs com hierarquia de borda e leitura limpa */
+  :root[data-theme='minimal-gray'] input:not([type="checkbox"]):not([type="radio"]),
+  :root[data-theme='minimal-gray'] textarea,
+  :root[data-theme='minimal-gray'] select {
+    background-color: hsl(var(--gray-surface));
+    border-color: hsl(var(--gray-border-strong));
+    border-radius: var(--radius-standard);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast),
+      background-color var(--transition-fast);
+  }
+
+  :root[data-theme='minimal-gray'] input:focus-visible,
+  :root[data-theme='minimal-gray'] textarea:focus-visible,
+  :root[data-theme='minimal-gray'] select:focus-visible {
+    border-color: hsl(var(--ring));
+    box-shadow: 0 0 0 3px hsl(var(--ring) / 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  }
+
+  :root[data-theme='minimal-gray'] input:disabled {
+    background-color: hsl(var(--gray-surface-soft));
+    border-color: hsl(var(--gray-border-soft));
+    opacity: 0.7;
+  }
+
+  /* Tabela com contraste elegante e zebra sutil */
+  :root[data-theme='minimal-gray'] table thead th {
+    background-color: hsl(var(--gray-surface-soft));
+    color: hsl(var(--muted-foreground));
+    border-bottom-color: hsl(var(--gray-border-strong));
+    font-weight: 600;
+  }
+
+  :root[data-theme='minimal-gray'] table tbody tr {
+    border-color: hsl(var(--gray-border-soft));
+    transition: background-color var(--transition-fast);
+  }
+
+  :root[data-theme='minimal-gray'] table tbody tr:nth-child(even) {
+    background-color: hsl(0 0% 97%);
+  }
+
+  :root[data-theme='minimal-gray'] table tbody tr:hover {
+    background-color: hsl(0 0% 94%);
+  }
+
+  /* Alinhamento numérico consistente para pesos e valores */
+  :root[data-theme='minimal-gray'] input[inputmode="numeric"],
+  :root[data-theme='minimal-gray'] input[type="number"],
+  :root[data-theme='minimal-gray'] td.text-right,
+  :root[data-theme='minimal-gray'] th.text-right {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root[data-theme='minimal-gray'] .scale-hero-card,
+    :root[data-theme='minimal-gray'] .scale-set-card,
+    :root[data-theme='minimal-gray'] .scale-add-set-row,
+    :root[data-theme='minimal-gray'] .scale-total-card,
+    :root[data-theme='minimal-gray'] .scale-actions-bar {
+      animation: none !important;
+      opacity: 1;
+      transform: none;
+    }
+
+    :root[data-theme='minimal-gray'] .card,
+    :root[data-theme='minimal-gray'] button,
+    :root[data-theme='minimal-gray'] .button,
+    :root[data-theme='minimal-gray'] input,
+    :root[data-theme='minimal-gray'] textarea,
+    :root[data-theme='minimal-gray'] select {
+      transition: none !important;
+    }
+  }
+
+  @media print {
+    :root[data-theme='minimal-gray'] .scale-hero-card,
+    :root[data-theme='minimal-gray'] .scale-set-card,
+    :root[data-theme='minimal-gray'] .scale-add-set-row,
+    :root[data-theme='minimal-gray'] .scale-total-card,
+    :root[data-theme='minimal-gray'] .scale-actions-bar {
+      animation: none !important;
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* ==================== NÍVEIS DE DESIGN ==================== */
   /* Nível 1 — Polimento Sutil */
   :root[data-design-level="1"] {
     --radius: 0.75rem;

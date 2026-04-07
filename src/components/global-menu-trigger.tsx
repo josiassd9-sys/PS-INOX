@@ -31,7 +31,10 @@ export function GlobalMenuTrigger() {
   }, [theme]);
 
   return (
-    <div className={isMobile ? "fixed top-3 left-3 z-50 flex items-center gap-2 print:hidden" : "fixed top-2 left-2 z-50 flex items-center gap-1 print:hidden"}>
+    <div
+      className={isMobile ? "fixed z-50 flex items-center gap-2 print:hidden" : "fixed top-2 left-2 z-50 flex items-center gap-1 print:hidden"}
+      style={isMobile ? { top: "calc(var(--safe-area-top) + 0.75rem)", left: "calc(var(--safe-area-left) + 0.75rem)" } : undefined}
+    >
       <Button onClick={toggleSidebar} variant="outline" size="icon" className={isMobile ? "h-11 w-11 rounded-xl border-border/70 bg-background/80 shadow-lg backdrop-blur-md" : "h-8 w-8 bg-background/50 backdrop-blur-sm"}>
         <Menu className="h-4 w-4" />
         <span className="sr-only">Abrir menu</span>

@@ -16,6 +16,9 @@ import { suggestOptimalMarkup, SuggestOptimalMarkupInput, SuggestOptimalMarkupOu
 import { forecastMaterialCost, ForecastMaterialCostInput, ForecastMaterialCostOutput } from "@/ai/flows/material-cost-forecaster";
 import { Lightbulb, TrendingUp } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RefinedButton, RefinedCard } from "@/components/refined-components";
+import { FormSkeleton } from "@/components/skeleton";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Schema for Optimal Markup Assistant
 const optimalMarkupFormSchema = z.object({
@@ -35,6 +38,7 @@ type CostForecastFormData = z.infer<typeof costForecastFormSchema>;
 
 
 function OptimalMarkupAssistant() {
+  const isMobile = useIsMobile();
   const [isLoading, setIsLoading] = React.useState(false);
   const [result, setResult] = React.useState<SuggestOptimalMarkupOutput | null>(null);
   const [error, setError] = React.useState<string | null>(null);
@@ -65,7 +69,7 @@ function OptimalMarkupAssistant() {
   };
 
   return (
-    <Card>
+    <RefinedCard hover="subtle" className="p-0 overflow-hidden">
       <CardHeader>
         <CardTitle>Assistente de Markup Ideal</CardTitle>
         <CardDescription>
@@ -116,11 +120,13 @@ function OptimalMarkupAssistant() {
                 )}
               />
             </div>
-            <Button type="submit" disabled={isLoading}>
+            <RefinedButton type="submit" disabled={isLoading} className={isMobile ? "w-full" : ""}>
               {isLoading ? "Analisando..." : "Obter Sugestão"}
-            </Button>
+            </RefinedButton>
           </form>
         </Form>
+
+        {isLoading && <FormSkeleton />}
 
         {error && (
            <Alert variant="destructive">
@@ -146,12 +152,13 @@ function OptimalMarkupAssistant() {
           </Alert>
         )}
       </CardContent>
-    </Card>
+    </RefinedCard>
   );
 }
 
 
 function MaterialCostForecaster() {
+  const isMobile = useIsMobile();
   const [isLoading, setIsLoading] = React.useState(false);
   const [result, setResult] = React.useState<ForecastMaterialCostOutput | null>(null);
   const [error, setError] = React.useState<string | null>(null);
@@ -182,7 +189,7 @@ function MaterialCostForecaster() {
   };
 
   return (
-    <Card>
+    <RefinedCard hover="subtle" className="p-0 overflow-hidden">
       <CardHeader>
         <CardTitle>Previsão de Custo de Material</CardTitle>
         <CardDescription>
@@ -233,11 +240,13 @@ function MaterialCostForecaster() {
                 )}
               />
             </div>
-            <Button type="submit" disabled={isLoading}>
+            <RefinedButton type="submit" disabled={isLoading} className={isMobile ? "w-full" : ""}>
               {isLoading ? "Prevendo..." : "Obter Previsão"}
-            </Button>
+            </RefinedButton>
           </form>
         </Form>
+
+        {isLoading && <FormSkeleton />}
 
         {error && (
            <Alert variant="destructive">
@@ -265,24 +274,26 @@ function MaterialCostForecaster() {
           </Alert>
         )}
       </CardContent>
-    </Card>
+    </RefinedCard>
   );
 }
 
 
 export default function Page() {
+    const isMobile = useIsMobile();
+
     return (
         <Dashboard initialCategoryId="ai-assistant">
-          <div className="container mx-auto p-4">
+          <div className="container mx-auto px-3 py-4 md:p-4">
              <Tabs defaultValue="markup" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className={isMobile ? "grid w-full grid-cols-1 h-auto gap-2 bg-transparent p-0" : "grid w-full grid-cols-2"}>
                   <TabsTrigger value="markup">Markup Ideal</TabsTrigger>
                   <TabsTrigger value="cost-forecast">Previsão de Custo</TabsTrigger>
                 </TabsList>
-                <TabsContent value="markup">
+                <TabsContent value="markup" className="mt-4">
                   <OptimalMarkupAssistant />
                 </TabsContent>
-                <TabsContent value="cost-forecast">
+                <TabsContent value="cost-forecast" className="mt-4">
                   <MaterialCostForecaster />
                 </TabsContent>
               </Tabs>

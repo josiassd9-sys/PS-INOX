@@ -12,6 +12,7 @@ import {
   THEMES,
   type AppTheme,
 } from "@/lib/theme";
+import { DesignSelector } from "./design-selector";
 
 export function ThemeSettings() {
   const [theme, setTheme] = React.useState<AppTheme>("industrial-light");
@@ -27,10 +28,10 @@ export function ThemeSettings() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-3xl p-2">
+    <div className="mx-auto max-w-3xl p-2 space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Configurações de Aparência</CardTitle>
+          <CardTitle>Tema de Cores</CardTitle>
           <CardDescription>
             Escolha o tema visual oficial do aplicativo. Essa alteração é apenas visual e não afeta cálculos, dados ou fluxos.
           </CardDescription>
@@ -54,6 +55,8 @@ export function ThemeSettings() {
           </div>
         </CardContent>
       </Card>
+
+      <DesignSelector />
     </div>
   );
 }

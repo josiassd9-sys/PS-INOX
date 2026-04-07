@@ -160,6 +160,237 @@
   }
 }
 
+/* ==================== DESIGN LEVELS ==================== */
+@layer components {
+  /* Nível 1 — Polimento Sutil */
+  :root[data-design-level="1"] {
+    --radius: 0.75rem;
+  }
+
+  :root[data-design-level="1"] .card {
+    @apply shadow-md transition-shadow hover:shadow-lg;
+  }
+
+  :root[data-design-level="1"] button,
+  :root[data-design-level="1"] .button {
+    @apply transition-all duration-200;
+  }
+
+  :root[data-design-level="1"] button:hover,
+  :root[data-design-level="1"] .button:hover {
+    @apply scale-105;
+  }
+
+  /* Nível 2 — Refinamento Tipográfico + Layout */
+  :root[data-design-level="2"] {
+    --radius: 0.75rem;
+  }
+
+  :root[data-design-level="2"] h1,
+  :root[data-design-level="2"] h2,
+  :root[data-design-level="2"] .heading {
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  :root[data-design-level="2"] .card {
+    @apply shadow-md transition-shadow hover:shadow-lg;
+    border-top: 3px solid hsl(var(--primary));
+  }
+
+  :root[data-design-level="2"] button,
+  :root[data-design-level="2"] .button {
+    @apply transition-all duration-200;
+  }
+
+  :root[data-design-level="2"] button:hover,
+  :root[data-design-level="2"] .button:hover {
+    @apply scale-105;
+  }
+
+  /* Nível 3 — Identidade Industrial */
+  :root[data-design-level="3"] {
+    --radius: 0.5rem;
+    /* Paleta profissional: azul navy + prata */
+    --design-primary: 211 100% 30%;
+    --design-secondary: 210 20% 65%;
+  }
+
+  :root[data-design-level="3"] h1,
+  :root[data-design-level="3"] h2,
+  :root[data-design-level="3"] .heading {
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 700;
+  }
+
+  :root[data-design-level="3"] .card {
+    @apply shadow-md border-l-4;
+    border-left-color: hsl(var(--primary));
+    transition: all 0.3s ease;
+  }
+
+  :root[data-design-level="3"] .card:hover {
+    @apply shadow-lg;
+    transform: translateX(4px);
+  }
+
+  :root[data-design-level="3"] table tbody tr:nth-child(odd) {
+    @apply bg-opacity-50;
+    background-color: hsl(var(--secondary) / 0.2);
+  }
+
+  :root[data-design-level="3"] table tbody tr:nth-child(even) {
+    background-color: hsl(var(--background));
+  }
+
+  :root[data-design-level="3"] table thead {
+    @apply font-bold;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
+  :root[data-design-level="3"] button,
+  :root[data-design-level="3"] .button {
+    @apply transition-all duration-300;
+  }
+
+  :root[data-design-level="3"] button:hover,
+  :root[data-design-level="3"] .button:hover {
+    @apply shadow-lg;
+    transform: translateY(-2px);
+  }
+
+  /* Nível 4 — Redesign Total com Micro-interações */
+  :root[data-design-level="4"] {
+    --radius: 0.5rem;
+  }
+
+  :root[data-design-level="4"] * {
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  :root[data-design-level="4"] h1,
+  :root[data-design-level="4"] h2,
+  :root[data-design-level="4"] .heading {
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 700;
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--ring)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  :root[data-design-level="4"] .card {
+    @apply shadow-lg border-l-4;
+    border-left-color: hsl(var(--primary));
+    position: relative;
+    overflow: hidden;
+  }
+
+  :root[data-design-level="4"] .card::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, transparent, hsl(var(--primary) / 0.1), transparent);
+    transition: top 0.5s;
+  }
+
+  :root[data-design-level="4"] .card:hover::before {
+    top: 100%;
+  }
+
+  :root[data-design-level="4"] .card:hover {
+    @apply shadow-2xl;
+    transform: translateY(-4px) scale(1.02);
+  }
+
+  :root[data-design-level="4"] table tbody tr:nth-child(odd) {
+    background-color: hsl(var(--secondary) / 0.15);
+  }
+
+  :root[data-design-level="4"] table tbody tr:nth-child(even) {
+    background-color: hsl(var(--background));
+  }
+
+  :root[data-design-level="4"] table tbody tr:hover {
+    background-color: hsl(var(--primary) / 0.1);
+    transform: scale(1.01);
+  }
+
+  :root[data-design-level="4"] table thead {
+    @apply font-bold;
+    background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--primary) / 0.8));
+    color: hsl(var(--primary-foreground));
+  }
+
+  :root[data-design-level="4"] button,
+  :root[data-design-level="4"] .button {
+    @apply transition-all duration-300;
+    position: relative;
+    overflow: hidden;
+  }
+
+  :root[data-design-level="4"] button::after,
+  :root[data-design-level="4"] .button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: hsl(var(--primary) / 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  :root[data-design-level="4"] button:active::after,
+  :root[data-design-level="4"] .button:active::after {
+    width: 300px;
+    height: 300px;
+  }
+
+  :root[data-design-level="4"] button:hover,
+  :root[data-design-level="4"] .button:hover {
+    @apply shadow-lg;
+    transform: translateY(-2px) scale(1.05);
+  }
+
+  :root[data-design-level="4"] input,
+  :root[data-design-level="4"] textarea,
+  :root[data-design-level="4"] select {
+    @apply transition-all;
+  }
+
+  :root[data-design-level="4"] input:focus,
+  :root[data-design-level="4"] textarea:focus,
+  :root[data-design-level="4"] select:focus {
+    @apply ring-2;
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+  }
+
+  /* Animação de carregamento */
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  :root[data-design-level="4"] .card,
+  :root[data-design-level="4"] button {
+    animation: slideIn 0.5s ease-out forwards;
+  }
+}
+
 @layer base {
   * {
     @apply border-border;

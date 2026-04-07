@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/hooks/use-toast";
 
-const SlabAnalysis = () => {
+export const SlabAnalysis = () => {
     const [vaoX, setVaoX] = useState(10);
     const [vaoY, setVaoY] = useState(8);
     const [balancoX_E, setBalancoX_E] = useState(1);

@@ -586,6 +586,18 @@
     background-clip: text;
   }
 
+  /* O Accordion do sidebar usa Header em h3. No nível 4, esse h3 ficava
+     transparente por causa do efeito global de heading. No menu lateral,
+     forçamos texto normal para preservar legibilidade. */
+  :root[data-design-level="4"] [data-sidebar="sidebar"] h1,
+  :root[data-design-level="4"] [data-sidebar="sidebar"] h2,
+  :root[data-design-level="4"] [data-sidebar="sidebar"] h3,
+  :root[data-design-level="4"] [data-sidebar="sidebar"] .heading {
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    color: inherit;
+  }
+
   :root[data-design-level="4"] .card {
     box-shadow: var(--shadow-xl);
     border-left: 5px solid hsl(var(--primary));

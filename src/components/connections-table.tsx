@@ -27,6 +27,8 @@ import {
 import { ConnectionWeightCalculator } from "./connection-weight-calculator";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { RefinedButton, RefinedCard } from "./refined-components";
 
 interface ConnectionsTableProps {
   category: Category;
@@ -41,6 +43,7 @@ export function ConnectionsTable({
   editedWeights,
   onWeightChange,
 }: ConnectionsTableProps) {
+  const isMobile = useIsMobile();
   const connectionGroups = category.items as ConnectionGroup[];
   const [selectedItemForEdit, setSelectedItemForEdit] = React.useState<any>(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -108,7 +111,7 @@ export function ConnectionsTable({
         <AccordionItem
           value={group.id}
           key={group.id}
-          className="border rounded-lg overflow-hidden bg-card"
+          className="border rounded-lg overflow-hidden bg-card shadow-md border-border/70"
         >
           <AccordionTrigger className="px-2 py-2 hover:bg-primary/10 text-base font-semibold">
             {group.name} ({group.items.length})
@@ -119,8 +122,8 @@ export function ConnectionsTable({
                 <TableHeader>
                   <TableRow className="hover:bg-transparent flex">
                       <TableHead className="flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
-                      <TableHead className="text-center p-1 w-[120px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Peso (kg/un)</TableHead>
-                      <TableHead className="text-center p-1 w-[120px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Preço (R$/un)</TableHead>
+                      <TableHead className={cn("text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-[96px]" : "w-[120px]")}>Peso (kg/un)</TableHead>
+                      <TableHead className={cn("text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-[96px]" : "w-[120px]")}>Preço (R$/un)</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -138,21 +141,24 @@ export function ConnectionsTable({
                         )}
                       >
                         <TableCell className="font-medium text-text-item-pink text-xs flex-1 p-1">{item.description}</TableCell>
-                        <TableCell className={cn("text-center p-1 w-[120px]",
+                        <TableCell className={cn("text-center p-1",
+                           isMobile ? "w-[96px]" : "w-[120px]",
                             !isEven ? "bg-row-odd-bg" : "bg-row-pmq-bg"
                           )}>
-                           <Button
+                          <RefinedButton
                               variant="outline"
-                              className="h-8 w-full justify-center text-center border-primary/20 bg-transparent"
+                            animation="scale"
+                            className="h-8 w-full justify-center text-center border-primary/20 bg-transparent"
                               onClick={() => handleEditClick(item)}
                            >
                             <div className="flex flex-col items-center justify-center h-full">
                                 {formatWeight(currentWeight)}
                             </div>
-                           </Button>
+                          </RefinedButton>
                         </TableCell>
                         <TableCell className={cn(
-                              "text-right font-semibold p-1 w-[120px]",
+                            "text-right font-semibold p-1",
+                             isMobile ? "w-[96px]" : "w-[120px]",
                                !isEven ? "bg-row-even-bg" : "bg-row-pmq-bg"
                           )}>
                           <div className="h-full flex items-center justify-end text-sheet-total-price-fg">

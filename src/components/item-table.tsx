@@ -26,6 +26,8 @@ import {
 import { Label } from "./ui/label";
 import { cn } from "@/lib/utils";
 import { CutPriceCalculator } from "./cut-price-calculator";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { RefinedButton } from "./refined-components";
 
 interface ItemTableProps {
   category: Category;
@@ -36,6 +38,7 @@ interface ItemTableProps {
 }
 
 export function ItemTable({ category, priceParams, costAdjustments, onItemClick, showTableHeader = true }: ItemTableProps) {
+  const isMobile = useIsMobile();
   const [items, setItems] = React.useState<SteelItem[]>(category.items as SteelItem[]);
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [selectedItemIdForCut, setSelectedItemIdForCut] = React.useState<string | null>(null);
@@ -142,12 +145,12 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
       <div className="flex items-center justify-end mb-1">
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="h-8 gap-1">
+            <RefinedButton size="sm" className="h-8 gap-1" animation="lift">
               <PlusCircle className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                 Adicionar Item
               </span>
-            </Button>
+            </RefinedButton>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -181,21 +184,21 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
             </div>
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="outline">Cancelar</Button>
+                <RefinedButton variant="outline" animation="scale">Cancelar</RefinedButton>
               </DialogClose>
-              <Button onClick={handleAddItem}>Adicionar</Button>
+              <RefinedButton onClick={handleAddItem}>Adicionar</RefinedButton>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
-      <div className="border rounded-lg overflow-hidden">
+      <div className="border rounded-lg overflow-hidden shadow-lg border-border/70 bg-card">
         <Table>
           {showTableHeader && (
              <TableHeader>
                 <TableRow className="hover:bg-transparent flex">
                     <TableHead className="flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
-                    <TableHead className="text-center p-1 w-[120px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">{weightUnitLabel}</TableHead>
-                    <TableHead className="text-center p-1 w-[120px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">{priceUnitLabel}</TableHead>
+                    <TableHead className={cn("text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-[96px]" : "w-[120px]")}>{weightUnitLabel}</TableHead>
+                    <TableHead className={cn("text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-[96px]" : "w-[120px]")}>{priceUnitLabel}</TableHead>
                 </TableRow>
             </TableHeader>
           )}
@@ -224,13 +227,13 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
                           </TableCell>
                           <TableCell 
                              onClick={() => handleCutCalculatorToggle(item)}
-                             className={cn("text-center p-1 w-[120px]", !isEven ? "bg-row-odd-bg" : "bg-row-pmq-bg")}
+                             className={cn("text-center p-1", isMobile ? "w-[96px]" : "w-[120px]", !isEven ? "bg-row-odd-bg" : "bg-row-pmq-bg")}
                           >
                               <div className="h-full flex items-center justify-center">{formatWeight(item.weight)}</div>
                           </TableCell>
                           <TableCell 
                             onClick={() => handleCutCalculatorToggle(item)}
-                            className={cn("text-right font-semibold p-1 w-[120px]", !isEven ? "bg-row-even-bg" : "bg-row-pmq-bg")}
+                            className={cn("text-right font-semibold p-1", isMobile ? "w-[96px]" : "w-[120px]", !isEven ? "bg-row-even-bg" : "bg-row-pmq-bg")}
                           >
                             <div className="h-full flex flex-col items-end justify-center text-sheet-total-price-fg">
                                 {formatCurrency(itemPrice)}

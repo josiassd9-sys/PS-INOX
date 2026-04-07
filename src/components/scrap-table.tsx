@@ -26,6 +26,9 @@ import { Label } from "./ui/label";
 import { Icon } from "./icons";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { RefinedButton, RefinedCard } from "./refined-components";
+import { TableSkeleton } from "./skeleton";
 
 interface ScrapTableProps {
   category: Category;
@@ -39,8 +42,10 @@ const LOCAL_STORAGE_HIDDEN_KEY = "scrapTableHiddenItems";
 
 export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm }: ScrapTableProps) {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [allItems, setAllItems] = React.useState<ScrapItem[]>([]);
   const [hiddenItemIds, setHiddenItemIds] = React.useState<Set<string>>(new Set());
+  const [isReady, setIsReady] = React.useState(false);
   
   const [newMaterial, setNewMaterial] = React.useState("");
   const [newComposition, setNewComposition] = React.useState("");
@@ -61,6 +66,8 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
     } catch (error) {
       console.error("Failed to load data from localStorage", error);
       setAllItems(category.items as ScrapItem[]);
+    } finally {
+      setIsReady(true);
     }
   }, [category.items]);
 
@@ -177,22 +184,22 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
 
   return (
     <>
-      <div className="flex items-center justify-between mb-1">
+      <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-2">
           {hasHiddenItems && (
-            <Button size="sm" className="h-8 gap-1" variant="outline" onClick={showAllItems}>
+            <RefinedButton size="sm" className="h-8 gap-1" variant="outline" animation="scale" onClick={showAllItems}>
               <Eye className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                 Mostrar Todos
               </span>
-            </Button>
+            </RefinedButton>
           )}
-          <Button size="sm" className="h-8 gap-1" variant="outline" onClick={handleRestoreDefaults}>
+          <RefinedButton size="sm" className="h-8 gap-1" variant="outline" animation="scale" onClick={handleRestoreDefaults}>
             <RotateCcw className="h-3.5 w-3.5" />
             <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
               Restaurar Padrão
             </span>
-          </Button>
+          </RefinedButton>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogContent>
@@ -241,20 +248,25 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
                 </div>
                 <DialogFooter>
                 <DialogClose asChild>
-                    <Button variant="outline">Cancelar</Button>
+                    <RefinedButton variant="outline" animation="scale">Cancelar</RefinedButton>
                 </DialogClose>
-                <Button onClick={handleAddItem}>Adicionar</Button>
+                <RefinedButton onClick={handleAddItem}>Adicionar</RefinedButton>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
       </div>
-      <div className="-mx-1 rounded-lg overflow-hidden flex-1 flex flex-col">
+      {!isReady ? (
+        <RefinedCard hover="none" className="p-3">
+          <TableSkeleton rows={isMobile ? 5 : 8} />
+        </RefinedCard>
+      ) : (
+      <div className="-mx-1 rounded-lg overflow-hidden flex-1 flex flex-col shadow-lg border border-border/70 bg-card">
         <div className="relative overflow-auto flex-1">
         <Table>
           <TableHeader className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm">
              <TableRow className="hover:bg-transparent flex">
                 <TableHead className="flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Material (Composição)</TableHead>
-                <TableHead className="text-center p-1 w-40 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Preço (R$/kg)</TableHead>
+                <TableHead className={cn("text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-32" : "w-40")}>Preço (R$/kg)</TableHead>
               </TableRow>
           </TableHeader>
           <TableBody>
@@ -276,7 +288,8 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
                             />
                         </TableCell>
                         <TableCell className={cn(
-                            "text-right font-semibold p-1 w-40 relative flex items-center", 
+                          "text-right font-semibold p-1 relative flex items-center", 
+                          isMobile ? "w-32" : "w-40",
                             !isEven ? "bg-row-even-bg" : "bg-row-pmq-bg")}
                         >
                             <Input
@@ -315,6 +328,7 @@ export function ScrapTable({ category, isDialogOpen, setIsDialogOpen, searchTerm
         </Table>
         </div>
       </div>
+      )}
       </>
   );
 }

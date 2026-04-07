@@ -17,6 +17,9 @@ import { COST_ADJUSTMENTS_LOCAL_STORAGE_KEY, EDITED_CONNECTIONS_WEIGHTS_KEY } fr
 import { Label } from "./ui/label";
 import { cn } from "@/lib/utils";
 import { ScrapCalculator } from "./scrap-calculator";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { RefinedButton, RefinedCard } from "./refined-components";
+import { ListSkeleton, TableSkeleton } from "./skeleton";
 
 
 const MATERIAL_LIST_KEY = "materialBuilderList";
@@ -107,9 +110,11 @@ function EditForm({ item, onUpdate, onDelete, onCancel }: EditFormProps) {
 
 export function MaterialListBuilder() {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [materialList, setMaterialList] = React.useState<ListItem[]>([]);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [editingItemId, setEditingItemId] = React.useState<string | null>(null);
+  const [isReady, setIsReady] = React.useState(false);
 
   const [priceParams, setPriceParams] = React.useState<Record<string, PriceParams>>({});
   const [costAdjustments, setCostAdjustments] = React.useState<Record<string, number>>({});
@@ -132,6 +137,8 @@ export function MaterialListBuilder() {
 
     } catch(error) {
         console.error("Failed to load data from localStorage", error);
+    } finally {
+      setIsReady(true);
     }
   }, []);
 
@@ -297,12 +304,21 @@ export function MaterialListBuilder() {
   }, [searchTerm, isScrapCalculatorActive]);
 
   const renderContent = () => {
+    if (!isReady) {
+      return (
+        <div className="space-y-4 p-2">
+          <ListSkeleton items={isMobile ? 2 : 3} />
+          <TableSkeleton rows={isMobile ? 4 : 6} />
+        </div>
+      );
+    }
+
     if (isScrapCalculatorActive) {
       return (
-        <div className="p-2 bg-card rounded-lg border">
+        <RefinedCard hover="subtle" className="p-3 md:p-4">
           <h2 className="text-lg font-semibold text-center mb-1 text-foreground">Calculadora de Retalhos</h2>
           <ScrapCalculator onAddItem={handleAddItemToList} />
-        </div>
+        </RefinedCard>
       );
     }
     
@@ -323,14 +339,14 @@ export function MaterialListBuilder() {
     if (materialList.length > 0) {
       return (
         <div id="material-list-section" className="flex-1 flex flex-col min-h-0 pt-2 print:pt-0">
-             <Card className="flex-1 overflow-hidden flex flex-col">
+         <Card className="flex-1 overflow-hidden flex flex-col shadow-lg border-border/70">
                 <CardContent className="p-0 flex-1 overflow-y-auto">
                    <Table>
                        <TableHeader>
                            <TableRow className="hover:bg-transparent flex">
                                <TableHead className="flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
-                               <TableHead className="text-center p-1 w-[80px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">PMQ</TableHead>
-                               <TableHead className="text-center p-1 w-[80px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">VALOR</TableHead>
+                   <TableHead className={cn("text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-[72px]" : "w-[96px]")}>PMQ</TableHead>
+                   <TableHead className={cn("text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-[84px]" : "w-[96px]")}>VALOR</TableHead>
                            </TableRow>
                        </TableHeader>
                        <TableBody>
@@ -349,7 +365,8 @@ export function MaterialListBuilder() {
                                   <TableCell className="font-medium text-text-item-pink text-xs flex-1 p-1">
                                     {item.description}
                                   </TableCell>
-                                  <TableCell className={cn("text-center p-1 w-[80px]",
+                                  <TableCell className={cn("text-center p-1",
+                                    isMobile ? "w-[72px]" : "w-[96px]",
                                     !isEven ? "bg-row-odd-bg" : "bg-row-pmq-bg"
                                   )}>
                                       <div className="flex flex-col items-center justify-center h-full">
@@ -358,7 +375,8 @@ export function MaterialListBuilder() {
                                       </div>
                                   </TableCell>
                                   <TableCell className={cn(
-                                      "text-right font-semibold p-1 w-[80px]",
+                                      "text-right font-semibold p-1",
+                                       isMobile ? "w-[84px]" : "w-[96px]",
                                        !isEven ? "bg-row-even-bg" : "bg-row-pmq-bg")}>
                                     <div className="h-full flex items-center justify-end text-sheet-total-price-fg">
                                       {formatPrice(item.price)}
@@ -395,8 +413,8 @@ export function MaterialListBuilder() {
   return (
     <div className="relative w-full h-full flex flex-col overflow-hidden bg-background text-foreground">
         
-        <div style={{backgroundColor: 'hsl(var(--sheet-header-bg))', color: 'hsl(var(--sheet-header-fg))'}} className="relative z-40 w-full px-8 py-1 flex flex-col gap-1 shrink-0">
-            <div id="material-list-header" className="flex justify-center pt-1 text-4xl font-bold tracking-wider">
+      <div style={{backgroundColor: 'hsl(var(--sheet-header-bg))', color: 'hsl(var(--sheet-header-fg))'}} className={cn("relative z-40 w-full flex flex-col gap-2 shrink-0", isMobile ? "px-4 py-3" : "px-8 py-2")}>
+        <div id="material-list-header" className={cn("flex justify-center pt-1 font-bold tracking-wider", isMobile ? "text-2xl" : "text-4xl")}>
                 PS INOX
             </div>
             
@@ -405,7 +423,7 @@ export function MaterialListBuilder() {
                 <Input
                 type="search"
                 placeholder="Buscar materiais ou 'retalho'..."
-                className="w-full rounded-lg bg-muted pl-8"
+                className={cn("w-full rounded-lg bg-muted pl-8", isMobile && "h-11 text-base")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -420,21 +438,21 @@ export function MaterialListBuilder() {
              <div id="material-list-footer" className="shrink-0 border-t-2 border-sheet-header-bg flex items-center bg-sheet-total-bg">
                 <div className="p-2 flex items-center gap-2">
                     <Link href="/calculator/package-checker" passHref className="print:hidden">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10">
+                <RefinedButton variant="ghost" size="sm" animation="scale" className="h-8 w-8 p-0 text-white/70 hover:text-white hover:bg-white/10">
                             <Menu />
-                        </Button>
+                </RefinedButton>
                     </Link>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10 print:hidden" onClick={handleSaveList}>
+              <RefinedButton variant="ghost" size="sm" animation="scale" className="h-8 w-8 p-0 text-white/70 hover:text-white hover:bg-white/10 print:hidden" onClick={handleSaveList}>
                         <Save />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10 print:hidden" onClick={() => window.print()}>
+              </RefinedButton>
+              <RefinedButton variant="ghost" size="sm" animation="scale" className="h-8 w-8 p-0 text-white/70 hover:text-white hover:bg-white/10 print:hidden" onClick={() => window.print()}>
                         <Printer />
-                    </Button>
+              </RefinedButton>
                 </div>
                 <div className="flex-1 p-2 flex items-center justify-end">
                     <span className="text-lg font-bold text-sheet-header-fg">Total</span>
                 </div>
-                <div className="p-2 min-w-[150px] bg-sheet-total-price-bg">
+            <div className={cn("p-2 bg-sheet-total-price-bg", isMobile ? "min-w-[116px]" : "min-w-[150px]")}>
                     <span className="text-right text-lg font-bold block text-sheet-total-price-fg">{formatCurrency(totalListPrice)}</span>
                 </div>
             </div>

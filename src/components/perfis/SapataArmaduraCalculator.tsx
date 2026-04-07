@@ -11,6 +11,8 @@ import { CheckCircle, Info, Sparkles, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useCalculator, SapataArmaduraInputs } from "@/app/perfis/calculadora/CalculatorContext";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { RefinedButton, RefinedCard } from "@/components/refined-components";
+import { FormSkeleton } from "@/components/skeleton";
 
 interface SapataArmaduraResult {
     requiredSteelAreaCm2: number;
@@ -123,7 +125,7 @@ export function SapataArmaduraCalculator() {
     };
 
     return (
-        <Card>
+        <RefinedCard hover="subtle" className="p-0 overflow-hidden">
             <CardHeader>
                 <CardTitle>Calculadora de Armadura da Sapata</CardTitle>
                 <CardDescription>
@@ -170,11 +172,12 @@ export function SapataArmaduraCalculator() {
                     </div>
                 </div>
 
-                <Button type="button" onClick={handleCalculate} className="w-full md:w-auto" disabled={isCalculating || !sapata.result}>
+                <RefinedButton type="button" onClick={handleCalculate} className="w-full md:w-auto" disabled={isCalculating || !sapata.result}>
                     {isCalculating ? <><Loader className="animate-spin mr-2"/> Calculando...</> : <><Sparkles className="mr-2"/> Calcular Armadura</>}
-                </Button>
+                </RefinedButton>
 
                 {error && <Alert variant="destructive"><AlertTitle>Erro</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
+                {isCalculating && <FormSkeleton />}
                 {result && (
                     <Card className="mt-4 bg-primary/5 border-primary/20">
                         <CardHeader>
@@ -194,6 +197,6 @@ export function SapataArmaduraCalculator() {
                     </Card>
                 )}
             </CardContent>
-        </Card>
+        </RefinedCard>
     );
 }

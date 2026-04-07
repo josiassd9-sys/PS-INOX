@@ -12,6 +12,8 @@ import { CheckCircle, PlusCircle, Sparkles, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { perfisData, tiposAco, BudgetItem, Perfil, E_ACO_MPA } from "@/lib/data/index";
 import { useCalculator, PilarInputs } from "@/app/perfis/calculadora/CalculatorContext";
+import { RefinedButton, RefinedCard } from "@/components/refined-components";
+import { FormSkeleton } from "@/components/skeleton";
 
 interface PilarCalcResult {
     profile: Perfil;
@@ -173,7 +175,7 @@ export function PilarCalculator() {
     };
 
     return (
-        <Card>
+        <RefinedCard hover="subtle" className="p-0 overflow-hidden">
             <CardHeader>
                 <CardTitle>Calculadora de Pilar (Coluna)</CardTitle>
                 <CardDescription>Dimensione um perfil W para um pilar submetido à carga axial, com verificação de flambagem.</CardDescription>
@@ -204,7 +206,7 @@ export function PilarCalculator() {
                         <Input id="safety-factor" type="text" inputMode="decimal" value={safetyFactor} onChange={e => handleInputChange('safetyFactor', e.target.value)} placeholder="Ex: 1,4"/>
                     </div>
                 </div>
-                <Button type="button" onClick={handleCalculate} className="w-full md:w-auto">Calcular Pilar</Button>
+                 <RefinedButton type="button" onClick={handleCalculate} className="w-full md:w-auto">Calcular Pilar</RefinedButton>
                 {error && <Alert variant="destructive"><AlertTitle>Erro</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
                 {result && (
                      <Card className="mt-4 bg-primary/5 border-primary/20">
@@ -220,10 +222,15 @@ export function PilarCalculator() {
                             </AlertDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <Button type="button" onClick={handleAnalyze} className="w-full" disabled={isAnalyzing}>
+                            <RefinedButton type="button" onClick={handleAnalyze} className="w-full" disabled={isAnalyzing}>
                                 {isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar Resultado</>}
-                            </Button>
-                            {isAnalyzing && <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-4"><Loader className="animate-spin h-4 w-4" />Gerando análise local...</div>}
+                            </RefinedButton>
+                            {isAnalyzing && (
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-2"><Loader className="animate-spin h-4 w-4" />Gerando análise local...</div>
+                                    <FormSkeleton />
+                                </div>
+                            )}
                             {analysis && (
                                 <Alert variant="default">
                                     <Sparkles className="h-4 w-4" /><AlertTitle className="font-semibold">Análise Lógica</AlertTitle>
@@ -240,11 +247,11 @@ export function PilarCalculator() {
                                     <Input id="pilar-pricePerKg" type="text" inputMode="decimal" value={pricePerKg} onChange={e => handleInputChange('pricePerKg', e.target.value)} />
                                 </div>
                             </div>
-                            <Button onClick={handleAddToBudget} className="w-full gap-2"><PlusCircle/> Adicionar ao Orçamento</Button>
+                            <RefinedButton onClick={handleAddToBudget} className="w-full gap-2"><PlusCircle/> Adicionar ao Orçamento</RefinedButton>
                         </CardContent>
                     </Card>
                 )}
             </CardContent>
-        </Card>
+        </RefinedCard>
     );
 }

@@ -14,6 +14,8 @@ import { perfisIpeData, tiposAco, E_ACO_MPA, BudgetItem, PerfilIpe, RESISTENCIA_
 import { BeamSchemeDiagram } from "./BeamSchemeDiagram";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
 import { useCalculator, VigaInputs } from "@/app/perfis/calculadora/CalculatorContext";
+import { RefinedButton, RefinedCard } from "@/components/refined-components";
+import { FormSkeleton } from "@/components/skeleton";
 
 interface CalculationResult {
     profile: PerfilIpe;
@@ -255,7 +257,7 @@ export function VigaSecundariaCalculator() {
 
   return (
     <div className="space-y-4">
-      <Card>
+      <RefinedCard hover="subtle" className="p-0 overflow-hidden">
         <CardHeader>
           <CardTitle>Calculadora de Viga Secundária (Perfil IPE)</CardTitle>
           <CardDescription>Dimensione vigas secundárias que apoiam a laje, como em um sistema de steel deck.</CardDescription>
@@ -279,7 +281,7 @@ export function VigaSecundariaCalculator() {
              <div className="space-y-2"><Label htmlFor="vs-steel-type">Tipo de Aço</Label><Select value={steelType} onValueChange={value => updateVigaSecundaria({ steelType: value })}><SelectTrigger id="vs-steel-type"><SelectValue placeholder="Selecione o aço" /></SelectTrigger><SelectContent>{tiposAco.map(aco => <SelectItem key={aco.nome} value={aco.nome}>{aco.nome}</SelectItem>)}</SelectContent></Select></div>
              <div className="space-y-2"><Label htmlFor="safety-factor">Fator de Segurança</Label><Input id="safety-factor" type="text" inputMode="decimal" value={safetyFactor} onChange={e => handleInputChange('safetyFactor', e.target.value)} placeholder="Ex: 1,4"/></div>
           </div>
-          <Button type="button" onClick={handleCalculate} className="w-full md:w-auto">Calcular Viga Secundária</Button>
+           <RefinedButton type="button" onClick={handleCalculate} className="w-full md:w-auto">Calcular Viga Secundária</RefinedButton>
           {error && <Alert variant="destructive"><AlertTitle>Erro</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>}
           {result && (
              <Card className="mt-4 bg-primary/5 border-primary/20">
@@ -287,20 +289,25 @@ export function VigaSecundariaCalculator() {
                  <CardContent className="space-y-4">
                      <div className="h-40"><ResponsiveContainer width="100%" height="100%"><BarChart data={result.optimizationData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}><XAxis type="number" domain={[0, 100]} hide /><YAxis type="category" dataKey="name" hide /><Tooltip cursor={{fill: 'hsla(var(--primary) / 0.1)'}} content={({ active, payload }) => active && payload?.length ? <div className="rounded-lg border bg-background p-2 shadow-sm"><p className="text-sm font-bold">{`${payload[0].payload.name}: ${payload[0].value?.toFixed(1)}% de utilização`}</p></div> : null} /><Bar dataKey="utilization" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]}><LabelList dataKey="name" position="insideLeft" offset={10} className="fill-primary-foreground text-xs" /><LabelList dataKey="utilization" position="right" formatter={(value: number) => `${value.toFixed(0)}%`} className="fill-foreground text-xs" /></Bar></BarChart></ResponsiveContainer></div>
                       <div className="rounded-lg border bg-background p-2"><p className="text-sm font-medium text-center text-muted-foreground">Conectores de Cisalhamento (Stud Bolts 19mm)</p><p className="text-xl font-bold text-center text-primary">{result.connectorCount} unidades</p><p className="text-xs text-center text-muted-foreground">({(result.connectorCount / (beamScheme === 'biapoiada' ? parseFloat(span.replace(',', '.')) : parseFloat(span.replace(',', '.')) + parseFloat(balanco1.replace(',', '.')) + (beamScheme === 'dois-balancos' ? parseFloat(balanco2.replace(',', '.')) : 0))).toFixed(1)} un/m)</p></div>
-                      <Button type="button" onClick={handleAnalyze} className="w-full" disabled={isAnalyzing}>{isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar Resultado</>}</Button>
-                     {isAnalyzing && <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-4"><Loader className="animate-spin h-4 w-4" />Gerando análise...</div>}
+                      <RefinedButton type="button" onClick={handleAnalyze} className="w-full" disabled={isAnalyzing}>{isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar Resultado</>}</RefinedButton>
+                     {isAnalyzing && (
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-2"><Loader className="animate-spin h-4 w-4" />Gerando análise...</div>
+                          <FormSkeleton />
+                        </div>
+                     )}
                      {analysis && <Alert variant="default"><Sparkles className="h-4 w-4" /><AlertTitle className="font-semibold">Análise Lógica</AlertTitle><AlertDescription className="whitespace-pre-line">{analysis.analysis}</AlertDescription></Alert>}
                      <div className="grid grid-cols-2 gap-4 border-t pt-4">
                          <div className="space-y-2"><Label htmlFor="vs-quantity">Quantidade</Label><Input id="vs-quantity" type="text" inputMode="numeric" value={quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} placeholder="Ex: 1" /></div>
                          <div className="space-y-2"><Label htmlFor="vs-pricePerKg">Preço do Aço (R$/kg)</Label><Input id="vs-pricePerKg" type="text" inputMode="decimal" value={pricePerKg} onChange={(e) => handleInputChange('pricePerKg', e.target.value)} placeholder="Ex: 8,50" /></div>
                     </div>
                      {result.shearCheck.vsd > 0 && <div className="text-sm text-center text-muted-foreground">Reação de apoio máxima (não majorada): <span className="font-bold text-foreground">{ (result.shearCheck.vsd / (parseFloat(safetyFactor.replace(',', '.')) || 1.4) / 0.009807).toFixed(0)} kgf</span></div>}
-                    <Button type="button" onClick={handleAddToBudget} className="w-full gap-2"><PlusCircle/> Adicionar ao Orçamento</Button>
+                    <RefinedButton type="button" onClick={handleAddToBudget} className="w-full gap-2"><PlusCircle/> Adicionar ao Orçamento</RefinedButton>
                 </CardContent>
             </Card>
           )}
         </CardContent>
-      </Card>
+      </RefinedCard>
     </div>
   );
 }

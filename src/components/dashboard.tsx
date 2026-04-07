@@ -48,6 +48,7 @@ import { ConnectionsTable } from "./connections-table";
 import { CostAdjustmentCalculator } from "./cost-adjustment-calculator";
 import Link from "next/link";
 import { GaugeStandards } from "./gauge-standards";
+import { SidebarLogo } from "./sidebar-logo";
 import { MaterialListBuilder } from "./material-list-builder";
 import { ThemeSettings } from "./theme-settings";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "./ui/tooltip";
@@ -378,11 +379,8 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
   return (
     <>
       <Sidebar>
-        <SidebarHeader>
-          <div className="flex items-center gap-1 w-full" aria-label="Voltar para a tela inicial">
-            <Icon name="Home" className="size-6 text-primary" />
-            <h1 className="text-lg font-semibold">PS INOX</h1>
-          </div>
+        <SidebarHeader className="p-0">
+          <SidebarLogo />
         </SidebarHeader>
         <SidebarContent className="p-1">
            <Accordion type="single" collapsible className="w-full flex flex-col gap-1">

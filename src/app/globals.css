@@ -4,7 +4,8 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  :root,
+  :root[data-theme='industrial-light'] {
     --background: 220 10% 94%;
     --foreground: 220 10% 10%;
     --card: 220 10% 100%;
@@ -60,7 +61,8 @@
   }
   
 
-  .dark {
+  .dark,
+  :root[data-theme='industrial-dark'] {
     --background: 0 0% 40%;
     --foreground: 0 0% 100%;
     --card: 0 0% 45%;
@@ -95,7 +97,7 @@
     --sidebar-accent: 0 0% 45%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 0 0% 40%;
-    --sidebar-ring: 0-0-80;
+    --sidebar-ring: 0 0% 80%;
 
     /* Cores para o padrão de planilha no modo escuro */
     --sheet-header-bg: 211 51% 34%;
@@ -112,6 +114,49 @@
     --sheet-total-bg: 211 51% 34%;
     --sheet-total-price-bg: 114 30% 30%;
     --sheet-total-price-fg: 145 100% 74%;
+  }
+
+  :root[data-theme='sheet'] {
+    --background: 210 45% 96%;
+    --foreground: 215 25% 17%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 17%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 17%;
+    --primary: 211 51% 34%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 209 67% 95%;
+    --secondary-foreground: 211 51% 24%;
+    --muted: 209 45% 92%;
+    --muted-foreground: 211 30% 35%;
+    --accent: 202 81% 90%;
+    --accent-foreground: 211 51% 24%;
+    --destructive: 0 72% 52%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 210 30% 84%;
+    --input: 210 33% 88%;
+    --ring: 211 51% 34%;
+
+    --sidebar-background: 211 51% 28%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 211 51% 24%;
+    --sidebar-accent: 207 43% 41%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 211 45% 34%;
+    --sidebar-ring: 202 81% 70%;
+
+    --sheet-header-bg: 211 51% 34%;
+    --sheet-header-fg: 0 0% 100%;
+    --sheet-table-header-bg: 207 43% 41%;
+    --sheet-table-header-fg: 0 0% 100%;
+    --row-odd-bg: 0 0% 100%;
+    --row-even-bg: 209 67% 95%;
+    --row-pmq-bg: 202 81% 90%;
+    --text-item-pink: 300 100% 38%;
+    --sheet-total-bg: 211 51% 34%;
+    --sheet-total-price-bg: 114 78% 90%;
+    --sheet-total-price-fg: 145 100% 34%;
   }
 }
 

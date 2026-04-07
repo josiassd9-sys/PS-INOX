@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { GlobalMenuTrigger } from '@/components/global-menu-trigger';
+import { ThemeInitializer } from '@/components/theme-initializer';
 
 export const metadata: Metadata = {
   manifest: "/manifest.json",
@@ -25,6 +26,7 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className="font-body antialiased">
+        <ThemeInitializer />
         <SidebarProvider>
           <GlobalMenuTrigger />
           {children}

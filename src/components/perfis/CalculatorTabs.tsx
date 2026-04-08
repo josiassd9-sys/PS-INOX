@@ -24,6 +24,20 @@ export function CalculatorTabs() {
     const activeIndex = Math.max(0, tabs.findIndex((tab) => pathname === tab.href));
     const progress = ((activeIndex + 1) / tabs.length) * 100;
 
+    const handleTabTap = React.useCallback(() => {
+        // Native haptic on Capacitor builds (if plugin is available at runtime).
+        const capacitorHaptics = (window as any)?.Capacitor?.Plugins?.Haptics;
+        if (capacitorHaptics?.selectionChanged) {
+            capacitorHaptics.selectionChanged();
+            return;
+        }
+
+        // Web fallback for tactile feedback.
+        if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+            navigator.vibrate(8);
+        }
+    }, []);
+
     return (
         <RefinedCard hover="subtle" className="w-full overflow-hidden p-0 print:hidden">
             <div className="border-b bg-muted/20 px-3 py-2.5 sm:px-4">
@@ -50,15 +64,19 @@ export function CalculatorTabs() {
                         <Link
                             key={tab.href}
                             href={tab.href}
+                            onClick={handleTabTap}
                             className={cn(
-                                "group flex min-w-0 flex-col items-start gap-1 rounded-lg border px-2.5 py-2 text-left transition-all duration-200",
+                                "group relative flex min-w-0 flex-col items-start gap-1 rounded-lg border px-2.5 py-2 text-left transition-all duration-200 active:scale-[0.985]",
                                 isActive
-                                    ? "border-primary/35 bg-primary/10 shadow-sm"
+                                    ? "border-primary/35 bg-primary/10 shadow-sm ring-1 ring-primary/25"
                                     : isCompleted
                                       ? "border-green-500/30 bg-green-500/10 hover:border-green-500/45"
                                       : "border-border/70 bg-background hover:border-primary/25 hover:bg-muted/30"
                             )}
                         >
+                            {isActive && (
+                                <span className="pointer-events-none absolute inset-x-1 top-0 h-0.5 rounded-full bg-primary/80" />
+                            )}
                             <div className="flex w-full items-center justify-between gap-2">
                                 <span className={cn(
                                     "inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-semibold",

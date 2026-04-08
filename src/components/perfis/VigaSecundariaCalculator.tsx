@@ -16,6 +16,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList } 
 import { useCalculator, VigaInputs } from "@/app/perfis/calculadora/CalculatorContext";
 import { RefinedButton, RefinedCard } from "@/components/refined-components";
 import { FormSkeleton } from "@/components/skeleton";
+import { getAiSettings } from "@/lib/ai-settings";
 
 interface CalculationResult {
     profile: PerfilIpe;
@@ -61,6 +62,9 @@ export function VigaSecundariaCalculator() {
   const { span, balanco1, balanco2, spacing, slabLoad, distributedLoad, pointLoad, pointLoadPosition, steelType, beamScheme, quantity, pricePerKg, result, analysis, safetyFactor } = vigaSecundaria;
 
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
+  const [isAiAnalyzing, setIsAiAnalyzing] = React.useState(false);
+  const [aiAnalysis, setAiAnalysis] = React.useState<string | null>(null);
+  const [aiError, setAiError] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const { toast } = useToast();
 
@@ -232,6 +236,51 @@ export function VigaSecundariaCalculator() {
         setIsAnalyzing(false);
     }, 500);
   };
+
+  const handleAnalyzeWithAI = async () => {
+    if (!result) {
+      toast({ variant: "destructive", title: "Calculo necessario", description: "Calcule o perfil antes de usar a IA." });
+      return;
+    }
+
+    const aiSettings = getAiSettings();
+    if (aiSettings.provider === "local") {
+      toast({ variant: "destructive", title: "IA não configurada", description: "Configure um provedor de IA em Ferramentas > Configurações." });
+      return;
+    }
+
+    setIsAiAnalyzing(true);
+    setAiAnalysis(null);
+    setAiError(null);
+
+    try {
+      const response = await fetch("/api/ai-compare", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          analysisType: "viga-secundaria",
+          context: {
+            inputs: { span, balanco1, balanco2, spacing, slabLoad, distributedLoad, pointLoad, pointLoadPosition, steelType, beamScheme, safetyFactor },
+            result,
+            localAnalysis: analysis?.analysis ?? null,
+          },
+          ...(aiSettings.apiKey.trim() ? { apiKey: aiSettings.apiKey.trim() } : {}),
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data?.error || "IA indisponivel nesta versao/dispositivo.");
+      }
+
+      setAiAnalysis(data.analysis);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Falha ao consultar IA.";
+      setAiError(message);
+    } finally {
+      setIsAiAnalyzing(false);
+    }
+  };
   
   const handleAddToBudget = () => {
     if (!result) { toast({ variant: "destructive", title: "Nenhum Perfil Calculado" }); return; }
@@ -298,6 +347,15 @@ export function VigaSecundariaCalculator() {
                         </div>
                      )}
                      {analysis && <Alert variant="default"><Sparkles className="h-4 w-4" /><AlertTitle className="font-semibold">Análise Lógica</AlertTitle><AlertDescription className="whitespace-pre-line">{analysis.analysis}</AlertDescription></Alert>}
+                     <RefinedButton type="button" onClick={handleAnalyzeWithAI} className="w-full" disabled={isAiAnalyzing}>{isAiAnalyzing ? <><Loader className="animate-spin mr-2"/> Consultando IA...</> : <><Sparkles className="mr-2"/> Comparar com IA</>}</RefinedButton>
+                     {isAiAnalyzing && (
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground p-2"><Loader className="animate-spin h-4 w-4" />Gerando segunda analise por IA...</div>
+                          <FormSkeleton />
+                        </div>
+                     )}
+                     {aiError && <Alert variant="destructive"><AlertTitle>IA indisponível</AlertTitle><AlertDescription>{aiError}</AlertDescription></Alert>}
+                     {aiAnalysis && <Alert variant="default"><Sparkles className="h-4 w-4" /><AlertTitle className="font-semibold">Análise por IA (Comparativa)</AlertTitle><AlertDescription className="whitespace-pre-line">{aiAnalysis}</AlertDescription></Alert>}
                      <div className="grid grid-cols-2 gap-4 border-t pt-4">
                          <div className="space-y-2"><Label htmlFor="vs-quantity">Quantidade</Label><Input id="vs-quantity" type="text" inputMode="numeric" value={quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} placeholder="Ex: 1" /></div>
                          <div className="space-y-2"><Label htmlFor="vs-pricePerKg">Preço do Aço (R$/kg)</Label><Input id="vs-pricePerKg" type="text" inputMode="decimal" value={pricePerKg} onChange={(e) => handleInputChange('pricePerKg', e.target.value)} placeholder="Ex: 8,50" /></div>

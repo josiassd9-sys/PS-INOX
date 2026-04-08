@@ -243,7 +243,7 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
                                             </AccordionTrigger>
                                             <AccordionContent className="p-0">
                                                 <Table>
-                                                    <TableHeader>
+                                                    <TableHeader className="sticky top-0 z-20">
                                                         <TableRow className="hover:bg-transparent flex">
                                                             <TableHead className="flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
                                                             <TableHead className="text-center p-1 w-[80px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Peso</TableHead>
@@ -310,7 +310,7 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
                         <AccordionContent className="p-0">
                             <div className="overflow-auto">
                                 <Table>
-                                    <TableHeader>
+                                    <TableHeader className="sticky top-0 z-20">
                                     <TableRow className="hover:bg-transparent flex">
                                         <TableHead className="flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
                                         <TableHead className="text-center p-1 w-[120px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Peso (kg/{(category as Category).unit})</TableHead>

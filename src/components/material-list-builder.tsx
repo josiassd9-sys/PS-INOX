@@ -245,6 +245,11 @@ export function MaterialListBuilder() {
   }
   
   const totalListPrice = materialList.reduce((acc, item) => acc + item.price, 0);
+  const totalListWeight = materialList.reduce((acc, item) => acc + item.weight, 0);
+
+  const formatTotalWeight = (value: number) => {
+    return `${new Intl.NumberFormat("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 }).format(value)} kg`;
+  };
 
   const isScrapCalculatorActive = searchTerm.trim().length > 0 && ('retalho'.startsWith(searchTerm.toLowerCase()) || 'ret'.startsWith(searchTerm.toLowerCase()));
 
@@ -341,8 +346,8 @@ export function MaterialListBuilder() {
         <div id="material-list-section" className="flex-1 flex flex-col min-h-0 pt-2 print:pt-0">
          <Card className="flex-1 overflow-hidden flex flex-col shadow-lg border-border/70">
                 <CardContent className="p-0 flex-1 overflow-y-auto">
-                   <Table>
-                       <TableHeader>
+                     <Table>
+                       <TableHeader className="sticky top-0 z-20">
                            <TableRow className="hover:bg-transparent flex">
                                <TableHead className="flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
                    <TableHead className={cn("text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-[72px]" : "w-[96px]")}>PMQ</TableHead>
@@ -430,30 +435,31 @@ export function MaterialListBuilder() {
             </div>
         </div>
 
-        <div className="flex-1 mt-px overflow-y-auto relative z-0 p-1 min-h-0">
+           <div className={cn("flex-1 mt-px overflow-y-auto relative z-0 p-1 min-h-0", materialList.length > 0 && !searchTerm && "pb-20 md:pb-1")}>
              {renderContent()}
         </div>
 
         {materialList.length > 0 && !searchTerm && (
-             <div id="material-list-footer" className="shrink-0 border-t-2 border-sheet-header-bg flex items-center bg-sheet-total-bg">
-                <div className="p-2 flex items-center gap-2">
+             <div id="material-list-footer" className="sticky bottom-0 z-30 md:static shrink-0 border-t-2 border-sheet-header-bg flex items-center bg-sheet-total-bg shadow-[0_-6px_16px_rgba(0,0,0,0.18)] md:shadow-none">
+              <div className={cn("flex items-center", isMobile ? "p-1.5 gap-1" : "p-2 gap-2")}>
                     <Link href="/calculator/package-checker" passHref className="print:hidden">
-                <RefinedButton variant="ghost" size="sm" animation="scale" className="h-8 w-8 p-0 text-white/70 hover:text-white hover:bg-white/10">
+              <RefinedButton variant="ghost" size="sm" animation="scale" className={cn("p-0 text-white/70 hover:text-white hover:bg-white/10", isMobile ? "h-7 w-7" : "h-8 w-8")}>
                             <Menu />
                 </RefinedButton>
                     </Link>
-              <RefinedButton variant="ghost" size="sm" animation="scale" className="h-8 w-8 p-0 text-white/70 hover:text-white hover:bg-white/10 print:hidden" onClick={handleSaveList}>
+              <RefinedButton variant="ghost" size="sm" animation="scale" className={cn("p-0 text-white/70 hover:text-white hover:bg-white/10 print:hidden", isMobile ? "h-7 w-7" : "h-8 w-8")} onClick={handleSaveList}>
                         <Save />
               </RefinedButton>
-              <RefinedButton variant="ghost" size="sm" animation="scale" className="h-8 w-8 p-0 text-white/70 hover:text-white hover:bg-white/10 print:hidden" onClick={() => window.print()}>
+              <RefinedButton variant="ghost" size="sm" animation="scale" className={cn("p-0 text-white/70 hover:text-white hover:bg-white/10 print:hidden", isMobile ? "h-7 w-7" : "h-8 w-8")} onClick={() => window.print()}>
                         <Printer />
               </RefinedButton>
                 </div>
-                <div className="flex-1 p-2 flex items-center justify-end">
-                    <span className="text-lg font-bold text-sheet-header-fg">Total</span>
+              <div className={cn("flex-1 flex flex-col items-end justify-center", isMobile ? "p-1.5" : "p-2")}>
+                <span className="text-[10px] leading-none text-sheet-header-fg/70 mb-0.5">peso: {formatTotalWeight(totalListWeight)}</span>
+                <span className={cn("font-bold text-sheet-header-fg leading-none", isMobile ? "text-base" : "text-lg")}>Total</span>
                 </div>
-            <div className={cn("p-2 bg-sheet-total-price-bg", isMobile ? "min-w-[116px]" : "min-w-[150px]")}>
-                    <span className="text-right text-lg font-bold block text-sheet-total-price-fg">{formatCurrency(totalListPrice)}</span>
+            <div className={cn("bg-sheet-total-price-bg", isMobile ? "p-1.5 min-w-[104px]" : "p-2 min-w-[150px]")}>
+                <span className={cn("text-right font-bold block text-sheet-total-price-fg", isMobile ? "text-base" : "text-lg")}>{formatCurrency(totalListPrice)}</span>
                 </div>
             </div>
         )}

@@ -386,6 +386,13 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
       return "Selecione uma categoria no menu para começar.";
   }
 
+  const canUseSearch = selectedCategoryId !== 'balanca' && !selectedCategoryId?.startsWith('perfis/calculadora');
+
+  const hasQuickActions =
+    (!!showPriceControls && !!currentPriceParams) ||
+    selectedCategoryId === 'tabela-sucata' ||
+    (canUseSearch && !!searchTerm);
+
   const getContextTone = () => {
     if (!selectedCategoryId) return { chip: "bg-muted text-muted-foreground", bar: "from-muted/30 via-transparent to-transparent" };
     if (selectedCategoryId === "lista-materiais" || selectedCategoryId === "lista-sucatas") {
@@ -467,18 +474,22 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
               </div>
             </div>
             <header className={cn(
-              "flex items-center justify-between gap-1 p-1.5 border-b bg-gradient-to-r from-background via-background to-muted/20"
+              "border-b bg-gradient-to-r from-background via-background to-muted/20"
             )}>
-              <div className="flex items-center gap-1 flex-1 min-w-0">
-                <SidebarTrigger className="md:hidden"/>
-                <div className="hidden md:block overflow-hidden">
-                  <h2 className="text-lg font-semibold tracking-tight truncate">{getPageTitle()}</h2>
-                  <p className="text-sm text-muted-foreground truncate">{getPageDescription()}</p>
+              <div className="flex items-center justify-between gap-1 p-1.5">
+                <div className="flex items-center gap-1 flex-1 min-w-0">
+                  <SidebarTrigger className="md:hidden"/>
+                  <div className="hidden md:block overflow-hidden">
+                    <h2 className="text-lg font-semibold tracking-tight truncate">{getPageTitle()}</h2>
+                    <p className="text-sm text-muted-foreground truncate">{getPageDescription()}</p>
+                  </div>
+                  <div className="md:hidden overflow-hidden">
+                    <h2 className="text-sm font-semibold tracking-tight truncate">{getPageTitle()}</h2>
+                  </div>
                 </div>
-              </div>
-              
-             {selectedCategoryId !== 'balanca' && !selectedCategoryId?.startsWith('perfis/calculadora') && (
-                <div className="relative flex-1 max-w-sm">
+
+                {canUseSearch && (
+                <div className="relative hidden md:block flex-1 max-w-sm">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
                     type="search"
@@ -494,13 +505,13 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                    )}
                 </div>
               )}
-              
-              <div className="flex items-center gap-1">
+
+                <div className="hidden md:flex items-center gap-1 rounded-lg border bg-muted/30 p-1">
                 
                 {showPriceControls && currentPriceParams && (
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="outline" size="sm" className="gap-1">
+                      <Button variant="outline" size="sm" className="gap-1 h-8">
                         <SlidersHorizontal />
                         <span className="hidden sm:inline">Ajustar</span>
                       </Button>
@@ -526,12 +537,81 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                   </Dialog>
                 )}
                  {selectedCategoryId === 'tabela-sucata' && (
-                    <Button variant="outline" size="sm" className="gap-1" onClick={() => setIsScrapItemDialogOpen(true)}>
+                    <Button variant="outline" size="sm" className="gap-1 h-8" onClick={() => setIsScrapItemDialogOpen(true)}>
                       <PlusCircle className="h-4 w-4" />
                       <span className="hidden sm:inline">Adicionar</span>
                     </Button>
                 )}
+                {canUseSearch && searchTerm && (
+                  <Button variant="ghost" size="sm" className="gap-1 h-8" onClick={() => setSearchTerm("")}>
+                    <X className="h-4 w-4" />
+                    <span>Limpar</span>
+                  </Button>
+                )}
               </div>
+              </div>
+
+              {(canUseSearch || hasQuickActions) && (
+                <div className="md:hidden border-t bg-muted/20 px-1.5 py-1.5 space-y-1.5">
+                  {canUseSearch && (
+                    <div className="relative">
+                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="search"
+                        placeholder="Buscar..."
+                        className="w-full rounded-lg bg-background pl-8 h-9"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                      {searchTerm && (
+                        <Button variant="ghost" size="icon" className="absolute right-0 top-0 h-full" onClick={() => setSearchTerm("")}>
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  )}
+
+                  {hasQuickActions && (
+                    <div className="flex items-center gap-1 rounded-lg border bg-background/80 p-1">
+                      {showPriceControls && currentPriceParams && (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm" className="gap-1 h-8 flex-1">
+                              <SlidersHorizontal className="h-4 w-4" />
+                              <span>Ajustar</span>
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>{`Ajustar Preços - ${selectedCategory?.hasOwnPriceControls ? selectedCategory.name : 'Global'}`}</DialogTitle>
+                            </DialogHeader>
+                            <PriceControls
+                              costPrice={currentPriceParams.costPrice}
+                              markup={currentPriceParams.markup}
+                              sellingPrice={currentPriceParams.sellingPrice}
+                              onCostChange={(v) => handlePriceChange('costPrice', v)}
+                              onMarkupChange={(v) => handlePriceChange('markup', v)}
+                              onSellingPriceChange={(v) => handlePriceChange('sellingPrice', v)}
+                            />
+                            <DialogFooter>
+                              <DialogClose asChild>
+                                 <Button onClick={savePriceParams}>Salvar</Button>
+                              </DialogClose>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      )}
+
+                      {selectedCategoryId === 'tabela-sucata' && (
+                        <Button variant="outline" size="sm" className="gap-1 h-8 flex-1" onClick={() => setIsScrapItemDialogOpen(true)}>
+                          <PlusCircle className="h-4 w-4" />
+                          <span>Adicionar</span>
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </header>
             
             <div className="flex-1 flex flex-col overflow-hidden">

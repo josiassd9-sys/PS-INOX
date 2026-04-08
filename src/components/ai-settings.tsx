@@ -81,40 +81,38 @@ export function AiSettings() {
 
   return (
     <RefinedCard hover="subtle" className="overflow-hidden p-0">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5" />
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+          <Sparkles className="h-4 w-4" />
           Inteligência Artificial
         </CardTitle>
         <CardDescription>
-          Configure seu provedor de IA para usar "Comparar com IA" nos calculadores. A chave é
-          salva apenas neste dispositivo — não é enviada para nenhum servidor externo além da
-          própria IA escolhida.
+          Configure o provedor para usar "Comparar com IA". A chave fica salva só neste dispositivo.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 pt-0">
         {/* Provider selector */}
         <div className="space-y-2">
-          <Label>Provedor de IA</Label>
-          <div className="grid grid-cols-2 gap-3">
+          <Label className="text-xs uppercase tracking-wide text-muted-foreground">Provedor</Label>
+          <div className="grid grid-cols-2 gap-2">
             <RefinedButton
               type="button"
               variant={provider === "local" ? "primary" : "outline"}
               animation={provider === "local" ? "lift" : "scale"}
-              className="h-auto min-h-16 flex-col gap-1 p-3"
+              className="h-auto min-h-12 flex-col gap-0.5 p-2.5"
               onClick={() => handleProviderChange("local")}
             >
-              <span className="font-medium">Local</span>
+              <span className="text-sm font-medium">Local</span>
               <span className="text-xs font-normal opacity-70">Sem IA externa</span>
             </RefinedButton>
             <RefinedButton
               type="button"
               variant={provider === "gemini" ? "primary" : "outline"}
               animation={provider === "gemini" ? "lift" : "scale"}
-              className="h-auto min-h-16 flex-col gap-1 p-3"
+              className="h-auto min-h-12 flex-col gap-0.5 p-2.5"
               onClick={() => handleProviderChange("gemini")}
             >
-              <span className="font-medium">Gemini</span>
+              <span className="text-sm font-medium">Gemini</span>
               <span className="text-xs font-normal opacity-70">Google AI</span>
             </RefinedButton>
           </div>
@@ -122,7 +120,7 @@ export function AiSettings() {
 
         {/* API Key field */}
         {provider === "gemini" && (
-          <div className="space-y-2">
+          <div className="space-y-2 rounded-xl border bg-muted/30 p-3">
             <Label htmlFor="ai-api-key">Chave de API (Gemini)</Label>
             <div className="relative">
               <Input
@@ -156,6 +154,35 @@ export function AiSettings() {
               </a>
               .
             </p>
+
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <RefinedButton
+                type="button"
+                variant="primary"
+                animation="lift"
+                onClick={handleSave}
+                className="flex-1"
+              >
+                Salvar
+              </RefinedButton>
+              <RefinedButton
+                type="button"
+                variant="outline"
+                animation="scale"
+                onClick={handleTest}
+                disabled={testStatus === "testing"}
+                className="flex-1"
+              >
+                {testStatus === "testing" ? (
+                  <>
+                    <Loader className="animate-spin mr-2 h-4 w-4" />
+                    Testando...
+                  </>
+                ) : (
+                  "Testar Conexão"
+                )}
+              </RefinedButton>
+            </div>
           </div>
         )}
 
@@ -174,36 +201,17 @@ export function AiSettings() {
         )}
 
         {/* Action buttons */}
-        <div className="flex gap-3">
+        {provider === "local" && (
           <RefinedButton
             type="button"
             variant="primary"
             animation="lift"
             onClick={handleSave}
-            className="flex-1"
+            className="w-full"
           >
             Salvar
           </RefinedButton>
-          {provider === "gemini" && (
-            <RefinedButton
-              type="button"
-              variant="outline"
-              animation="scale"
-              onClick={handleTest}
-              disabled={testStatus === "testing"}
-              className="flex-1"
-            >
-              {testStatus === "testing" ? (
-                <>
-                  <Loader className="animate-spin mr-2 h-4 w-4" />
-                  Testando...
-                </>
-              ) : (
-                "Testar Conexão"
-              )}
-            </RefinedButton>
-          )}
-        </div>
+        )}
       </CardContent>
     </RefinedCard>
   );

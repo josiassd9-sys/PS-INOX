@@ -29,14 +29,14 @@ export function DesignSelector() {
 
   return (
     <RefinedCard hover="subtle" className="overflow-hidden p-0">
-      <CardHeader>
-        <CardTitle>Nível de Design</CardTitle>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base">Refinamento Visual</CardTitle>
         <CardDescription>
-          Escolha o nível de refinamento visual da interface. Varia de polimento sutil até redesign completo com micro-interações.
+          Controle o nível de polimento da interface.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
+      <CardContent className="pt-0">
+        <div className="grid gap-2 sm:grid-cols-2">
           {DESIGN_LEVELS.map((level) => {
             const isActive = designLevel === level;
             return (
@@ -44,15 +44,15 @@ export function DesignSelector() {
                 key={level}
                 variant={isActive ? "primary" : "outline"}
                 animation={isActive ? "lift" : "scale"}
-                className="w-full justify-between p-4 text-left h-auto"
+                className="h-auto min-h-16 w-full justify-between rounded-xl p-3 text-left"
                 onClick={() => handleSelectDesign(level)}
               >
-                <span className="flex items-start justify-between gap-4 w-full">
-                  <span className="flex flex-col gap-1">
-                    <span className="font-medium">{DESIGN_LABELS[level]}</span>
-                    <span className="text-xs opacity-70">{DESIGN_DESCRIPTIONS[level]}</span>
+                <span className="flex w-full items-start justify-between gap-3">
+                  <span className="flex flex-col gap-0.5">
+                    <span className="text-sm font-medium">{DESIGN_LABELS[level]}</span>
+                    <span className="text-xs opacity-70 line-clamp-2">{DESIGN_DESCRIPTIONS[level]}</span>
                   </span>
-                  {isActive ? <Check className="h-4 w-4 flex-shrink-0 mt-0.5" /> : null}
+                  {isActive ? <Check className="mt-0.5 h-4 w-4 flex-shrink-0" /> : null}
                 </span>
               </RefinedButton>
             );

@@ -242,12 +242,12 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
                                                 {group.name} ({group.items.length})
                                             </AccordionTrigger>
                                             <AccordionContent className="p-0">
-                                                <Table>
+                                                <Table className="border-separate border-spacing-0">
                                                     <TableHeader className="sticky top-0 z-20">
                                                         <TableRow className="hover:bg-transparent flex">
-                                                            <TableHead className="flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
-                                                            <TableHead className="text-center p-1 w-[80px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Peso</TableHead>
-                                                            <TableHead className="text-center p-1 w-[80px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Preço</TableHead>
+                                                            <TableHead className="sticky top-0 z-30 flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
+                                                            <TableHead className="sticky top-0 z-30 text-center p-1 w-[80px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Peso</TableHead>
+                                                            <TableHead className="sticky top-0 z-30 text-center p-1 w-[80px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Preço</TableHead>
                                                         </TableRow>
                                                     </TableHeader>
                                                     <TableBody>
@@ -309,12 +309,12 @@ export function GlobalSearchResults({ categories, priceParams, searchTerm, costA
                         </AccordionTrigger>
                         <AccordionContent className="p-0">
                             <div className="overflow-auto">
-                                <Table>
+                                <Table className="border-separate border-spacing-0">
                                     <TableHeader className="sticky top-0 z-20">
                                     <TableRow className="hover:bg-transparent flex">
-                                        <TableHead className="flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
-                                        <TableHead className="text-center p-1 w-[120px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Peso (kg/{(category as Category).unit})</TableHead>
-                                        <TableHead className="text-center p-1 w-[120px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Preço (R$/{(category as Category).unit})</TableHead>
+                                        <TableHead className="sticky top-0 z-30 flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
+                                        <TableHead className="sticky top-0 z-30 text-center p-1 w-[120px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Peso (kg/{(category as Category).unit})</TableHead>
+                                        <TableHead className="sticky top-0 z-30 text-center p-1 w-[120px] bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Preço (R$/{(category as Category).unit})</TableHead>
                                     </TableRow>
                                     </TableHeader>
                                     <TableBody>

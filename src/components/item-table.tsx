@@ -192,13 +192,13 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
         </Dialog>
       </div>
       <div className="border rounded-lg overflow-hidden shadow-lg border-border/70 bg-card">
-        <Table>
+        <Table className="border-separate border-spacing-0">
           {showTableHeader && (
              <TableHeader className="sticky top-0 z-20">
                 <TableRow className="hover:bg-transparent flex">
-                    <TableHead className="flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
-                    <TableHead className={cn("text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-[96px]" : "w-[120px]")}>{weightUnitLabel}</TableHead>
-                    <TableHead className={cn("text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-[96px]" : "w-[120px]")}>{priceUnitLabel}</TableHead>
+                    <TableHead className="sticky top-0 z-30 flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
+                    <TableHead className={cn("sticky top-0 z-30 text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-[96px]" : "w-[120px]")}>{weightUnitLabel}</TableHead>
+                    <TableHead className={cn("sticky top-0 z-30 text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-[96px]" : "w-[120px]")}>{priceUnitLabel}</TableHead>
                 </TableRow>
             </TableHeader>
           )}

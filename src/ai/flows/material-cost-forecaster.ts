@@ -9,7 +9,7 @@
  * - ForecastMaterialCostOutput - The return type for the forecastMaterialCost function.
  */
 
-import { z } from 'genkit';
+import { z } from 'zod';
 
 // Schema for the input data remains the same for compatibility.
 const ForecastMaterialCostInputSchema = z.object({

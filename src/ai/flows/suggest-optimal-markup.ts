@@ -8,7 +8,7 @@
  * - SuggestOptimalMarkupOutput - The return type for the suggestOptimalMarkup function.
  */
 
-import { z } from 'genkit';
+import { z } from 'zod';
 
 const SuggestOptimalMarkupInputSchema = z.object({
   costPrice: z.number().describe('The cost price of the stainless steel item.'),

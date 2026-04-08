@@ -2,102 +2,166 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { CheckCircle2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, CheckCircle2 } from "lucide-react";
 import { RefinedCard } from "@/components/refined-components";
 
 const tabs = [
-    { step: 1, short: "Geometria", title: "Geometria", href: "/perfis/calculadora/geometria" },
-    { step: 2, short: "Laje", title: "Laje", href: "/perfis/calculadora/laje" },
-    { step: 3, short: "Viga Sec.", title: "Viga Secundária", href: "/perfis/calculadora/viga-secundaria" },
-    { step: 4, short: "Viga Princ.", title: "Viga Principal", href: "/perfis/calculadora/viga-principal" },
-    { step: 5, short: "Pilar", title: "Pilar", href: "/perfis/calculadora/pilar" },
-    { step: 6, short: "Sapata", title: "Sapata", href: "/perfis/calculadora/sapata" },
-    { step: 7, short: "Armadura", title: "Armadura", href: "/perfis/calculadora/armadura-sapata" },
-    { step: 8, short: "Visualização", title: "Visualização", href: "/perfis/calculadora/visualizacao" },
+    { step: 1, title: "Geometria", href: "/perfis/calculadora/geometria" },
+    { step: 2, title: "Laje", href: "/perfis/calculadora/laje" },
+    { step: 3, title: "Viga Secundária", href: "/perfis/calculadora/viga-secundaria" },
+    { step: 4, title: "Viga Principal", href: "/perfis/calculadora/viga-principal" },
+    { step: 5, title: "Pilar", href: "/perfis/calculadora/pilar" },
+    { step: 6, title: "Sapata", href: "/perfis/calculadora/sapata" },
+    { step: 7, title: "Armadura", href: "/perfis/calculadora/armadura-sapata" },
+    { step: 8, title: "Visualização", href: "/perfis/calculadora/visualizacao" },
 ];
 
 export function CalculatorTabs() {
     const pathname = usePathname();
+    const router = useRouter();
     const activeIndex = Math.max(0, tabs.findIndex((tab) => pathname === tab.href));
     const progress = ((activeIndex + 1) / tabs.length) * 100;
 
-    const handleTabTap = React.useCallback(() => {
-        // Native haptic on Capacitor builds (if plugin is available at runtime).
-        const capacitorHaptics = (window as any)?.Capacitor?.Plugins?.Haptics;
-        if (capacitorHaptics?.selectionChanged) {
-            capacitorHaptics.selectionChanged();
-            return;
-        }
+    const [menuOpen, setMenuOpen] = React.useState(false);
+    const menuRef = React.useRef<HTMLDivElement>(null);
 
-        // Web fallback for tactile feedback.
-        if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-            navigator.vibrate(8);
-        }
+    const haptic = React.useCallback(() => {
+        const h = (window as any)?.Capacitor?.Plugins?.Haptics;
+        if (h?.selectionChanged) { h.selectionChanged(); return; }
+        if (typeof navigator !== "undefined" && "vibrate" in navigator) navigator.vibrate(8);
     }, []);
+
+    const navigateTo = React.useCallback((href: string) => {
+        haptic();
+        router.push(href);
+        setMenuOpen(false);
+    }, [haptic, router]);
+
+    const goBack = () => { if (activeIndex > 0) navigateTo(tabs[activeIndex - 1].href); };
+    const goForward = () => { if (activeIndex < tabs.length - 1) navigateTo(tabs[activeIndex + 1].href); };
+
+    React.useEffect(() => {
+        if (!menuOpen) return;
+        const handler = (e: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, [menuOpen]);
+
+    const active = tabs[activeIndex];
 
     return (
         <RefinedCard hover="subtle" className="w-full overflow-hidden p-0 print:hidden">
-            <div className="border-b bg-muted/20 px-3 py-2.5 sm:px-4">
-                <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-semibold tracking-tight">Fluxo Estrutural</p>
-                    <p className="text-xs text-muted-foreground">
-                        Etapa {activeIndex + 1} de {tabs.length}
-                    </p>
+            {/* Single navigation row */}
+            <div className="flex items-center gap-1.5 px-2 py-2 sm:px-3">
+                {/* Back */}
+                <button
+                    onClick={goBack}
+                    disabled={activeIndex === 0}
+                    aria-label="Etapa anterior"
+                    className={cn(
+                        "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md border transition-colors active:scale-95",
+                        activeIndex === 0
+                            ? "cursor-not-allowed border-border/30 text-muted-foreground/30"
+                            : "border-border hover:bg-muted"
+                    )}
+                >
+                    <ChevronLeft className="h-4 w-4" />
+                </button>
+
+                {/* Current step label */}
+                <div className="flex min-w-0 flex-1 items-center justify-center gap-2">
+                    <span className="inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
+                        {activeIndex + 1}
+                    </span>
+                    <span className="truncate text-sm font-semibold tracking-tight">
+                        {active.title}
+                    </span>
+                    <span className="flex-shrink-0 text-xs text-muted-foreground">/ {tabs.length}</span>
                 </div>
-                <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+
+                {/* Forward */}
+                <button
+                    onClick={goForward}
+                    disabled={activeIndex === tabs.length - 1}
+                    aria-label="Próxima etapa"
+                    className={cn(
+                        "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md border transition-colors active:scale-95",
+                        activeIndex === tabs.length - 1
+                            ? "cursor-not-allowed border-border/30 text-muted-foreground/30"
+                            : "border-border hover:bg-muted"
+                    )}
+                >
+                    <ChevronRight className="h-4 w-4" />
+                </button>
+
+                {/* All-steps dropdown */}
+                <div className="relative ml-0.5 flex-shrink-0" ref={menuRef}>
+                    <button
+                        onClick={() => { haptic(); setMenuOpen((v) => !v); }}
+                        aria-label="Ver todas as etapas"
+                        className={cn(
+                            "flex h-8 items-center gap-1 rounded-md border px-2 text-xs font-medium transition-colors",
+                            menuOpen
+                                ? "border-primary/40 bg-primary/10 text-primary"
+                                : "border-border hover:bg-muted"
+                        )}
+                    >
+                        <span className="hidden sm:inline">Etapas</span>
+                        <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-200", menuOpen && "rotate-180")} />
+                    </button>
+
+                    {menuOpen && (
+                        <div className="absolute right-0 top-full z-50 mt-1.5 w-52 rounded-xl border bg-popover shadow-lg">
+                            <div className="p-1">
+                                {tabs.map((tab, index) => {
+                                    const isActive = index === activeIndex;
+                                    const isCompleted = index < activeIndex;
+                                    return (
+                                        <button
+                                            key={tab.href}
+                                            onClick={() => navigateTo(tab.href)}
+                                            className={cn(
+                                                "flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm transition-colors",
+                                                isActive
+                                                    ? "bg-primary/10 font-semibold text-foreground"
+                                                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                            )}
+                                        >
+                                            <span className={cn(
+                                                "inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-semibold",
+                                                isActive
+                                                    ? "bg-primary text-primary-foreground"
+                                                    : isCompleted
+                                                      ? "bg-green-600 text-white"
+                                                      : "bg-muted text-muted-foreground"
+                                            )}>
+                                                {isCompleted ? <CheckCircle2 className="h-3 w-3" /> : tab.step}
+                                            </span>
+                                            <span className="truncate">{tab.title}</span>
+                                            {isActive && (
+                                                <span className="ml-auto flex-shrink-0 text-[10px] text-muted-foreground">atual</span>
+                                            )}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Progress bar */}
+            <div className="px-3 pb-2.5">
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                     <div
                         className="h-full rounded-full bg-primary transition-all duration-300"
                         style={{ width: `${progress}%` }}
                     />
                 </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 p-2 sm:grid-cols-4 lg:grid-cols-8">
-                {tabs.map((tab, index) => {
-                    const isActive = pathname === tab.href;
-                    const isCompleted = index < activeIndex;
-
-                    return (
-                        <Link
-                            key={tab.href}
-                            href={tab.href}
-                            onClick={handleTabTap}
-                            className={cn(
-                                "group relative flex min-w-0 flex-col items-start gap-1 rounded-lg border px-2.5 py-2 text-left transition-all duration-200 active:scale-[0.985]",
-                                isActive
-                                    ? "border-primary/35 bg-primary/10 shadow-sm ring-1 ring-primary/25"
-                                    : isCompleted
-                                      ? "border-green-500/30 bg-green-500/10 hover:border-green-500/45"
-                                      : "border-border/70 bg-background hover:border-primary/25 hover:bg-muted/30"
-                            )}
-                        >
-                            {isActive && (
-                                <span className="pointer-events-none absolute inset-x-1 top-0 h-0.5 rounded-full bg-primary/80" />
-                            )}
-                            <div className="flex w-full items-center justify-between gap-2">
-                                <span className={cn(
-                                    "inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-semibold",
-                                    isActive
-                                        ? "bg-primary text-primary-foreground"
-                                        : isCompleted
-                                          ? "bg-green-600 text-white"
-                                          : "bg-muted text-muted-foreground"
-                                )}>
-                                    {isCompleted ? <CheckCircle2 className="h-3.5 w-3.5" /> : tab.step}
-                                </span>
-                            </div>
-                            <span className={cn(
-                                "line-clamp-2 text-[11px] leading-tight sm:text-xs",
-                                isActive ? "font-semibold text-foreground" : "text-muted-foreground group-hover:text-foreground"
-                            )}>
-                                {tab.short}
-                            </span>
-                        </Link>
-                    );
-                })}
             </div>
         </RefinedCard>
     );

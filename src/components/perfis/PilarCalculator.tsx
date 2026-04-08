@@ -148,7 +148,7 @@ export function PilarCalculator() {
             return;
         }
         const H = parseFloat(height.replace(",", "."));
-        const addH = parseFloat(additionalHeight?.replace(",", ".")) || 0;
+        const addH = parseFloat((additionalHeight ?? "").replace(",", ".")) || 0;
         const totalHeight = H + addH;
 
         const qty = parseInt(quantity);

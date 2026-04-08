@@ -1,6 +1,6 @@
 
 
-import type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction, LiveLoadOption } from './types';
+import type { SteelItem, Category, ConnectionItem, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction, LiveLoadOption } from './types';
 import { perfisData, tiposAco, PESO_CONCRETO_KGF_M3, E_ACO_MPA, RESISTENCIA_CALCULO_CONECTOR_KN } from './perfis';
 import { perfisIpeData } from './perfis-ipe';
 import { steelDeckData } from './steel-deck';
@@ -564,4 +564,4 @@ export {
     RESISTENCIA_CALCULO_CONECTOR_KN,
     liveLoadOptions
 };
-export type { SteelItem, Category, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction, LiveLoadOption };
+export type { SteelItem, Category, ConnectionItem, ConnectionGroup, ScrapItem, CategoryGroup, Perfil, PerfilIpe, SteelDeck, BudgetItem, SupportReaction, LiveLoadOption };

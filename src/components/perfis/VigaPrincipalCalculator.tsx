@@ -10,7 +10,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckCircle, PlusCircle, Sparkles, Loader } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { perfisData, tiposAco, E_ACO_MPA, BudgetItem, Perfil } from "@/lib/data/index";
+import { perfisData, tiposAco, E_ACO_MPA, BudgetItem, Perfil, PerfilIpe } from "@/lib/data/index";
 import { BeamSchemeDiagram } from "./BeamSchemeDiagram";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LabelList } from 'recharts';
 import { useCalculator, VigaInputs } from "@/app/perfis/calculadora/CalculatorContext";
@@ -18,7 +18,7 @@ import { RefinedButton, RefinedCard } from "@/components/refined-components";
 import { FormSkeleton } from "@/components/skeleton";
 
 interface VigaCalcResult {
-    profile: Perfil;
+  profile: Perfil | PerfilIpe;
     requiredWx: number;
     requiredIx: number;
     ltbCheck: { msd: number; mrd: number; passed: boolean; };
@@ -80,7 +80,7 @@ export function VigaPrincipalCalculator() {
 
   React.useEffect(() => {
     const vsReaction = supportReactions.vigaSecundaria;
-    const vsSpacing = parseFloat(vigaSecundaria.spacing?.replace(',', '.')) || 0;
+    const vsSpacing = parseFloat((vigaSecundaria.spacing ?? '').replace(',', '.')) || 0;
 
     if (vsReaction > 0 && vsSpacing > 0) {
         const loadFromVs = vsReaction / vsSpacing;
@@ -289,7 +289,7 @@ export function VigaPrincipalCalculator() {
              <Card className="mt-4 bg-primary/5 border-primary/20">
                 <CardHeader><AlertTitle className="text-primary font-bold flex items-center gap-2"><CheckCircle className="h-5 w-5"/> Perfil Recomendado</AlertTitle><AlertDescription className="space-y-2 pt-2"><div className="text-2xl font-bold text-center py-2 text-primary">{result.profile.nome}</div></AlertDescription></CardHeader>
                 <CardContent className="space-y-4">
-                     <div className="h-40"><ResponsiveContainer width="100%" height="100%"><BarChart data={result.optimizationData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}><XAxis type="number" domain={[0, 100]} hide /><YAxis type="category" dataKey="name" hide /><Tooltip cursor={{fill: 'hsla(var(--primary) / 0.1)'}} content={({ active, payload }) => active && payload && payload.length ? <div className="rounded-lg border bg-background p-2 shadow-sm"><p className="text-sm font-bold">{`${payload[0].payload.name}: ${payload[0].value?.toFixed(1)}% de utilização`}</p></div> : null} /><Bar dataKey="utilization" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]}><LabelList dataKey="name" position="insideLeft" offset={10} className="fill-primary-foreground text-xs" /><LabelList dataKey="utilization" position="right" formatter={(value: number) => `${value.toFixed(0)}%`} className="fill-foreground text-xs" /></Bar></BarChart></ResponsiveContainer></div>
+                     <div className="h-40"><ResponsiveContainer width="100%" height="100%"><BarChart data={result.optimizationData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}><XAxis type="number" domain={[0, 100]} hide /><YAxis type="category" dataKey="name" hide /><Tooltip cursor={{fill: 'hsla(var(--primary) / 0.1)'}} content={({ active, payload }) => active && payload && payload.length ? <div className="rounded-lg border bg-background p-2 shadow-sm"><p className="text-sm font-bold">{`${payload[0].payload.name}: ${Number(payload[0].value ?? 0).toFixed(1)}% de utilização`}</p></div> : null} /><Bar dataKey="utilization" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]}><LabelList dataKey="name" position="insideLeft" offset={10} className="fill-primary-foreground text-xs" /><LabelList dataKey="utilization" position="right" formatter={(value: number) => `${value.toFixed(0)}%`} className="fill-foreground text-xs" /></Bar></BarChart></ResponsiveContainer></div>
                   <RefinedButton type="button" onClick={handleAnalyze} className="w-full" disabled={isAnalyzing}>{isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar Resultado</>}</RefinedButton>
                   {isAnalyzing && (
                     <div className="space-y-4">

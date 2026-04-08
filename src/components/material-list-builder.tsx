@@ -345,16 +345,21 @@ export function MaterialListBuilder() {
       return (
         <div id="material-list-section" className="flex-1 flex flex-col min-h-0 pt-2 print:pt-0">
          <Card className="flex-1 overflow-hidden flex flex-col shadow-lg border-border/70">
-                <CardContent className="p-0 flex-1 overflow-y-auto">
-                     <Table className="border-separate border-spacing-0">
-                       <TableHeader className="sticky top-0 z-20">
-                           <TableRow className="hover:bg-transparent flex">
-                               <TableHead className="sticky top-0 z-30 flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
-                   <TableHead className={cn("sticky top-0 z-30 text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-[72px]" : "w-[96px]")}>PMQ</TableHead>
-                   <TableHead className={cn("sticky top-0 z-30 text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-[84px]" : "w-[96px]")}>VALOR</TableHead>
-                           </TableRow>
-                       </TableHeader>
-                       <TableBody>
+                <CardContent className="p-0 flex-1 min-h-0 flex flex-col overflow-hidden">
+                     <div className="shrink-0">
+                       <Table className="border-separate border-spacing-0">
+                         <TableHeader>
+                             <TableRow className="hover:bg-transparent flex">
+                                 <TableHead className="flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
+                     <TableHead className={cn("text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-[72px]" : "w-[96px]")}>PMQ</TableHead>
+                     <TableHead className={cn("text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-[84px]" : "w-[96px]")}>VALOR</TableHead>
+                             </TableRow>
+                         </TableHeader>
+                       </Table>
+                     </div>
+                     <div className="flex-1 overflow-y-auto min-h-0">
+                       <Table className="border-separate border-spacing-0">
+                         <TableBody>
                            {materialList.map((item, index) => {
                                 const isEven = index % 2 === 1;
                                return (
@@ -398,8 +403,9 @@ export function MaterialListBuilder() {
                                 )}
                                </React.Fragment>
                            )})}
-                       </TableBody>
-                   </Table>
+                         </TableBody>
+                       </Table>
+                     </div>
                 </CardContent>
              </Card>
         </div>

@@ -50,7 +50,7 @@ const PlanView = () => {
     const cantileverRight = parseFloat(slabAnalysis.cantileverRight.replace(',', '.')) || 0;
     const cantileverFront = parseFloat(slabAnalysis.cantileverFront.replace(',', '.')) || 0;
     const cantileverBack = parseFloat(slabAnalysis.cantileverBack.replace(',', '.')) || 0;
-    const spacingVS = parseFloat(vigaSecundaria.spacing?.replace(',', '.')) || 1.5;
+    const spacingVS = parseFloat((vigaSecundaria.spacing ?? '').replace(',', '.')) || 1.5;
     
     const vigaP_b = (vigaPrincipal.result?.profile.b || 200) / 1000;
     const vigaS_b = (vigaSecundaria.result?.profile.b || 100) / 1000;
@@ -115,7 +115,7 @@ const FrontElevationView = () => {
     const { slabAnalysis, laje, vigaPrincipal, vigaSecundaria, pilar, sapata } = useCalculator();
 
     const pilarH = parseFloat(pilar.height.replace(',', '.')) || 3;
-    const addPilarH = parseFloat(pilar.additionalHeight?.replace(',', '.')) || 0;
+    const addPilarH = parseFloat((pilar.additionalHeight ?? '').replace(',', '.')) || 0;
     const totalPilarH = pilarH + addPilarH;
     
     const vigaP = vigaPrincipal.result?.profile;
@@ -134,7 +134,7 @@ const FrontElevationView = () => {
     const cantileverLeft = parseFloat(slabAnalysis.cantileverLeft.replace(',', '.')) || 0;
     const cantileverRight = parseFloat(slabAnalysis.cantileverRight.replace(',', '.')) || 0;
     const spanX = totalSpanX - cantileverLeft - cantileverRight;
-    const spacingVS = parseFloat(vigaSecundaria.spacing?.replace(',', '.')) || 1.5;
+    const spacingVS = parseFloat((vigaSecundaria.spacing ?? '').replace(',', '.')) || 1.5;
 
     const sapataResult = sapata.result?.footingDimensions;
     const sapataH = (sapataResult?.recommendedHeightCm || 30) / 100;
@@ -219,7 +219,7 @@ const SideElevationView = () => {
     const { slabAnalysis, laje, vigaSecundaria, vigaPrincipal, pilar, sapata } = useCalculator();
 
     const pilarH = parseFloat(pilar.height.replace(',', '.')) || 3;
-    const addPilarH = parseFloat(pilar.additionalHeight?.replace(',', '.')) || 0;
+    const addPilarH = parseFloat((pilar.additionalHeight ?? '').replace(',', '.')) || 0;
     const totalPilarH = pilarH + addPilarH;
     const deckInfo = laje.result?.deck;
     const deckHeight_mm = deckInfo ? (deckInfo.tipo === 'MD75' ? 75 : 57) : 57;

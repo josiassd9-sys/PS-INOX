@@ -22,8 +22,9 @@ export function generateStaticParams() {
   return Array.from(ids).map((id) => ({ id }));
 }
 
-export default function CalculatorPage({ params }: { params: { id: string } }) {
+export default async function CalculatorPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   return (
-      <ClientPage id={params.id} />
+      <ClientPage id={id} />
   );
 }

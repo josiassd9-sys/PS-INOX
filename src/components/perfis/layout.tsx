@@ -5,7 +5,7 @@ import { Dashboard } from "@/components/dashboard";
 import * as React from "react";
 import { BudgetTable } from "@/components/perfis/BudgetTable";
 import { CalculatorTabs } from "@/components/perfis/CalculatorTabs";
-import { CalculatorProvider, useCalculator } from "./CalculatorContext";
+import { CalculatorProvider, useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
 
 function CalculatorLayoutContent({ children }: { children: React.ReactNode }) {
     const { budgetItems, onClearBudget, onSaveBudget, onPrintBudget } = useCalculator();

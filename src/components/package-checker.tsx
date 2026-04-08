@@ -39,8 +39,8 @@ export function PackageChecker() {
 
   const allItems = React.useMemo(() => {
     return ALL_CATEGORIES.flatMap((cat) =>
-      cat.unit === "m" ? cat.items : []
-    ) as SteelItem[];
+      cat.unit === "m" ? (cat.items as SteelItem[]) : []
+    );
   }, []);
 
   const filteredItems = React.useMemo(() => {

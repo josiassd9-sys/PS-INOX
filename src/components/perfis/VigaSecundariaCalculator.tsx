@@ -23,7 +23,7 @@ interface CalculationResult {
     requiredIx: number;
     ltbCheck: { msd: number; mrd: number; passed: boolean; };
     shearCheck: { vsd: number; vrd: number; passed: boolean; };
-    connectorCount: number;
+    connectorCount?: number;
     optimizationData: { name: string; utilization: number }[];
 }
 
@@ -32,7 +32,8 @@ interface AnalysisResult {
 }
 
 function getLocalAnalysis(result: CalculationResult, safetyFactor: number): AnalysisResult {
-    const { profile, optimizationData, connectorCount } = result;
+  const { profile, optimizationData } = result;
+  const connectorCount = result.connectorCount ?? 0;
     const flexao = optimizationData.find(d => d.name === 'Flexão (Wx)')?.utilization || 0;
     const deformacao = optimizationData.find(d => d.name === 'Deform. (Ix)')?.utilization || 0;
     const cortante = optimizationData.find(d => d.name === 'Cortante')?.utilization || 0;
@@ -287,8 +288,8 @@ export function VigaSecundariaCalculator() {
              <Card className="mt-4 bg-primary/5 border-primary/20">
                 <CardHeader><AlertTitle className="text-primary font-bold flex items-center gap-2"><CheckCircle className="h-5 w-5"/> Perfil IPE Recomendado</AlertTitle><AlertDescription className="space-y-2 pt-2"><div className="text-2xl font-bold text-center py-2 text-primary">{result.profile.nome}</div></AlertDescription></CardHeader>
                  <CardContent className="space-y-4">
-                     <div className="h-40"><ResponsiveContainer width="100%" height="100%"><BarChart data={result.optimizationData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}><XAxis type="number" domain={[0, 100]} hide /><YAxis type="category" dataKey="name" hide /><Tooltip cursor={{fill: 'hsla(var(--primary) / 0.1)'}} content={({ active, payload }) => active && payload?.length ? <div className="rounded-lg border bg-background p-2 shadow-sm"><p className="text-sm font-bold">{`${payload[0].payload.name}: ${payload[0].value?.toFixed(1)}% de utilização`}</p></div> : null} /><Bar dataKey="utilization" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]}><LabelList dataKey="name" position="insideLeft" offset={10} className="fill-primary-foreground text-xs" /><LabelList dataKey="utilization" position="right" formatter={(value: number) => `${value.toFixed(0)}%`} className="fill-foreground text-xs" /></Bar></BarChart></ResponsiveContainer></div>
-                      <div className="rounded-lg border bg-background p-2"><p className="text-sm font-medium text-center text-muted-foreground">Conectores de Cisalhamento (Stud Bolts 19mm)</p><p className="text-xl font-bold text-center text-primary">{result.connectorCount} unidades</p><p className="text-xs text-center text-muted-foreground">({(result.connectorCount / (beamScheme === 'biapoiada' ? parseFloat(span.replace(',', '.')) : parseFloat(span.replace(',', '.')) + parseFloat(balanco1.replace(',', '.')) + (beamScheme === 'dois-balancos' ? parseFloat(balanco2.replace(',', '.')) : 0))).toFixed(1)} un/m)</p></div>
+                     <div className="h-40"><ResponsiveContainer width="100%" height="100%"><BarChart data={result.optimizationData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}><XAxis type="number" domain={[0, 100]} hide /><YAxis type="category" dataKey="name" hide /><Tooltip cursor={{fill: 'hsla(var(--primary) / 0.1)'}} content={({ active, payload }) => active && payload?.length ? <div className="rounded-lg border bg-background p-2 shadow-sm"><p className="text-sm font-bold">{`${payload[0].payload.name}: ${Number(payload[0].value ?? 0).toFixed(1)}% de utilização`}</p></div> : null} /><Bar dataKey="utilization" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]}><LabelList dataKey="name" position="insideLeft" offset={10} className="fill-primary-foreground text-xs" /><LabelList dataKey="utilization" position="right" formatter={(value: number) => `${value.toFixed(0)}%`} className="fill-foreground text-xs" /></Bar></BarChart></ResponsiveContainer></div>
+                      <div className="rounded-lg border bg-background p-2"><p className="text-sm font-medium text-center text-muted-foreground">Conectores de Cisalhamento (Stud Bolts 19mm)</p><p className="text-xl font-bold text-center text-primary">{result.connectorCount ?? 0} unidades</p><p className="text-xs text-center text-muted-foreground">({(((result.connectorCount ?? 0) / (beamScheme === 'biapoiada' ? parseFloat(span.replace(',', '.')) : parseFloat(span.replace(',', '.')) + parseFloat(balanco1.replace(',', '.')) + (beamScheme === 'dois-balancos' ? parseFloat(balanco2.replace(',', '.')) : 0))) || 0).toFixed(1)} un/m)</p></div>
                       <RefinedButton type="button" onClick={handleAnalyze} className="w-full" disabled={isAnalyzing}>{isAnalyzing ? <><Loader className="animate-spin mr-2"/> Analisando...</> : <><Sparkles className="mr-2"/> Analisar Resultado</>}</RefinedButton>
                      {isAnalyzing && (
                         <div className="space-y-4">

@@ -141,7 +141,7 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
 
 
   return (
-    <>
+    <div className="h-full min-h-0 flex flex-col">
       <div className="flex items-center justify-end mb-1">
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
@@ -191,18 +191,23 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
           </DialogContent>
         </Dialog>
       </div>
-      <div className="border rounded-lg overflow-hidden shadow-lg border-border/70 bg-card">
-        <Table className="border-separate border-spacing-0">
-          {showTableHeader && (
-             <TableHeader className="sticky top-0 z-20">
-                <TableRow className="hover:bg-transparent flex">
-                    <TableHead className="sticky top-0 z-30 flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
-                    <TableHead className={cn("sticky top-0 z-30 text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-[96px]" : "w-[120px]")}>{weightUnitLabel}</TableHead>
-                    <TableHead className={cn("sticky top-0 z-30 text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-[96px]" : "w-[120px]")}>{priceUnitLabel}</TableHead>
-                </TableRow>
-            </TableHeader>
-          )}
-          <TableBody>
+      <div className="border rounded-lg overflow-hidden shadow-lg border-border/70 bg-card flex-1 min-h-0 flex flex-col">
+        {showTableHeader && (
+          <div className="shrink-0">
+            <Table className="border-separate border-spacing-0">
+              <TableHeader>
+                  <TableRow className="hover:bg-transparent flex">
+                      <TableHead className="flex-1 p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm">Descrição</TableHead>
+                      <TableHead className={cn("text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-[96px]" : "w-[120px]")}>{weightUnitLabel}</TableHead>
+                      <TableHead className={cn("text-center p-1 bg-sheet-table-header-bg text-sheet-table-header-fg font-bold text-sm", isMobile ? "w-[96px]" : "w-[120px]")}>{priceUnitLabel}</TableHead>
+                  </TableRow>
+              </TableHeader>
+            </Table>
+          </div>
+        )}
+        <div className="flex-1 overflow-y-auto min-h-0">
+          <Table className="border-separate border-spacing-0">
+            <TableBody>
             {filteredItems.map((item, index) => {
                 const itemPrice = calculateItemPrice(item);
                 const isSelectedForCut = selectedItemIdForCut === item.id;
@@ -261,10 +266,11 @@ export function ItemTable({ category, priceParams, costAdjustments, onItemClick,
                       )}
                   </React.Fragment>
             )})}
-          </TableBody>
-        </Table>
+            </TableBody>
+          </Table>
+        </div>
       </div>
-      </>
+      </div>
   );
 }
 

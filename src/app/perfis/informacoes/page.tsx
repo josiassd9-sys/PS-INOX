@@ -159,7 +159,7 @@ function InfoComponent() {
             </CardHeader>
         </Card>
         
-        <Accordion type="multiple" collapsible className="w-full" defaultValue={["normas", "conceitos"]}>
+        <Accordion type="multiple" className="w-full" defaultValue={["normas", "conceitos"]}>
             {informacoes.map(info => (
                 <AccordionItem value={info.id} key={info.id}>
                     <AccordionTrigger className="text-lg font-semibold hover:bg-primary/10 px-1">

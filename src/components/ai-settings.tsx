@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Sparkles, Eye, EyeOff, CheckCircle, XCircle, Loader } from "lucide-react";
+import { Sparkles, Eye, EyeOff, CheckCircle, XCircle, Loader, Lock } from "lucide-react";
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -99,7 +99,7 @@ export function AiSettings() {
               type="button"
               variant={provider === "local" ? "primary" : "outline"}
               animation={provider === "local" ? "lift" : "scale"}
-              className="h-auto min-h-12 flex-col gap-0.5 p-2.5"
+              className="h-auto min-h-12 flex-col gap-0.5 rounded-xl p-2.5 transition-all duration-200 hover:-translate-y-[1px]"
               onClick={() => handleProviderChange("local")}
             >
               <span className="text-sm font-medium">Local</span>
@@ -109,7 +109,7 @@ export function AiSettings() {
               type="button"
               variant={provider === "gemini" ? "primary" : "outline"}
               animation={provider === "gemini" ? "lift" : "scale"}
-              className="h-auto min-h-12 flex-col gap-0.5 p-2.5"
+              className="h-auto min-h-12 flex-col gap-0.5 rounded-xl p-2.5 transition-all duration-200 hover:-translate-y-[1px]"
               onClick={() => handleProviderChange("gemini")}
             >
               <span className="text-sm font-medium">Gemini</span>
@@ -120,16 +120,17 @@ export function AiSettings() {
 
         {/* API Key field */}
         {provider === "gemini" && (
-          <div className="space-y-2 rounded-xl border bg-muted/30 p-3">
+          <div className="space-y-2 rounded-xl border bg-muted/30 p-3 shadow-sm">
             <Label htmlFor="ai-api-key">Chave de API (Gemini)</Label>
             <div className="relative">
+              <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 id="ai-api-key"
                 type={showKey ? "text" : "password"}
                 placeholder="AIzaSy..."
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                className="pr-10"
+                className="pl-9 pr-10"
                 autoComplete="off"
                 spellCheck={false}
               />
@@ -188,13 +189,13 @@ export function AiSettings() {
 
         {/* Test status */}
         {testStatus === "ok" && (
-          <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+          <div className="flex items-center gap-2 rounded-lg border border-green-500/30 bg-green-500/10 px-3 py-2 text-sm text-green-700 dark:text-green-400">
             <CheckCircle className="h-4 w-4 shrink-0" />
             {testMessage}
           </div>
         )}
         {testStatus === "error" && (
-          <div className="flex items-center gap-2 text-sm text-destructive">
+          <div className="flex items-center gap-2 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
             <XCircle className="h-4 w-4 shrink-0" />
             {testMessage}
           </div>

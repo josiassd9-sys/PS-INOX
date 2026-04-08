@@ -36,7 +36,7 @@ export function DesignSelector() {
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="grid gap-2 sm:grid-cols-2">
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           {DESIGN_LEVELS.map((level) => {
             const isActive = designLevel === level;
             return (
@@ -44,7 +44,7 @@ export function DesignSelector() {
                 key={level}
                 variant={isActive ? "primary" : "outline"}
                 animation={isActive ? "lift" : "scale"}
-                className="h-auto min-h-16 w-full justify-between rounded-xl p-3 text-left"
+                className="h-auto min-h-16 w-full justify-between rounded-xl p-3 text-left transition-all duration-200 hover:-translate-y-[1px]"
                 onClick={() => handleSelectDesign(level)}
               >
                 <span className="flex w-full items-start justify-between gap-3">

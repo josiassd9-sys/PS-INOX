@@ -1,8 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { Check, Palette, SlidersHorizontal } from "lucide-react";
-import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Palette, Sparkles } from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
 import {
   applyTheme,
   getStoredTheme,
@@ -11,8 +17,15 @@ import {
   THEMES,
   type AppTheme,
 } from "@/lib/theme";
-import { RefinedButton, RefinedCard } from "./refined-components";
-import { DesignSelector } from "./design-selector";
+import {
+  applyDesignLevel,
+  getStoredDesignLevel,
+  storeDesignLevel,
+  DESIGN_LABELS,
+  DESIGN_DESCRIPTIONS,
+  DESIGN_LEVELS,
+  type DesignLevel,
+} from "@/lib/design";
 import { AiSettings } from "./ai-settings";
 
 const THEME_PREVIEWS: Record<AppTheme, string[]> = {
@@ -22,89 +35,171 @@ const THEME_PREVIEWS: Record<AppTheme, string[]> = {
   "minimal-gray": ["bg-[hsl(0_0%_10%)]", "bg-[hsl(152_58%_30%)]", "bg-[hsl(0_0%_95%)]"],
 };
 
+type Tab = "aparencia" | "ia";
+
+const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
+  { id: "aparencia", label: "Aparência", icon: <Palette className="h-4 w-4 shrink-0" /> },
+  { id: "ia", label: "Inteligência Artificial", icon: <Sparkles className="h-4 w-4 shrink-0" /> },
+];
+
+function SettingRow({
+  label,
+  description,
+  children,
+}: {
+  label: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-2 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0">
+        <p className="text-sm font-medium">{label}</p>
+        {description && <p className="text-xs text-muted-foreground">{description}</p>}
+      </div>
+      <div className="w-full sm:w-auto sm:shrink-0">{children}</div>
+    </div>
+  );
+}
+
 export function ThemeSettings() {
+  const [activeTab, setActiveTab] = React.useState<Tab>("aparencia");
   const [theme, setTheme] = React.useState<AppTheme>("industrial-light");
+  const [designLevel, setDesignLevel] = React.useState<DesignLevel>(4);
 
   React.useEffect(() => {
     setTheme(getStoredTheme());
+    setDesignLevel(getStoredDesignLevel());
   }, []);
 
-  const handleSelectTheme = React.useCallback((nextTheme: AppTheme) => {
-    setTheme(nextTheme);
-    applyTheme(nextTheme);
-    storeTheme(nextTheme);
-  }, []);
+  const handleSelectTheme = (next: AppTheme) => {
+    setTheme(next);
+    applyTheme(next);
+    storeTheme(next);
+  };
+
+  const handleSelectDesign = (next: DesignLevel) => {
+    setDesignLevel(next);
+    applyDesignLevel(next);
+    storeDesignLevel(next);
+  };
 
   return (
-    <div className="mx-auto max-w-4xl p-2 space-y-4">
-      <div className="relative overflow-hidden rounded-2xl border bg-gradient-to-br from-primary/10 via-background to-accent/10 p-4 shadow-sm sm:p-5">
-        <div className="pointer-events-none absolute -top-10 -right-8 h-24 w-24 rounded-full bg-primary/10 blur-2xl" />
-        <div className="pointer-events-none absolute -bottom-8 -left-6 h-20 w-20 rounded-full bg-accent/20 blur-xl" />
-        <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Configurações</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Ajuste aparência e IA de forma rápida, com foco em produtividade.
-        </p>
-      </div>
+    <div className="mx-auto max-w-4xl p-2 pb-6">
+      <div className="overflow-hidden rounded-xl border shadow-sm">
+        {/* Panel header */}
+        <div className="border-b bg-muted/30 px-4 py-2.5">
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            Configurações
+          </p>
+        </div>
 
-      <div className="grid gap-4 lg:grid-cols-12">
-        <RefinedCard hover="subtle" className="overflow-hidden p-0 lg:col-span-7">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-              <Palette className="h-4 w-4" />
-              Tema de Cores
-            </CardTitle>
-            <CardDescription>
-              Escolha o visual do app. Essa mudança não altera cálculos nem dados.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="grid gap-2 sm:grid-cols-2">
-              {THEMES.map((themeOption) => {
-                const isActive = theme === themeOption;
-                const previewSwatches = THEME_PREVIEWS[themeOption] ?? [
-                  "bg-[hsl(0_0%_12%)]",
-                  "bg-[hsl(0_0%_72%)]",
-                  "bg-[hsl(0_0%_95%)]",
-                ];
-                return (
-                  <RefinedButton
-                    key={themeOption}
-                    variant={isActive ? "primary" : "outline"}
-                    animation={isActive ? "lift" : "scale"}
-                    className="h-auto min-h-20 w-full justify-between rounded-xl p-3 text-left transition-all duration-200 hover:-translate-y-[1px]"
-                    onClick={() => handleSelectTheme(themeOption)}
-                  >
-                    <span className="flex w-full flex-col gap-2">
-                      <span className="flex items-center justify-between gap-3">
-                        <span className="text-sm font-medium">{THEME_LABELS[themeOption]}</span>
-                        {isActive ? <Check className="h-4 w-4" /> : null}
-                      </span>
-                      <span className="flex gap-2">
-                        {previewSwatches.map((previewClass) => (
-                          <span key={previewClass} className={`h-2.5 flex-1 rounded-full border border-black/10 ${previewClass}`} />
-                        ))}
-                      </span>
-                    </span>
-                  </RefinedButton>
-                );
-              })}
+        {/* Sidebar + content */}
+        <div className="grid min-h-[320px] grid-cols-1 md:grid-cols-[200px_1fr]">
+          {/* Sidebar nav */}
+          <nav className="border-b bg-muted/10 p-2 md:border-b-0 md:border-r">
+            <div className="flex gap-1 overflow-x-auto md:flex-col md:overflow-visible">
+              {TABS.map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    "flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
+                    activeTab === tab.id
+                      ? "bg-primary/10 font-semibold text-primary"
+                      : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+                  )}
+                >
+                  {tab.icon}
+                  <span className="whitespace-nowrap">{tab.label}</span>
+                </button>
+              ))}
             </div>
-          </CardContent>
-        </RefinedCard>
+          </nav>
 
-        <div className="lg:col-span-5">
-          <AiSettings />
+          {/* Content area */}
+          <div className="p-4 sm:p-5">
+            {activeTab === "aparencia" && (
+              <div className="space-y-4">
+                <div>
+                  <h2 className="text-sm font-semibold">Aparência</h2>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    Personalize o visual do aplicativo.
+                  </p>
+                </div>
+
+                <div className="overflow-hidden divide-y rounded-lg border">
+                  <SettingRow label="Tema de cores" description="Paleta visual aplicada ao app">
+                    <Select value={theme} onValueChange={handleSelectTheme}>
+                      <SelectTrigger className="h-9 w-full sm:w-56">
+                        <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
+                          <span className="flex shrink-0 gap-1">
+                            {(THEME_PREVIEWS[theme] ?? []).map((cls) => (
+                              <span
+                                key={cls}
+                                className={`block h-3 w-3 rounded-full border border-black/10 ${cls}`}
+                              />
+                            ))}
+                          </span>
+                          <span className="truncate text-sm">{THEME_LABELS[theme]}</span>
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {THEMES.map((t) => (
+                          <SelectItem key={t} value={t}>
+                            <div className="flex items-center gap-2">
+                              <span className="flex shrink-0 gap-1">
+                                {(THEME_PREVIEWS[t] ?? []).map((cls) => (
+                                  <span
+                                    key={cls}
+                                    className={`block h-3 w-3 rounded-full border border-black/10 ${cls}`}
+                                  />
+                                ))}
+                              </span>
+                              {THEME_LABELS[t]}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </SettingRow>
+
+                  <SettingRow
+                    label="Nível de design"
+                    description="Grau de refinamento visual e micro-interações"
+                  >
+                    <Select
+                      value={String(designLevel)}
+                      onValueChange={(v) => handleSelectDesign(Number(v) as DesignLevel)}
+                    >
+                      <SelectTrigger className="h-9 w-full sm:w-56">
+                        <div className="flex min-w-0 flex-1 items-center overflow-hidden">
+                          <span className="truncate text-sm">{DESIGN_LABELS[designLevel]}</span>
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {DESIGN_LEVELS.map((level) => (
+                          <SelectItem key={level} value={String(level)}>
+                            <div className="flex flex-col gap-0.5">
+                              <span>{DESIGN_LABELS[level]}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {DESIGN_DESCRIPTIONS[level]}
+                              </span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </SettingRow>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "ia" && <AiSettings />}
+          </div>
         </div>
       </div>
-
-      <div className="rounded-2xl border bg-gradient-to-br from-accent/10 via-background to-primary/5 p-3">
-        <div className="mb-2 flex items-center gap-2 px-1">
-          <SlidersHorizontal className="h-4 w-4" />
-          <p className="text-sm font-medium">Nível de Design</p>
-        </div>
-        <DesignSelector />
-      </div>
-
     </div>
   );
 }

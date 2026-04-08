@@ -12,10 +12,10 @@ function CalculatorLayoutContent({ children }: { children: React.ReactNode }) {
     
     return (
         <Dashboard initialCategoryId="perfis/calculadora">
-      <div className="container mx-auto px-3 py-4 md:p-4 space-y-4 print:p-0">
+      <div className="mx-auto w-full max-w-7xl overflow-x-hidden px-3 py-4 md:p-4 space-y-4 print:p-0">
                 <CalculatorTabs />
                 
-                <div className="mt-4">
+                <div className="mt-4 min-w-0 w-full overflow-x-hidden">
                   {children}
                 </div>
                 

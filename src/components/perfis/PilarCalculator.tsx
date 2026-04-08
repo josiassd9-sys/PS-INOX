@@ -265,7 +265,7 @@ export function PilarCalculator() {
                             <AlertDescription className="space-y-2 pt-2">
                                 <p>O perfil mais leve que atende à carga axial de <span className="font-semibold">{axialLoad} kgf</span> e pé-direito de <span className="font-semibold">{height}m</span> é:</p>
                                 <div className="text-2xl font-bold text-center py-2 text-primary">{result.profile.nome}</div>
-                                <div className="grid grid-cols-2 gap-2 text-center text-sm">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-center text-sm">
                                     <div><p className="text-muted-foreground">Tensão Atuante (Majorada)</p><p className="font-semibold">{result.actingStress.toFixed(1)} MPa</p></div>
                                     <div><p className="text-muted-foreground">Tensão Admissível</p><p className="font-semibold">{result.allowableStress.toFixed(1)} MPa</p></div>
                                 </div>
@@ -308,7 +308,7 @@ export function PilarCalculator() {
                                     <AlertDescription className="whitespace-pre-line">{aiAnalysis}</AlertDescription>
                                 </Alert>
                             )}
-                            <div className="grid grid-cols-2 gap-4 border-t pt-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="pilar-quantity">Quantidade</Label>
                                     <Input id="pilar-quantity" type="text" inputMode="numeric" value={quantity} onChange={e => handleInputChange('quantity', e.target.value)} />

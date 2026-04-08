@@ -356,7 +356,7 @@ export function VigaPrincipalCalculator() {
                      )}
                      {aiError && <Alert variant="destructive"><AlertTitle>IA indisponível</AlertTitle><AlertDescription>{aiError}</AlertDescription></Alert>}
                      {aiAnalysis && <Alert variant="default"><Sparkles className="h-4 w-4" /><AlertTitle className="font-semibold">Análise por IA (Comparativa)</AlertTitle><AlertDescription className="whitespace-pre-line">{aiAnalysis}</AlertDescription></Alert>}
-                     <div className="grid grid-cols-2 gap-4 border-t pt-4">
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-4">
                          <div className="space-y-2"><Label htmlFor="quantity">Quantidade de Vigas</Label><Input id="quantity" type="text" inputMode="numeric" value={quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} placeholder="Ex: 1" /></div>
                          <div className="space-y-2"><Label htmlFor="pricePerKg">Preço do Aço (R$/kg)</Label><Input id="pricePerKg" type="text" inputMode="decimal" value={pricePerKg} onChange={(e) => handleInputChange('pricePerKg', e.target.value)} placeholder="Ex: 8,50" /></div>
                     </div>

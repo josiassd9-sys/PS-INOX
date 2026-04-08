@@ -105,47 +105,47 @@ export const SlabAnalysis = () => {
     };
 
     return (
-        <Card className="w-full max-w-4xl mx-auto">
+        <Card className="w-full max-w-4xl mx-auto overflow-hidden">
             <CardHeader>
                 <CardTitle>Análise Estrutural da Geometria da Laje</CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 min-w-0">
                     {/* Coluna de Inputs */}
-                    <div className="space-y-4">
+                    <div className="space-y-4 min-w-0">
                         <h3 className="font-semibold text-lg">Parâmetros da Laje (em metros)</h3>
-                        <div className="grid grid-cols-2 gap-4">
-                            <Label htmlFor="vaoX">Vão em X (Principal)</Label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+                            <Label htmlFor="vaoX" className="text-sm">Vão em X (Principal)</Label>
                             <Input id="vaoX" type="number" value={vaoX} onChange={(e) => setVaoX(Number(e.target.value))} />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <Label htmlFor="vaoY">Vão em Y (Secundário)</Label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+                            <Label htmlFor="vaoY" className="text-sm">Vão em Y (Secundário)</Label>
                             <Input id="vaoY" type="number" value={vaoY} onChange={(e) => setVaoY(Number(e.target.value))} />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <Label htmlFor="balancoX_E">Balanço em X (Esquerda)</Label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+                            <Label htmlFor="balancoX_E" className="text-sm">Balanço em X (Esquerda)</Label>
                             <Input id="balancoX_E" type="number" value={balancoX_E} onChange={(e) => setBalancoX_E(Number(e.target.value))} />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <Label htmlFor="balancoX_D">Balanço em X (Direita)</Label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+                            <Label htmlFor="balancoX_D" className="text-sm">Balanço em X (Direita)</Label>
                             <Input id="balancoX_D" type="number" value={balancoX_D} onChange={(e) => setBalancoX_D(Number(e.target.value))} />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <Label htmlFor="balancoY_S">Balanço em Y (Superior)</Label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+                            <Label htmlFor="balancoY_S" className="text-sm">Balanço em Y (Superior)</Label>
                             <Input id="balancoY_S" type="number" value={balancoY_S} onChange={(e) => setBalancoY_S(Number(e.target.value))} />
                         </div>
-                         <div className="grid grid-cols-2 gap-4">
-                            <Label htmlFor="balancoY_I">Balanço em Y (Inferior)</Label>
+                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+                            <Label htmlFor="balancoY_I" className="text-sm">Balanço em Y (Inferior)</Label>
                             <Input id="balancoY_I" type="number" value={balancoY_I} onChange={(e) => setBalancoY_I(Number(e.target.value))} />
                         </div>
                         <Button onClick={handleAnalyze} className="w-full">Analisar Geometria</Button>
                     </div>
 
                     {/* Coluna de Análise */}
-                    <div className="space-y-4">
+                    <div className="space-y-4 min-w-0">
                         <h3 className="font-semibold text-lg">Resultado da Análise</h3>
-                        <ScrollArea className="h-72 w-full rounded-md border p-4">
-                            <pre className="whitespace-pre-wrap text-sm">{analysis || "A análise aparecerá aqui."}</pre>
+                        <ScrollArea className="h-72 w-full rounded-md border p-4 overflow-x-hidden">
+                            <pre className="whitespace-pre-wrap break-words text-sm">{analysis || "A análise aparecerá aqui."}</pre>
                         </ScrollArea>
                         {analysis && (
                             <Button onClick={handleCopy} variant="outline" className="w-full">

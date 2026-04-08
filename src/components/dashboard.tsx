@@ -17,7 +17,7 @@ import {
   useSidebar,
   SidebarGroup,
 } from "@/components/ui/sidebar";
-import { Search, SlidersHorizontal, PlusCircle, Calculator, BookOpen, Ruler, Variable, X, Trash2, Save, ArrowUpFromLine, Printer } from "lucide-react";
+import { Search, SlidersHorizontal, PlusCircle, Calculator, BookOpen, Ruler, Variable, X, Trash2, Save, ArrowUpFromLine, Printer, Activity, Layers3 } from "lucide-react";
 import { PriceControls } from "./price-controls";
 import { ItemTable } from "./item-table";
 import { Icon } from "./icons";
@@ -386,6 +386,22 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
       return "Selecione uma categoria no menu para começar.";
   }
 
+  const getContextTone = () => {
+    if (!selectedCategoryId) return { chip: "bg-muted text-muted-foreground", bar: "from-muted/30 via-transparent to-transparent" };
+    if (selectedCategoryId === "lista-materiais" || selectedCategoryId === "lista-sucatas") {
+      return { chip: "bg-primary/10 text-primary border-primary/20", bar: "from-primary/20 via-primary/5 to-transparent" };
+    }
+    if (selectedCategoryId.startsWith("perfis/")) {
+      return { chip: "bg-accent/20 text-accent-foreground border-accent/30", bar: "from-accent/25 via-accent/5 to-transparent" };
+    }
+    if (selectedCategoryId.startsWith("informativos/") || selectedCategoryId.startsWith("mecanica/")) {
+      return { chip: "bg-secondary/30 text-secondary-foreground border-secondary/40", bar: "from-secondary/20 via-secondary/5 to-transparent" };
+    }
+    return { chip: "bg-muted text-foreground border-border", bar: "from-muted/40 via-muted/10 to-transparent" };
+  };
+
+  const contextTone = getContextTone();
+
   if (isBooting) {
     return <LoadingScreen />;
   }
@@ -432,13 +448,31 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
       <SidebarInset>
         <div className={cn("p-1 h-screen flex flex-col gap-1")}>
           <div className="bg-background rounded-lg border flex-1 flex flex-col overflow-hidden">
+            <div className={cn("h-1 w-full bg-gradient-to-r", contextTone.bar)} />
+            <div className="border-b bg-muted/25 px-2 py-1">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 overflow-hidden">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-green-500/30 bg-green-500/10 px-2 py-0.5 text-[11px] font-medium text-green-700 dark:text-green-400">
+                    <Activity className="h-3 w-3" />
+                    Operacional
+                  </span>
+                  <span className={cn("inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium", contextTone.chip)}>
+                    <Layers3 className="h-3 w-3" />
+                    {selectedCategory?.name ?? "Painel"}
+                  </span>
+                </div>
+                <div className="text-[11px] text-muted-foreground">
+                  {new Date().toLocaleDateString("pt-BR")}
+                </div>
+              </div>
+            </div>
             <header className={cn(
-              "flex items-center justify-between gap-1 p-1 border-b"
+              "flex items-center justify-between gap-1 p-1.5 border-b bg-gradient-to-r from-background via-background to-muted/20"
             )}>
               <div className="flex items-center gap-1 flex-1 min-w-0">
                 <SidebarTrigger className="md:hidden"/>
                 <div className="hidden md:block overflow-hidden">
-                  <h2 className="text-lg font-semibold truncate">{getPageTitle()}</h2>
+                  <h2 className="text-lg font-semibold tracking-tight truncate">{getPageTitle()}</h2>
                   <p className="text-sm text-muted-foreground truncate">{getPageDescription()}</p>
                 </div>
               </div>

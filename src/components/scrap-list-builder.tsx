@@ -16,6 +16,7 @@ import { Label } from "./ui/label";
 import { cn } from "@/lib/utils";
 import { ScrapCalculator } from "./scrap-calculator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "./ui/dialog";
+import { generateScrapListPdf } from "@/services/scrap-list-pdf";
 
 const SCRAP_LIST_KEY = "scrapBuilderList";
 
@@ -193,6 +194,46 @@ export function ScrapListBuilder() {
         description: "Sua lista de sucatas foi salva com sucesso."
     })
   }
+
+  const handlePrintList = async () => {
+    if (scrapList.length === 0) {
+      toast({
+        title: "Lista vazia",
+        description: "Adicione itens para gerar o PDF.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const mode = await generateScrapListPdf({
+        items: scrapList.map((item) => ({
+          description: item.description || "-",
+          unit: item.unit,
+          quantity: item.quantity ?? 0,
+          weight: item.weight ?? 0,
+          price: item.price ?? 0,
+        })),
+        totalWeight: totalListWeight,
+        totalPrice: totalListPrice,
+      });
+
+      toast({
+        title: mode === "native" ? "PDF pronto" : "Download iniciado",
+        description:
+          mode === "native"
+            ? "Abra o compartilhamento para enviar ou salvar o arquivo."
+            : "O PDF da lista de sucatas foi baixado.",
+      });
+    } catch (error) {
+      console.error("Erro ao gerar PDF da lista de sucatas", error);
+      toast({
+        title: "Falha ao gerar PDF",
+        description: "Nao foi possivel gerar o PDF da lista de sucatas.",
+        variant: "destructive",
+      });
+    }
+  };
   
   const handleAddItemToList = (item: any) => {
     const newItem: ListItem = {
@@ -481,7 +522,7 @@ export function ScrapListBuilder() {
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10 print:hidden" onClick={handleSaveList}>
                         <Save />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10 print:hidden" onClick={() => window.print()}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-white/70 hover:text-white hover:bg-white/10 print:hidden" onClick={handlePrintList}>
                         <Printer />
                     </Button>
                 </div>

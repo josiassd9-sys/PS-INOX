@@ -412,7 +412,11 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
       return "Selecione uma categoria no menu para começar.";
   }
 
-  const canUseSearch = selectedCategoryId !== 'balanca' && !selectedCategoryId?.startsWith('perfis/calculadora');
+  const canUseSearch =
+    selectedCategoryId !== 'balanca' &&
+    selectedCategoryId !== 'lista-materiais' &&
+    selectedCategoryId !== 'lista-sucatas' &&
+    !selectedCategoryId?.startsWith('perfis/calculadora');
 
   const hasQuickActions =
     (!!showPriceControls && !!currentPriceParams) ||

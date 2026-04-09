@@ -505,6 +505,13 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
               <div className="flex items-center justify-between gap-1 p-1.5">
                 <div className="flex items-center gap-1 flex-1 min-w-0">
                   <SidebarTrigger className="md:hidden"/>
+                  <button
+                    onClick={handleThemeSwitch}
+                    className="md:hidden h-9 w-9 inline-flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                    title={`Tema: ${THEME_LABELS[theme]}`}
+                  >
+                    <Palette className="h-4 w-4" />
+                  </button>
                   <div className="hidden md:block overflow-hidden">
                     <h2 className="text-lg font-semibold tracking-tight truncate">{getPageTitle()}</h2>
                     <p className="text-sm text-muted-foreground truncate">{getPageDescription()}</p>

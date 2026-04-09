@@ -2,7 +2,6 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { GlobalMenuTrigger } from '@/components/global-menu-trigger';
 import { ThemeInitializer } from '@/components/theme-initializer';
 import type { Viewport } from 'next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -41,7 +40,6 @@ export default function RootLayout({
       <body className="font-body antialiased">
         <ThemeInitializer />
         <SidebarProvider>
-          <GlobalMenuTrigger />
           {children}
         </SidebarProvider>
         <Toaster />

@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 
+// Required for CAPACITOR_BUILD static export flow.
+// In static export this route is not served, but declaring force-static
+// avoids build-time failure for /api paths.
+export const dynamic = "force-static";
+
 interface AiComparePayload {
   analysisType: string;
   context: Record<string, unknown>;

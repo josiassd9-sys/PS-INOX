@@ -1,5 +1,4 @@
 // src/ai/flows/material-cost-forecaster.ts
-'use server';
 
 /**
  * @fileOverview Calculates an adjusted selling price based on cost and margin.

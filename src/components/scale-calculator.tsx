@@ -17,6 +17,7 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "./ui/tooltip";
 import { cn } from "@/lib/utils";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
+import { generateWeighingPdf } from "@/services/weighing-pdf";
 
 type WeighingItem = {
   id: string;
@@ -227,25 +228,48 @@ const ScaleCalculatorComponent = forwardRef((props, ref) => {
       }
   }
 
-  const handlePrint = () => {
+  const handlePrint = async () => {
     try {
-        const dataToPrint = {
-            ...{weighingSets, headerData, operationType},
-            weighingSets: weighingSets.map(set => ({
-                ...set,
-                descontoCacamba: parseFloat(set.descontoCacamba) || 0,
-                items: set.items.map(item => ({
-                    ...item,
-                    bruto: parseFloat(item.bruto) || 0,
-                    tara: parseFloat(item.tara) || 0,
-                    descontos: parseFloat(item.descontos) || 0,
-                }))
-            }))
-        };
-        localStorage.setItem("scaleData", JSON.stringify(dataToPrint));
-        window.open('/calculator/balanca/print', '_blank');
+      const weighingSetsNumeric = weighingSets.map((set) => ({
+        name: set.name,
+        descontoCacamba: parseFloat(set.descontoCacamba) || 0,
+        items: set.items.map((item) => ({
+          material: item.material,
+          bruto: parseFloat(item.bruto) || 0,
+          tara: parseFloat(item.tara) || 0,
+          descontos: parseFloat(item.descontos) || 0,
+          liquido: item.liquido || 0,
+        })),
+      }));
+
+      const totalLiquido = weighingSetsNumeric.reduce((total, set) => {
+        const setTotal = set.items.reduce((acc, item) => acc + item.liquido, 0);
+        return total + (setTotal - set.descontoCacamba);
+      }, 0);
+
+      const mode = await generateWeighingPdf({
+        headerData: {
+          client: headerData.client,
+          plate: headerData.plate,
+          driver: headerData.driver,
+        },
+        weighingSets: weighingSetsNumeric,
+        grandTotalLiquido: totalLiquido,
+      });
+
+      toast({
+        title: mode === "native" ? "PDF pronto para compartilhar" : "PDF baixado",
+        description:
+          mode === "native"
+            ? "O PDF foi gerado e aberto no compartilhamento do aparelho."
+            : "O PDF foi gerado e baixado no navegador.",
+      });
     } catch (e) {
-        toast({ variant: "destructive", title: "Erro ao Imprimir", description: "Não foi possível preparar os dados para impressão." });
+      toast({
+        variant: "destructive",
+        title: "Erro ao gerar PDF",
+        description: "Não foi possível gerar o PDF da pesagem.",
+      });
     }
   }
 

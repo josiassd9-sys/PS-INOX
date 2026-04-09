@@ -1,5 +1,3 @@
-'use server';
-
 /**
  * @fileOverview Suggests a markup percentage based on the item's cost price.
  *

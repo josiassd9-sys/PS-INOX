@@ -13,6 +13,15 @@ const nextConfig: NextConfig = {
   /* config options here */
   ...(isCapacitorBuild
     ? {
+        experimental: {
+          serverActions: {
+            allowedOrigins: [],
+          },
+        },
+      }
+    : {}),
+  ...(isCapacitorBuild
+    ? {
         output: 'export',
       }
     : {}),

@@ -481,7 +481,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                     {selectedCategory?.name ?? "Painel"}
                   </span>
                 </div>
-                <div className="text-[11px] text-muted-foreground">
+                <div className="text-[11px] text-muted-foreground md:mr-[80px]">
                   {new Date().toLocaleDateString("pt-BR")}
                 </div>
               </div>
@@ -519,7 +519,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                 </div>
               )}
 
-                <div className="hidden md:flex items-center gap-1 rounded-lg border bg-muted/30 p-1">
+                <div className="hidden md:flex items-center gap-1 rounded-lg border bg-muted/30 p-1 md:mr-[80px]">
                 
                 {showPriceControls && currentPriceParams && (
                   <Dialog>

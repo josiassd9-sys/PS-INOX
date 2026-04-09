@@ -17,7 +17,8 @@ import {
   useSidebar,
   SidebarGroup,
 } from "@/components/ui/sidebar";
-import { Search, SlidersHorizontal, PlusCircle, Calculator, BookOpen, Ruler, Variable, X, Trash2, Save, ArrowUpFromLine, Printer, Activity, Layers3 } from "lucide-react";
+import { Search, SlidersHorizontal, PlusCircle, Calculator, BookOpen, Ruler, Variable, X, Trash2, Save, ArrowUpFromLine, Printer, Activity, Layers3, Menu, Palette } from "lucide-react";
+import { applyTheme, getNextTheme, getStoredTheme, storeTheme, THEME_LABELS, type AppTheme } from "@/lib/theme";
 import { PriceControls } from "./price-controls";
 import { ItemTable } from "./item-table";
 import { Icon } from "./icons";
@@ -108,8 +109,20 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
   const [isBooting, setIsBooting] = React.useState(true);
   
   const [selectedCategoryId, setSelectedCategoryId] = React.useState<string | null>(initialCategoryId);
+  const [theme, setTheme] = React.useState<AppTheme>("industrial-light");
+
+  React.useEffect(() => {
+    setTheme(getStoredTheme());
+  }, []);
+
+  const handleThemeSwitch = React.useCallback(() => {
+    const nextTheme = getNextTheme(theme);
+    setTheme(nextTheme);
+    applyTheme(nextTheme);
+    storeTheme(nextTheme);
+  }, [theme]);
   const [searchTerm, setSearchTerm] = React.useState("");
-  const { setOpenMobile, isMobile } = useSidebar();
+  const { setOpenMobile, isMobile, toggleSidebar } = useSidebar();
   const [isScrapItemDialogOpen, setIsScrapItemDialogOpen] = React.useState(false);
   const [editedWeights, setEditedWeights] = React.useState<Record<string, number>>({});
   const [costAdjustments, setCostAdjustments] = React.useState<Record<string, number>>({});
@@ -481,7 +494,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                     {selectedCategory?.name ?? "Painel"}
                   </span>
                 </div>
-                <div className="text-[11px] text-muted-foreground md:mr-[80px]">
+                <div className="text-[11px] text-muted-foreground">
                   {new Date().toLocaleDateString("pt-BR")}
                 </div>
               </div>
@@ -519,7 +532,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                 </div>
               )}
 
-                <div className="hidden md:flex items-center gap-1 rounded-lg border bg-muted/30 p-1 md:mr-[80px]">
+                <div className="hidden md:flex items-center gap-1 rounded-lg border bg-muted/30 p-1">
                 
                 {showPriceControls && currentPriceParams && (
                   <Dialog>
@@ -561,6 +574,14 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
                     <span>Limpar</span>
                   </Button>
                 )}
+                <Button onClick={toggleSidebar} variant="ghost" size="icon" className="h-8 w-8">
+                  <Menu className="h-4 w-4" />
+                  <span className="sr-only">Menu</span>
+                </Button>
+                <Button onClick={handleThemeSwitch} variant="ghost" size="icon" className="h-8 w-8" title={`Tema: ${THEME_LABELS[theme]}`}>
+                  <Palette className="h-4 w-4" />
+                  <span className="sr-only">Tema</span>
+                </Button>
               </div>
               </div>
 

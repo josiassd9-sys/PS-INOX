@@ -30,16 +30,19 @@ export function GlobalMenuTrigger() {
     storeTheme(nextTheme);
   }, [theme]);
 
+  // No desktop os botões ficam integrados no header do dashboard
+  if (!isMobile) return null;
+
   return (
     <div
-      className={isMobile ? "fixed z-50 flex items-center gap-2 print:hidden" : "fixed top-2 right-2 z-50 flex items-center gap-1 print:hidden"}
-      style={isMobile ? { top: "calc(var(--safe-area-top) + 0.75rem)", right: "calc(var(--safe-area-right) + 0.75rem)" } : undefined}
+      className="fixed z-50 flex items-center gap-2 print:hidden"
+      style={{ top: "calc(var(--safe-area-top) + 0.75rem)", right: "calc(var(--safe-area-right) + 0.75rem)" }}
     >
-      <Button onClick={toggleSidebar} variant="outline" size="icon" className={isMobile ? "h-11 w-11 rounded-xl border-border/70 bg-background/80 shadow-lg backdrop-blur-md" : "h-8 w-8 bg-background/50 backdrop-blur-sm"}>
+      <Button onClick={toggleSidebar} variant="outline" size="icon" className="h-11 w-11 rounded-xl border-border/70 bg-background/80 shadow-lg backdrop-blur-md">
         <Menu className="h-4 w-4" />
         <span className="sr-only">Abrir menu</span>
       </Button>
-      <Button onClick={handleThemeSwitch} variant="outline" size="icon" className={isMobile ? "h-11 w-11 rounded-xl border-border/70 bg-background/80 shadow-lg backdrop-blur-md" : "h-8 w-8 bg-background/50 backdrop-blur-sm"} title={`Tema: ${THEME_LABELS[theme]}`}>
+      <Button onClick={handleThemeSwitch} variant="outline" size="icon" className="h-11 w-11 rounded-xl border-border/70 bg-background/80 shadow-lg backdrop-blur-md" title={`Tema: ${THEME_LABELS[theme]}`}>
         <Palette className="h-4 w-4" />
         <span className="sr-only">Alternar tema visual</span>
       </Button>

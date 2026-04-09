@@ -15,141 +15,175 @@ import { Icon } from "@/components/icons";
 const guideTopics = [
     {
         id: "fluxo",
-        title: "1. O Fluxo de Trabalho Inteligente",
+        title: "1. O Fluxo Completo da Calculadora",
         icon: "Workflow",
         content: (
             <div>
                 <p className="mb-2">
-                    A calculadora foi projetada para seguir o caminho natural das cargas em uma estrutura. Para um melhor aproveitamento, siga esta ordem. A mágica acontece quando a carga de uma aba é <strong>automaticamente enviada para a próxima</strong>.
+                    A calculadora de estruturas hoje trabalha em <strong>8 etapas integradas</strong>, seguindo o caminho da geometria, das cargas e do orçamento da estrutura. Para aproveitar tudo, use nesta sequência:
                 </p>
                 <ol className="list-decimal pl-5 space-y-2">
                     <li>
-                        <strong>Laje (Steel Deck):</strong> Comece aqui. O resultado principal, a <strong>Carga Total (kgf/m²)</strong>, será usado no próximo passo.
+                        <strong>Geometria:</strong> defina vãos principais, vãos secundários e balanços para entender o comportamento global da laje e da estrutura.
                     </li>
                     <li>
-                        <strong>Viga Secundária (IPE):</strong> A carga da laje calculada preencherá o campo aqui automaticamente. O resultado crucial, a <strong>Reação de Apoio (kgf)</strong>, será enviado para a viga principal.
+                        <strong>Laje (Steel Deck):</strong> calcule a carga total majorada da laje e os insumos de steel deck e concreto.
                     </li>
                     <li>
-                        <strong>Viga Principal (W):</strong> A reação da viga secundária se tornará uma <strong>Carga Pontual</strong> nesta aba. A reação de apoio da viga principal será, por sua vez, enviada ao pilar.
+                        <strong>Viga Secundária (IPE):</strong> receba a carga da laje, informe espaçamento, esquema estrutural e dimensione o perfil IPE.
                     </li>
-                     <li>
-                        <strong>Pilar (Coluna):</strong> As reações das vigas compõem a carga final do pilar, que será dimensionado para resistir à compressão e flambagem. A carga total do pilar é enviada para a sapata.
+                    <li>
+                        <strong>Viga Principal (W):</strong> receba automaticamente a reação da viga secundária como carga pontual e dimensione a viga principal.
                     </li>
-                     <li>
-                        <strong>Sapata (Fundação):</strong> A carga do pilar é recebida automaticamente. Informe o tipo de solo e o assistente de IA irá pré-dimensionar a sapata de concreto.
+                    <li>
+                        <strong>Pilar:</strong> receba a carga axial da etapa anterior e dimensione o perfil do pilar com verificação de compressão.
+                    </li>
+                    <li>
+                        <strong>Sapata:</strong> use a carga do pilar e o tipo de solo para pré-dimensionar a fundação e estimar o consumo de concreto.
+                    </li>
+                    <li>
+                        <strong>Armadura da Sapata:</strong> com base na sapata calculada, obtenha uma sugestão inicial de aço, espaçamento e quantidade de barras.
+                    </li>
+                    <li>
+                        <strong>Visualização:</strong> confira a estrutura em planta e elevações com base nos dados calculados nas etapas anteriores.
                     </li>
                 </ol>
                 <p className="mt-2 text-sm text-muted-foreground">
-                    Após cada cálculo, um botão <strong>"Analisar com IA"</strong> aparecerá. Clique nele para obter insights sobre a seleção do perfil, otimização e segurança. Todos os itens podem ser adicionados ao <strong>Orçamento Final</strong> na parte inferior da página.
+                    Ao longo do fluxo, a calculadora compartilha automaticamente cargas entre etapas, permite <strong>análises lógicas locais</strong>, em vários módulos oferece <strong>comparação com IA</strong>, e consolida materiais no <strong>Orçamento Final</strong> ao final da página.
                 </p>
             </div>
         )
     },
     {
-        id: "laje",
-        title: "2. Aba Laje (Steel Deck)",
-        icon: "Layers",
+        id: "geometria",
+        title: "2. Aba Geometria",
+        icon: "Ruler",
         content: (
             <div>
                 <p className="mb-2">
-                   O ponto de partida para sistemas de piso.
+                   Esta é agora a etapa inicial da calculadora.
                 </p>
                 <ul className="list-disc pl-5 space-y-1">
-                    <li><strong>Como Usar:</strong> Escolha o modelo de Steel Deck, a espessura do concreto e use o <strong>"Construtor de Sobrecarga"</strong> para definir as cargas de uso.</li>
-                    <li><strong>Resultado Principal:</strong> A <strong>Carga Total em kgf/m²</strong>. Este valor será enviado automaticamente para a aba "Viga Secundária".</li>
-                    <li><strong>Ação:</strong> Adicione a quantidade de chapas de Steel Deck (em m²) ao seu orçamento.</li>
+                    <li><strong>Como Usar:</strong> informe o vão em X, o vão em Y e os balanços em cada lado da laje.</li>
+                    <li><strong>O que a etapa faz:</strong> gera uma <strong>análise textual da geometria</strong>, apontando relação entre vãos, comportamento em uma ou duas direções, risco de balanços excessivos e coerência estrutural do sistema.</li>
+                    <li><strong>Quando usar:</strong> antes de escolher perfis, para validar se a distribuição estrutural faz sentido.</li>
+                    <li><strong>Recurso extra:</strong> o texto pode ser copiado para uso em estudo preliminar, briefing técnico ou conferência rápida.</li>
+                </ul>
+            </div>
+        )
+    },
+    {
+        id: "laje",
+        title: "3. Aba Laje (Steel Deck)",
+        icon: "Layers",
+        content: (
+            <div>
+                <p className="mb-2">Etapa para estimar a carga da laje colaborante e já preparar parte do orçamento.</p>
+                <ul className="list-disc pl-5 space-y-1">
+                    <li><strong>Como Usar:</strong> selecione o tipo de steel deck, informe a espessura do concreto, o fator de segurança e monte a sobrecarga pelo <strong>Construtor de Sobrecarga</strong>.</li>
+                    <li><strong>Resultado Principal:</strong> a <strong>Carga Total Majorada da Laje (kgf/m²)</strong>, usada na viga secundária.</li>
+                    <li><strong>Análises disponíveis:</strong> análise lógica da seleção, verificação de coerência do vão e observações sobre concreto, carregamento e uso.</li>
+                    <li><strong>Orçamento:</strong> permite lançar ao orçamento tanto o steel deck quanto o concreto da laje.</li>
                 </ul>
             </div>
         )
     },
     {
         id: "vigas",
-        title: "3. Abas de Viga (Secundária e Principal)",
+        title: "4. Abas de Viga Secundária e Principal",
         icon: "Minus",
         content: (
             <div className="space-y-4">
-                <p>Dimensiona as vigas que suportam a laje ou outras vigas. A lógica é a mesma para vigas secundárias (IPE) e principais (W).</p>
-                <div className="space-y-1">
-                    <h4 className="font-semibold">Como Usar</h4>
-                    <ul className="list-disc pl-5 mt-1 space-y-1">
-                         <li>Para vigas secundárias, o campo <strong>Carga da Laje (kgf/m²)</strong> é preenchido automaticamente com o resultado da aba Laje. Você só precisa informar o <strong>Espaçamento</strong> entre as vigas.</li>
-                         <li>Para vigas principais, a <strong>Carga Pontual (kgf)</strong> é preenchida automaticamente com a reação da viga secundária.</li>
-                         <li>O mais importante: selecione o <strong>Esquema da Viga</strong>. Isso é crucial, pois o cálculo dos esforços muda drasticamente.</li>
-                    </ul>
-                </div>
-                <div className="space-y-2">
-                    <h4 className="font-semibold">Entendendo os Esquemas de Viga e o Conceito de Viga Contínua</h4>
-                     <ul className="list-disc pl-5 mt-1 space-y-2 text-sm">
-                        <li><strong>Viga Bi-apoiada:</strong> É uma viga simples, apoiada em dois pilares. É o esquema menos eficiente, mas mais simples.</li>
-                        <li><strong>Viga Contínua (2 ou mais vãos):</strong> É uma única viga longa que passa sobre 3 ou mais pilares, sendo um sistema muito mais eficiente. A continuidade faz com que surjam momentos negativos sobre os apoios internos, o que alivia o momento positivo no meio do vão, exigindo um perfil mais leve.</li>
-                        <li><strong>Como a Calculadora Lida com Isso:</strong> Usamos esquemas que simulam os trechos de uma viga contínua:
-                            <ul className="list-disc pl-5 mt-1 space-y-2 text-primary/90">
-                                <li>
-                                    <strong>Viga com um Balanço:</strong> Perfeito para simular o **vão da ponta** de uma viga contínua.
-                                </li>
-                                <li>
-                                    <strong className="text-primary">Viga com Dois Balanços:</strong> Simula com excelente precisão um **vão interno** de uma viga contínua. Para isso, o **Vão Central** na calculadora é o vão que você quer dimensionar, e os **Balanços** representam a continuidade para os vãos vizinhos.
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-                 <div>
-                     <p className="mt-2 text-sm text-muted-foreground">
-                        <strong>Resultado Principal:</strong> O <strong>Perfil Recomendado</strong> e a <strong>Reação de Apoio (kgf)</strong>, que é enviada automaticamente para a próxima etapa (Viga Principal ou Pilar).
-                     </p>
-                 </div>
+                <p>As duas abas de vigas compartilham a mesma lógica de pré-dimensionamento, com perfis e cargas adequados a cada função estrutural.</p>
+                <ul className="list-disc pl-5 space-y-1">
+                    <li><strong>Viga Secundária:</strong> usa perfil <strong>IPE</strong>, recebe a carga da laje, aceita espaçamento entre vigas, carga distribuída adicional, carga pontual e posição da carga.</li>
+                    <li><strong>Viga Principal:</strong> usa perfil <strong>W</strong>, recebe a reação da viga secundária como carga pontual e também aceita carga distribuída adicional.</li>
+                    <li><strong>Esquemas de viga:</strong> ambas trabalham com <strong>bi-apoiada</strong>, <strong>com balanço</strong> e <strong>com dois balanços</strong>, com diagrama visual do esquema selecionado.</li>
+                    <li><strong>Entradas configuráveis:</strong> vão central, balanços, tipo de aço, fator de segurança e dados para orçamento.</li>
+                    <li><strong>Saídas principais:</strong> perfil recomendado, gráfico de utilização e <strong>reação de apoio máxima</strong>, usada nas próximas etapas.</li>
+                    <li><strong>Extras:</strong> análise lógica local, comparação com IA e, no caso da viga secundária, sugestão de <strong>conectores de cisalhamento</strong>.</li>
+                </ul>
             </div>
         )
     },
     {
         id: "pilar",
-        title: "4. Aba Pilar (Coluna)",
+        title: "5. Aba Pilar",
         icon: "Square",
         content: (
             <div>
-                <p className="mb-2">Dimensiona as colunas que sustentam as vigas.</p>
-                 <ul className="list-disc pl-5 space-y-1">
-                    <li><strong>Como Usar:</strong>
-                        <ul className="list-disc pl-5 mt-1 space-y-1">
-                             <li>A <strong>Carga Axial (kgf)</strong> é preenchida automaticamente com a reação de apoio calculada na aba "Viga Principal".</li>
-                             <li>Informe a <strong>Altura do Pilar</strong>.</li>
-                        </ul>
-                    </li>
-                    <li><strong>Resultado Principal:</strong> O <strong>Perfil W Recomendado</strong> para o pilar. A carga total do pilar é enviada automaticamente para a aba "Sapata".</li>
-                     <li><strong>Ação:</strong> Adicione os pilares ao orçamento para ter a lista completa de materiais da sua estrutura.</li>
+                <p className="mb-2">Dimensiona o perfil do pilar a partir da carga transferida pela estrutura superior.</p>
+                <ul className="list-disc pl-5 space-y-1">
+                    <li><strong>Como Usar:</strong> informe pé-direito, comprimento adicional acima da estrutura, tipo de aço e fator de segurança.</li>
+                    <li><strong>Carga automática:</strong> a <strong>carga axial</strong> vem da reação calculada na viga principal.</li>
+                    <li><strong>Resultado Principal:</strong> perfil W recomendado, tensão atuante e tensão admissível.</li>
+                    <li><strong>Extras:</strong> análise lógica local, comparação com IA e lançamento direto no orçamento.</li>
                 </ul>
             </div>
         )
     },
     {
         id: "sapata",
-        title: "5. Aba Sapata (Fundação)",
+        title: "6. Aba Sapata",
         icon: "Layers",
         content: (
             <div>
-                <p className="mb-2">Pré-dimensiona a fundação de concreto para o pilar.</p>
-                 <ul className="list-disc pl-5 space-y-1">
-                    <li><strong>Como Usar:</strong>
-                        <ul className="list-disc pl-5 mt-1 space-y-1">
-                             <li>O campo <strong>Carga Total do Pilar (kgf)</strong> é preenchido automaticamente.</li>
-                             <li>Selecione o <strong>Tipo de Solo</strong> mais apropriado para o seu local.</li>
-                             <li>Clique em "Analisar Fundação".</li>
-                        </ul>
-                    </li>
-                    <li><strong>Resultado Principal:</strong> A IA fornecerá uma <strong>análise completa</strong>, o <strong>pré-dimensionamento da sapata</strong> e uma <strong>estimativa de custo</strong>.</li>
+                <p className="mb-2">Pré-dimensiona a fundação de concreto a partir da carga do pilar e da tensão admissível do solo.</p>
+                <ul className="list-disc pl-5 space-y-1">
+                    <li><strong>Como Usar:</strong> confirme a carga do pilar, selecione o tipo de solo e clique em <strong>Analisar Fundação</strong>.</li>
+                    <li><strong>Resultado Principal:</strong> lado da sapata, altura recomendada e texto técnico de análise.</li>
+                    <li><strong>Estimativa adicional:</strong> a tela calcula <strong>volume de concreto</strong> e <strong>custo estimado</strong> com base no preço informado.</li>
+                    <li><strong>Observação:</strong> é um pré-dimensionamento para estudo preliminar e preparação da etapa de armadura.</li>
+                </ul>
+            </div>
+        )
+    },
+    {
+        id: "armadura",
+        title: "7. Aba Armadura da Sapata",
+        icon: "DraftingCompass",
+        content: (
+            <div>
+                <p className="mb-2">Esta etapa foi adicionada e não estava refletida no guia anterior.</p>
+                <ul className="list-disc pl-5 space-y-1">
+                    <li><strong>Pré-requisito:</strong> primeiro calcule a sapata na etapa anterior.</li>
+                    <li><strong>Como Usar:</strong> escolha <strong>fck</strong>, classe do aço da armadura e diâmetro da barra.</li>
+                    <li><strong>Resultado Principal:</strong> área de aço necessária, espaçamento sugerido e quantidade total de barras por direção.</li>
+                    <li><strong>Análise adicional:</strong> a calculadora alerta quando o espaçamento fica apertado demais ou excessivo para uma solução prática.</li>
+                </ul>
+            </div>
+        )
+    },
+    {
+        id: "visualizacao",
+        title: "8. Aba Visualização Estrutural",
+        icon: "Eye",
+        content: (
+            <div>
+                <p className="mb-2">Esta aba consolida visualmente os dados gerados nas etapas anteriores.</p>
+                <ul className="list-disc pl-5 space-y-1">
+                    <li><strong>O que mostra:</strong> planta, elevação frontal e elevação lateral da estrutura.</li>
+                    <li><strong>Dados usados:</strong> geometria, laje, vigas, pilar e sapata já calculados.</li>
+                    <li><strong>Utilidade:</strong> conferência rápida de vãos, balanços, posição dos pilares, altura do sistema e coerência geral da solução.</li>
                 </ul>
             </div>
         )
     },
     {
         id: "orcamento",
-        title: "6. O Orçamento Final",
+        title: "9. Orçamento Final e Navegação",
         icon: "Calculator",
         content: (
-            <p>
-                Todos os itens adicionados (Laje, Vigas e Pilares) são consolidados na tabela de orçamento na parte inferior da página. Ali, você pode ver o peso e o custo total do seu projeto, além de poder salvar, limpar ou imprimir um relatório limpo e profissional para o seu cliente ou para registro.
-            </p>
+            <div>
+                <p className="mb-2">
+                    Todos os itens adicionados nas etapas de laje, vigas e pilar são consolidados na tabela final de orçamento exibida abaixo da calculadora.
+                </p>
+                <ul className="list-disc pl-5 space-y-1">
+                    <li><strong>Na tabela final:</strong> você visualiza peso, custo por item, custo total, salva, limpa e imprime o relatório.</li>
+                    <li><strong>Navegação:</strong> a calculadora também possui uma barra de etapas com avanço, retorno, menu completo de fases e indicador de progresso.</li>
+                    <li><strong>Fluxo recomendado:</strong> sempre avance na ordem das abas para aproveitar o preenchimento automático entre etapas.</li>
+                </ul>
+            </div>
         )
     }
 ];
@@ -161,7 +195,7 @@ function GuideComponent() {
             <CardHeader>
                 <CardTitle>Guia da Calculadora de Estruturas</CardTitle>
                 <CardDescription>
-                    Aprenda passo a passo como dimensionar e orçar seu projeto de estrutura metálica, da laje à fundação.
+                    Aprenda o fluxo completo atual da calculadora, da geometria inicial até a visualização e o orçamento da estrutura.
                 </CardDescription>
             </CardHeader>
         </Card>

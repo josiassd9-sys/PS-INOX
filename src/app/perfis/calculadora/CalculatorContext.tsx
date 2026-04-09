@@ -115,9 +115,48 @@ interface CalculatorState {
     sapataArmadura: SapataArmaduraInputs & { result: SapataArmaduraResult | null };
 }
 
+export type WorkflowStepId = 'laje' | 'vigaSecundaria' | 'vigaPrincipal' | 'pilar' | 'sapata' | 'sapataArmadura' | 'visualizacao';
+type ComputationStepId = Exclude<WorkflowStepId, 'visualizacao'>;
+
+export interface DerivedFieldLinks {
+    laje: {
+        quantity: boolean;
+    };
+    vigaSecundaria: {
+        span: boolean;
+        balanco1: boolean;
+        balanco2: boolean;
+        quantity: boolean;
+        slabLoad: boolean;
+        distributedLoad: boolean;
+    };
+    vigaPrincipal: {
+        span: boolean;
+        balanco1: boolean;
+        balanco2: boolean;
+        distributedLoad: boolean;
+    };
+    pilar: {
+        axialLoad: boolean;
+    };
+    sapata: {
+        load: boolean;
+    };
+}
+
+export interface FinalCalculatorSnapshot {
+    capturedAt: string;
+    calculatorState: CalculatorState;
+    supportReactions: SupportReaction;
+    budgetItems: BudgetItem[];
+}
+
 interface CalculatorContextType extends CalculatorState {
   budgetItems: BudgetItem[];
   supportReactions: SupportReaction;
+    fieldLinks: DerivedFieldLinks;
+    staleSteps: Record<ComputationStepId, boolean>;
+    finalSnapshot: FinalCalculatorSnapshot | null;
   
   onAddToBudget: (item: BudgetItem) => void;
   onClearBudget: () => void;
@@ -135,6 +174,10 @@ interface CalculatorContextType extends CalculatorState {
   updatePilar: (update: Partial<CalculatorState['pilar']>) => void;
   updateSapata: (update: Partial<CalculatorState['sapata']>) => void;
   updateSapataArmadura: (update: Partial<CalculatorState['sapataArmadura']>) => void;
+    setFieldLink: <T extends keyof DerivedFieldLinks, K extends keyof DerivedFieldLinks[T]>(step: T, field: K, linked: boolean) => void;
+    isStepStale: (step: WorkflowStepId) => boolean;
+    captureFinalSnapshot: () => boolean;
+    clearFinalSnapshot: () => void;
 
   clearAllInputs: () => void;
 }
@@ -202,22 +245,174 @@ const initialState: CalculatorState = {
     sapataArmadura: initialSapataArmaduraState,
 };
 
+const initialFieldLinks: DerivedFieldLinks = {
+    laje: {
+        quantity: true,
+    },
+    vigaSecundaria: {
+        span: true,
+        balanco1: true,
+        balanco2: true,
+        quantity: true,
+        slabLoad: true,
+        distributedLoad: true,
+    },
+    vigaPrincipal: {
+        span: true,
+        balanco1: true,
+        balanco2: true,
+        distributedLoad: true,
+    },
+    pilar: {
+        axialLoad: true,
+    },
+    sapata: {
+        load: true,
+    },
+};
+
+const initialStaleSteps: Record<ComputationStepId, boolean> = {
+    laje: false,
+    vigaSecundaria: false,
+    vigaPrincipal: false,
+    pilar: false,
+    sapata: false,
+    sapataArmadura: false,
+};
+
+const staleCascadeMap: Record<keyof CalculatorState, ComputationStepId[]> = {
+    slabAnalysis: ['laje', 'vigaSecundaria', 'vigaPrincipal', 'pilar', 'sapata', 'sapataArmadura'],
+    laje: ['laje', 'vigaSecundaria', 'vigaPrincipal', 'pilar', 'sapata', 'sapataArmadura'],
+    vigaSecundaria: ['vigaSecundaria', 'vigaPrincipal', 'pilar', 'sapata', 'sapataArmadura'],
+    vigaPrincipal: ['vigaPrincipal', 'pilar', 'sapata', 'sapataArmadura'],
+    pilar: ['pilar', 'sapata', 'sapataArmadura'],
+    sapata: ['sapata', 'sapataArmadura'],
+    sapataArmadura: ['sapataArmadura'],
+};
+
+const cloneData = <T,>(value: T): T => JSON.parse(JSON.stringify(value));
+
+function resetInvalidatedReactions(
+    current: SupportReaction,
+    affectedSteps: ComputationStepId[]
+): SupportReaction {
+    return {
+        vigaSecundaria: affectedSteps.includes('vigaSecundaria') ? 0 : current.vigaSecundaria,
+        vigaPrincipal: affectedSteps.includes('vigaPrincipal') ? 0 : current.vigaPrincipal,
+        pilar: affectedSteps.includes('pilar') ? 0 : current.pilar,
+    };
+}
+
+function resetComputedStep(state: CalculatorState, step: ComputationStepId): CalculatorState {
+    switch (step) {
+        case 'laje':
+            return {
+                ...state,
+                laje: { ...state.laje, result: null, analysis: null },
+            };
+        case 'vigaSecundaria':
+            return {
+                ...state,
+                vigaSecundaria: { ...state.vigaSecundaria, result: null, analysis: null },
+            };
+        case 'vigaPrincipal':
+            return {
+                ...state,
+                vigaPrincipal: { ...state.vigaPrincipal, result: null, analysis: null },
+            };
+        case 'pilar':
+            return {
+                ...state,
+                pilar: { ...state.pilar, result: null, analysis: null },
+            };
+        case 'sapata':
+            return {
+                ...state,
+                sapata: { ...state.sapata, result: null },
+            };
+        case 'sapataArmadura':
+            return {
+                ...state,
+                sapataArmadura: { ...state.sapataArmadura, result: null },
+            };
+        default:
+            return state;
+    }
+}
+
+function hasCompleteResults(state: CalculatorState) {
+    return Boolean(
+        state.slabAnalysis.result &&
+        state.laje.result &&
+        state.vigaSecundaria.result &&
+        state.vigaPrincipal.result &&
+        state.pilar.result &&
+        state.sapata.result &&
+        state.sapataArmadura.result
+    );
+}
+
 
 export function CalculatorProvider({ children }: { children: React.ReactNode }) {
   const [budgetItems, setBudgetItems] = React.useState<BudgetItem[]>([]);
   const [supportReactions, setSupportReactions] = React.useState<SupportReaction>({ vigaPrincipal: 0, vigaSecundaria: 0, pilar: 0 });
   const [calculatorState, setCalculatorState] = React.useState<CalculatorState>(initialState);
+  const [fieldLinks, setFieldLinks] = React.useState<DerivedFieldLinks>(initialFieldLinks);
+  const [staleSteps, setStaleSteps] = React.useState<Record<ComputationStepId, boolean>>(initialStaleSteps);
+  const [finalSnapshot, setFinalSnapshot] = React.useState<FinalCalculatorSnapshot | null>(null);
   const { toast } = useToast();
 
   const handleUpdate = React.useCallback(<T extends keyof CalculatorState>(key: T, update: Partial<CalculatorState[T]>) => {
+      const changedKeys = Object.keys(update) as Array<keyof CalculatorState[T]>;
+      const hasInputChanges = changedKeys.some((changedKey) => changedKey !== 'result' && changedKey !== 'analysis');
+      const setsResult = changedKeys.includes('result' as keyof CalculatorState[T]);
+
+      if (hasInputChanges) {
+          const affectedSteps = staleCascadeMap[key];
+          setCalculatorState(prev => {
+              let nextState: CalculatorState = {
+                  ...prev,
+                  [key]: { ...prev[key], ...update }
+              };
+
+              for (const step of affectedSteps) {
+                  nextState = resetComputedStep(nextState, step);
+              }
+
+              return nextState;
+          });
+          setSupportReactions(prev => resetInvalidatedReactions(prev, affectedSteps));
+          setStaleSteps(prev => ({
+              ...prev,
+              ...affectedSteps.reduce((acc, step) => {
+                  acc[step] = true;
+                  return acc;
+              }, {} as Record<ComputationStepId, boolean>),
+          }));
+          setFinalSnapshot(null);
+          return;
+      }
+
       setCalculatorState(prev => ({
           ...prev,
           [key]: { ...prev[key], ...update }
-      }))
+      }));
+
+      if (setsResult && update.result) {
+          if (key !== 'slabAnalysis') {
+              setStaleSteps(prev => ({
+                  ...prev,
+                  [key]: false,
+              }));
+          }
+      }
   }, []);
 
   const handleClearAllInputs = React.useCallback(() => {
       setCalculatorState(initialState);
+      setFieldLinks(initialFieldLinks);
+      setStaleSteps(initialStaleSteps);
+      setFinalSnapshot(null);
       setSupportReactions({ vigaPrincipal: 0, vigaSecundaria: 0, pilar: 0 });
       setBudgetItems([]);
       toast({
@@ -261,11 +456,85 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
       window.print();
   }
 
+  const handleSetFieldLink = React.useCallback(<T extends keyof DerivedFieldLinks, K extends keyof DerivedFieldLinks[T]>(step: T, field: K, linked: boolean) => {
+      setFieldLinks(prev => ({
+          ...prev,
+          [step]: {
+              ...prev[step],
+              [field]: linked,
+          }
+      }));
+
+      const affectedSteps = staleCascadeMap[step as keyof CalculatorState];
+      setCalculatorState(prev => {
+          let nextState = prev;
+          for (const affectedStep of affectedSteps) {
+              nextState = resetComputedStep(nextState, affectedStep);
+          }
+          return nextState;
+      });
+      setSupportReactions(prev => resetInvalidatedReactions(prev, affectedSteps));
+      setStaleSteps(prev => ({
+          ...prev,
+          ...affectedSteps.reduce((acc, affectedStep) => {
+              acc[affectedStep] = true;
+              return acc;
+          }, {} as Record<ComputationStepId, boolean>),
+      }));
+      setFinalSnapshot(null);
+  }, []);
+
+  const isStepStale = React.useCallback((step: WorkflowStepId) => {
+      if (step === 'visualizacao') {
+          return Object.values(staleSteps).some(Boolean);
+      }
+      return staleSteps[step];
+  }, [staleSteps]);
+
+  const handleCaptureFinalSnapshot = React.useCallback(() => {
+      if (Object.values(staleSteps).some(Boolean)) {
+          toast({
+              variant: 'destructive',
+              title: 'Etapas desatualizadas',
+              description: 'Recalcule as etapas marcadas como desatualizadas antes de congelar o snapshot final.',
+          });
+          return false;
+      }
+
+      if (!hasCompleteResults(calculatorState)) {
+          toast({
+              variant: 'destructive',
+              title: 'Cálculos incompletos',
+              description: 'Finalize geometria, laje, vigas, pilar, sapata e armadura antes de capturar o snapshot final.',
+          });
+          return false;
+      }
+
+      setFinalSnapshot({
+          capturedAt: new Date().toISOString(),
+          calculatorState: cloneData(calculatorState),
+          supportReactions: cloneData(supportReactions),
+          budgetItems: cloneData(budgetItems),
+      });
+      toast({
+          title: 'Snapshot final congelado',
+          description: 'O relatório final passa a usar esta fotografia estável até você atualizar ou limpar o snapshot.',
+      });
+      return true;
+  }, [budgetItems, calculatorState, staleSteps, supportReactions, toast]);
+
+  const handleClearFinalSnapshot = React.useCallback(() => {
+      setFinalSnapshot(null);
+  }, []);
+
 
   const contextValue: CalculatorContextType = React.useMemo(() => ({
     ...calculatorState,
     budgetItems,
     supportReactions,
+    fieldLinks,
+    staleSteps,
+    finalSnapshot,
     onAddToBudget: handleAddToBudget,
     onClearBudget: handleClearBudget,
     onSaveBudget: handleSaveBudget,
@@ -280,8 +549,12 @@ export function CalculatorProvider({ children }: { children: React.ReactNode }) 
     updatePilar: (update) => handleUpdate('pilar', update),
     updateSapata: (update) => handleUpdate('sapata', update),
     updateSapataArmadura: (update) => handleUpdate('sapataArmadura', update),
+        setFieldLink: handleSetFieldLink,
+        isStepStale,
+        captureFinalSnapshot: handleCaptureFinalSnapshot,
+        clearFinalSnapshot: handleClearFinalSnapshot,
     clearAllInputs: handleClearAllInputs,
-  }), [calculatorState, budgetItems, supportReactions, handleAddToBudget, handleClearBudget, handleSaveBudget, handleVigaPrincipalReaction, handleVigaSecundariaReaction, handlePillarLoad, handleUpdate, handleClearAllInputs]);
+    }), [calculatorState, budgetItems, supportReactions, fieldLinks, staleSteps, finalSnapshot, handleAddToBudget, handleClearBudget, handleSaveBudget, handleVigaPrincipalReaction, handleVigaSecundariaReaction, handlePillarLoad, handleUpdate, handleSetFieldLink, isStepStale, handleCaptureFinalSnapshot, handleClearFinalSnapshot, handleClearAllInputs]);
 
   return (
     <CalculatorContext.Provider value={contextValue}>

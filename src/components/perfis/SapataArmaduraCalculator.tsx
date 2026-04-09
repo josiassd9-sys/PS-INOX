@@ -13,6 +13,7 @@ import { useCalculator, SapataArmaduraInputs } from "@/app/perfis/calculadora/Ca
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { RefinedButton, RefinedCard } from "@/components/refined-components";
 import { FormSkeleton } from "@/components/skeleton";
+import { StaleStepAlert } from "./linked-field-controls";
 
 interface SapataArmaduraResult {
     requiredSteelAreaCm2: number;
@@ -44,7 +45,7 @@ function getLocalAnalysis(result: SapataArmaduraResult): string {
 }
 
 export function SapataArmaduraCalculator() {
-    const { sapata, sapataArmadura, updateSapataArmadura } = useCalculator();
+    const { sapata, sapataArmadura, updateSapataArmadura, isStepStale } = useCalculator();
     const { concreteStrength, steelStrength, barDiameter, result } = sapataArmadura;
     
     const [isCalculating, setIsCalculating] = React.useState(false);
@@ -133,6 +134,12 @@ export function SapataArmaduraCalculator() {
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+                {isStepStale('sapataArmadura') && (
+                    <StaleStepAlert
+                        title="Armadura da sapata desatualizada"
+                        description="A sapata ou os parâmetros de armadura foram alterados. Recalcule esta etapa antes de usar o relatório final."
+                    />
+                )}
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label>Carga do Pilar</Label>

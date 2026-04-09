@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useCalculator, SapataInputs } from "@/app/perfis/calculadora/CalculatorContext";
 import { RefinedButton, RefinedCard } from "@/components/refined-components";
 import { FormSkeleton } from "@/components/skeleton";
+import { LinkedFieldLabel, StaleStepAlert } from "./linked-field-controls";
 
 interface SapataAnalysisResult {
   analysis: string;
@@ -48,20 +49,21 @@ function getLocalAnalysis(totalLoadKgf: number, soilName: string, soilPressure: 
 }
 
 export function SapataCalculator() {
-    const { pilar, sapata, updateSapata } = useCalculator();
+    const { pilar, sapata, updateSapata, fieldLinks, setFieldLink, isStepStale } = useCalculator();
     const { load, selectedSoil, concretePrice, steelPrice, steelRatio, result } = sapata;
     
     const [isAnalyzing, setIsAnalyzing] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
 
      React.useEffect(() => {
+        if (!fieldLinks.sapata.load) return;
         if (pilar.axialLoad) {
             const pilarLoad = parseFloat(pilar.axialLoad.replace(',', '.'));
             if (!isNaN(pilarLoad) && pilarLoad > 0) {
                  updateSapata({ load: pilarLoad.toFixed(0) });
             }
         }
-    }, [pilar.axialLoad]);
+    }, [pilar.axialLoad, updateSapata, fieldLinks.sapata.load]);
 
 
     const handleInputChange = (field: keyof SapataInputs, value: string) => {
@@ -117,10 +119,16 @@ export function SapataCalculator() {
                 <CardDescription>Obtenha uma recomendação de pré-dimensionamento para a sapata de concreto do pilar.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+                {isStepStale('sapata') && (
+                    <StaleStepAlert
+                        title="Sapata desatualizada"
+                        description="A carga do pilar ou os parâmetros da fundação mudaram. Refaça a análise da sapata antes de seguir para a armadura."
+                    />
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <Label htmlFor="pillar-load">Carga Total do Pilar (kgf)</Label>
-                        <Input id="pillar-load" type="text" inputMode="decimal" value={load} onChange={e => handleInputChange('load', e.target.value)} placeholder="Ex: 12000" />
+                        <LinkedFieldLabel htmlFor="pillar-load" label="Carga Total do Pilar (kgf)" linked={fieldLinks.sapata.load} onToggle={(linked) => setFieldLink('sapata', 'load', linked)} source="Resultado do pilar" />
+                        <Input id="pillar-load" type="text" inputMode="decimal" value={load} onChange={e => handleInputChange('load', e.target.value)} placeholder="Ex: 12000" readOnly={fieldLinks.sapata.load} className={fieldLinks.sapata.load ? "bg-muted/70" : ""} />
                     </div>
                      <div className="space-y-2">
                         <Label htmlFor="soil-type">Tipo de Solo (Tensão Admissível)</Label>

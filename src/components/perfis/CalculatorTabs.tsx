@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, ChevronDown, CheckCircle2 } from "lucide-react";
 import { RefinedCard } from "@/components/refined-components";
+import { useCalculator, WorkflowStepId } from "@/app/perfis/calculadora/CalculatorContext";
 
 const tabs = [
     { step: 1, title: "Geometria", href: "/perfis/calculadora/geometria" },
@@ -18,9 +19,20 @@ const tabs = [
     { step: 8, title: "Visualização", href: "/perfis/calculadora/visualizacao" },
 ];
 
+const staleStepByHref: Partial<Record<(typeof tabs)[number]['href'], WorkflowStepId>> = {
+    "/perfis/calculadora/laje": "laje",
+    "/perfis/calculadora/viga-secundaria": "vigaSecundaria",
+    "/perfis/calculadora/viga-principal": "vigaPrincipal",
+    "/perfis/calculadora/pilar": "pilar",
+    "/perfis/calculadora/sapata": "sapata",
+    "/perfis/calculadora/armadura-sapata": "sapataArmadura",
+    "/perfis/calculadora/visualizacao": "visualizacao",
+};
+
 export function CalculatorTabs() {
     const pathname = usePathname();
     const router = useRouter();
+    const { isStepStale } = useCalculator();
     const activeIndex = Math.max(0, tabs.findIndex((tab) => pathname === tab.href));
     const progress = ((activeIndex + 1) / tabs.length) * 100;
 
@@ -120,6 +132,8 @@ export function CalculatorTabs() {
                                 {tabs.map((tab, index) => {
                                     const isActive = index === activeIndex;
                                     const isCompleted = index < activeIndex;
+                                    const staleStep = staleStepByHref[tab.href];
+                                    const isStale = staleStep ? isStepStale(staleStep) : false;
                                     return (
                                         <button
                                             key={tab.href}
@@ -142,8 +156,9 @@ export function CalculatorTabs() {
                                                 {isCompleted ? <CheckCircle2 className="h-3 w-3" /> : tab.step}
                                             </span>
                                             <span className="truncate">{tab.title}</span>
+                                            {isStale && !isActive && <span className="ml-auto flex-shrink-0 text-[10px] font-semibold text-amber-600">desat.</span>}
                                             {isActive && (
-                                                <span className="ml-auto flex-shrink-0 text-[10px] text-muted-foreground">atual</span>
+                                                <span className="ml-auto flex-shrink-0 text-[10px] text-muted-foreground">{isStale ? 'desat.' : 'atual'}</span>
                                             )}
                                         </button>
                                     );

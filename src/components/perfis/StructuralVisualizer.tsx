@@ -2,13 +2,15 @@
 
 import * as React from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Info, GitCompareArrows, Loader, Sparkles } from "lucide-react";
+import { Info, GitCompareArrows, Loader, Sparkles, ZoomIn, ZoomOut, RotateCcw, Move, Camera, RefreshCcw } from "lucide-react";
 import { RefinedButton } from "@/components/refined-components";
 import { getAiSettings } from "@/lib/ai-settings";
 import { useToast } from "@/hooks/use-toast";
+import { StaleStepAlert } from "./linked-field-controls";
 
 const SVG_WIDTH = 800;
 const SVG_HEIGHT = 500;
@@ -36,8 +38,8 @@ function safeParse(value?: string, fallback = 0) {
     return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-function buildHybridReportData(calculator: ReturnType<typeof useCalculator>) {
-    const { slabAnalysis, laje, vigaSecundaria, vigaPrincipal, pilar, sapata, sapataArmadura, budgetItems, supportReactions } = calculator;
+function buildHybridReportData(data: Pick<ReturnType<typeof useCalculator>, 'slabAnalysis' | 'laje' | 'vigaSecundaria' | 'vigaPrincipal' | 'pilar' | 'sapata' | 'sapataArmadura' | 'budgetItems' | 'supportReactions'>) {
+    const { slabAnalysis, laje, vigaSecundaria, vigaPrincipal, pilar, sapata, sapataArmadura, budgetItems, supportReactions } = data;
 
     const totalSpanX = safeParse(slabAnalysis.spanX);
     const totalSpanY = safeParse(slabAnalysis.spanY);
@@ -198,6 +200,163 @@ function buildHybridReportData(calculator: ReturnType<typeof useCalculator>) {
     };
 }
 
+function clamp(value: number, min: number, max: number) {
+    return Math.min(max, Math.max(min, value));
+}
+
+function distanceBetween(a: { x: number; y: number }, b: { x: number; y: number }) {
+    return Math.hypot(b.x - a.x, b.y - a.y);
+}
+
+function midpointBetween(a: { x: number; y: number }, b: { x: number; y: number }) {
+    return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+}
+
+function ZoomableViewport({ children }: { children: React.ReactNode }) {
+    const containerRef = React.useRef<HTMLDivElement | null>(null);
+    const pointersRef = React.useRef(new Map<number, { x: number; y: number }>());
+    const dragRef = React.useRef<{ startX: number; startY: number; offsetX: number; offsetY: number } | null>(null);
+    const pinchRef = React.useRef<{ initialDistance: number; initialScale: number; initialMidpoint: { x: number; y: number }; offsetX: number; offsetY: number } | null>(null);
+
+    const [scale, setScale] = React.useState(1);
+    const [offset, setOffset] = React.useState({ x: 0, y: 0 });
+
+    const setScaleClamped = React.useCallback((next: number) => {
+        setScale(clamp(next, 1, 4));
+    }, []);
+
+    const resetView = React.useCallback(() => {
+        setScale(1);
+        setOffset({ x: 0, y: 0 });
+        dragRef.current = null;
+        pinchRef.current = null;
+    }, []);
+
+    const handlePointerDown = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+        if (event.pointerType === "mouse" && event.button !== 0) return;
+
+        event.currentTarget.setPointerCapture(event.pointerId);
+        pointersRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+        if (pointersRef.current.size === 1 && scale > 1) {
+            dragRef.current = {
+                startX: event.clientX,
+                startY: event.clientY,
+                offsetX: offset.x,
+                offsetY: offset.y,
+            };
+        }
+
+        if (pointersRef.current.size === 2) {
+            const [pointA, pointB] = Array.from(pointersRef.current.values());
+            pinchRef.current = {
+                initialDistance: distanceBetween(pointA, pointB),
+                initialScale: scale,
+                initialMidpoint: midpointBetween(pointA, pointB),
+                offsetX: offset.x,
+                offsetY: offset.y,
+            };
+            dragRef.current = null;
+        }
+    }, [offset.x, offset.y, scale]);
+
+    const handlePointerMove = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+        if (!pointersRef.current.has(event.pointerId)) return;
+
+        pointersRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+        if (pointersRef.current.size === 2 && pinchRef.current) {
+            const [pointA, pointB] = Array.from(pointersRef.current.values());
+            const nextDistance = distanceBetween(pointA, pointB);
+            const nextMidpoint = midpointBetween(pointA, pointB);
+            const nextScale = clamp((nextDistance / pinchRef.current.initialDistance) * pinchRef.current.initialScale, 1, 4);
+
+            setScale(nextScale);
+            setOffset({
+                x: pinchRef.current.offsetX + (nextMidpoint.x - pinchRef.current.initialMidpoint.x),
+                y: pinchRef.current.offsetY + (nextMidpoint.y - pinchRef.current.initialMidpoint.y),
+            });
+            return;
+        }
+
+        if (pointersRef.current.size === 1 && dragRef.current && scale > 1) {
+            setOffset({
+                x: dragRef.current.offsetX + (event.clientX - dragRef.current.startX),
+                y: dragRef.current.offsetY + (event.clientY - dragRef.current.startY),
+            });
+        }
+    }, [scale]);
+
+    const handlePointerUp = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+        pointersRef.current.delete(event.pointerId);
+
+        if (pointersRef.current.size < 2) {
+            pinchRef.current = null;
+        }
+
+        if (pointersRef.current.size === 0) {
+            dragRef.current = null;
+        }
+    }, []);
+
+    const handleWheel = React.useCallback((event: React.WheelEvent<HTMLDivElement>) => {
+        event.preventDefault();
+        const delta = -event.deltaY * 0.0015;
+        setScale((current) => clamp(current + delta, 1, 4));
+    }, []);
+
+    React.useEffect(() => {
+        if (scale <= 1 && (offset.x !== 0 || offset.y !== 0)) {
+            setOffset({ x: 0, y: 0 });
+        }
+    }, [scale, offset.x, offset.y]);
+
+    return (
+        <div className="space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-md border bg-muted/30 px-2 py-1.5 text-xs text-muted-foreground">
+                <div className="flex items-center gap-2">
+                    <Move className="h-3.5 w-3.5" />
+                    <span>Use dois dedos para zoom, arraste para mover e roda do mouse para aproximar.</span>
+                </div>
+                <div className="flex items-center gap-1">
+                    <Button type="button" variant="outline" size="icon" className="h-7 w-7" onClick={() => setScaleClamped(scale - 0.2)}>
+                        <ZoomOut className="h-3.5 w-3.5" />
+                    </Button>
+                    <div className="min-w-[52px] text-center font-medium text-foreground">{Math.round(scale * 100)}%</div>
+                    <Button type="button" variant="outline" size="icon" className="h-7 w-7" onClick={() => setScaleClamped(scale + 0.2)}>
+                        <ZoomIn className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button type="button" variant="outline" size="icon" className="h-7 w-7" onClick={resetView}>
+                        <RotateCcw className="h-3.5 w-3.5" />
+                    </Button>
+                </div>
+            </div>
+
+            <div
+                ref={containerRef}
+                className="relative overflow-hidden rounded-lg border bg-background"
+                style={{ touchAction: "none" }}
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerUp}
+                onPointerLeave={handlePointerUp}
+                onWheel={handleWheel}
+            >
+                <div
+                    className="transition-transform duration-75 ease-out select-none"
+                    style={{
+                        transform: `translate(${offset.x}px, ${offset.y}px) scale(${scale})`,
+                        transformOrigin: "center center",
+                    }}
+                >
+                    {children}
+                </div>
+            </div>
+        </div>
+    );
+}
+
 const DrawingText = ({ x, y, children, ...props }: React.SVGProps<SVGTextElement>) => (
     <text x={x} y={y} fontSize="12" fill="hsl(var(--foreground))" textAnchor="middle" {...props}>
         {children}
@@ -294,6 +453,9 @@ const PlanView = () => {
             {cantileverRight > 0 && <DimensionLine x1={pilarX2} y1={yOffset} x2={xOffset + scaledWidth} y2={yOffset} label={`${cantileverRight.toFixed(2)}m`} offset={-15} />}
             
             <DimensionLine x1={xOffset + scaledWidth} y1={yOffset} x2={xOffset + scaledWidth} y2={yOffset + scaledHeight} label={`Total Y: ${totalSpanY.toFixed(2)} m`} offset={45} vertical />
+            {cantileverFront > 0 && <DimensionLine x1={xOffset + scaledWidth} y1={yOffset} x2={xOffset + scaledWidth} y2={pilarY1} label={`${cantileverFront.toFixed(2)}m`} offset={20} vertical />}
+            <DimensionLine x1={xOffset + scaledWidth} y1={pilarY1} x2={xOffset + scaledWidth} y2={pilarY2} label={`${spanY.toFixed(2)}m`} offset={20} vertical />
+            {cantileverBack > 0 && <DimensionLine x1={xOffset + scaledWidth} y1={pilarY2} x2={xOffset + scaledWidth} y2={yOffset + scaledHeight} label={`${cantileverBack.toFixed(2)}m`} offset={20} vertical />}
         </svg>
     );
 };
@@ -329,7 +491,7 @@ const FrontElevationView = () => {
 
     if (spanX <= 0) return <Alert variant="destructive">Vão X inválido na Aba 1.</Alert>;
 
-    const totalDrawingHeight = totalPilarH + vigaPH_m + sapataH;
+    const totalDrawingHeight = totalPilarH + vigaPH_m + lajeH_m + sapataH;
     const scale = Math.min((SVG_WIDTH - 2 * PADDING) / totalSpanX, (SVG_HEIGHT - 2 * PADDING) / totalDrawingHeight);
     
     const scaledSpanX = totalSpanX * scale;
@@ -354,7 +516,6 @@ const FrontElevationView = () => {
     const realSpacing = numVigasSecundarias > 1 ? (spanX * scale) / (numVigasSecundarias - 1) : 0;
     
     const vigaS_h_scaled = vigaSH_m * scale;
-    const lajeH_scaled = lajeH_m * scale;
     const concreteH_scaled = (concreteH_cm / 100) * scale;
     const lajeBaseY = vigaPY-vigaPHeight;
 
@@ -398,6 +559,7 @@ const FrontElevationView = () => {
              {cantileverRight > 0 && <DimensionLine x1={pilarX2} y1={vigaPY} x2={xOffset+scaledSpanX} y2={vigaPY} label={`${cantileverRight.toFixed(2)}m`} offset={10} />}
 
              <DimensionLine x1={pilarX1} y1={sapataY} x2={pilarX1} y2={vigaPY} label={`Pé-Direito: ${pilarH.toFixed(2)}m`} offset={-pilarWidth - 5} vertical/>
+             {addPilarH > 0 && <DimensionLine x1={pilarX1} y1={pilarTopoY} x2={pilarX1} y2={vigaPY - vigaPHeight} label={`Comp. adicional: ${addPilarH.toFixed(2)}m`} offset={-pilarWidth - 30} vertical/>}
          </svg>
     )
 }
@@ -434,7 +596,7 @@ const SideElevationView = () => {
 
     if (spanY <= 0) return <Alert variant="destructive">Vão Y inválido na Aba 1.</Alert>;
 
-    const totalDrawingHeight = totalPilarH + lajeH_m + sapataH;
+    const totalDrawingHeight = totalPilarH + vigaPH_m + lajeH_m + sapataH;
     const scale = Math.min((SVG_WIDTH - 2*PADDING) / totalSpanY, (SVG_HEIGHT - 2*PADDING) / totalDrawingHeight);
     const scaledSpanY = totalSpanY * scale;
     const xOffset = (SVG_WIDTH - scaledSpanY) / 2;
@@ -521,12 +683,15 @@ const SectionCutView = () => {
     const deckInfo = laje.result?.deck;
     const concreteH_cm = parseFloat(laje.concreteThickness.replace(',', '.')) || 12;
     const vigaS = vigaSecundaria.result?.profile;
+    const sectionWidth_m = Math.max(parseFloat((vigaSecundaria.spacing ?? '').replace(',', '.')) || 1.5, 0.6);
 
     const deckHeight_mm = (deckInfo?.tipo === 'MD75' ? 75 : 57);
     const totalHeight = deckHeight_mm + concreteH_cm * 10;
+    const sectionWidth_mm = sectionWidth_m * 1000;
 
-    const scale = Math.min((SVG_WIDTH - 2*PADDING) / 500, (SVG_HEIGHT - 2*PADDING) / totalHeight);
-    const xOffset = PADDING * 2;
+    const scale = Math.min((SVG_WIDTH - 2*PADDING) / sectionWidth_mm, (SVG_HEIGHT - 2*PADDING) / totalHeight);
+    const sectionWidthScaled = sectionWidth_mm * scale;
+    const xOffset = (SVG_WIDTH - sectionWidthScaled) / 2;
     
     const vigaS_h = (vigaS?.h || 200);
     const vigaS_b = (vigaS?.b || 100);
@@ -545,11 +710,12 @@ const SectionCutView = () => {
     const vigaY = baseY - scaled_vigaS_h;
     const deckTopY = vigaY;
     const concreteTopY = deckTopY - deck_h_scaled;
+    const centerX = xOffset + sectionWidthScaled / 2;
     
     const deckPoints = [
         { x: xOffset, y: deckTopY },
-        { x: xOffset + 400, y: deckTopY },
-        { x: xOffset + 400, y: concreteTopY },
+        { x: xOffset + sectionWidthScaled, y: deckTopY },
+        { x: xOffset + sectionWidthScaled, y: concreteTopY },
         { x: xOffset, y: concreteTopY },
     ].map(p => `${p.x},${p.y}`).join(' ');
 
@@ -557,17 +723,17 @@ const SectionCutView = () => {
         <svg viewBox={`0 0 ${SVG_WIDTH} ${SVG_HEIGHT}`} className="w-full h-auto">
             {/* Viga Secundária em Corte */}
             {vigaS && <>
-                <rect x={xOffset + 200 - scaled_vigaS_b/2} y={vigaY} width={scaled_vigaS_b} height={scaled_vigaS_tf} fill="hsl(var(--primary)/0.6)" />
-                <rect x={xOffset + 200 - scaled_vigaS_tw/2} y={vigaY + scaled_vigaS_tf} width={scaled_vigaS_tw} height={scaled_vigaS_h - 2 * scaled_vigaS_tf} fill="hsl(var(--primary)/0.6)" />
-                <rect x={xOffset + 200 - scaled_vigaS_b/2} y={vigaY + scaled_vigaS_h - scaled_vigaS_tf} width={scaled_vigaS_b} height={scaled_vigaS_tf} fill="hsl(var(--primary)/0.6)" />
-                <DrawingText x={xOffset + 200} y={baseY + 15}>{vigaS.nome}</DrawingText>
+                <rect x={centerX - scaled_vigaS_b/2} y={vigaY} width={scaled_vigaS_b} height={scaled_vigaS_tf} fill="hsl(var(--primary)/0.6)" />
+                <rect x={centerX - scaled_vigaS_tw/2} y={vigaY + scaled_vigaS_tf} width={scaled_vigaS_tw} height={scaled_vigaS_h - 2 * scaled_vigaS_tf} fill="hsl(var(--primary)/0.6)" />
+                <rect x={centerX - scaled_vigaS_b/2} y={vigaY + scaled_vigaS_h - scaled_vigaS_tf} width={scaled_vigaS_b} height={scaled_vigaS_tf} fill="hsl(var(--primary)/0.6)" />
+                <DrawingText x={centerX} y={baseY + 15}>{vigaS.nome}</DrawingText>
             </>}
 
             {/* Steel Deck */}
             {deckInfo && <polygon points={deckPoints} fill="url(#deck-pattern)" stroke="hsl(var(--border))" />}
 
             {/* Concreto */}
-            <rect x={xOffset} y={concreteTopY - concreteHeight} width="400" height={concreteHeight} fill="hsl(var(--muted))" />
+            <rect x={xOffset} y={concreteTopY - concreteHeight} width={sectionWidthScaled} height={concreteHeight} fill="hsl(var(--muted))" />
 
             <defs>
                 <pattern id="deck-pattern" width="10" height="10" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
@@ -578,6 +744,7 @@ const SectionCutView = () => {
             {/* Labels */}
             <DimensionLine x1={xOffset-10} y1={concreteTopY - concreteHeight} x2={xOffset-10} y2={concreteTopY} label={`${concreteH_cm} cm`} vertical offset={-15} />
             <DimensionLine x1={xOffset-10} y1={deckTopY - deck_h_scaled} x2={xOffset-10} y2={deckTopY} label={`${deckHeight_mm} mm`} vertical offset={-15}/>
+            <DimensionLine x1={xOffset} y1={deckTopY} x2={xOffset + sectionWidthScaled} y2={deckTopY} label={`Faixa analisada: ${sectionWidth_m.toFixed(2)}m`} offset={20} />
         </svg>
     )
 }
@@ -589,7 +756,36 @@ export function StructuralVisualizer() {
     const [aiAnalysis, setAiAnalysis] = React.useState<string | null>(null);
     const [aiError, setAiError] = React.useState<string | null>(null);
 
-    const hybridReport = React.useMemo(() => buildHybridReportData(calculator), [calculator]);
+    const reportSource = React.useMemo(() => {
+        if (!calculator.finalSnapshot) {
+            return {
+                slabAnalysis: calculator.slabAnalysis,
+                laje: calculator.laje,
+                vigaSecundaria: calculator.vigaSecundaria,
+                vigaPrincipal: calculator.vigaPrincipal,
+                pilar: calculator.pilar,
+                sapata: calculator.sapata,
+                sapataArmadura: calculator.sapataArmadura,
+                budgetItems: calculator.budgetItems,
+                supportReactions: calculator.supportReactions,
+            };
+        }
+
+        return {
+            ...calculator.finalSnapshot.calculatorState,
+            budgetItems: calculator.finalSnapshot.budgetItems,
+            supportReactions: calculator.finalSnapshot.supportReactions,
+        };
+    }, [calculator]);
+
+    const hybridReport = React.useMemo(() => buildHybridReportData(reportSource), [reportSource]);
+
+    const snapshotCapturedAt = calculator.finalSnapshot
+        ? new Intl.DateTimeFormat("pt-BR", {
+              dateStyle: "short",
+              timeStyle: "short",
+          }).format(new Date(calculator.finalSnapshot.capturedAt))
+        : null;
 
     const handleAnalyzeWithAI = async () => {
         const aiSettings = getAiSettings();
@@ -638,6 +834,12 @@ export function StructuralVisualizer() {
                     <CardDescription>Esquema simplificado da estrutura dimensionada. Todos os valores são baseados nos dados das abas anteriores.</CardDescription>
                 </CardHeader>
                 <CardContent>
+                    {calculator.isStepStale('visualizacao') && (
+                        <StaleStepAlert
+                            title="Visualização final com dependências desatualizadas"
+                            description="Uma ou mais etapas anteriores mudaram. As vistas continuam exibidas, mas o relatório final só deve ser congelado após recalcular as etapas marcadas."
+                        />
+                    )}
                     <Tabs defaultValue="plan">
                         <TabsList className="grid w-full grid-cols-4">
                             <TabsTrigger value="plan">Planta</TabsTrigger>
@@ -648,7 +850,9 @@ export function StructuralVisualizer() {
                         <TabsContent value="plan">
                             <Card className="mt-2">
                                 <CardContent className="p-2">
-                                    <PlanView />
+                                    <ZoomableViewport>
+                                        <PlanView />
+                                    </ZoomableViewport>
                                     <Alert variant="default" className="mt-2">
                                         <Info className="h-4 w-4" />
                                         <AlertTitle>Legenda</AlertTitle>
@@ -666,21 +870,27 @@ export function StructuralVisualizer() {
                         <TabsContent value="elevation-front">
                             <Card className="mt-2">
                                 <CardContent className="p-2">
-                                    <FrontElevationView />
+                                    <ZoomableViewport>
+                                        <FrontElevationView />
+                                    </ZoomableViewport>
                                 </CardContent>
                             </Card>
                         </TabsContent>
                         <TabsContent value="elevation-side">
                             <Card className="mt-2">
                                 <CardContent className="p-2">
-                                    <SideElevationView />
+                                    <ZoomableViewport>
+                                        <SideElevationView />
+                                    </ZoomableViewport>
                                 </CardContent>
                             </Card>
                         </TabsContent>
                         <TabsContent value="section-cut">
                             <Card className="mt-2">
                                 <CardContent className="p-2">
-                                    <SectionCutView />
+                                    <ZoomableViewport>
+                                        <SectionCutView />
+                                    </ZoomableViewport>
                                 </CardContent>
                             </Card>
                         </TabsContent>
@@ -696,6 +906,24 @@ export function StructuralVisualizer() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                    <div className="flex flex-wrap items-center gap-2 border-b pb-4">
+                        <RefinedButton type="button" onClick={() => calculator.captureFinalSnapshot()} className="gap-2">
+                            <Camera className="h-4 w-4" />
+                            {calculator.finalSnapshot ? 'Atualizar snapshot final' : 'Congelar snapshot final'}
+                        </RefinedButton>
+                        {calculator.finalSnapshot && (
+                            <Button type="button" variant="outline" onClick={calculator.clearFinalSnapshot} className="gap-2">
+                                <RefreshCcw className="h-4 w-4" />
+                                Voltar ao modo ao vivo
+                            </Button>
+                        )}
+                        <div className="text-sm text-muted-foreground">
+                            {calculator.finalSnapshot
+                                ? `Relatório congelado em ${snapshotCapturedAt}. As vistas continuam ao vivo.`
+                                : 'Sem snapshot: o relatório abaixo reflete os dados atuais da calculadora.'}
+                        </div>
+                    </div>
+
                     {hybridReport.missingSteps.length > 0 && (
                         <Alert>
                             <Info className="h-4 w-4" />

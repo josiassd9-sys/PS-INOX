@@ -6,16 +6,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "@/hooks/use-toast";
+import { useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
 
 export const SlabAnalysis = () => {
-    const [vaoX, setVaoX] = useState(10);
-    const [vaoY, setVaoY] = useState(8);
-    const [balancoX_E, setBalancoX_E] = useState(1);
-    const [balancoX_D, setBalancoX_D] = useState(1);
-    const [balancoY_S, setBalancoY_S] = useState(1);
-    const [balancoY_I, setBalancoY_I] = useState(1);
+    const { slabAnalysis, updateSlabAnalysis } = useCalculator();
+    const vaoX = Number(slabAnalysis.spanX.replace(',', '.')) || 0;
+    const vaoY = Number(slabAnalysis.spanY.replace(',', '.')) || 0;
+    const balancoX_E = Number(slabAnalysis.cantileverLeft.replace(',', '.')) || 0;
+    const balancoX_D = Number(slabAnalysis.cantileverRight.replace(',', '.')) || 0;
+    const balancoY_S = Number(slabAnalysis.cantileverFront.replace(',', '.')) || 0;
+    const balancoY_I = Number(slabAnalysis.cantileverBack.replace(',', '.')) || 0;
+    const analysis = slabAnalysis.result?.analysis ?? "";
 
-    const [analysis, setAnalysis] = useState("");
+    const handleInputChange = (field: 'spanX' | 'spanY' | 'cantileverLeft' | 'cantileverRight' | 'cantileverFront' | 'cantileverBack', value: string) => {
+        updateSlabAnalysis({ [field]: value });
+    };
 
     const handleAnalyze = () => {
     let analysisText = `Análise da Geometria da Laje:\n\n`;
@@ -82,7 +87,7 @@ export const SlabAnalysis = () => {
             analysisText += `A configuração geométrica parece razoável e segue as práticas comuns de engenharia. O pré-dimensionamento pode prosseguir com base nesta configuração, focando em um equilíbrio otimizado entre os perfis.`;
         }
 
-        setAnalysis(analysisText);
+        updateSlabAnalysis({ result: { analysis: analysisText } });
 
     };
 
@@ -116,27 +121,27 @@ export const SlabAnalysis = () => {
                         <h3 className="font-semibold text-lg">Parâmetros da Laje (em metros)</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                             <Label htmlFor="vaoX" className="text-sm">Vão em X (Principal)</Label>
-                            <Input id="vaoX" type="number" value={vaoX} onChange={(e) => setVaoX(Number(e.target.value))} />
+                            <Input id="vaoX" type="number" value={slabAnalysis.spanX} onChange={(e) => handleInputChange('spanX', e.target.value)} />
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                             <Label htmlFor="vaoY" className="text-sm">Vão em Y (Secundário)</Label>
-                            <Input id="vaoY" type="number" value={vaoY} onChange={(e) => setVaoY(Number(e.target.value))} />
+                            <Input id="vaoY" type="number" value={slabAnalysis.spanY} onChange={(e) => handleInputChange('spanY', e.target.value)} />
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                             <Label htmlFor="balancoX_E" className="text-sm">Balanço em X (Esquerda)</Label>
-                            <Input id="balancoX_E" type="number" value={balancoX_E} onChange={(e) => setBalancoX_E(Number(e.target.value))} />
+                            <Input id="balancoX_E" type="number" value={slabAnalysis.cantileverLeft} onChange={(e) => handleInputChange('cantileverLeft', e.target.value)} />
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                             <Label htmlFor="balancoX_D" className="text-sm">Balanço em X (Direita)</Label>
-                            <Input id="balancoX_D" type="number" value={balancoX_D} onChange={(e) => setBalancoX_D(Number(e.target.value))} />
+                            <Input id="balancoX_D" type="number" value={slabAnalysis.cantileverRight} onChange={(e) => handleInputChange('cantileverRight', e.target.value)} />
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                             <Label htmlFor="balancoY_S" className="text-sm">Balanço em Y (Superior)</Label>
-                            <Input id="balancoY_S" type="number" value={balancoY_S} onChange={(e) => setBalancoY_S(Number(e.target.value))} />
+                            <Input id="balancoY_S" type="number" value={slabAnalysis.cantileverFront} onChange={(e) => handleInputChange('cantileverFront', e.target.value)} />
                         </div>
                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                             <Label htmlFor="balancoY_I" className="text-sm">Balanço em Y (Inferior)</Label>
-                            <Input id="balancoY_I" type="number" value={balancoY_I} onChange={(e) => setBalancoY_I(Number(e.target.value))} />
+                            <Input id="balancoY_I" type="number" value={slabAnalysis.cantileverBack} onChange={(e) => handleInputChange('cantileverBack', e.target.value)} />
                         </div>
                         <Button onClick={handleAnalyze} className="w-full">Analisar Geometria</Button>
                     </div>

@@ -15,6 +15,7 @@ import { useCalculator, PilarInputs } from "@/app/perfis/calculadora/CalculatorC
 import { RefinedButton, RefinedCard } from "@/components/refined-components";
 import { FormSkeleton } from "@/components/skeleton";
 import { getAiSettings } from "@/lib/ai-settings";
+import { LinkedFieldLabel, StaleStepAlert } from "./linked-field-controls";
 
 interface PilarCalcResult {
     profile: Perfil;
@@ -42,7 +43,7 @@ function getLocalAnalysis(result: PilarCalcResult, reactions: { vigaPrincipal: n
 }
 
 export function PilarCalculator() {
-    const { onAddToBudget, supportReactions, onPillarLoadCalculated, pilar, updatePilar } = useCalculator();
+    const { onAddToBudget, supportReactions, onPillarLoadCalculated, pilar, updatePilar, fieldLinks, setFieldLink, isStepStale } = useCalculator();
     const { height, axialLoad, steelType, quantity, pricePerKg, result, analysis, safetyFactor, additionalHeight } = pilar;
     
     const [isAnalyzing, setIsAnalyzing] = React.useState(false);
@@ -53,11 +54,12 @@ export function PilarCalculator() {
     const { toast } = useToast();
     
     React.useEffect(() => {
+        if (!fieldLinks.pilar.axialLoad) return;
         const totalReaction = supportReactions.vigaPrincipal + supportReactions.vigaSecundaria;
         if (totalReaction > 0 && totalReaction.toFixed(0) !== axialLoad) {
             updatePilar({ axialLoad: totalReaction.toFixed(0) });
         }
-    }, [supportReactions.vigaPrincipal, supportReactions.vigaSecundaria, axialLoad]);
+    }, [supportReactions.vigaPrincipal, supportReactions.vigaSecundaria, axialLoad, updatePilar, fieldLinks.pilar.axialLoad]);
 
     React.useEffect(() => {
         const load = parseFloat(axialLoad.replace(',', '.'));
@@ -231,6 +233,12 @@ export function PilarCalculator() {
                 <CardDescription>Dimensione um perfil W para um pilar submetido à carga axial, com verificação de flambagem.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+                {isStepStale('pilar') && (
+                    <StaleStepAlert
+                        title="Pilar desatualizado"
+                        description="As reações das vigas ou os dados do pilar mudaram. Recalcule o pilar antes de congelar relatório ou seguir para a fundação."
+                    />
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="pilar-height">Pé-Direito (Altura de Flambagem) (m)</Label>
@@ -241,8 +249,8 @@ export function PilarCalculator() {
                         <Input id="pilar-additional-height" type="text" inputMode="decimal" value={additionalHeight} onChange={e => handleInputChange('additionalHeight', e.target.value)} placeholder="Ex: 3,0" />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="pilar-load">Carga Axial (kgf)</Label>
-                        <Input id="pilar-load" type="text" inputMode="decimal" value={axialLoad} onChange={e => handleInputChange('axialLoad', e.target.value)} placeholder="Ex: 5000" readOnly className="bg-muted/70"/>
+                        <LinkedFieldLabel htmlFor="pilar-load" label="Carga Axial (kgf)" linked={fieldLinks.pilar.axialLoad} onToggle={(linked) => setFieldLink('pilar', 'axialLoad', linked)} source="Reações das vigas principal + secundária" />
+                        <Input id="pilar-load" type="text" inputMode="decimal" value={axialLoad} onChange={e => handleInputChange('axialLoad', e.target.value)} placeholder="Ex: 5000" readOnly={fieldLinks.pilar.axialLoad} className={fieldLinks.pilar.axialLoad ? "bg-muted/70" : ""}/>
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="pilar-steel-type">Tipo de Aço</Label>

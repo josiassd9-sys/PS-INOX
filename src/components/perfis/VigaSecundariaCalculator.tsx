@@ -17,6 +17,7 @@ import { useCalculator, VigaInputs } from "@/app/perfis/calculadora/CalculatorCo
 import { RefinedButton, RefinedCard } from "@/components/refined-components";
 import { FormSkeleton } from "@/components/skeleton";
 import { getAiSettings } from "@/lib/ai-settings";
+import { LinkedFieldLabel, StaleStepAlert } from "./linked-field-controls";
 
 interface CalculationResult {
     profile: PerfilIpe;
@@ -58,7 +59,7 @@ function getLocalAnalysis(result: CalculationResult, safetyFactor: number): Anal
 }
 
 export function VigaSecundariaCalculator() {
-  const { onAddToBudget, onVigaSecundariaReactionCalculated, laje, vigaSecundaria, updateVigaSecundaria, slabAnalysis } = useCalculator();
+  const { onAddToBudget, onVigaSecundariaReactionCalculated, laje, vigaSecundaria, updateVigaSecundaria, slabAnalysis, fieldLinks, setFieldLink, isStepStale } = useCalculator();
   const { span, balanco1, balanco2, spacing, slabLoad, distributedLoad, pointLoad, pointLoadPosition, steelType, beamScheme, quantity, pricePerKg, result, analysis, safetyFactor } = vigaSecundaria;
 
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
@@ -77,23 +78,24 @@ export function VigaSecundariaCalculator() {
         const balancoY_A = parseFloat(cantileverBack.replace(',', '.')) || 0;
         const vaoY = totalY - balancoY_F - balancoY_A;
 
-        if (vaoY > 0 && vaoY.toFixed(2) !== span) updates.span = vaoY.toFixed(2);
-        if (cantileverFront && cantileverFront !== balanco1) updates.balanco1 = cantileverFront;
-        if (cantileverBack && cantileverBack !== balanco2) updates.balanco2 = cantileverBack;
+        if (fieldLinks.vigaSecundaria.span && vaoY > 0 && vaoY.toFixed(2) !== span) updates.span = vaoY.toFixed(2);
+        if (fieldLinks.vigaSecundaria.balanco1 && cantileverFront && cantileverFront !== balanco1) updates.balanco1 = cantileverFront;
+        if (fieldLinks.vigaSecundaria.balanco2 && cantileverBack && cantileverBack !== balanco2) updates.balanco2 = cantileverBack;
         
         const E_m = parseFloat(spacing!.replace(",", "."));
         const L_total_m = parseFloat(spanX.replace(",", "."));
         if (!isNaN(E_m) && E_m > 0 && !isNaN(L_total_m) && L_total_m > 0) {
             const numVigas = Math.ceil(L_total_m / E_m) + 1;
-            if (numVigas.toString() !== quantity) updates.quantity = numVigas.toString();
+            if (fieldLinks.vigaSecundaria.quantity && numVigas.toString() !== quantity) updates.quantity = numVigas.toString();
         }
 
         if (Object.keys(updates).length > 0) {
             updateVigaSecundaria(updates);
         }
-    }, [slabAnalysis, spacing, span, balanco1, balanco2, quantity, updateVigaSecundaria]);
+    }, [slabAnalysis, spacing, span, balanco1, balanco2, quantity, updateVigaSecundaria, fieldLinks.vigaSecundaria]);
   
   React.useEffect(() => {
+    if (!fieldLinks.vigaSecundaria.distributedLoad) return;
     const E_m = parseFloat(spacing!.replace(",", "."));
     const S_kgf_m2 = parseFloat(slabLoad!.replace(",", "."));
     if (!isNaN(E_m) && !isNaN(S_kgf_m2) && E_m > 0 && S_kgf_m2 > 0) {
@@ -102,13 +104,14 @@ export function VigaSecundariaCalculator() {
            updateVigaSecundaria({ distributedLoad: q_dist_kgf_m.toFixed(2).replace('.',',') });
        }
     }
-  }, [slabLoad, spacing, distributedLoad, updateVigaSecundaria]);
+  }, [slabLoad, spacing, distributedLoad, updateVigaSecundaria, fieldLinks.vigaSecundaria.distributedLoad]);
 
   React.useEffect(() => {
+    if (!fieldLinks.vigaSecundaria.slabLoad) return;
     if (laje.result && laje.result.totalLoad.toFixed(0) !== slabLoad) {
       updateVigaSecundaria({ slabLoad: laje.result.totalLoad.toFixed(0) });
     }
-  }, [laje.result, slabLoad, updateVigaSecundaria]);
+  }, [laje.result, slabLoad, updateVigaSecundaria, fieldLinks.vigaSecundaria.slabLoad]);
 
   const handleInputChange = (field: keyof VigaInputs, value: string) => {
     const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -313,18 +316,24 @@ export function VigaSecundariaCalculator() {
           <CardDescription>Dimensione vigas secundárias que apoiam a laje, como em um sistema de steel deck.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {isStepStale('vigaSecundaria') && (
+            <StaleStepAlert
+              title="Viga secundária desatualizada"
+              description="Geometria, laje ou campos desta etapa foram alterados. Recalcule a viga secundária para atualizar reações e etapas seguintes."
+            />
+          )}
           <BeamSchemeDiagram scheme={beamScheme} span={parseFloat(span.replace(",", ".")) || 0} balanco1={parseFloat(balanco1.replace(",", ".")) || 0} balanco2={parseFloat(balanco2.replace(",", ".")) || 0} />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-end">
             {beamScheme === 'biapoiada' ? (
-                <div className="space-y-2"><Label htmlFor="vs-span">Vão / Comprimento (m)</Label><Input id="vs-span" type="text" inputMode="decimal" value={span} onChange={(e) => handleInputChange('span', e.target.value)} placeholder="Ex: 4,0" /></div>
+                <div className="space-y-2"><LinkedFieldLabel htmlFor="vs-span" label="Vão / Comprimento (m)" linked={fieldLinks.vigaSecundaria.span} onToggle={(linked) => setFieldLink('vigaSecundaria', 'span', linked)} source="Geometria da aba 1" /><Input id="vs-span" type="text" inputMode="decimal" value={span} onChange={(e) => handleInputChange('span', e.target.value)} placeholder="Ex: 4,0" readOnly={fieldLinks.vigaSecundaria.span} className={fieldLinks.vigaSecundaria.span ? "bg-muted/70" : ""} /></div>
             ) : beamScheme === 'balanco' ? (
-                 <><div className="space-y-2"><Label htmlFor="vs-span-balanco">Vão Central (m)</Label><Input id="vs-span-balanco" type="text" inputMode="decimal" value={span} onChange={(e) => handleInputChange('span', e.target.value)} placeholder="Ex: 4,0"/></div><div className="space-y-2"><Label htmlFor="vs-balanco1-single">Balanço (m)</Label><Input id="vs-balanco1-single" type="text" inputMode="decimal" value={balanco1} onChange={(e) => handleInputChange('balanco1', e.target.value)} placeholder="Ex: 1,0"/></div></>
+                 <><div className="space-y-2"><LinkedFieldLabel htmlFor="vs-span-balanco" label="Vão Central (m)" linked={fieldLinks.vigaSecundaria.span} onToggle={(linked) => setFieldLink('vigaSecundaria', 'span', linked)} source="Geometria da aba 1" /><Input id="vs-span-balanco" type="text" inputMode="decimal" value={span} onChange={(e) => handleInputChange('span', e.target.value)} placeholder="Ex: 4,0" readOnly={fieldLinks.vigaSecundaria.span} className={fieldLinks.vigaSecundaria.span ? "bg-muted/70" : ""}/></div><div className="space-y-2"><LinkedFieldLabel htmlFor="vs-balanco1-single" label="Balanço (m)" linked={fieldLinks.vigaSecundaria.balanco1} onToggle={(linked) => setFieldLink('vigaSecundaria', 'balanco1', linked)} source="Geometria da aba 1" /><Input id="vs-balanco1-single" type="text" inputMode="decimal" value={balanco1} onChange={(e) => handleInputChange('balanco1', e.target.value)} placeholder="Ex: 1,0" readOnly={fieldLinks.vigaSecundaria.balanco1} className={fieldLinks.vigaSecundaria.balanco1 ? "bg-muted/70" : ""}/></div></>
             ) : (
-                <><div className="space-y-2"><Label htmlFor="vs-balanco1">Balanço 1 (m)</Label><Input id="vs-balanco1" type="text" inputMode="decimal" value={balanco1} onChange={(e) => handleInputChange('balanco1', e.target.value)} placeholder="Ex: 1,0"/></div><div className="space-y-2"><Label htmlFor="vs-span-central">Vão Central (m)</Label><Input id="vs-span-central" type="text" inputMode="decimal" value={span} onChange={(e) => handleInputChange('span', e.target.value)} placeholder="Ex: 4,0"/></div><div className="space-y-2"><Label htmlFor="vs-balanco2">Balanço 2 (m)</Label><Input id="vs-balanco2" type="text" inputMode="decimal" value={balanco2} onChange={(e) => handleInputChange('balanco2', e.target.value)} placeholder="Ex: 1,0"/></div></>
+                <><div className="space-y-2"><LinkedFieldLabel htmlFor="vs-balanco1" label="Balanço 1 (m)" linked={fieldLinks.vigaSecundaria.balanco1} onToggle={(linked) => setFieldLink('vigaSecundaria', 'balanco1', linked)} source="Geometria da aba 1" /><Input id="vs-balanco1" type="text" inputMode="decimal" value={balanco1} onChange={(e) => handleInputChange('balanco1', e.target.value)} placeholder="Ex: 1,0" readOnly={fieldLinks.vigaSecundaria.balanco1} className={fieldLinks.vigaSecundaria.balanco1 ? "bg-muted/70" : ""}/></div><div className="space-y-2"><LinkedFieldLabel htmlFor="vs-span-central" label="Vão Central (m)" linked={fieldLinks.vigaSecundaria.span} onToggle={(linked) => setFieldLink('vigaSecundaria', 'span', linked)} source="Geometria da aba 1" /><Input id="vs-span-central" type="text" inputMode="decimal" value={span} onChange={(e) => handleInputChange('span', e.target.value)} placeholder="Ex: 4,0" readOnly={fieldLinks.vigaSecundaria.span} className={fieldLinks.vigaSecundaria.span ? "bg-muted/70" : ""}/></div><div className="space-y-2"><LinkedFieldLabel htmlFor="vs-balanco2" label="Balanço 2 (m)" linked={fieldLinks.vigaSecundaria.balanco2} onToggle={(linked) => setFieldLink('vigaSecundaria', 'balanco2', linked)} source="Geometria da aba 1" /><Input id="vs-balanco2" type="text" inputMode="decimal" value={balanco2} onChange={(e) => handleInputChange('balanco2', e.target.value)} placeholder="Ex: 1,0" readOnly={fieldLinks.vigaSecundaria.balanco2} className={fieldLinks.vigaSecundaria.balanco2 ? "bg-muted/70" : ""}/></div></>
             )}
-             <div className="space-y-2"><div className="flex items-center justify-between"><Label htmlFor="vs-slab-load">Carga da Laje (kgf/m²)</Label></div><Input id="vs-slab-load" type="text" inputMode="decimal" value={slabLoad} onChange={(e) => handleInputChange('slabLoad', e.target.value)} placeholder="Ex: 450" /></div>
+             <div className="space-y-2"><LinkedFieldLabel htmlFor="vs-slab-load" label="Carga da Laje (kgf/m²)" linked={fieldLinks.vigaSecundaria.slabLoad} onToggle={(linked) => setFieldLink('vigaSecundaria', 'slabLoad', linked)} source="Resultado da aba Laje" /><Input id="vs-slab-load" type="text" inputMode="decimal" value={slabLoad} onChange={(e) => handleInputChange('slabLoad', e.target.value)} placeholder="Ex: 450" readOnly={fieldLinks.vigaSecundaria.slabLoad} className={fieldLinks.vigaSecundaria.slabLoad ? "bg-muted/70" : ""} /></div>
             <div className="space-y-2"><Label htmlFor="vs-spacing">Espaçamento entre Vigas (m)</Label><Input id="vs-spacing" type="text" inputMode="decimal" value={spacing} onChange={(e) => handleInputChange('spacing', e.target.value)} placeholder="Ex: 1,5" /></div>
-             <div className="space-y-2"><Label htmlFor="vs-load">Carga Distribuída (kgf/m)</Label><Input id="vs-load" type="text" inputMode="decimal" value={distributedLoad} onChange={(e) => handleInputChange('distributedLoad', e.target.value)} placeholder="Carga linear" /></div>
+             <div className="space-y-2"><LinkedFieldLabel htmlFor="vs-load" label="Carga Distribuída (kgf/m)" linked={fieldLinks.vigaSecundaria.distributedLoad} onToggle={(linked) => setFieldLink('vigaSecundaria', 'distributedLoad', linked)} source="Carga da laje x espaçamento" /><Input id="vs-load" type="text" inputMode="decimal" value={distributedLoad} onChange={(e) => handleInputChange('distributedLoad', e.target.value)} placeholder="Carga linear" readOnly={fieldLinks.vigaSecundaria.distributedLoad} className={fieldLinks.vigaSecundaria.distributedLoad ? "bg-muted/70" : ""} /></div>
              <div className="space-y-2"><Label htmlFor="vs-point-load">Carga Pontual (kgf)</Label><Input id="vs-point-load" type="text" inputMode="decimal" value={pointLoad} onChange={e => handleInputChange('pointLoad', e.target.value)} placeholder="Opcional" /></div>
             <div className="space-y-2"><Label htmlFor="vs-point-load-pos">Posição da Carga (m)</Label><Input id="vs-point-load-pos" type="text" inputMode="decimal" value={pointLoadPosition} onChange={e => handleInputChange('pointLoadPosition', e.target.value)} placeholder="Dist. do apoio esquerdo" /></div>
             <div className="space-y-2"><Label htmlFor="vs-beam-scheme">Esquema da Viga</Label><Select value={beamScheme} onValueChange={(value) => updateVigaSecundaria({ beamScheme: value as VigaInputs['beamScheme'] })}><SelectTrigger id="vs-beam-scheme"><SelectValue placeholder="Selecione o esquema" /></SelectTrigger><SelectContent><SelectItem value="biapoiada">Viga Bi-apoiada</SelectItem><SelectItem value="balanco">Viga com Balanço</SelectItem><SelectItem value="dois-balancos">Viga com Dois Balanços</SelectItem></SelectContent></Select></div>
@@ -357,7 +366,7 @@ export function VigaSecundariaCalculator() {
                      {aiError && <Alert variant="destructive"><AlertTitle>IA indisponível</AlertTitle><AlertDescription>{aiError}</AlertDescription></Alert>}
                      {aiAnalysis && <Alert variant="default"><Sparkles className="h-4 w-4" /><AlertTitle className="font-semibold">Análise por IA (Comparativa)</AlertTitle><AlertDescription className="whitespace-pre-line">{aiAnalysis}</AlertDescription></Alert>}
                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-4">
-                         <div className="space-y-2"><Label htmlFor="vs-quantity">Quantidade</Label><Input id="vs-quantity" type="text" inputMode="numeric" value={quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} placeholder="Ex: 1" /></div>
+                        <div className="space-y-2"><LinkedFieldLabel htmlFor="vs-quantity" label="Quantidade" linked={fieldLinks.vigaSecundaria.quantity} onToggle={(linked) => setFieldLink('vigaSecundaria', 'quantity', linked)} source="Malha da geometria / espaçamento" /><Input id="vs-quantity" type="text" inputMode="numeric" value={quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} placeholder="Ex: 1" readOnly={fieldLinks.vigaSecundaria.quantity} className={fieldLinks.vigaSecundaria.quantity ? "bg-muted/70" : ""} /></div>
                          <div className="space-y-2"><Label htmlFor="vs-pricePerKg">Preço do Aço (R$/kg)</Label><Input id="vs-pricePerKg" type="text" inputMode="decimal" value={pricePerKg} onChange={(e) => handleInputChange('pricePerKg', e.target.value)} placeholder="Ex: 8,50" /></div>
                     </div>
                      {result.shearCheck.vsd > 0 && <div className="text-sm text-center text-muted-foreground">Reação de apoio máxima (não majorada): <span className="font-bold text-foreground">{ (result.shearCheck.vsd / (parseFloat(safetyFactor.replace(',', '.')) || 1.4) / 0.009807).toFixed(0)} kgf</span></div>}

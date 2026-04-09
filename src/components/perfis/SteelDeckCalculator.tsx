@@ -16,6 +16,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useCalculator, LajeInputs } from "@/app/perfis/calculadora/CalculatorContext";
+import { LinkedFieldLabel, StaleStepAlert } from "./linked-field-controls";
 
 interface AnalysisResult {
   analysis: string;
@@ -79,7 +80,7 @@ function getLocalAnalysis(
 }
 
 export function SteelDeckCalculator() {
-    const { onAddToBudget, updateLaje, laje, vigaSecundaria, slabAnalysis } = useCalculator();
+    const { onAddToBudget, updateLaje, laje, vigaSecundaria, slabAnalysis, fieldLinks, setFieldLink, isStepStale } = useCalculator();
     const { selectedDeckId, concreteThickness, selectedLoads, extraLoad, quantity, pricePerKg, concretePrice, result, analysis, safetyFactor } = laje;
     
     const [isAnalyzing, setIsAnalyzing] = React.useState(false);
@@ -98,6 +99,7 @@ export function SteelDeckCalculator() {
     }, [selectedLoads, extraLoad, updateLaje]);
 
     React.useEffect(() => {
+        if (!fieldLinks.laje.quantity) return;
         const totalX = parseFloat(slabAnalysis.spanX.replace(',', '.')) || 0;
         const totalY = parseFloat(slabAnalysis.spanY.replace(',', '.')) || 0;
         const area = totalX * totalY;
@@ -106,7 +108,7 @@ export function SteelDeckCalculator() {
         if (area > 0 && area.toFixed(2) !== currentQuantity.toFixed(2)) {
             updateLaje({ quantity: area.toFixed(2) });
         }
-    }, [slabAnalysis.spanX, slabAnalysis.spanY, quantity, updateLaje]);
+    }, [slabAnalysis.spanX, slabAnalysis.spanY, quantity, updateLaje, fieldLinks.laje.quantity]);
 
     const handleInputChange = (field: keyof LajeInputs, value: string) => {
         const sanitizedValue = value.replace(/[^0-9,.]/g, '').replace('.', ',');
@@ -248,6 +250,12 @@ export function SteelDeckCalculator() {
                 <CardDescription>Calcule a carga total (kgf/m²) da sua laje e adicione o material ao orçamento.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+                {isStepStale('laje') && (
+                    <StaleStepAlert
+                        title="Resultado da laje desatualizado"
+                        description="Algum dado desta etapa ou da geometria mudou. Recalcule a carga da laje antes de seguir para as etapas seguintes."
+                    />
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
                         <Label>Tipo de Steel Deck</Label>
@@ -315,8 +323,14 @@ export function SteelDeckCalculator() {
                             <Separator />
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t pt-4">
                                <div className="space-y-2">
-                                  <Label htmlFor="deck-quantity">Área da Laje (m²)</Label>
-                                  <Input id="deck-quantity" type="text" inputMode="numeric" value={quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} placeholder="Ex: 50" readOnly className="bg-muted/70"/>
+                                  <LinkedFieldLabel
+                                      htmlFor="deck-quantity"
+                                      label="Área da Laje (m²)"
+                                      linked={fieldLinks.laje.quantity}
+                                      onToggle={(linked) => setFieldLink('laje', 'quantity', linked)}
+                                      source="Geometria da aba 1"
+                                  />
+                                  <Input id="deck-quantity" type="text" inputMode="numeric" value={quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} placeholder="Ex: 50" readOnly={fieldLinks.laje.quantity} className={fieldLinks.laje.quantity ? "bg-muted/70" : ""}/>
                               </div>
                                <div className="space-y-2">
                                   <Label htmlFor="deck-pricePerKg">Preço Aço Galv. (R$/kg)</Label>

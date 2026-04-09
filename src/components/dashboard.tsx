@@ -145,8 +145,21 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
   }, []);
 
   React.useEffect(() => {
-    const timer = window.setTimeout(() => setIsBooting(false), 650);
-    return () => window.clearTimeout(timer);
+    // DEBUG: Force boot to complete immediately
+    try {
+      console.log('[Dashboard] Component mounted, setting isBooting to false');
+      setIsBooting(false);
+      
+      // Also set a fallback timeout just in case
+      const timer = window.setTimeout(() => {
+        console.log('[Dashboard] Fallback timeout triggered');
+        setIsBooting(false);
+      }, 2000);
+      return () => window.clearTimeout(timer);
+    } catch (error) {
+      console.error('[Dashboard] Error in boot useEffect:', error);
+      setIsBooting(false);
+    }
   }, []);
   
   const savePriceParams = () => {

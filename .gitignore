@@ -23,6 +23,12 @@ build/
 .idea/
 # Next.js build
 .next/
+out/
+tsconfig.tsbuildinfo
+
+# Generated PWA artifacts
+public/sw.js
+public/workbox-*.js
 
 # Firebase logs
 firebase-debug.log

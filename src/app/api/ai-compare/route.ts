@@ -60,6 +60,30 @@ function buildPrompt(payload: AiComparePayload): string {
   if (payload.analysisType === "test") {
     return "Responda apenas com a palavra: ok";
   }
+  if (payload.analysisType === "estrutura-completa") {
+    return [
+      "Voce e um engenheiro estrutural senior, atuando como revisor tecnico preliminar.",
+      "Recebera um relatorio hibrido gerado pelo aplicativo com dados da estrutura metalica e da fundacao.",
+      "Sua tarefa e complementar esse material com um parecer tecnico preliminar em portugues do Brasil.",
+      "Regras obrigatorias:",
+      "1) Nao trate o texto como laudo executivo ou ART.",
+      "2) Use apenas os dados fornecidos e nao invente resultados numericos ausentes.",
+      "3) Cite normas apenas como referencias de verificacao e boas praticas, sem afirmar conformidade final.",
+      "4) Destaque pendencias de validacao por engenheiro responsavel quando necessario.",
+      "5) Estruture em 6 blocos com estes titulos exatos:",
+      "Visao Geral",
+      "Cadeia de Cargas",
+      "Pontos Criticos",
+      "Checklist Normativo",
+      "Otimizacoes Possiveis",
+      "Conclusao Tecnica Preliminar",
+      "6) Seja objetivo, tecnico e util para tomada de decisao.",
+      "",
+      `Tipo de analise: ${payload.analysisType}`,
+      "Dados em JSON:",
+      JSON.stringify(payload.context, null, 2),
+    ].join("\n");
+  }
   return [
     "Voce e um engenheiro estrutural senior.",
     "Analise os dados abaixo e produza uma segunda opiniao tecnica em portugues do Brasil.",

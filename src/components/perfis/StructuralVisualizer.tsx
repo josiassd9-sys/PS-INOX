@@ -5,11 +5,198 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useCalculator } from "@/app/perfis/calculadora/CalculatorContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Info, GitCompareArrows } from "lucide-react";
+import { Info, GitCompareArrows, Loader, Sparkles } from "lucide-react";
+import { RefinedButton } from "@/components/refined-components";
+import { getAiSettings } from "@/lib/ai-settings";
+import { useToast } from "@/hooks/use-toast";
 
 const SVG_WIDTH = 800;
 const SVG_HEIGHT = 500;
 const PADDING = 50;
+
+const NORMATIVE_REFERENCES = [
+    "ABNT NBR 8800: projeto de estruturas de aço e estruturas mistas de aço e concreto.",
+    "ABNT NBR 6120: ações para o cálculo de estruturas de edificações.",
+    "ABNT NBR 8681: ações e segurança nas estruturas.",
+    "ABNT NBR 6118: projeto de estruturas de concreto.",
+    "ABNT NBR 6122: projeto e execução de fundações.",
+];
+
+function formatNumber(value: number, decimals = 2) {
+    if (!Number.isFinite(value)) return "0";
+    return new Intl.NumberFormat("pt-BR", {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+    }).format(value);
+}
+
+function safeParse(value?: string, fallback = 0) {
+    if (!value) return fallback;
+    const parsed = parseFloat(value.replace(',', '.'));
+    return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function buildHybridReportData(calculator: ReturnType<typeof useCalculator>) {
+    const { slabAnalysis, laje, vigaSecundaria, vigaPrincipal, pilar, sapata, sapataArmadura, budgetItems, supportReactions } = calculator;
+
+    const totalSpanX = safeParse(slabAnalysis.spanX);
+    const totalSpanY = safeParse(slabAnalysis.spanY);
+    const cantileverLeft = safeParse(slabAnalysis.cantileverLeft);
+    const cantileverRight = safeParse(slabAnalysis.cantileverRight);
+    const cantileverFront = safeParse(slabAnalysis.cantileverFront);
+    const cantileverBack = safeParse(slabAnalysis.cantileverBack);
+
+    const missingSteps: string[] = [];
+    if (!slabAnalysis.result) missingSteps.push("Geometria");
+    if (!laje.result) missingSteps.push("Laje");
+    if (!vigaSecundaria.result) missingSteps.push("Viga Secundária");
+    if (!vigaPrincipal.result) missingSteps.push("Viga Principal");
+    if (!pilar.result) missingSteps.push("Pilar");
+    if (!sapata.result) missingSteps.push("Sapata");
+    if (!sapataArmadura.result) missingSteps.push("Armadura da Sapata");
+
+    const sections = [
+        {
+            title: "1. Visão Geral da Estrutura",
+            body: [
+                `Geometria base considerada: ${formatNumber(totalSpanX)} m em X e ${formatNumber(totalSpanY)} m em Y.`,
+                `Balanços informados: X esquerdo ${formatNumber(cantileverLeft)} m, X direito ${formatNumber(cantileverRight)} m, Y superior ${formatNumber(cantileverFront)} m e Y inferior ${formatNumber(cantileverBack)} m.`,
+                slabAnalysis.result?.analysis ? `Síntese da geometria: ${slabAnalysis.result.analysis}` : "A análise da geometria ainda não foi executada.",
+            ],
+        },
+        {
+            title: "2. Cadeia de Cargas e Transferências",
+            body: [
+                laje.result
+                    ? `Laje steel deck calculada com carga total majorada de ${formatNumber(laje.result.totalLoad, 0)} kgf/m².`
+                    : "A carga da laje ainda não foi calculada.",
+                vigaSecundaria.result
+                    ? `Viga secundária dimensionada em ${vigaSecundaria.result.profile.nome}, com reação máxima estimada de ${formatNumber(supportReactions.vigaSecundaria, 0)} kgf para transferência à viga principal.`
+                    : "A viga secundária ainda não foi dimensionada.",
+                vigaPrincipal.result
+                    ? `Viga principal dimensionada em ${vigaPrincipal.result.profile.nome}, com reação máxima estimada de ${formatNumber(supportReactions.vigaPrincipal, 0)} kgf para transferência ao pilar.`
+                    : "A viga principal ainda não foi dimensionada.",
+                pilar.result
+                    ? `Pilar dimensionado em ${pilar.result.profile.nome}, trabalhando com carga axial de ${formatNumber(supportReactions.pilar, 0)} kgf para a fundação.`
+                    : "O pilar ainda não foi dimensionado.",
+            ],
+        },
+        {
+            title: "3. Elementos Dimensionados e Fundação",
+            body: [
+                laje.result?.deck ? `Deck selecionado: ${laje.result.deck.nome}, com concreto de ${laje.concreteThickness} cm.` : "O deck ainda não foi consolidado.",
+                sapata.result
+                    ? `Sapata pré-dimensionada com lado de ${formatNumber(sapata.result.footingDimensions.sideLengthM)} m e altura recomendada de ${formatNumber(sapata.result.footingDimensions.recommendedHeightCm, 0)} cm.`
+                    : "A fundação ainda não foi pré-dimensionada.",
+                sapataArmadura.result
+                    ? `Armadura sugerida: barras de ${formatNumber(sapataArmadura.result.barDiameter, 1)} mm, espaçamento de ${formatNumber(sapataArmadura.result.barSpacing, 1)} cm e ${formatNumber(sapataArmadura.result.totalBars, 0)} barras por direção.`
+                    : "A armadura da sapata ainda não foi calculada.",
+                budgetItems.length > 0
+                    ? `O orçamento possui ${budgetItems.length} item(ns) estruturais consolidados para revisão de peso e custo.`
+                    : "Ainda não há itens lançados no orçamento final.",
+            ],
+        },
+        {
+            title: "4. Checklist Normativo Fixo",
+            body: [
+                "Verificar se as ações permanentes e variáveis adotadas estão coerentes com o uso real da edificação.",
+                "Confirmar combinações de ações e fator de segurança compatíveis com o nível de confiabilidade desejado.",
+                "Revisar estabilidade global, flechas, ligações, flambagem local e global dos elementos metálicos no projeto executivo.",
+                "Conferir detalhamento da sapata, armaduras, cobrimentos, punção e ancoragens antes da execução.",
+                "Validar o modelo final com memorial de cálculo e responsabilidade técnica de engenheiro habilitado.",
+            ],
+        },
+    ];
+
+    return {
+        sections,
+        missingSteps,
+        context: {
+            geometry: {
+                spanX: slabAnalysis.spanX,
+                spanY: slabAnalysis.spanY,
+                cantileverLeft: slabAnalysis.cantileverLeft,
+                cantileverRight: slabAnalysis.cantileverRight,
+                cantileverFront: slabAnalysis.cantileverFront,
+                cantileverBack: slabAnalysis.cantileverBack,
+                localAnalysis: slabAnalysis.result?.analysis ?? null,
+            },
+            slab: {
+                inputs: {
+                    selectedDeckId: laje.selectedDeckId,
+                    concreteThickness: laje.concreteThickness,
+                    extraLoad: laje.extraLoad,
+                    safetyFactor: laje.safetyFactor,
+                },
+                result: laje.result,
+                localAnalysis: laje.analysis?.analysis ?? null,
+            },
+            secondaryBeam: {
+                inputs: {
+                    span: vigaSecundaria.span,
+                    spacing: vigaSecundaria.spacing,
+                    slabLoad: vigaSecundaria.slabLoad,
+                    distributedLoad: vigaSecundaria.distributedLoad,
+                    pointLoad: vigaSecundaria.pointLoad,
+                    beamScheme: vigaSecundaria.beamScheme,
+                    safetyFactor: vigaSecundaria.safetyFactor,
+                },
+                result: vigaSecundaria.result,
+                localAnalysis: vigaSecundaria.analysis?.analysis ?? null,
+            },
+            primaryBeam: {
+                inputs: {
+                    span: vigaPrincipal.span,
+                    distributedLoad: vigaPrincipal.distributedLoad,
+                    pointLoad: vigaPrincipal.pointLoad,
+                    beamScheme: vigaPrincipal.beamScheme,
+                    safetyFactor: vigaPrincipal.safetyFactor,
+                },
+                result: vigaPrincipal.result,
+                localAnalysis: vigaPrincipal.analysis?.analysis ?? null,
+            },
+            column: {
+                inputs: {
+                    height: pilar.height,
+                    additionalHeight: pilar.additionalHeight,
+                    axialLoad: pilar.axialLoad,
+                    safetyFactor: pilar.safetyFactor,
+                },
+                result: pilar.result,
+                localAnalysis: pilar.analysis?.analysis ?? null,
+            },
+            footing: {
+                inputs: {
+                    load: sapata.load,
+                    selectedSoil: sapata.selectedSoil,
+                    concretePrice: sapata.concretePrice,
+                },
+                result: sapata.result,
+            },
+            footingReinforcement: {
+                inputs: {
+                    concreteStrength: sapataArmadura.concreteStrength,
+                    steelStrength: sapataArmadura.steelStrength,
+                    barDiameter: sapataArmadura.barDiameter,
+                },
+                result: sapataArmadura.result,
+            },
+            supportReactions,
+            budgetSummary: {
+                itemCount: budgetItems.length,
+                items: budgetItems.map((item) => ({
+                    type: item.type,
+                    perfil: item.perfil?.nome,
+                    quantity: item.quantity,
+                    totalWeight: item.totalWeight,
+                    totalCost: item.totalCost,
+                })),
+            },
+            fixedNormativeReferences: NORMATIVE_REFERENCES,
+            missingSteps,
+        },
+    };
+}
 
 const DrawingText = ({ x, y, children, ...props }: React.SVGProps<SVGTextElement>) => (
     <text x={x} y={y} fontSize="12" fill="hsl(var(--foreground))" textAnchor="middle" {...props}>
@@ -396,61 +583,182 @@ const SectionCutView = () => {
 }
 
 export function StructuralVisualizer() {
+    const calculator = useCalculator();
+    const { toast } = useToast();
+    const [isAiAnalyzing, setIsAiAnalyzing] = React.useState(false);
+    const [aiAnalysis, setAiAnalysis] = React.useState<string | null>(null);
+    const [aiError, setAiError] = React.useState<string | null>(null);
+
+    const hybridReport = React.useMemo(() => buildHybridReportData(calculator), [calculator]);
+
+    const handleAnalyzeWithAI = async () => {
+        const aiSettings = getAiSettings();
+        if (aiSettings.provider === "local") {
+            toast({ variant: "destructive", title: "IA não configurada", description: "Configure um provedor de IA em Ferramentas > Configurações." });
+            return;
+        }
+
+        setIsAiAnalyzing(true);
+        setAiAnalysis(null);
+        setAiError(null);
+
+        try {
+            const response = await fetch("/api/ai-compare", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    analysisType: "estrutura-completa",
+                    context: {
+                        reportSections: hybridReport.sections,
+                        ...hybridReport.context,
+                    },
+                    ...(aiSettings.apiKey.trim() ? { apiKey: aiSettings.apiKey.trim() } : {}),
+                }),
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data?.error || "IA indisponivel nesta versao/dispositivo.");
+            }
+
+            setAiAnalysis(data.analysis);
+        } catch (err) {
+            const message = err instanceof Error ? err.message : "Falha ao consultar IA.";
+            setAiError(message);
+        } finally {
+            setIsAiAnalyzing(false);
+        }
+    };
+
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Visualização Estrutural</CardTitle>
-                <CardDescription>Esquema simplificado da estrutura dimensionada. Todos os valores são baseados nos dados das abas anteriores.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Tabs defaultValue="plan">
-                    <TabsList className="grid w-full grid-cols-4">
-                        <TabsTrigger value="plan">Planta</TabsTrigger>
-                        <TabsTrigger value="elevation-front">Elev. Frontal</TabsTrigger>
-                        <TabsTrigger value="elevation-side">Elev. Lateral</TabsTrigger>
-                        <TabsTrigger value="section-cut">Corte</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="plan">
-                        <Card className="mt-2">
-                            <CardContent className="p-2">
-                                <PlanView />
-                                <Alert variant="default" className="mt-2">
-                                    <Info className="h-4 w-4" />
-                                    <AlertTitle>Legenda</AlertTitle>
-                                    <AlertDescription>
-                                        <div className="flex flex-wrap items-center gap-4 text-xs">
-                                            <div className="flex items-center gap-1"><div className="h-2 w-4 bg-primary"/>Viga Principal</div>
-                                            <div className="flex items-center gap-1"><div className="h-2 w-4 bg-primary/50"/>Viga Secundária</div>
-                                            <div className="flex items-center gap-1"><div className="h-2 w-2 bg-foreground"/>Pilar</div>
-                                        </div>
-                                    </AlertDescription>
-                                </Alert>
+        <div className="space-y-4">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Visualização Estrutural</CardTitle>
+                    <CardDescription>Esquema simplificado da estrutura dimensionada. Todos os valores são baseados nos dados das abas anteriores.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Tabs defaultValue="plan">
+                        <TabsList className="grid w-full grid-cols-4">
+                            <TabsTrigger value="plan">Planta</TabsTrigger>
+                            <TabsTrigger value="elevation-front">Elev. Frontal</TabsTrigger>
+                            <TabsTrigger value="elevation-side">Elev. Lateral</TabsTrigger>
+                            <TabsTrigger value="section-cut">Corte</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="plan">
+                            <Card className="mt-2">
+                                <CardContent className="p-2">
+                                    <PlanView />
+                                    <Alert variant="default" className="mt-2">
+                                        <Info className="h-4 w-4" />
+                                        <AlertTitle>Legenda</AlertTitle>
+                                        <AlertDescription>
+                                            <div className="flex flex-wrap items-center gap-4 text-xs">
+                                                <div className="flex items-center gap-1"><div className="h-2 w-4 bg-primary"/>Viga Principal</div>
+                                                <div className="flex items-center gap-1"><div className="h-2 w-4 bg-primary/50"/>Viga Secundária</div>
+                                                <div className="flex items-center gap-1"><div className="h-2 w-2 bg-foreground"/>Pilar</div>
+                                            </div>
+                                        </AlertDescription>
+                                    </Alert>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+                        <TabsContent value="elevation-front">
+                            <Card className="mt-2">
+                                <CardContent className="p-2">
+                                    <FrontElevationView />
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+                        <TabsContent value="elevation-side">
+                            <Card className="mt-2">
+                                <CardContent className="p-2">
+                                    <SideElevationView />
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+                        <TabsContent value="section-cut">
+                            <Card className="mt-2">
+                                <CardContent className="p-2">
+                                    <SectionCutView />
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+                    </Tabs>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Relatório Técnico Híbrido</CardTitle>
+                    <CardDescription>
+                        Consolidação técnica da calculadora com base fixa do aplicativo, checklist normativo guiado e complemento opcional por IA.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    {hybridReport.missingSteps.length > 0 && (
+                        <Alert>
+                            <Info className="h-4 w-4" />
+                            <AlertTitle>Etapas ainda não concluídas</AlertTitle>
+                            <AlertDescription>
+                                O relatório já pode ser lido, mas ficará mais completo após finalizar: {hybridReport.missingSteps.join(", ")}.
+                            </AlertDescription>
+                        </Alert>
+                    )}
+
+                    {hybridReport.sections.map((section) => (
+                        <Card key={section.title} className="border-primary/10 bg-primary/5">
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-base">{section.title}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <ul className="list-disc space-y-2 pl-5 text-sm text-foreground">
+                                    {section.body.map((item) => (
+                                        <li key={item}>{item}</li>
+                                    ))}
+                                </ul>
                             </CardContent>
                         </Card>
-                    </TabsContent>
-                     <TabsContent value="elevation-front">
-                         <Card className="mt-2">
-                            <CardContent className="p-2">
-                                <FrontElevationView />
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-                    <TabsContent value="elevation-side">
-                         <Card className="mt-2">
-                            <CardContent className="p-2">
-                                <SideElevationView />
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-                     <TabsContent value="section-cut">
-                         <Card className="mt-2">
-                            <CardContent className="p-2">
-                                <SectionCutView />
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-                </Tabs>
-            </CardContent>
-        </Card>
+                    ))}
+
+                    <Alert>
+                        <GitCompareArrows className="h-4 w-4" />
+                        <AlertTitle>Referências normativas para conferência</AlertTitle>
+                        <AlertDescription>
+                            <ul className="list-disc space-y-1 pl-5 text-sm">
+                                {NORMATIVE_REFERENCES.map((reference) => (
+                                    <li key={reference}>{reference}</li>
+                                ))}
+                            </ul>
+                        </AlertDescription>
+                    </Alert>
+
+                    <div className="flex flex-col gap-3 border-t pt-4">
+                        <RefinedButton type="button" onClick={handleAnalyzeWithAI} className="w-full md:w-auto gap-2" disabled={isAiAnalyzing}>
+                            {isAiAnalyzing ? <><Loader className="animate-spin mr-2"/> Gerando relatório por IA...</> : <><Sparkles className="mr-2"/> Gerar Complemento Técnico por IA</>}
+                        </RefinedButton>
+
+                        {isAiAnalyzing && (
+                            <div className="text-sm text-muted-foreground">A IA está consolidando os dados da geometria, laje, vigas, pilar, sapata e armadura para emitir um parecer complementar.</div>
+                        )}
+
+                        {aiError && (
+                            <Alert variant="destructive">
+                                <AlertTitle>Falha ao consultar IA</AlertTitle>
+                                <AlertDescription>{aiError}</AlertDescription>
+                            </Alert>
+                        )}
+
+                        {aiAnalysis && (
+                            <Alert>
+                                <Sparkles className="h-4 w-4" />
+                                <AlertTitle>Parecer Complementar por IA</AlertTitle>
+                                <AlertDescription className="whitespace-pre-line">{aiAnalysis}</AlertDescription>
+                            </Alert>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
     );
 }

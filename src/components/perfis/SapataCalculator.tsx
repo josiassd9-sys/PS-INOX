@@ -49,7 +49,7 @@ function getLocalAnalysis(totalLoadKgf: number, soilName: string, soilPressure: 
 }
 
 export function SapataCalculator() {
-    const { pilar, sapata, updateSapata, fieldLinks, setFieldLink, isStepStale } = useCalculator();
+    const { pilar, sapata, supportReactions, updateSapata, fieldLinks, setFieldLink, isStepStale } = useCalculator();
     const { load, selectedSoil, concretePrice, steelPrice, steelRatio, result } = sapata;
     const isLoadLinked = fieldLinks?.sapata?.load ?? true;
     
@@ -58,13 +58,18 @@ export function SapataCalculator() {
 
      React.useEffect(() => {
         if (!isLoadLinked) return;
-        if (pilar.axialLoad) {
-            const pilarLoad = parseFloat(pilar.axialLoad.replace(',', '.'));
-            if (!isNaN(pilarLoad) && pilarLoad > 0) {
-                 updateSapata({ load: pilarLoad.toFixed(0) });
+
+        const reactionLoad = supportReactions.pilar;
+        const axialLoad = parseFloat((pilar.axialLoad || "").replace(',', '.'));
+        const linkedLoad = reactionLoad > 0 ? reactionLoad : axialLoad;
+
+        if (!isNaN(linkedLoad) && linkedLoad > 0) {
+            const nextLoad = linkedLoad.toFixed(0);
+            if (nextLoad !== load) {
+                updateSapata({ load: nextLoad });
             }
         }
-    }, [pilar.axialLoad, updateSapata, isLoadLinked]);
+    }, [supportReactions.pilar, pilar.axialLoad, load, updateSapata, isLoadLinked]);
 
 
     const handleInputChange = (field: keyof SapataInputs, value: string) => {

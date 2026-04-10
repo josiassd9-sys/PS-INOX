@@ -4,7 +4,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { ThemeInitializer } from '@/components/theme-initializer';
 import type { Viewport } from 'next';
-import { SpeedInsights } from '@vercel/speed-insights/next';
+// REMOVED: SpeedInsights pode bloquear em Capacitor WebView
+// import { SpeedInsights } from '@vercel/speed-insights/next';
 
 console.log("[layout.tsx]", "Layout imported");
 
@@ -46,7 +47,8 @@ export default function RootLayout({
           {children}
         </SidebarProvider>
         <Toaster />
-        <SpeedInsights />
+        {/* REMOVED: SpeedInsights causes freeze in Capacitor WebView */}
+        {/* <SpeedInsights /> */}
       </body>
     </html>
   );

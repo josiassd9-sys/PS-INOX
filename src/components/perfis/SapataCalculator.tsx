@@ -51,19 +51,20 @@ function getLocalAnalysis(totalLoadKgf: number, soilName: string, soilPressure: 
 export function SapataCalculator() {
     const { pilar, sapata, updateSapata, fieldLinks, setFieldLink, isStepStale } = useCalculator();
     const { load, selectedSoil, concretePrice, steelPrice, steelRatio, result } = sapata;
+    const isLoadLinked = fieldLinks?.sapata?.load ?? true;
     
     const [isAnalyzing, setIsAnalyzing] = React.useState(false);
     const [error, setError] = React.useState<string | null>(null);
 
      React.useEffect(() => {
-        if (!fieldLinks.sapata.load) return;
+        if (!isLoadLinked) return;
         if (pilar.axialLoad) {
             const pilarLoad = parseFloat(pilar.axialLoad.replace(',', '.'));
             if (!isNaN(pilarLoad) && pilarLoad > 0) {
                  updateSapata({ load: pilarLoad.toFixed(0) });
             }
         }
-    }, [pilar.axialLoad, updateSapata, fieldLinks.sapata.load]);
+    }, [pilar.axialLoad, updateSapata, isLoadLinked]);
 
 
     const handleInputChange = (field: keyof SapataInputs, value: string) => {
@@ -127,8 +128,8 @@ export function SapataCalculator() {
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <LinkedFieldLabel htmlFor="pillar-load" label="Carga Total do Pilar (kgf)" linked={fieldLinks.sapata.load} onToggle={(linked) => setFieldLink('sapata', 'load', linked)} source="Resultado do pilar" />
-                        <Input id="pillar-load" type="text" inputMode="decimal" value={load} onChange={e => handleInputChange('load', e.target.value)} placeholder="Ex: 12000" readOnly={fieldLinks.sapata.load} className={fieldLinks.sapata.load ? "bg-muted/70" : ""} />
+                        <LinkedFieldLabel htmlFor="pillar-load" label="Carga Total do Pilar (kgf)" linked={isLoadLinked} onToggle={(linked) => setFieldLink('sapata', 'load', linked)} source="Resultado do pilar" />
+                        <Input id="pillar-load" type="text" inputMode="decimal" value={load} onChange={e => handleInputChange('load', e.target.value)} placeholder="Ex: 12000" readOnly={isLoadLinked} className={isLoadLinked ? "bg-muted/70" : ""} />
                     </div>
                      <div className="space-y-2">
                         <Label htmlFor="soil-type">Tipo de Solo (Tensão Admissível)</Label>

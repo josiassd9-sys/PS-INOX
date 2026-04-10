@@ -30,9 +30,14 @@ export function getStoredTheme(): AppTheme {
     return "industrial-light";
   }
 
-  const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-  if (isAppTheme(storedTheme)) {
-    return storedTheme;
+  try {
+    const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+    if (isAppTheme(storedTheme)) {
+      return storedTheme;
+    }
+  } catch (error) {
+    // localStorage may not be ready during app initialization, fallback to default
+    console.debug("[Theme] localStorage access failed during boot, using default");
   }
 
   return "industrial-light";

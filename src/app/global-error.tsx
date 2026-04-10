@@ -10,8 +10,29 @@ export default function GlobalError({
   reset: () => void;
 }) {
   React.useEffect(() => {
-    console.error("Global app error:", error);
+    try {
+      console.error("Global app error:", error);
+    } catch {
+      // Silent fail on logging error
+    }
   }, [error]);
+
+  const handleRetry = () => {
+    try {
+      reset();
+    } catch (err) {
+      console.warn("Reset failed:", err);
+      window.location.reload();
+    }
+  };
+
+  const handleReload = () => {
+    try {
+      window.location.reload();
+    } catch (err) {
+      console.warn("Reload failed:", err);
+    }
+  };
 
   return (
     <html lang="pt-BR">
@@ -24,22 +45,22 @@ export default function GlobalError({
           <div className="flex flex-wrap items-center justify-center gap-2">
             <button
               type="button"
-              onClick={() => reset()}
+              onClick={handleRetry}
               className="rounded-md border px-4 py-2 text-sm hover:bg-muted"
             >
               Tentar novamente
             </button>
             <button
               type="button"
-              onClick={() => window.location.reload()}
+              onClick={handleReload}
               className="rounded-md border px-4 py-2 text-sm hover:bg-muted"
             >
               Recarregar pagina
             </button>
           </div>
-          {process.env.NODE_ENV !== "production" && (
+          {process.env.NODE_ENV !== "production" && error?.message && (
             <pre className="w-full overflow-x-auto rounded-md border bg-muted p-3 text-left text-xs text-muted-foreground">
-              {error?.message}
+              {error.message}
             </pre>
           )}
         </main>

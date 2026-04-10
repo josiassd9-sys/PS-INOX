@@ -61,31 +61,57 @@ async function recoverFromChunkError() {
 
 export function ThemeInitializer() {
   React.useEffect(() => {
-    applyTheme(getStoredTheme());
-    applyDesignLevel(getStoredDesignLevel());
+    try {
+      applyTheme(getStoredTheme());
+    } catch (error) {
+      console.warn("[ThemeInitializer] Theme application failed:", error);
+    }
+    try {
+      applyDesignLevel(getStoredDesignLevel());
+    } catch (error) {
+      console.warn("[ThemeInitializer] Design level application failed:", error);
+    }
   }, []);
 
   React.useEffect(() => {
     const onError = (event: ErrorEvent) => {
-      const message = getErrorMessage(event.error || event.message);
-      if (isChunkLoadLikeError(message)) {
-        void recoverFromChunkError();
+      try {
+        const message = getErrorMessage(event.error || event.message);
+        if (isChunkLoadLikeError(message)) {
+          console.log("[ThemeInitializer] Detected chunk error, attempting recovery");
+          void recoverFromChunkError();
+        }
+      } catch (err) {
+        console.warn("[ThemeInitializer] Error handler failed:", err);
       }
     };
 
     const onUnhandledRejection = (event: PromiseRejectionEvent) => {
-      const message = getErrorMessage(event.reason);
-      if (isChunkLoadLikeError(message)) {
-        void recoverFromChunkError();
+      try {
+        const message = getErrorMessage(event.reason);
+        if (isChunkLoadLikeError(message)) {
+          console.log("[ThemeInitializer] Detected chunk error (promise), attempting recovery");
+          void recoverFromChunkError();
+        }
+      } catch (err) {
+        console.warn("[ThemeInitializer] Rejection handler failed:", err);
       }
     };
 
-    window.addEventListener("error", onError);
-    window.addEventListener("unhandledrejection", onUnhandledRejection);
+    try {
+      window.addEventListener("error", onError);
+      window.addEventListener("unhandledrejection", onUnhandledRejection);
+    } catch (err) {
+      console.warn("[ThemeInitializer] Failed to attach error listeners:", err);
+    }
 
     return () => {
-      window.removeEventListener("error", onError);
-      window.removeEventListener("unhandledrejection", onUnhandledRejection);
+      try {
+        window.removeEventListener("error", onError);
+        window.removeEventListener("unhandledrejection", onUnhandledRejection);
+      } catch (err) {
+        console.warn("[ThemeInitializer] Failed to remove error listeners:", err);
+      }
     };
   }, []);
 

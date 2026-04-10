@@ -6,6 +6,8 @@ import { applyDesignLevel, getStoredDesignLevel } from "@/lib/design";
 
 const CHUNK_RECOVERY_KEY = "psinox-chunk-recovery-attempted";
 
+console.log("[ThemeInitializer]", "Module loaded");
+
 function getErrorMessage(value: unknown): string {
   if (!value) return "";
   if (typeof value === "string") return value;
@@ -60,7 +62,10 @@ async function recoverFromChunkError() {
 }
 
 export function ThemeInitializer() {
+  console.log("[ThemeInitializer]", "Component rendering");
+  
   React.useEffect(() => {
+    console.log("[ThemeInitializer]", "First useEffect running - applying theme");
     try {
       applyTheme(getStoredTheme());
     } catch (error) {

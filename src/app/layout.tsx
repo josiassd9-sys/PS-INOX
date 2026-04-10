@@ -6,6 +6,8 @@ import { ThemeInitializer } from '@/components/theme-initializer';
 import type { Viewport } from 'next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
+console.log("[layout.tsx]", "Layout imported");
+
 export const metadata: Metadata = {
   manifest: "/manifest.json",
   title: 'PS INOX',
@@ -26,6 +28,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  console.log("[layout.tsx]", "RootLayout rendering");
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head>

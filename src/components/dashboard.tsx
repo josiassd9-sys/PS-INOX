@@ -104,9 +104,10 @@ const initializePriceParams = (): Record<string, PriceParams> => {
 };
 
 function DashboardComponent({ initialCategoryId, children }: { initialCategoryId: string | null, children?: React.ReactNode }) {
+  console.log("[Dashboard]", "DashboardComponent rendering");
   const { toast } = useToast();
   const [priceParams, setPriceParams] = React.useState<Record<string, PriceParams>>({});
-  const [isBooting, setIsBooting] = React.useState(true);
+  const [isBooting, setIsBooting] = React.useState(false); // CHANGED: Start as false, not true
   
   const [selectedCategoryId, setSelectedCategoryId] = React.useState<string | null>(initialCategoryId);
   const [theme, setTheme] = React.useState<AppTheme>("industrial-light");

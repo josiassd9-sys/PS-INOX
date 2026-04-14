@@ -140,14 +140,14 @@ export function SapataArmaduraCalculator() {
                         description="A sapata ou os parâmetros de armadura foram alterados. Recalcule esta etapa antes de usar o relatório final."
                     />
                 )}
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
+                 <div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-2">
+                    <div className="space-y-2 min-w-0">
                         <Label>Carga do Pilar</Label>
                         <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm font-semibold h-10 flex items-center">
                             {sapata.load || "0"} kgf
                         </div>
                     </div>
-                     <div className="space-y-2">
+                     <div className="space-y-2 min-w-0">
                         <Label>Dimensões da Sapata</Label>
                         <div className="w-full rounded-md border border-input bg-muted/30 px-3 py-2 text-base md:text-sm font-semibold h-10 flex items-center">
                            {sapata.result ? `${sapata.result.footingDimensions.sideLengthM.toFixed(2)}m x ${sapata.result.footingDimensions.recommendedHeightCm.toFixed(0)}cm` : "N/D"}
@@ -155,22 +155,22 @@ export function SapataArmaduraCalculator() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-3">
+                    <div className="space-y-2 min-w-0">
                         <Label htmlFor="concrete-strength">fck do Concreto (MPa)</Label>
                         <Select value={concreteStrength} onValueChange={value => handleInputChange('concreteStrength', value)}>
                             <SelectTrigger id="concrete-strength"><SelectValue /></SelectTrigger>
                             <SelectContent>{concreteStrengths.map(fck => <SelectItem key={fck} value={fck}>{fck}</SelectItem>)}</SelectContent>
                         </Select>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 min-w-0">
                         <Label htmlFor="steel-strength">Aço da Armadura</Label>
                         <Select value={steelStrength} onValueChange={value => handleInputChange('steelStrength', value)}>
                             <SelectTrigger id="steel-strength"><SelectValue /></SelectTrigger>
                             <SelectContent>{steelStrengths.map(fyk => <SelectItem key={fyk} value={fyk}>CA-{fyk}</SelectItem>)}</SelectContent>
                         </Select>
                     </div>
-                     <div className="space-y-2">
+                     <div className="space-y-2 min-w-0 col-span-2 md:col-span-1">
                         <Label htmlFor="bar-diameter">Diâmetro da Barra (mm)</Label>
                         <Select value={barDiameter} onValueChange={value => handleInputChange('barDiameter', value)}>
                             <SelectTrigger id="bar-diameter"><SelectValue /></SelectTrigger>

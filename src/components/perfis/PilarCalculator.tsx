@@ -239,29 +239,29 @@ export function PilarCalculator() {
                         description="As reações das vigas ou os dados do pilar mudaram. Recalcule o pilar antes de congelar relatório ou seguir para a fundação."
                     />
                 )}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-2">
+                    <div className="space-y-2 min-w-0">
                         <Label htmlFor="pilar-height">Pé-Direito (Altura de Flambagem) (m)</Label>
                         <Input id="pilar-height" type="text" inputMode="decimal" value={height} onChange={e => handleInputChange('height', e.target.value)} placeholder="Ex: 3,0" />
                     </div>
-                     <div className="space-y-2">
+                     <div className="space-y-2 min-w-0">
                         <Label htmlFor="pilar-additional-height">Comp. Adicional Acima (m)</Label>
                         <Input id="pilar-additional-height" type="text" inputMode="decimal" value={additionalHeight} onChange={e => handleInputChange('additionalHeight', e.target.value)} placeholder="Ex: 3,0" />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 min-w-0">
                         <LinkedFieldLabel htmlFor="pilar-load" label="Carga Axial (kgf)" linked={fieldLinks.pilar.axialLoad} onToggle={(linked) => setFieldLink('pilar', 'axialLoad', linked)} source="Reações das vigas principal + secundária" />
                         <Input id="pilar-load" type="text" inputMode="decimal" value={axialLoad} onChange={e => handleInputChange('axialLoad', e.target.value)} placeholder="Ex: 5000" readOnly={fieldLinks.pilar.axialLoad} className={fieldLinks.pilar.axialLoad ? "bg-muted/70" : ""}/>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 min-w-0">
+                        <Label htmlFor="safety-factor">Fator de Segurança</Label>
+                        <Input id="safety-factor" type="text" inputMode="decimal" value={safetyFactor} onChange={e => handleInputChange('safetyFactor', e.target.value)} placeholder="Ex: 1,4"/>
+                    </div>
+                    <div className="space-y-2 col-span-2">
                         <Label htmlFor="pilar-steel-type">Tipo de Aço</Label>
                         <Select value={steelType} onValueChange={value => updatePilar({ steelType: value })}>
                             <SelectTrigger id="pilar-steel-type"><SelectValue placeholder="Selecione o aço" /></SelectTrigger>
                             <SelectContent>{tiposAco.map(aco => <SelectItem key={aco.nome} value={aco.nome}>{aco.nome}</SelectItem>)}</SelectContent>
                         </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="safety-factor">Fator de Segurança</Label>
-                        <Input id="safety-factor" type="text" inputMode="decimal" value={safetyFactor} onChange={e => handleInputChange('safetyFactor', e.target.value)} placeholder="Ex: 1,4"/>
                     </div>
                 </div>
                  <RefinedButton type="button" onClick={handleCalculate} className="w-full md:w-auto">Calcular Pilar</RefinedButton>

@@ -119,29 +119,54 @@ export const SlabAnalysis = () => {
                     {/* Coluna de Inputs */}
                     <div className="space-y-4 min-w-0">
                         <h3 className="font-semibold text-lg">Parâmetros da Laje (em metros)</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-                            <Label htmlFor="vaoX" className="text-sm">Vão em X (Principal)</Label>
-                            <Input id="vaoX" type="number" value={slabAnalysis.spanX} onChange={(e) => handleInputChange('spanX', e.target.value)} />
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-                            <Label htmlFor="vaoY" className="text-sm">Vão em Y (Secundário)</Label>
-                            <Input id="vaoY" type="number" value={slabAnalysis.spanY} onChange={(e) => handleInputChange('spanY', e.target.value)} />
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-                            <Label htmlFor="balancoX_E" className="text-sm">Balanço em X (Esquerda)</Label>
-                            <Input id="balancoX_E" type="number" value={slabAnalysis.cantileverLeft} onChange={(e) => handleInputChange('cantileverLeft', e.target.value)} />
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-                            <Label htmlFor="balancoX_D" className="text-sm">Balanço em X (Direita)</Label>
-                            <Input id="balancoX_D" type="number" value={slabAnalysis.cantileverRight} onChange={(e) => handleInputChange('cantileverRight', e.target.value)} />
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-                            <Label htmlFor="balancoY_S" className="text-sm">Balanço em Y (Superior)</Label>
-                            <Input id="balancoY_S" type="number" value={slabAnalysis.cantileverFront} onChange={(e) => handleInputChange('cantileverFront', e.target.value)} />
-                        </div>
-                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-                            <Label htmlFor="balancoY_I" className="text-sm">Balanço em Y (Inferior)</Label>
-                            <Input id="balancoY_I" type="number" value={slabAnalysis.cantileverBack} onChange={(e) => handleInputChange('cantileverBack', e.target.value)} />
+                        <div className="grid grid-cols-2 gap-2 sm:gap-4 auto-rows-fr">
+                            <div className="space-y-1.5 min-w-0">
+                                <Label htmlFor="vaoX" className="text-xs sm:text-sm leading-tight break-words">
+                                    <span className="block">Vão em X</span>
+                                    <span className="block text-[11px] sm:text-xs text-muted-foreground">(principal)</span>
+                                </Label>
+                                <Input id="vaoX" type="number" className="w-full min-w-0 text-sm" value={slabAnalysis.spanX} onChange={(e) => handleInputChange('spanX', e.target.value)} />
+                            </div>
+
+                            <div className="space-y-1.5 min-w-0">
+                                <Label htmlFor="vaoY" className="text-xs sm:text-sm leading-tight break-words">
+                                    <span className="block">Vão em Y</span>
+                                    <span className="block text-[11px] sm:text-xs text-muted-foreground">(secundário)</span>
+                                </Label>
+                                <Input id="vaoY" type="number" className="w-full min-w-0 text-sm" value={slabAnalysis.spanY} onChange={(e) => handleInputChange('spanY', e.target.value)} />
+                            </div>
+
+                            <div className="space-y-1.5 min-w-0">
+                                <Label htmlFor="balancoX_E" className="text-xs sm:text-sm leading-tight break-words">
+                                    <span className="block">Balanço em X</span>
+                                    <span className="block text-[11px] sm:text-xs text-muted-foreground">(esquerda)</span>
+                                </Label>
+                                <Input id="balancoX_E" type="number" className="w-full min-w-0 text-sm" value={slabAnalysis.cantileverLeft} onChange={(e) => handleInputChange('cantileverLeft', e.target.value)} />
+                            </div>
+
+                            <div className="space-y-1.5 min-w-0">
+                                <Label htmlFor="balancoX_D" className="text-xs sm:text-sm leading-tight break-words">
+                                    <span className="block">Balanço em X</span>
+                                    <span className="block text-[11px] sm:text-xs text-muted-foreground">(direita)</span>
+                                </Label>
+                                <Input id="balancoX_D" type="number" className="w-full min-w-0 text-sm" value={slabAnalysis.cantileverRight} onChange={(e) => handleInputChange('cantileverRight', e.target.value)} />
+                            </div>
+
+                            <div className="space-y-1.5 min-w-0">
+                                <Label htmlFor="balancoY_S" className="text-xs sm:text-sm leading-tight break-words">
+                                    <span className="block">Balanço em Y</span>
+                                    <span className="block text-[11px] sm:text-xs text-muted-foreground">(superior)</span>
+                                </Label>
+                                <Input id="balancoY_S" type="number" className="w-full min-w-0 text-sm" value={slabAnalysis.cantileverFront} onChange={(e) => handleInputChange('cantileverFront', e.target.value)} />
+                            </div>
+
+                            <div className="space-y-1.5 min-w-0">
+                                <Label htmlFor="balancoY_I" className="text-xs sm:text-sm leading-tight break-words">
+                                    <span className="block">Balanço em Y</span>
+                                    <span className="block text-[11px] sm:text-xs text-muted-foreground">(inferior)</span>
+                                </Label>
+                                <Input id="balancoY_I" type="number" className="w-full min-w-0 text-sm" value={slabAnalysis.cantileverBack} onChange={(e) => handleInputChange('cantileverBack', e.target.value)} />
+                            </div>
                         </div>
                         <Button onClick={handleAnalyze} className="w-full">Analisar Geometria</Button>
                     </div>

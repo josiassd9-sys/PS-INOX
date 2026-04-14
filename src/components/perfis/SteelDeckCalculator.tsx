@@ -256,7 +256,7 @@ export function SteelDeckCalculator() {
                         description="Algum dado desta etapa ou da geometria mudou. Recalcule a carga da laje antes de seguir para as etapas seguintes."
                     />
                 )}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
                         <Label>Tipo de Steel Deck</Label>
                         <Select value={selectedDeckId} onValueChange={(value) => updateLaje({ selectedDeckId: value })}>
@@ -264,21 +264,31 @@ export function SteelDeckCalculator() {
                             <SelectContent>{steelDeckData.map(deck => <SelectItem key={deck.nome} value={deck.nome}>{deck.nome}</SelectItem>)}</SelectContent>
                         </Select>
                     </div>
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                            <Label htmlFor="concrete-thickness">Espessura do Concreto (cm)</Label>
-                             <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild><Info className="h-4 w-4 text-muted-foreground cursor-help" /></TooltipTrigger>
-                                    <TooltipContent className="max-w-xs"><p className="font-bold mb-1">Recomendações Típicas:</p><ul className="list-disc pl-4 text-xs"><li><strong>8-12 cm:</strong> Lajes leves.</li><li><strong>12-16 cm:</strong> Pisos de escritórios e residenciais.</li><li><strong>16-20 cm:</strong> Garagens, áreas de armazenamento leve.</li></ul></TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
+
+                    <div className="grid grid-cols-2 gap-2 sm:gap-4 auto-rows-fr">
+                        <div className="space-y-2 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                                <Label htmlFor="concrete-thickness" className="text-xs sm:text-sm leading-tight break-words">
+                                    <span className="block">Espessura do Concreto</span>
+                                    <span className="block text-[11px] sm:text-xs text-muted-foreground">(cm)</span>
+                                </Label>
+                                 <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild><Info className="h-4 w-4 text-muted-foreground cursor-help mt-0.5" /></TooltipTrigger>
+                                        <TooltipContent className="max-w-xs"><p className="font-bold mb-1">Recomendações Típicas:</p><ul className="list-disc pl-4 text-xs"><li><strong>8-12 cm:</strong> Lajes leves.</li><li><strong>12-16 cm:</strong> Pisos de escritórios e residenciais.</li><li><strong>16-20 cm:</strong> Garagens, áreas de armazenamento leve.</li></ul></TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </div>
+                            <Input id="concrete-thickness" type="text" inputMode="decimal" className="w-full min-w-0 text-sm" value={concreteThickness} onChange={e => handleInputChange('concreteThickness', e.target.value)} placeholder="Ex: 10"/>
                         </div>
-                        <Input id="concrete-thickness" type="text" inputMode="decimal" value={concreteThickness} onChange={e => handleInputChange('concreteThickness', e.target.value)} placeholder="Ex: 10"/>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="safety-factor">Fator de Segurança</Label>
-                        <Input id="safety-factor" type="text" inputMode="decimal" value={safetyFactor} onChange={e => handleInputChange('safetyFactor', e.target.value)} placeholder="Ex: 1,4"/>
+
+                        <div className="space-y-2 min-w-0">
+                            <Label htmlFor="safety-factor" className="text-xs sm:text-sm leading-tight break-words">
+                                <span className="block">Fator de Segurança</span>
+                                <span className="block text-[11px] sm:text-xs text-muted-foreground">(coeficiente)</span>
+                            </Label>
+                            <Input id="safety-factor" type="text" inputMode="decimal" className="w-full min-w-0 text-sm" value={safetyFactor} onChange={e => handleInputChange('safetyFactor', e.target.value)} placeholder="Ex: 1,4"/>
+                        </div>
                     </div>
                 </div>
                 <Accordion type="single" collapsible className="w-full">

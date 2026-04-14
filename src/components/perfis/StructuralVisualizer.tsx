@@ -411,8 +411,9 @@ const PlanView = () => {
     const scaledWidth = totalSpanX * scale;
     const scaledHeight = totalSpanY * scale;
 
-    const numVigasSecundarias = spacingVS > 0 ? Math.floor(spanX / spacingVS) + 1 : 0;
-    const realSpacing = numVigasSecundarias > 1 ? (spanX * scale) / (numVigasSecundarias -1) : 0;
+    const secondaryBeamSpanCount = spacingVS > 0 ? Math.max(1, Math.ceil(totalSpanX / spacingVS)) : 1;
+    const numVigasSecundarias = secondaryBeamSpanCount + 1;
+    const realSpacing = (totalSpanX * scale) / secondaryBeamSpanCount;
     
     const xOffset = (SVG_WIDTH - scaledWidth) / 2;
     const yOffset = (SVG_HEIGHT - scaledHeight) / 2;
@@ -436,8 +437,8 @@ const PlanView = () => {
             <rect x={xOffset} y={pilarY2 - vigaP_b_scaled / 2} width={scaledWidth} height={vigaP_b_scaled} fill="hsl(var(--primary))" />
 
             {/* Vigas Secundárias */}
-            {numVigasSecundarias > 0 && Array.from({ length: numVigasSecundarias }).map((_, i) => (
-                 <rect key={i} x={pilarX1 + i * realSpacing - vigaS_b_scaled / 2} y={yOffset} width={vigaS_b_scaled} height={scaledHeight} fill="hsl(var(--primary) / 0.5)" />
+              {numVigasSecundarias > 0 && Array.from({ length: numVigasSecundarias }).map((_, i) => (
+                  <rect key={i} x={xOffset + i * realSpacing - vigaS_b_scaled / 2} y={yOffset} width={vigaS_b_scaled} height={scaledHeight} fill="hsl(var(--primary) / 0.5)" />
             ))}
 
             {/* Pilares */}
@@ -512,8 +513,9 @@ const FrontElevationView = () => {
     const pilarX1 = xOffset + cantileverLeft * scale;
     const pilarX2 = xOffset + (totalSpanX - cantileverRight) * scale;
     
-    const numVigasSecundarias = spacingVS > 0 ? Math.floor(spanX / spacingVS) + 1 : 0;
-    const realSpacing = numVigasSecundarias > 1 ? (spanX * scale) / (numVigasSecundarias - 1) : 0;
+    const secondaryBeamSpanCount = spacingVS > 0 ? Math.max(1, Math.ceil(totalSpanX / spacingVS)) : 1;
+    const numVigasSecundarias = secondaryBeamSpanCount + 1;
+    const realSpacing = (totalSpanX * scale) / secondaryBeamSpanCount;
     
     const vigaS_h_scaled = vigaSH_m * scale;
     const concreteH_scaled = (concreteH_cm / 100) * scale;
@@ -538,7 +540,7 @@ const FrontElevationView = () => {
              {/* Laje e Vigas Secundárias em corte */}
              <rect x={xOffset} y={lajeBaseY - concreteH_scaled} width={scaledSpanX} height={concreteH_scaled} fill="hsl(var(--muted)/0.5)" />
              {vigaS && numVigasSecundarias > 0 && Array.from({ length: numVigasSecundarias }).map((_, i) => {
-                const vigaSX = pilarX1 + i * realSpacing;
+                const vigaSX = xOffset + i * realSpacing;
                 const vigaS_b_scaled = (vigaS.b / 1000) * scale;
                 const vigaS_tf_scaled = (vigaS.tf / 1000) * scale;
                 const vigaS_tw_scaled = (vigaS.tw / 1000) * scale;

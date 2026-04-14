@@ -66,7 +66,7 @@ export function CalculatorTabs() {
     const active = tabs[activeIndex];
 
     return (
-        <RefinedCard hover="subtle" className="w-full overflow-hidden p-0 print:hidden">
+        <RefinedCard hover="subtle" className="w-full overflow-visible p-0 print:hidden">
             {/* Single navigation row */}
             <div className="flex items-center gap-1.5 px-2 py-2 sm:px-3">
                 {/* Back */}
@@ -127,7 +127,7 @@ export function CalculatorTabs() {
                     </button>
 
                     {menuOpen && (
-                        <div className="absolute right-0 top-full z-50 mt-1.5 w-52 rounded-xl border bg-popover shadow-lg">
+                        <div className="absolute right-0 top-full z-[90] mt-1.5 w-52 rounded-xl border bg-popover shadow-lg">
                             <div className="p-1">
                                 {tabs.map((tab, index) => {
                                     const isActive = index === activeIndex;

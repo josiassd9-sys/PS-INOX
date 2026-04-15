@@ -64,18 +64,18 @@ function TableComponent() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                  </div>
-                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2 pt-2">
-                    <div className="space-y-1">
-                        <Label htmlFor="minPeso" className="text-xs font-normal">Peso ≥ (kg/m)</Label>
-                        <Input id="minPeso" type="number" placeholder="Ex: 20" value={filters.minPeso} onChange={handleFilterChange} />
+                 <div className="grid grid-cols-3 gap-1 pt-2">
+                    <div className="space-y-0.5">
+                        <Label htmlFor="minPeso" className="text-[10px] sm:text-xs font-normal line-clamp-2">Peso ≥ (kg/m)</Label>
+                        <Input id="minPeso" type="number" placeholder="Ex: 20" value={filters.minPeso} onChange={handleFilterChange} className="h-8 text-xs p-1.5" />
                     </div>
-                     <div className="space-y-1">
-                        <Label htmlFor="minH" className="text-xs font-normal">Altura ≥ (mm)</Label>
-                        <Input id="minH" type="number" placeholder="Ex: 250" value={filters.minH} onChange={handleFilterChange} />
+                     <div className="space-y-0.5">
+                        <Label htmlFor="minH" className="text-[10px] sm:text-xs font-normal line-clamp-2">Altura ≥ (mm)</Label>
+                        <Input id="minH" type="number" placeholder="Ex: 250" value={filters.minH} onChange={handleFilterChange} className="h-8 text-xs p-1.5" />
                     </div>
-                     <div className="space-y-1">
-                        <Label htmlFor="minWx" className="text-xs font-normal">Wx ≥ (cm³)</Label>
-                        <Input id="minWx" type="number" placeholder="Ex: 300" value={filters.minWx} onChange={handleFilterChange} />
+                     <div className="space-y-0.5">
+                        <Label htmlFor="minWx" className="text-[10px] sm:text-xs font-normal line-clamp-2">Wx ≥ (cm³)</Label>
+                        <Input id="minWx" type="number" placeholder="Ex: 300" value={filters.minWx} onChange={handleFilterChange} className="h-8 text-xs p-1.5" />
                     </div>
                  </div>
                    <p className="pt-1 text-xs text-muted-foreground">
@@ -83,12 +83,12 @@ function TableComponent() {
                    </p>
             </CardHeader>
                 <CardContent>
-                  <div className="max-h-[62vh] overflow-auto rounded-md border">
+                  <div className="max-h-[56vh] overflow-auto rounded-md border touch-pan-x sm:max-h-[62vh] [--col1:96px] [--col2:76px] [overscroll-behavior-x:contain] [scrollbar-gutter:stable] sm:[--col1:110px] sm:[--col2:88px]">
                   <Table className="min-w-[980px] text-xs">
                     <TableHeader className="sticky top-0 z-40 bg-card">
                         <TableRow className="text-xs">
-                        <TableHead className="sticky left-0 z-30 min-w-[110px] bg-card font-bold shadow-[2px_0_0_0_hsl(var(--border))]">Perfil</TableHead>
-                        <TableHead className="sticky left-[110px] z-30 min-w-[88px] bg-card shadow-[2px_0_0_0_hsl(var(--border))]">Peso (kg/m)</TableHead>
+                        <TableHead className="sticky left-0 z-30 w-[var(--col1)] min-w-[var(--col1)] whitespace-nowrap bg-card font-bold shadow-[2px_0_0_0_hsl(var(--border))]">Perfil</TableHead>
+                        <TableHead className="sticky z-30 w-[var(--col2)] min-w-[var(--col2)] whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))] [left:var(--col1)]">Peso (kg/m)</TableHead>
                             <TableHead>h (mm)</TableHead>
                             <TableHead>b (mm)</TableHead>
                             <TableHead>tw (mm)</TableHead>
@@ -104,8 +104,8 @@ function TableComponent() {
                     <TableBody>
                         {filteredData.map((perfil) => (
                             <TableRow key={perfil.nome} className="text-xs">
-                          <TableCell className="sticky left-0 z-20 min-w-[110px] bg-card font-medium shadow-[2px_0_0_0_hsl(var(--border))]">{perfil.nome}</TableCell>
-                          <TableCell className="sticky left-[110px] z-20 min-w-[88px] bg-card shadow-[2px_0_0_0_hsl(var(--border))]">{perfil.peso.toFixed(1)}</TableCell>
+                          <TableCell className="sticky left-0 z-20 w-[var(--col1)] min-w-[var(--col1)] whitespace-nowrap bg-card font-medium shadow-[2px_0_0_0_hsl(var(--border))]">{perfil.nome}</TableCell>
+                          <TableCell className="sticky z-20 w-[var(--col2)] min-w-[var(--col2)] whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))] [left:var(--col1)]">{perfil.peso.toFixed(1)}</TableCell>
                                 <TableCell>{perfil.h}</TableCell>
                                 <TableCell>{perfil.b}</TableCell>
                                 <TableCell>{perfil.tw}</TableCell>

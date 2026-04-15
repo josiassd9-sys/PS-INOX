@@ -65,32 +65,32 @@ function TableComponent() {
                   />
                  </div>
                  <div className="grid grid-cols-3 gap-1 pt-2">
-                    <div className="space-y-0.5">
+                  <div className="min-w-0 space-y-0.5">
                         <Label htmlFor="minPeso" className="text-[10px] sm:text-xs font-normal line-clamp-2">Peso ≥ (kg/m)</Label>
-                        <Input id="minPeso" type="number" placeholder="Ex: 20" value={filters.minPeso} onChange={handleFilterChange} className="h-8 text-xs p-1.5" />
+                    <Input id="minPeso" type="number" placeholder="Ex: 20" value={filters.minPeso} onChange={handleFilterChange} className="h-8 w-full min-w-0 text-xs p-1.5" />
                     </div>
-                     <div className="space-y-0.5">
+                   <div className="min-w-0 space-y-0.5">
                         <Label htmlFor="minH" className="text-[10px] sm:text-xs font-normal line-clamp-2">Altura ≥ (mm)</Label>
-                        <Input id="minH" type="number" placeholder="Ex: 250" value={filters.minH} onChange={handleFilterChange} className="h-8 text-xs p-1.5" />
+                    <Input id="minH" type="number" placeholder="Ex: 250" value={filters.minH} onChange={handleFilterChange} className="h-8 w-full min-w-0 text-xs p-1.5" />
                     </div>
-                     <div className="space-y-0.5">
+                   <div className="min-w-0 space-y-0.5">
                         <Label htmlFor="minWx" className="text-[10px] sm:text-xs font-normal line-clamp-2">Wx ≥ (cm³)</Label>
-                        <Input id="minWx" type="number" placeholder="Ex: 300" value={filters.minWx} onChange={handleFilterChange} className="h-8 text-xs p-1.5" />
+                    <Input id="minWx" type="number" placeholder="Ex: 300" value={filters.minWx} onChange={handleFilterChange} className="h-8 w-full min-w-0 text-xs p-1.5" />
                     </div>
                  </div>
                    <p className="pt-1 text-xs text-muted-foreground">
-                    No celular, as colunas Perfil e Peso ficam fixas; arraste a tabela para ver os demais dados.
+                  No celular, as colunas Perfil, Peso, h e b ficam fixas; arraste para ver tw até ry.
                    </p>
             </CardHeader>
                 <CardContent>
-                  <div className="w-full max-h-[56vh] overflow-x-auto overflow-y-hidden rounded-md border touch-pan-x sm:max-h-[62vh] [--col1:96px] [--col2:76px] [overscroll-behavior-x:contain] [scrollbar-gutter:stable] sm:[--col1:110px] sm:[--col2:88px]">
-                  <Table className="w-full min-w-[380px] sm:min-w-[980px] text-xs">
+                  <div className="w-full max-h-[56vh] overflow-x-auto overflow-y-auto rounded-md border sm:max-h-[62vh] [overscroll-behavior-x:contain]">
+                  <Table className="w-full min-w-[860px] text-xs">
                     <TableHeader className="sticky top-0 z-40 bg-card">
                         <TableRow className="text-xs">
-                        <TableHead className="sticky left-0 z-30 w-[var(--col1)] min-w-[var(--col1)] whitespace-nowrap bg-card font-bold shadow-[2px_0_0_0_hsl(var(--border))]">Perfil</TableHead>
-                        <TableHead className="sticky z-30 w-[var(--col2)] min-w-[var(--col2)] whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))] [left:var(--col1)]">Peso (kg/m)</TableHead>
-                            <TableHead>h (mm)</TableHead>
-                            <TableHead>b (mm)</TableHead>
+                        <TableHead className="sticky left-0 z-30 whitespace-nowrap bg-card font-bold shadow-[2px_0_0_0_hsl(var(--border))]" style={{ width: 96, minWidth: 96 }}>Perfil</TableHead>
+                        <TableHead className="sticky z-30 whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))]" style={{ left: 96, width: 76, minWidth: 76 }}>Peso (kg/m)</TableHead>
+                        <TableHead className="sticky z-30 whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))]" style={{ left: 172, width: 62, minWidth: 62 }}>h (mm)</TableHead>
+                        <TableHead className="sticky z-30 whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))]" style={{ left: 234, width: 62, minWidth: 62 }}>b (mm)</TableHead>
                             <TableHead>tw (mm)</TableHead>
                             <TableHead>tf (mm)</TableHead>
                             <TableHead>Ix (cm⁴)</TableHead>
@@ -104,10 +104,10 @@ function TableComponent() {
                     <TableBody>
                         {filteredData.map((perfil) => (
                             <TableRow key={perfil.nome} className="text-xs">
-                          <TableCell className="sticky left-0 z-20 w-[var(--col1)] min-w-[var(--col1)] whitespace-nowrap bg-card font-medium shadow-[2px_0_0_0_hsl(var(--border))]">{perfil.nome}</TableCell>
-                          <TableCell className="sticky z-20 w-[var(--col2)] min-w-[var(--col2)] whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))] [left:var(--col1)]">{perfil.peso.toFixed(1)}</TableCell>
-                                <TableCell>{perfil.h}</TableCell>
-                                <TableCell>{perfil.b}</TableCell>
+                          <TableCell className="sticky left-0 z-20 whitespace-nowrap bg-card font-medium shadow-[2px_0_0_0_hsl(var(--border))]" style={{ width: 96, minWidth: 96 }}>{perfil.nome}</TableCell>
+                          <TableCell className="sticky z-20 whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))]" style={{ left: 96, width: 76, minWidth: 76 }}>{perfil.peso.toFixed(1)}</TableCell>
+                                <TableCell className="sticky z-20 whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))]" style={{ left: 172, width: 62, minWidth: 62 }}>{perfil.h}</TableCell>
+                                <TableCell className="sticky z-20 whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))]" style={{ left: 234, width: 62, minWidth: 62 }}>{perfil.b}</TableCell>
                                 <TableCell>{perfil.tw}</TableCell>
                                 <TableCell>{perfil.tf}</TableCell>
                                 <TableCell>{perfil.Ix}</TableCell>
@@ -137,3 +137,4 @@ export default function Page() {
       </Dashboard>
   )
 }
+

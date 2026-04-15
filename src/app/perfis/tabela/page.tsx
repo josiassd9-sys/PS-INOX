@@ -83,8 +83,8 @@ function TableComponent() {
                    </p>
             </CardHeader>
                 <CardContent>
-                  <div className="max-h-[56vh] overflow-auto rounded-md border touch-pan-x sm:max-h-[62vh] [--col1:96px] [--col2:76px] [overscroll-behavior-x:contain] [scrollbar-gutter:stable] sm:[--col1:110px] sm:[--col2:88px]">
-                  <Table className="min-w-[980px] text-xs">
+                  <div className="w-full max-h-[56vh] overflow-x-auto overflow-y-hidden rounded-md border touch-pan-x sm:max-h-[62vh] [--col1:96px] [--col2:76px] [overscroll-behavior-x:contain] [scrollbar-gutter:stable] sm:[--col1:110px] sm:[--col2:88px]">
+                  <Table className="w-full min-w-[380px] sm:min-w-[980px] text-xs">
                     <TableHeader className="sticky top-0 z-40 bg-card">
                         <TableRow className="text-xs">
                         <TableHead className="sticky left-0 z-30 w-[var(--col1)] min-w-[var(--col1)] whitespace-nowrap bg-card font-bold shadow-[2px_0_0_0_hsl(var(--border))]">Perfil</TableHead>

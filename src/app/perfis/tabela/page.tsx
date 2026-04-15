@@ -85,20 +85,20 @@ function TableComponent() {
                 <CardContent>
                   <div className="w-full max-h-[56vh] overflow-x-auto overflow-y-auto rounded-md border sm:max-h-[62vh] [overscroll-behavior-x:contain]">
                   <Table className="w-full min-w-[860px] text-xs">
-                    <TableHeader className="sticky top-0 z-40 bg-card">
+                    <TableHeader className="bg-card">
                         <TableRow className="text-xs">
-                        <TableHead className="sticky left-0 z-30 whitespace-nowrap bg-card font-bold shadow-[2px_0_0_0_hsl(var(--border))]" style={{ width: 96, minWidth: 96 }}>Perfil</TableHead>
-                        <TableHead className="sticky z-30 whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))]" style={{ left: 96, width: 76, minWidth: 76 }}>Peso (kg/m)</TableHead>
-                        <TableHead className="sticky z-30 whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))]" style={{ left: 172, width: 62, minWidth: 62 }}>h (mm)</TableHead>
-                        <TableHead className="sticky z-30 whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))]" style={{ left: 234, width: 62, minWidth: 62 }}>b (mm)</TableHead>
-                            <TableHead>tw (mm)</TableHead>
-                            <TableHead>tf (mm)</TableHead>
-                            <TableHead>Ix (cm⁴)</TableHead>
-                            <TableHead>Wx (cm³)</TableHead>
-                            <TableHead>rx (cm)</TableHead>
-                            <TableHead>Iy (cm⁴)</TableHead>
-                            <TableHead>Wy (cm³)</TableHead>
-                            <TableHead>ry (cm)</TableHead>
+                        <TableHead className="sticky top-0 left-0 z-40 whitespace-nowrap bg-card font-bold shadow-[2px_0_0_0_hsl(var(--border))]" style={{ width: 96, minWidth: 96 }}>Perfil</TableHead>
+                        <TableHead className="sticky top-0 z-40 whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))]" style={{ left: 96, width: 76, minWidth: 76 }}>Peso (kg/m)</TableHead>
+                        <TableHead className="sticky top-0 z-40 whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))]" style={{ left: 172, width: 62, minWidth: 62 }}>h (mm)</TableHead>
+                        <TableHead className="sticky top-0 z-40 whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))]" style={{ left: 234, width: 62, minWidth: 62 }}>b (mm)</TableHead>
+                            <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">tw (mm)</TableHead>
+                            <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">tf (mm)</TableHead>
+                            <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Ix (cm⁴)</TableHead>
+                            <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Wx (cm³)</TableHead>
+                            <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">rx (cm)</TableHead>
+                            <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Iy (cm⁴)</TableHead>
+                            <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Wy (cm³)</TableHead>
+                            <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">ry (cm)</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>

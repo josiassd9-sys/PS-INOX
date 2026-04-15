@@ -256,7 +256,7 @@ export function SteelDeckCalculator() {
                         description="Algum dado desta etapa ou da geometria mudou. Recalcule a carga da laje antes de seguir para as etapas seguintes."
                     />
                 )}
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 gap-4 [&_label]:truncate [&_label]:leading-tight">
                     <div className="space-y-2">
                         <Label>Tipo de Steel Deck</Label>
                         <Select value={selectedDeckId} onValueChange={(value) => updateLaje({ selectedDeckId: value })}>
@@ -265,7 +265,7 @@ export function SteelDeckCalculator() {
                         </Select>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 sm:gap-4 auto-rows-fr">
+                    <div className="grid grid-cols-2 gap-2 sm:gap-4 auto-rows-fr [&_label]:truncate [&_label]:leading-tight">
                         <div className="space-y-2 min-w-0">
                             <div className="flex items-start justify-between gap-2">
                                 <Label htmlFor="concrete-thickness" className="text-xs sm:text-sm leading-tight break-words">
@@ -331,7 +331,7 @@ export function SteelDeckCalculator() {
                                 </Alert>
                             )}
                             <Separator />
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t pt-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-4 [&_label]:truncate [&_label]:leading-tight">
                                <div className="space-y-2">
                                   <LinkedFieldLabel
                                       htmlFor="deck-quantity"
@@ -346,7 +346,7 @@ export function SteelDeckCalculator() {
                                   <Label htmlFor="deck-pricePerKg">Preço Aço Galv. (R$/kg)</Label>
                                   <Input id="deck-pricePerKg" type="text" inputMode="decimal" value={pricePerKg} onChange={(e) => handleInputChange('pricePerKg', e.target.value)} placeholder="Ex: 7,80" />
                               </div>
-                              <div className="space-y-2">
+                                                            <div className="space-y-2 sm:col-span-2">
                                   <Label htmlFor="concrete-price">Preço Concreto (R$/m³)</Label>
                                   <Input id="concrete-price" type="text" inputMode="decimal" value={concretePrice} onChange={(e) => handleInputChange('concretePrice', e.target.value)} placeholder="Ex: 750,00" />
                               </div>

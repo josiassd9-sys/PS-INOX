@@ -78,13 +78,17 @@ function TableComponent() {
                         <Input id="minWx" type="number" placeholder="Ex: 300" value={filters.minWx} onChange={handleFilterChange} />
                     </div>
                  </div>
+                   <p className="pt-1 text-xs text-muted-foreground">
+                    No celular, as colunas Perfil e Peso ficam fixas; arraste a tabela para ver os demais dados.
+                   </p>
             </CardHeader>
-            <CardContent className="overflow-x-auto">
-                <Table>
-                    <TableHeader>
+                <CardContent>
+                  <div className="max-h-[62vh] overflow-auto rounded-md border">
+                  <Table className="min-w-[980px] text-xs">
+                    <TableHeader className="sticky top-0 z-40 bg-card">
                         <TableRow className="text-xs">
-                            <TableHead className="font-bold">Perfil</TableHead>
-                            <TableHead>Peso (kg/m)</TableHead>
+                        <TableHead className="sticky left-0 z-30 min-w-[110px] bg-card font-bold shadow-[2px_0_0_0_hsl(var(--border))]">Perfil</TableHead>
+                        <TableHead className="sticky left-[110px] z-30 min-w-[88px] bg-card shadow-[2px_0_0_0_hsl(var(--border))]">Peso (kg/m)</TableHead>
                             <TableHead>h (mm)</TableHead>
                             <TableHead>b (mm)</TableHead>
                             <TableHead>tw (mm)</TableHead>
@@ -100,8 +104,8 @@ function TableComponent() {
                     <TableBody>
                         {filteredData.map((perfil) => (
                             <TableRow key={perfil.nome} className="text-xs">
-                                <TableCell className="font-medium">{perfil.nome}</TableCell>
-                                <TableCell>{perfil.peso.toFixed(1)}</TableCell>
+                          <TableCell className="sticky left-0 z-20 min-w-[110px] bg-card font-medium shadow-[2px_0_0_0_hsl(var(--border))]">{perfil.nome}</TableCell>
+                          <TableCell className="sticky left-[110px] z-20 min-w-[88px] bg-card shadow-[2px_0_0_0_hsl(var(--border))]">{perfil.peso.toFixed(1)}</TableCell>
                                 <TableCell>{perfil.h}</TableCell>
                                 <TableCell>{perfil.b}</TableCell>
                                 <TableCell>{perfil.tw}</TableCell>
@@ -116,6 +120,7 @@ function TableComponent() {
                         ))}
                     </TableBody>
                 </Table>
+                      </div>
                  {filteredData.length === 0 && (
                     <div className="text-center p-4 text-muted-foreground">Nenhum perfil encontrado com os critérios especificados.</div>
                 )}

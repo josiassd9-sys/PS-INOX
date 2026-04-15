@@ -131,7 +131,7 @@ export function SapataCalculator() {
                         description="A carga do pilar ou os parâmetros da fundação mudaram. Refaça a análise da sapata antes de seguir para a armadura."
                     />
                 )}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 [&_label]:truncate [&_label]:leading-tight">
                     <div className="space-y-2">
                         <LinkedFieldLabel htmlFor="pillar-load" label="Carga Total do Pilar (kgf)" linked={isLoadLinked} onToggle={(linked) => setFieldLink('sapata', 'load', linked)} source="Resultado do pilar" />
                         <Input id="pillar-load" type="text" inputMode="decimal" value={load} onChange={e => handleInputChange('load', e.target.value)} placeholder="Ex: 12000" readOnly={isLoadLinked} className={isLoadLinked ? "bg-muted/70" : ""} />
@@ -176,10 +176,10 @@ export function SapataCalculator() {
                             <Card>
                                 <CardHeader className="p-3"><CardTitle className="text-lg flex items-center gap-2"><Calculator className="h-5 w-5"/> Estimativa de Custo</CardTitle></CardHeader>
                                 <CardContent className="space-y-4 p-3 pt-0">
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 [&_label]:truncate [&_label]:leading-tight">
                                         <div className="space-y-1"><Label htmlFor="concrete-price" className="text-xs">Preço Concreto (R$/m³)</Label><Input id="concrete-price" type="text" inputMode="decimal" value={concretePrice} onChange={e => handleInputChange('concretePrice', e.target.value)} /></div>
                                         <div className="space-y-1"><Label htmlFor="steel-price" className="text-xs">Preço Aço (R$/kg)</Label><Input id="steel-price" type="text" inputMode="decimal" value={steelPrice} onChange={e => handleInputChange('steelPrice', e.target.value)} /></div>
-                                        <div className="space-y-1"><Label htmlFor="steel-ratio" className="text-xs">Taxa de Aço (kg/m³)</Label><Input id="steel-ratio" type="text" inputMode="decimal" value={steelRatio} onChange={e => handleInputChange('steelRatio', e.target.value)} /></div>
+                                        <div className="space-y-1 sm:col-span-2"><Label htmlFor="steel-ratio" className="text-xs">Taxa de Aço (kg/m³)</Label><Input id="steel-ratio" type="text" inputMode="decimal" value={steelRatio} onChange={e => handleInputChange('steelRatio', e.target.value)} /></div>
                                     </div>
                                     <div className="space-y-2 rounded-lg border bg-background p-2">
                                         <div className="flex justify-between items-center text-sm"><span className="text-muted-foreground">Volume de Concreto:</span><span className="font-medium">{volumeM3.toFixed(3)} m³</span></div>

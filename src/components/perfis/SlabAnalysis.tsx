@@ -119,7 +119,7 @@ export const SlabAnalysis = () => {
                     {/* Coluna de Inputs */}
                     <div className="space-y-4 min-w-0">
                         <h3 className="font-semibold text-lg">Parâmetros da Laje (em metros)</h3>
-                        <div className="grid grid-cols-2 gap-2 sm:gap-4 auto-rows-fr">
+                        <div className="grid grid-cols-2 gap-2 sm:gap-4 auto-rows-fr [&_label]:truncate [&_label]:leading-tight">
                             <div className="space-y-1.5 min-w-0">
                                 <Label htmlFor="vaoX" className="text-xs sm:text-sm leading-tight break-words">
                                     <span className="block">Vão em X</span>

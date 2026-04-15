@@ -17,19 +17,19 @@ interface LinkedFieldLabelProps {
 
 export function LinkedFieldLabel({ htmlFor, label, linked, onToggle, source }: LinkedFieldLabelProps) {
     return (
-        <div className="flex flex-wrap items-center justify-between gap-2">
-            <Label htmlFor={htmlFor}>{label}</Label>
+        <div className="space-y-2 min-w-0">
+            <Label htmlFor={htmlFor} className="block min-h-5 truncate leading-tight" title={label}>{label}</Label>
             <div className="flex flex-wrap items-center gap-2 text-xs">
-                <Badge variant={linked ? "secondary" : "outline"} className="gap-1">
+                <Badge variant={linked ? "secondary" : "outline"} className="gap-1 whitespace-nowrap">
                     {linked ? <Link2 className="h-3 w-3" /> : <PencilLine className="h-3 w-3" />}
                     {linked ? "Vinculado" : "Manual"}
                 </Badge>
-                <span className="text-muted-foreground">Origem: {source}</span>
                 <div className="flex items-center gap-2 rounded-md border px-2 py-1">
                     <span className="text-muted-foreground">Auto</span>
                     <Switch checked={linked} onCheckedChange={onToggle} aria-label={`Alternar vínculo automático para ${label}`} />
                 </div>
             </div>
+            <span className="block truncate text-xs text-muted-foreground" title={`Origem: ${source}`}>Origem: {source}</span>
         </div>
     );
 }

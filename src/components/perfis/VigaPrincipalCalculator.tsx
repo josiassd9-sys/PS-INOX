@@ -325,7 +325,7 @@ export function VigaPrincipalCalculator() {
             />
           )}
           <BeamSchemeDiagram scheme={beamScheme} span={parseFloat(span.replace(",", ".")) || 0} balanco1={parseFloat(balanco1.replace(",", ".")) || 0} balanco2={parseFloat(balanco2.replace(",", ".")) || 0} />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 [&_label]:truncate [&_label]:leading-tight">
             {beamScheme === 'biapoiada' ? (
                  <div className="space-y-2"><LinkedFieldLabel htmlFor="span" label="Vão / Comprimento (m)" linked={fieldLinks.vigaPrincipal.span} onToggle={(linked) => setFieldLink('vigaPrincipal', 'span', linked)} source="Geometria da aba 1" /><Input id="span" type="text" inputMode="decimal" value={span} onChange={(e) => handleInputChange('span', e.target.value)} placeholder="Ex: 5,0" readOnly={fieldLinks.vigaPrincipal.span} className={fieldLinks.vigaPrincipal.span ? "bg-muted/70" : ""} /></div>
             ) : beamScheme === 'balanco' ? (
@@ -333,11 +333,11 @@ export function VigaPrincipalCalculator() {
             ) : (
                 <><div className="space-y-2"><LinkedFieldLabel htmlFor="vp-balanco1" label="Balanço 1 (m)" linked={fieldLinks.vigaPrincipal.balanco1} onToggle={(linked) => setFieldLink('vigaPrincipal', 'balanco1', linked)} source="Geometria da aba 1" /><Input id="vp-balanco1" type="text" inputMode="decimal" value={balanco1} onChange={(e) => handleInputChange('balanco1', e.target.value)} placeholder="Ex: 1,5" readOnly={fieldLinks.vigaPrincipal.balanco1} className={fieldLinks.vigaPrincipal.balanco1 ? "bg-muted/70" : ""}/></div><div className="space-y-2"><LinkedFieldLabel htmlFor="vp-span-central" label="Vão Central (m)" linked={fieldLinks.vigaPrincipal.span} onToggle={(linked) => setFieldLink('vigaPrincipal', 'span', linked)} source="Geometria da aba 1" /><Input id="vp-span-central" type="text" inputMode="decimal" value={span} onChange={(e) => handleInputChange('span', e.target.value)} placeholder="Ex: 5,0" readOnly={fieldLinks.vigaPrincipal.span} className={fieldLinks.vigaPrincipal.span ? "bg-muted/70" : ""}/></div><div className="space-y-2"><LinkedFieldLabel htmlFor="vp-balanco2" label="Balanço 2 (m)" linked={fieldLinks.vigaPrincipal.balanco2} onToggle={(linked) => setFieldLink('vigaPrincipal', 'balanco2', linked)} source="Geometria da aba 1" /><Input id="vp-balanco2" type="text" inputMode="decimal" value={balanco2} onChange={(e) => handleInputChange('balanco2', e.target.value)} placeholder="Ex: 1,5" readOnly={fieldLinks.vigaPrincipal.balanco2} className={fieldLinks.vigaPrincipal.balanco2 ? "bg-muted/70" : ""}/></div></>
             )}
-            <div className="grid grid-cols-2 gap-2 sm:gap-4 md:col-span-2 lg:col-span-3">
+            <div className="grid grid-cols-2 gap-2 sm:gap-4 md:col-span-2 [&_label]:truncate [&_label]:leading-tight">
               <div className="space-y-2 min-w-0"><LinkedFieldLabel htmlFor="load" label="Carga Distribuída (kgf/m)" linked={fieldLinks.vigaPrincipal.distributedLoad} onToggle={(linked) => setFieldLink('vigaPrincipal', 'distributedLoad', linked)} source="Reações da viga secundária / espaçamento" /><Input id="load" type="text" inputMode="decimal" value={distributedLoad} onChange={(e) => handleInputChange('distributedLoad', e.target.value)} placeholder="Peso próprio, etc." readOnly={fieldLinks.vigaPrincipal.distributedLoad} className={fieldLinks.vigaPrincipal.distributedLoad ? "bg-muted/70" : ""} /></div>
               <div className="space-y-2 min-w-0"><div className="flex items-center justify-between"><Label htmlFor="vp-point-load">Carga Pontual (kgf)</Label></div><Input id="vp-point-load" type="text" inputMode="decimal" value={pointLoad} onChange={e => handleInputChange('pointLoad', e.target.value)} placeholder="Carga manual" /></div>
             </div>
-            <div className="grid grid-cols-2 gap-2 sm:gap-4 md:col-span-2 lg:col-span-3">
+            <div className="grid grid-cols-2 gap-2 sm:gap-4 md:col-span-2 [&_label]:truncate [&_label]:leading-tight">
               <div className="space-y-2 min-w-0"><Label htmlFor="vp-point-load-pos">Posição da Carga (m)</Label><Input id="vp-point-load-pos" type="text" inputMode="decimal" value={pointLoadPosition} onChange={e => handleInputChange('pointLoadPosition', e.target.value)} placeholder="Dist. do apoio esquerdo" /></div>
               <div className="space-y-2 min-w-0"><Label htmlFor="safety-factor">Fator de Segurança</Label><Input id="safety-factor" type="text" inputMode="decimal" value={safetyFactor} onChange={e => handleInputChange('safetyFactor', e.target.value)} placeholder="Ex: 1,4"/></div>
             </div>
@@ -368,7 +368,7 @@ export function VigaPrincipalCalculator() {
                      )}
                      {aiError && <Alert variant="destructive"><AlertTitle>IA indisponível</AlertTitle><AlertDescription>{aiError}</AlertDescription></Alert>}
                      {aiAnalysis && <Alert variant="default"><Sparkles className="h-4 w-4" /><AlertTitle className="font-semibold">Análise por IA (Comparativa)</AlertTitle><AlertDescription className="whitespace-pre-line">{aiAnalysis}</AlertDescription></Alert>}
-                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-4">
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-4 [&_label]:truncate [&_label]:leading-tight">
                          <div className="space-y-2"><Label htmlFor="quantity">Quantidade de Vigas</Label><Input id="quantity" type="text" inputMode="numeric" value={quantity} onChange={(e) => handleInputChange('quantity', e.target.value)} placeholder="Ex: 1" /></div>
                          <div className="space-y-2"><Label htmlFor="pricePerKg">Preço do Aço (R$/kg)</Label><Input id="pricePerKg" type="text" inputMode="decimal" value={pricePerKg} onChange={(e) => handleInputChange('pricePerKg', e.target.value)} placeholder="Ex: 8,50" /></div>
                     </div>

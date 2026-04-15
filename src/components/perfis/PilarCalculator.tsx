@@ -239,7 +239,7 @@ export function PilarCalculator() {
                         description="As reações das vigas ou os dados do pilar mudaram. Recalcule o pilar antes de congelar relatório ou seguir para a fundação."
                     />
                 )}
-                <div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 md:grid-cols-2 [&_label]:truncate [&_label]:leading-tight">
                     <div className="space-y-2 min-w-0">
                         <Label htmlFor="pilar-height">Pé-Direito (Altura de Flambagem) (m)</Label>
                         <Input id="pilar-height" type="text" inputMode="decimal" value={height} onChange={e => handleInputChange('height', e.target.value)} placeholder="Ex: 3,0" />
@@ -316,7 +316,7 @@ export function PilarCalculator() {
                                     <AlertDescription className="whitespace-pre-line">{aiAnalysis}</AlertDescription>
                                 </Alert>
                             )}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t pt-4 [&_label]:truncate [&_label]:leading-tight">
                                 <div className="space-y-2">
                                     <Label htmlFor="pilar-quantity">Quantidade</Label>
                                     <Input id="pilar-quantity" type="text" inputMode="numeric" value={quantity} onChange={e => handleInputChange('quantity', e.target.value)} />

@@ -83,22 +83,22 @@ function TableComponent() {
                      </p>
             </CardHeader>
                 <CardContent className="flex min-h-0 flex-1 flex-col px-2 pb-3 pt-0 sm:p-4 sm:pt-0">
-                  <div className="relative w-full min-w-0 flex-1 min-h-0 max-h-[56vh] overflow-y-auto overflow-x-hidden rounded-md border bg-card shadow-sm sm:max-h-[62vh] md:overflow-auto [overscroll-behavior-x:contain]">
-                    <Table className="w-full min-w-0 table-fixed text-[10px] sm:text-xs md:min-w-[1100px]">
+                  <div className="relative w-full min-w-0 flex-1 min-h-0 max-h-[56vh] overflow-auto rounded-md border bg-card shadow-sm touch-pan-x sm:max-h-[62vh] [overscroll-behavior-x:contain]">
+                    <Table className="w-full min-w-[1100px] table-fixed text-xs">
                     <TableHeader className="sticky top-0 z-50 bg-card">
                         <TableRow className="text-xs">
                         <TableHead className="sticky top-0 left-0 z-50 whitespace-nowrap bg-card font-bold border-r border-border shadow-[2px_0_8px_-2px_rgba(0,0,0,0.1)]" style={{ width: 96, minWidth: 96 }}>Perfil</TableHead>
                         <TableHead className="sticky top-0 z-50 whitespace-nowrap bg-card border-r border-border shadow-[2px_0_8px_-2px_rgba(0,0,0,0.1)]" style={{ left: 96, width: 76, minWidth: 76 }}>Peso (kg/m)</TableHead>
-                      <TableHead className="sticky top-0 z-30 bg-card whitespace-normal break-words leading-tight md:whitespace-nowrap">h (mm)</TableHead>
-                      <TableHead className="sticky top-0 z-30 bg-card whitespace-normal break-words leading-tight md:whitespace-nowrap">b (mm)</TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-normal break-words leading-tight md:whitespace-nowrap">tw (mm)</TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-normal break-words leading-tight md:whitespace-nowrap">tf (mm)</TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-normal break-words leading-tight md:whitespace-nowrap">Ix (cm⁴)</TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-normal break-words leading-tight md:whitespace-nowrap">Wx (cm³)</TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-normal break-words leading-tight md:whitespace-nowrap">rx (cm)</TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-normal break-words leading-tight md:whitespace-nowrap">Iy (cm⁴)</TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-normal break-words leading-tight md:whitespace-nowrap">Wy (cm³)</TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-normal break-words leading-tight md:whitespace-nowrap">ry (cm)</TableHead>
+                      <TableHead className="sticky top-0 z-30 whitespace-nowrap bg-card">h (mm)</TableHead>
+                      <TableHead className="sticky top-0 z-30 whitespace-nowrap bg-card">b (mm)</TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">tw (mm)</TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">tf (mm)</TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Ix (cm⁴)</TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Wx (cm³)</TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">rx (cm)</TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Iy (cm⁴)</TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Wy (cm³)</TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">ry (cm)</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -106,16 +106,16 @@ function TableComponent() {
                             <TableRow key={perfil.nome} className="text-xs hover:bg-muted/50">
                           <TableCell className="sticky left-0 z-40 whitespace-nowrap bg-card font-medium border-r border-border shadow-[2px_0_8px_-2px_rgba(0,0,0,0.08)]" style={{ width: 96, minWidth: 96 }}>{perfil.nome}</TableCell>
                           <TableCell className="sticky z-40 whitespace-nowrap bg-card border-r border-border" style={{ left: 96, width: 76, minWidth: 76 }}>{perfil.peso.toFixed(1)}</TableCell>
-                            <TableCell className="whitespace-normal break-words leading-tight md:whitespace-nowrap">{perfil.h}</TableCell>
-                            <TableCell className="whitespace-normal break-words leading-tight md:whitespace-nowrap">{perfil.b}</TableCell>
-                              <TableCell className="whitespace-normal break-words leading-tight md:whitespace-nowrap">{perfil.tw}</TableCell>
-                              <TableCell className="whitespace-normal break-words leading-tight md:whitespace-nowrap">{perfil.tf}</TableCell>
-                              <TableCell className="whitespace-normal break-words leading-tight md:whitespace-nowrap">{perfil.Ix}</TableCell>
-                              <TableCell className="whitespace-normal break-words leading-tight md:whitespace-nowrap">{perfil.Wx}</TableCell>
-                              <TableCell className="whitespace-normal break-words leading-tight md:whitespace-nowrap">{perfil.rx}</TableCell>
-                              <TableCell className="whitespace-normal break-words leading-tight md:whitespace-nowrap">{perfil.Iy}</TableCell>
-                              <TableCell className="whitespace-normal break-words leading-tight md:whitespace-nowrap">{perfil.Wy}</TableCell>
-                              <TableCell className="whitespace-normal break-words leading-tight md:whitespace-nowrap">{perfil.ry}</TableCell>
+                              <TableCell className="whitespace-nowrap">{perfil.h}</TableCell>
+                              <TableCell className="whitespace-nowrap">{perfil.b}</TableCell>
+                                <TableCell className="whitespace-nowrap">{perfil.tw}</TableCell>
+                                <TableCell className="whitespace-nowrap">{perfil.tf}</TableCell>
+                                <TableCell className="whitespace-nowrap">{perfil.Ix}</TableCell>
+                                <TableCell className="whitespace-nowrap">{perfil.Wx}</TableCell>
+                                <TableCell className="whitespace-nowrap">{perfil.rx}</TableCell>
+                                <TableCell className="whitespace-nowrap">{perfil.Iy}</TableCell>
+                                <TableCell className="whitespace-nowrap">{perfil.Wy}</TableCell>
+                                <TableCell className="whitespace-nowrap">{perfil.ry}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

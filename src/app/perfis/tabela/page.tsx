@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { perfisData, Perfil } from "@/lib/data/index";
+import { perfisData } from "@/lib/data/index";
 import { Dashboard } from "@/components/dashboard";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
@@ -83,12 +83,12 @@ function TableComponent() {
                      </p>
             </CardHeader>
                 <CardContent className="flex min-h-0 flex-1 flex-col px-2 pb-3 pt-0 sm:p-4 sm:pt-0">
-                  <div className="relative w-full min-w-0 flex-1 min-h-0 max-h-[56vh] overflow-x-auto overflow-y-auto rounded-md border touch-pan-x sm:max-h-[62vh] [overscroll-behavior-x:contain]">
-                    <Table className="w-full min-w-[980px] text-xs">
-                    <TableHeader className="bg-card">
+                  <div className="relative w-full min-w-0 flex-1 min-h-0 max-h-[56vh] overflow-auto rounded-md border bg-card shadow-sm touch-pan-x sm:max-h-[62vh] [overscroll-behavior-x:contain]">
+                    <Table className="w-full min-w-[1100px] table-fixed text-xs">
+                    <TableHeader className="sticky top-0 z-50 bg-card">
                         <TableRow className="text-xs">
-                        <TableHead className="sticky top-0 left-0 z-40 whitespace-nowrap bg-card font-bold shadow-[2px_0_0_0_hsl(var(--border))]" style={{ width: 96, minWidth: 96 }}>Perfil</TableHead>
-                        <TableHead className="sticky top-0 z-40 whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))]" style={{ left: 96, width: 76, minWidth: 76 }}>Peso (kg/m)</TableHead>
+                        <TableHead className="sticky top-0 left-0 z-50 whitespace-nowrap bg-card font-bold border-r border-border shadow-[2px_0_8px_-2px_rgba(0,0,0,0.1)]" style={{ width: 96, minWidth: 96 }}>Perfil</TableHead>
+                        <TableHead className="sticky top-0 z-50 whitespace-nowrap bg-card border-r border-border shadow-[2px_0_8px_-2px_rgba(0,0,0,0.1)]" style={{ left: 96, width: 76, minWidth: 76 }}>Peso (kg/m)</TableHead>
                       <TableHead className="sticky top-0 z-30 whitespace-nowrap bg-card">h (mm)</TableHead>
                       <TableHead className="sticky top-0 z-30 whitespace-nowrap bg-card">b (mm)</TableHead>
                         <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">tw (mm)</TableHead>
@@ -103,9 +103,9 @@ function TableComponent() {
                     </TableHeader>
                     <TableBody>
                         {filteredData.map((perfil) => (
-                            <TableRow key={perfil.nome} className="text-xs">
-                          <TableCell className="sticky left-0 z-20 whitespace-nowrap bg-card font-medium shadow-[2px_0_0_0_hsl(var(--border))]" style={{ width: 96, minWidth: 96 }}>{perfil.nome}</TableCell>
-                          <TableCell className="sticky z-20 whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))]" style={{ left: 96, width: 76, minWidth: 76 }}>{perfil.peso.toFixed(1)}</TableCell>
+                            <TableRow key={perfil.nome} className="text-xs hover:bg-muted/50">
+                          <TableCell className="sticky left-0 z-40 whitespace-nowrap bg-card font-medium border-r border-border shadow-[2px_0_8px_-2px_rgba(0,0,0,0.08)]" style={{ width: 96, minWidth: 96 }}>{perfil.nome}</TableCell>
+                          <TableCell className="sticky z-40 whitespace-nowrap bg-card border-r border-border" style={{ left: 96, width: 76, minWidth: 76 }}>{perfil.peso.toFixed(1)}</TableCell>
                           <TableCell>{perfil.h}</TableCell>
                           <TableCell>{perfil.b}</TableCell>
                                 <TableCell>{perfil.tw}</TableCell>

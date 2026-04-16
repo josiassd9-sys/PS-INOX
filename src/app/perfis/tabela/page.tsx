@@ -82,8 +82,9 @@ function TableComponent() {
                     No celular, as colunas Perfil e Peso ficam fixas; arraste para ver as demais colunas.
                      </p>
             </CardHeader>
-                <CardContent className="flex min-h-0 flex-1 flex-col px-2 pb-3 pt-0 sm:p-4 sm:pt-0">
-                  <div className="relative w-full min-w-0 flex-1 min-h-0 max-h-[56vh] overflow-auto rounded-md border bg-card shadow-sm touch-pan-x sm:max-h-[62vh] [overscroll-behavior-x:contain]">
+                <CardContent className="flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col overflow-hidden px-2 pb-3 pt-0 sm:p-4 sm:pt-0">
+                  <div className="w-full min-w-0 max-w-[100vw] flex-1 min-h-0 overflow-hidden rounded-md border bg-card shadow-sm">
+                    <div className="relative h-full max-h-[56vh] w-full overflow-x-auto overflow-y-auto touch-pan-x sm:max-h-[62vh] [-webkit-overflow-scrolling:touch] [overscroll-behavior-x:contain]">
                     <Table className="w-full min-w-[1100px] table-fixed text-xs">
                     <TableHeader className="sticky top-0 z-50 bg-card">
                         <TableRow className="text-xs">
@@ -121,6 +122,7 @@ function TableComponent() {
                     </TableBody>
                 </Table>
                       </div>
+                  </div>
                  {filteredData.length === 0 && (
                     <div className="text-center p-4 text-muted-foreground">Nenhum perfil encontrado com os critérios especificados.</div>
                 )}

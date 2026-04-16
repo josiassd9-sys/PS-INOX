@@ -18,8 +18,6 @@ import { Search } from "lucide-react";
 import { Label } from "@/components/ui/label";
 
 function TableComponent() {
-  const SHOW_TABLE = false; // Diagnostico temporario: mostra apenas o topo da pagina.
-
   const [searchTerm, setSearchTerm] = React.useState("");
   const [filters, setFilters] = React.useState({
     minPeso: "",
@@ -85,55 +83,47 @@ function TableComponent() {
                      </p>
             </CardHeader>
                 <CardContent className="flex min-h-0 flex-1 flex-col px-2 pb-3 pt-0 sm:p-4 sm:pt-0">
-                  {SHOW_TABLE ? (
-                    <>
-                      <div className="relative w-full min-w-0 flex-1 min-h-0 max-h-[56vh] overflow-auto rounded-md border sm:max-h-[62vh] [overscroll-behavior-x:contain]">
-                        <Table className="w-full min-w-[980px] text-xs">
-                        <TableHeader className="bg-card">
-                            <TableRow className="text-xs">
-                            <TableHead className="sticky top-0 left-0 z-40 whitespace-nowrap bg-card font-bold shadow-[2px_0_0_0_hsl(var(--border))]" style={{ width: 96, minWidth: 96 }}>Perfil</TableHead>
-                            <TableHead className="sticky top-0 z-40 whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))]" style={{ left: 96, width: 76, minWidth: 76 }}>Peso (kg/m)</TableHead>
-                          <TableHead className="sticky top-0 z-30 whitespace-nowrap bg-card">h (mm)</TableHead>
-                          <TableHead className="sticky top-0 z-30 whitespace-nowrap bg-card">b (mm)</TableHead>
-                            <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">tw (mm)</TableHead>
-                            <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">tf (mm)</TableHead>
-                            <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Ix (cm⁴)</TableHead>
-                            <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Wx (cm³)</TableHead>
-                            <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">rx (cm)</TableHead>
-                            <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Iy (cm⁴)</TableHead>
-                            <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Wy (cm³)</TableHead>
-                            <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">ry (cm)</TableHead>
+                  <div className="relative w-full min-w-0 flex-1 min-h-0 max-h-[56vh] overflow-x-auto overflow-y-auto rounded-md border touch-pan-x sm:max-h-[62vh] [overscroll-behavior-x:contain]">
+                    <Table className="w-full min-w-[980px] text-xs">
+                    <TableHeader className="bg-card">
+                        <TableRow className="text-xs">
+                        <TableHead className="sticky top-0 left-0 z-40 whitespace-nowrap bg-card font-bold shadow-[2px_0_0_0_hsl(var(--border))]" style={{ width: 96, minWidth: 96 }}>Perfil</TableHead>
+                        <TableHead className="sticky top-0 z-40 whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))]" style={{ left: 96, width: 76, minWidth: 76 }}>Peso (kg/m)</TableHead>
+                      <TableHead className="sticky top-0 z-30 whitespace-nowrap bg-card">h (mm)</TableHead>
+                      <TableHead className="sticky top-0 z-30 whitespace-nowrap bg-card">b (mm)</TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">tw (mm)</TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">tf (mm)</TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Ix (cm⁴)</TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Wx (cm³)</TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">rx (cm)</TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Iy (cm⁴)</TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Wy (cm³)</TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">ry (cm)</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {filteredData.map((perfil) => (
+                            <TableRow key={perfil.nome} className="text-xs">
+                          <TableCell className="sticky left-0 z-20 whitespace-nowrap bg-card font-medium shadow-[2px_0_0_0_hsl(var(--border))]" style={{ width: 96, minWidth: 96 }}>{perfil.nome}</TableCell>
+                          <TableCell className="sticky z-20 whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))]" style={{ left: 96, width: 76, minWidth: 76 }}>{perfil.peso.toFixed(1)}</TableCell>
+                          <TableCell>{perfil.h}</TableCell>
+                          <TableCell>{perfil.b}</TableCell>
+                                <TableCell>{perfil.tw}</TableCell>
+                                <TableCell>{perfil.tf}</TableCell>
+                                <TableCell>{perfil.Ix}</TableCell>
+                                <TableCell>{perfil.Wx}</TableCell>
+                                <TableCell>{perfil.rx}</TableCell>
+                                <TableCell>{perfil.Iy}</TableCell>
+                                <TableCell>{perfil.Wy}</TableCell>
+                                <TableCell>{perfil.ry}</TableCell>
                             </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {filteredData.map((perfil) => (
-                                <TableRow key={perfil.nome} className="text-xs">
-                              <TableCell className="sticky left-0 z-20 whitespace-nowrap bg-card font-medium shadow-[2px_0_0_0_hsl(var(--border))]" style={{ width: 96, minWidth: 96 }}>{perfil.nome}</TableCell>
-                              <TableCell className="sticky z-20 whitespace-nowrap bg-card shadow-[2px_0_0_0_hsl(var(--border))]" style={{ left: 96, width: 76, minWidth: 76 }}>{perfil.peso.toFixed(1)}</TableCell>
-                              <TableCell>{perfil.h}</TableCell>
-                              <TableCell>{perfil.b}</TableCell>
-                                    <TableCell>{perfil.tw}</TableCell>
-                                    <TableCell>{perfil.tf}</TableCell>
-                                    <TableCell>{perfil.Ix}</TableCell>
-                                    <TableCell>{perfil.Wx}</TableCell>
-                                    <TableCell>{perfil.rx}</TableCell>
-                                    <TableCell>{perfil.Iy}</TableCell>
-                                    <TableCell>{perfil.Wy}</TableCell>
-                                    <TableCell>{perfil.ry}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                          </div>
-                     {filteredData.length === 0 && (
-                        <div className="text-center p-4 text-muted-foreground">Nenhum perfil encontrado com os critérios especificados.</div>
-                    )}
-                    </>
-                  ) : (
-                    <div className="rounded-md border border-dashed p-3 text-xs text-muted-foreground">
-                      Modo de diagnostico ativo: tabela oculta temporariamente para validar apenas o comportamento do topo.
-                    </div>
-                  )}
+                        ))}
+                    </TableBody>
+                </Table>
+                      </div>
+                 {filteredData.length === 0 && (
+                    <div className="text-center p-4 text-muted-foreground">Nenhum perfil encontrado com os critérios especificados.</div>
+                )}
             </CardContent>
         </Card>
     </div>

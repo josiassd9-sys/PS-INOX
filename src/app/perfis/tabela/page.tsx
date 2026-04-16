@@ -89,17 +89,17 @@ function TableComponent() {
                     <TableHeader className="sticky top-0 z-50 bg-card">
                         <TableRow className="text-xs">
                         <TableHead className="sticky top-0 left-0 z-50 whitespace-nowrap bg-card font-bold border-r border-border shadow-[2px_0_8px_-2px_rgba(0,0,0,0.1)]" style={{ width: 96, minWidth: 96 }}>Perfil</TableHead>
-                        <TableHead className="sticky top-0 z-50 whitespace-nowrap bg-card border-r border-border shadow-[2px_0_8px_-2px_rgba(0,0,0,0.1)]" style={{ left: 96, width: 76, minWidth: 76 }}>Peso (kg/m)</TableHead>
-                      <TableHead className="sticky top-0 z-30 whitespace-nowrap bg-card">h (mm)</TableHead>
-                      <TableHead className="sticky top-0 z-30 whitespace-nowrap bg-card">b (mm)</TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">tw (mm)</TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">tf (mm)</TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Ix (cm⁴)</TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Wx (cm³)</TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">rx (cm)</TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Iy (cm⁴)</TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">Wy (cm³)</TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap">ry (cm)</TableHead>
+                        <TableHead className="sticky top-0 z-50 whitespace-nowrap bg-card border-r border-border shadow-[2px_0_8px_-2px_rgba(0,0,0,0.1)]" style={{ left: 96, width: 76, minWidth: 76 }}><span className="block leading-tight">Peso</span><span className="block text-[9px] font-normal opacity-70">(kg/m)</span></TableHead>
+                      <TableHead className="sticky top-0 z-30 whitespace-nowrap bg-card"><span className="block leading-tight">h</span><span className="block text-[9px] font-normal opacity-70">(mm)</span></TableHead>
+                      <TableHead className="sticky top-0 z-30 whitespace-nowrap bg-card"><span className="block leading-tight">b</span><span className="block text-[9px] font-normal opacity-70">(mm)</span></TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap"><span className="block leading-tight">tw</span><span className="block text-[9px] font-normal opacity-70">(mm)</span></TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap"><span className="block leading-tight">tf</span><span className="block text-[9px] font-normal opacity-70">(mm)</span></TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap"><span className="block leading-tight">Ix</span><span className="block text-[9px] font-normal opacity-70">(cm⁴)</span></TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap"><span className="block leading-tight">Wx</span><span className="block text-[9px] font-normal opacity-70">(cm³)</span></TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap"><span className="block leading-tight">rx</span><span className="block text-[9px] font-normal opacity-70">(cm)</span></TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap"><span className="block leading-tight">Iy</span><span className="block text-[9px] font-normal opacity-70">(cm⁴)</span></TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap"><span className="block leading-tight">Wy</span><span className="block text-[9px] font-normal opacity-70">(cm³)</span></TableHead>
+                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap"><span className="block leading-tight">ry</span><span className="block text-[9px] font-normal opacity-70">(cm)</span></TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>

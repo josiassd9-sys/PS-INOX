@@ -47,9 +47,9 @@ function TableComponent() {
   }, [searchTerm, filters]);
 
   return (
-    <div className="w-full max-w-full px-2 py-3 sm:px-4">
-      <Card className="w-full max-w-full overflow-hidden">
-        <CardHeader className="w-full max-w-full overflow-hidden">
+    <div className="h-full min-h-0 w-full min-w-0 overflow-x-hidden px-2 py-3 sm:px-4">
+      <Card className="flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden">
+        <CardHeader className="w-full min-w-0 shrink-0 overflow-x-hidden px-3 py-3 sm:p-4">
                 <CardTitle>Tabela de Perfis W</CardTitle>
                 <CardDescription>
                     Consulte as propriedades geométricas e físicas dos perfis de aço padrão W (Gerdau/Açominas).
@@ -66,24 +66,24 @@ function TableComponent() {
                  </div>
                  <div className="grid w-full max-w-full grid-cols-3 gap-1 pt-2 sm:gap-2">
                   <div className="min-w-0 space-y-0.5">
-                    <Label htmlFor="minPeso" className="text-[10px] leading-tight sm:text-xs font-normal whitespace-nowrap">Peso ≥ (kg/m)</Label>
-                  <Input id="minPeso" type="number" placeholder="Ex: 20" value={filters.minPeso} onChange={handleFilterChange} className="h-8 w-full min-w-0 px-2 text-xs" />
+                    <Label htmlFor="minPeso" className="block w-full truncate text-[9px] leading-tight sm:text-xs font-normal">Peso ≥ (kg/m)</Label>
+                  <Input id="minPeso" type="number" placeholder="Ex: 20" value={filters.minPeso} onChange={handleFilterChange} className="h-8 w-full min-w-0 px-1.5 text-[11px] sm:px-2 sm:text-xs" />
                     </div>
                    <div className="min-w-0 space-y-0.5">
-                    <Label htmlFor="minH" className="text-[10px] leading-tight sm:text-xs font-normal whitespace-nowrap">Altura ≥ (mm)</Label>
-                  <Input id="minH" type="number" placeholder="Ex: 250" value={filters.minH} onChange={handleFilterChange} className="h-8 w-full min-w-0 px-2 text-xs" />
+                    <Label htmlFor="minH" className="block w-full truncate text-[9px] leading-tight sm:text-xs font-normal">Altura ≥ (mm)</Label>
+                  <Input id="minH" type="number" placeholder="Ex: 250" value={filters.minH} onChange={handleFilterChange} className="h-8 w-full min-w-0 px-1.5 text-[11px] sm:px-2 sm:text-xs" />
                     </div>
                    <div className="min-w-0 space-y-0.5">
-                    <Label htmlFor="minWx" className="text-[10px] leading-tight sm:text-xs font-normal whitespace-nowrap">Wx ≥ (cm³)</Label>
-                  <Input id="minWx" type="number" placeholder="Ex: 300" value={filters.minWx} onChange={handleFilterChange} className="h-8 w-full min-w-0 px-2 text-xs" />
+                    <Label htmlFor="minWx" className="block w-full truncate text-[9px] leading-tight sm:text-xs font-normal">Wx ≥ (cm³)</Label>
+                  <Input id="minWx" type="number" placeholder="Ex: 300" value={filters.minWx} onChange={handleFilterChange} className="h-8 w-full min-w-0 px-1.5 text-[11px] sm:px-2 sm:text-xs" />
                     </div>
                  </div>
                      <p className="pt-1 text-xs text-muted-foreground">
                     No celular, as colunas Perfil e Peso ficam fixas; arraste para ver as demais colunas.
                      </p>
             </CardHeader>
-                <CardContent>
-                    <div className="relative w-full max-w-full max-h-[56vh] overflow-auto rounded-md border sm:max-h-[62vh] [overscroll-behavior-x:contain]">
+                <CardContent className="flex min-h-0 flex-1 flex-col px-2 pb-3 pt-0 sm:p-4 sm:pt-0">
+                  <div className="relative w-full min-w-0 flex-1 min-h-0 max-h-[56vh] overflow-auto rounded-md border sm:max-h-[62vh] [overscroll-behavior-x:contain]">
                     <Table className="w-full min-w-[980px] text-xs">
                     <TableHeader className="bg-card">
                         <TableRow className="text-xs">

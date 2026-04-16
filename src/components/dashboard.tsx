@@ -662,7 +662,7 @@ function DashboardComponent({ initialCategoryId, children }: { initialCategoryId
             
             <div className="flex-1 flex flex-col overflow-hidden">
               <div className={cn("p-1 flex-1 overflow-y-auto", (selectedCategoryId === 'tabela-sucata' || selectedCategoryId === 'conexoes') && "p-0 md:p-0", selectedCategoryId?.startsWith('perfis/calculadora') && 'p-0 overflow-x-hidden')}>
-                 <PageTransition variant={selectedCategoryId?.startsWith('perfis/') ? 'scale' : searchTerm ? 'fade' : 'slide'}>
+                 <PageTransition variant={selectedCategoryId === 'perfis/tabela-w' ? 'fade' : selectedCategoryId?.startsWith('perfis/') ? 'scale' : searchTerm ? 'fade' : 'slide'}>
                    {renderContent()}
                  </PageTransition>
               </div>

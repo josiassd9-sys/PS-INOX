@@ -19,117 +19,184 @@ import { Label } from "@/components/ui/label";
 
 function TableComponent() {
   const [searchTerm, setSearchTerm] = React.useState("");
-  const [filters, setFilters] = React.useState({
-    minPeso: "",
-    minH: "",
-    minWx: "",
-  });
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    setFilters(prev => ({ ...prev, [id]: value }));
-  };
+  type Perfil = (typeof perfisData)[0];
 
-  const filteredData = React.useMemo(() => {
-    const lowercasedFilter = searchTerm.toLowerCase();
-    const minPeso = parseFloat(filters.minPeso) || 0;
-    const minH = parseFloat(filters.minH) || 0;
-    const minWx = parseFloat(filters.minWx) || 0;
+  const columns: ColumnDef<Perfil>[] = [
+    {
+      accessorKey: "nome",
+      header: "Perfil",
+      cell: ({ row }) => <div className="font-medium">{row.getValue("nome")}</div>,
+      size: 160,
+      enablePinning: true,
+    },
+    {
+      accessorKey: "peso",
+      header: "Peso (kg/m)",
+      cell: ({ row }) => row.getValue("peso"),
+      size: 110,
+      enablePinning: true,
+    },
+    { accessorKey: "h", header: "h (mm)", size: 90 },
+    { accessorKey: "b", header: "b (mm)", size: 90 },
+    { accessorKey: "tw", header: "tw (mm)", size: 90 },
+    { accessorKey: "tf", header: "tf (mm)", size: 90 },
+    { accessorKey: "Ix", header: "Ix (cm⁴)", size: 110 },
+    { accessorKey: "Wx", header: "Wx (cm³)", size: 110 },
+    { accessorKey: "rx", header: "rx (cm)", size: 90 },
+    { accessorKey: "Iy", header: "Iy (cm⁴)", size: 110 },
+    { accessorKey: "Wy", header: "Wy (cm³)", size: 110 },
+    { accessorKey: "ry", header: "ry (cm)", size: 90 },
+  ];
 
-    return perfisData.filter((perfil) => {
-      const nameMatch = perfil.nome.toLowerCase().includes(lowercasedFilter);
-      const pesoMatch = !minPeso || perfil.peso >= minPeso;
-      const hMatch = !minH || perfil.h >= minH;
-      const wxMatch = !minWx || perfil.Wx >= minWx;
-
-      return nameMatch && pesoMatch && hMatch && wxMatch;
+  function TableComponent() {
+    const [searchTerm, setSearchTerm] = React.useState("");
+    const [filters, setFilters] = React.useState({
+      minPeso: "",
+      minH: "",
+      minWx: "",
     });
-  }, [searchTerm, filters]);
 
-  return (
-    <div className="h-full min-h-0 w-full min-w-0 overflow-x-hidden px-2 py-3 sm:px-4">
-      <Card className="flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden">
-        <CardHeader className="w-full min-w-0 shrink-0 overflow-x-hidden px-3 py-3 sm:p-4">
-                <CardTitle>Tabela de Perfis W</CardTitle>
-                <CardDescription>
-                    Consulte as propriedades geométricas e físicas dos perfis de aço padrão W (Gerdau/Açominas).
-                </CardDescription>
-                 <div className="relative pt-2">
-                  <Search className="absolute left-2.5 top-4 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="search"
-                    placeholder="Buscar perfil por nome..."
-                    className="w-full rounded-lg bg-background pl-8"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                 </div>
-                 <div className="grid w-full max-w-full grid-cols-3 gap-1 pt-2 sm:gap-2">
-                  <div className="min-w-0 space-y-0.5">
-                    <Label htmlFor="minPeso" className="block w-full truncate text-[9px] leading-tight sm:text-xs font-normal">Peso ≥ (kg/m)</Label>
-                  <Input id="minPeso" type="number" placeholder="Ex: 20" value={filters.minPeso} onChange={handleFilterChange} className="h-8 w-full min-w-0 px-1.5 text-[11px] sm:px-2 sm:text-xs" />
-                    </div>
-                   <div className="min-w-0 space-y-0.5">
-                    <Label htmlFor="minH" className="block w-full truncate text-[9px] leading-tight sm:text-xs font-normal">Altura ≥ (mm)</Label>
-                  <Input id="minH" type="number" placeholder="Ex: 250" value={filters.minH} onChange={handleFilterChange} className="h-8 w-full min-w-0 px-1.5 text-[11px] sm:px-2 sm:text-xs" />
-                    </div>
-                   <div className="min-w-0 space-y-0.5">
-                    <Label htmlFor="minWx" className="block w-full truncate text-[9px] leading-tight sm:text-xs font-normal">Wx ≥ (cm³)</Label>
-                  <Input id="minWx" type="number" placeholder="Ex: 300" value={filters.minWx} onChange={handleFilterChange} className="h-8 w-full min-w-0 px-1.5 text-[11px] sm:px-2 sm:text-xs" />
-                    </div>
-                 </div>
-                     <p className="pt-1 text-xs text-muted-foreground">
-                    No celular, as colunas Perfil e Peso ficam fixas; arraste para ver as demais colunas.
-                     </p>
-            </CardHeader>
-                <CardContent className="flex min-h-0 w-full min-w-0 max-w-full flex-1 flex-col overflow-hidden px-2 pb-3 pt-0 sm:p-4 sm:pt-0">
-                  <div className="w-full min-w-0 max-w-[100vw] flex-1 min-h-0 overflow-hidden rounded-md border bg-card shadow-sm">
-                    <div className="relative h-full max-h-[56vh] w-full overflow-x-auto overflow-y-auto touch-pan-x sm:max-h-[62vh] [-webkit-overflow-scrolling:touch] [overscroll-behavior-x:contain]">
-                    <Table className="w-full min-w-[1100px] table-fixed text-xs">
-                    <TableHeader className="sticky top-0 z-50 bg-card">
-                        <TableRow className="text-xs">
-                        <TableHead className="sticky top-0 left-0 z-50 whitespace-nowrap bg-card font-bold border-r border-border shadow-[2px_0_8px_-2px_rgba(0,0,0,0.1)]" style={{ width: 96, minWidth: 96 }}>Perfil</TableHead>
-                        <TableHead className="sticky top-0 z-50 whitespace-nowrap bg-card border-r border-border shadow-[2px_0_8px_-2px_rgba(0,0,0,0.1)]" style={{ left: 96, width: 76, minWidth: 76 }}><span className="block leading-tight">Peso</span><span className="block text-[9px] font-normal opacity-70">(kg/m)</span></TableHead>
-                      <TableHead className="sticky top-0 z-30 whitespace-nowrap bg-card"><span className="block leading-tight">h</span><span className="block text-[9px] font-normal opacity-70">(mm)</span></TableHead>
-                      <TableHead className="sticky top-0 z-30 whitespace-nowrap bg-card"><span className="block leading-tight">b</span><span className="block text-[9px] font-normal opacity-70">(mm)</span></TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap"><span className="block leading-tight">tw</span><span className="block text-[9px] font-normal opacity-70">(mm)</span></TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap"><span className="block leading-tight">tf</span><span className="block text-[9px] font-normal opacity-70">(mm)</span></TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap"><span className="block leading-tight">Ix</span><span className="block text-[9px] font-normal opacity-70">(cm⁴)</span></TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap"><span className="block leading-tight">Wx</span><span className="block text-[9px] font-normal opacity-70">(cm³)</span></TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap"><span className="block leading-tight">rx</span><span className="block text-[9px] font-normal opacity-70">(cm)</span></TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap"><span className="block leading-tight">Iy</span><span className="block text-[9px] font-normal opacity-70">(cm⁴)</span></TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap"><span className="block leading-tight">Wy</span><span className="block text-[9px] font-normal opacity-70">(cm³)</span></TableHead>
-                        <TableHead className="sticky top-0 z-30 bg-card whitespace-nowrap"><span className="block leading-tight">ry</span><span className="block text-[9px] font-normal opacity-70">(cm)</span></TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {filteredData.map((perfil) => (
-                            <TableRow key={perfil.nome} className="text-xs hover:bg-muted/50">
-                          <TableCell className="sticky left-0 z-40 whitespace-nowrap bg-card font-medium border-r border-border shadow-[2px_0_8px_-2px_rgba(0,0,0,0.08)]" style={{ width: 96, minWidth: 96 }}>{perfil.nome}</TableCell>
-                          <TableCell className="sticky z-40 whitespace-nowrap bg-card border-r border-border" style={{ left: 96, width: 76, minWidth: 76 }}>{perfil.peso.toFixed(1)}</TableCell>
-                              <TableCell className="whitespace-nowrap">{perfil.h}</TableCell>
-                              <TableCell className="whitespace-nowrap">{perfil.b}</TableCell>
-                                <TableCell className="whitespace-nowrap">{perfil.tw}</TableCell>
-                                <TableCell className="whitespace-nowrap">{perfil.tf}</TableCell>
-                                <TableCell className="whitespace-nowrap">{perfil.Ix}</TableCell>
-                                <TableCell className="whitespace-nowrap">{perfil.Wx}</TableCell>
-                                <TableCell className="whitespace-nowrap">{perfil.rx}</TableCell>
-                                <TableCell className="whitespace-nowrap">{perfil.Iy}</TableCell>
-                                <TableCell className="whitespace-nowrap">{perfil.Wy}</TableCell>
-                                <TableCell className="whitespace-nowrap">{perfil.ry}</TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-                      </div>
-                  </div>
-                 {filteredData.length === 0 && (
-                    <div className="text-center p-4 text-muted-foreground">Nenhum perfil encontrado com os critérios especificados.</div>
-                )}
-            </CardContent>
+    const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { id, value } = e.target;
+      setFilters(prev => ({ ...prev, [id]: value }));
+    };
+
+    const tableData = React.useMemo(() => {
+      const minPeso = parseFloat(filters.minPeso) || 0;
+      const minH = parseFloat(filters.minH) || 0;
+      const minWx = parseFloat(filters.minWx) || 0;
+
+      return perfisData.filter((perfil) => {
+        const nameMatch = perfil.nome.toLowerCase().includes(searchTerm.toLowerCase());
+        const pesoMatch = !minPeso || perfil.peso >= minPeso;
+        const hMatch = !minH || perfil.h >= minH;
+        const wxMatch = !minWx || perfil.Wx >= minWx;
+        return nameMatch && pesoMatch && hMatch && wxMatch;
+      });
+    }, [searchTerm, filters]);
+
+    const table = useReactTable({
+      data: tableData,
+      columns,
+      getCoreRowModel: getCoreRowModel(),
+      getFilteredRowModel: getFilteredRowModel(),
+      enablePinning: true,
+      initialState: {
+        columnPinning: { left: ["nome", "peso"] },
+      },
+    });
+
+    return (
+      <div className="container mx-auto p-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">Tabela de Perfis W</CardTitle>
+            <CardDescription>
+              Consulte as propriedades geométricas e físicas dos perfis de aço padrão W (Gerdau/Açominas).
+            </CardDescription>
+
+            <div className="relative mt-4">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar perfil por nome..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+              <div>
+                <Label htmlFor="minPeso">Peso ≥ (kg/m)</Label>
+                <Input id="minPeso" type="number" placeholder="Ex: 20" value={filters.minPeso} onChange={handleFilterChange} />
+              </div>
+              <div>
+                <Label htmlFor="minH">Altura ≥ (mm)</Label>
+                <Input id="minH" type="number" placeholder="Ex: 250" value={filters.minH} onChange={handleFilterChange} />
+              </div>
+              <div>
+                <Label htmlFor="minWx">Wx ≥ (cm³)</Label>
+                <Input id="minWx" type="number" placeholder="Ex: 300" value={filters.minWx} onChange={handleFilterChange} />
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent className="p-0">
+            <div className="border border-border rounded-md overflow-auto max-h-[580px] bg-card">
+              <table className="w-full table-fixed min-w-[1200px] text-sm border-collapse">
+                <thead className="sticky top-0 z-50 bg-muted">
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <tr key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => {
+                        const isPinned = header.column.getIsPinned();
+                        return (
+                          <th
+                            key={header.id}
+                            colSpan={header.colSpan}
+                            className={`px-4 py-3 font-semibold border-r border-border text-left ${
+                              isPinned === "left"
+                                ? "sticky left-0 z-50 bg-muted shadow-[4px_0_8px_-4px_rgba(0,0,0,0.15)]"
+                                : ""
+                            }`}
+                            style={{
+                              width: header.getSize(),
+                              minWidth: header.getSize(),
+                            }}
+                          >
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(header.column.columnDef.header, header.getContext())}
+                          </th>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </thead>
+                <tbody>
+                  {table.getRowModel().rows.length > 0 ? (
+                    table.getRowModel().rows.map((row) => (
+                      <tr key={row.id} className="hover:bg-muted/50 border-b">
+                        {row.getVisibleCells().map((cell) => {
+                          const isPinned = cell.column.getIsPinned();
+                          return (
+                            <td
+                              key={cell.id}
+                              className={`px-4 py-3 border-r border-border ${
+                                isPinned === "left"
+                                  ? "sticky left-0 z-40 bg-card shadow-[4px_0_8px_-4px_rgba(0,0,0,0.12)]"
+                                  : ""
+                              }`}
+                              style={{
+                                width: cell.column.getSize(),
+                                minWidth: cell.column.getSize(),
+                              }}
+                            >
+                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={12} className="h-32 text-center text-muted-foreground">
+                        Nenhum perfil encontrado.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <p className="text-xs text-center text-muted-foreground mt-3 md:hidden">
+              Arraste horizontalmente para ver todas as colunas →
+            </p>
+          </CardContent>
         </Card>
-    </div>
-  );
+      </div>
+    );
+  }
 }
 
 export default function Page() {
